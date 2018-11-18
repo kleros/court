@@ -14,8 +14,15 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "prettify": "kathari prettify",
+    "lint:styled": "kathari lint:styled",
+    "lint:js": "kathari lint:js --no-root",
+    "lint": "yarn run lint:styled && yarn run lint:js",
+    "test": "echo \"\"",
+    "cz": "kathari cz",
     "start": "react-scripts start",
-    "build": "react-scripts build"
+    "build": "react-scripts build",
+    "build:analyze": "source-map-explorer build/static/js/main.*"
   },
   "commitlint": {
     "extends": [
@@ -24,8 +31,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "./index.js precommit",
-      "commit-msg": "./index.js commitmsg"
+      "pre-commit": "kathari precommit",
+      "commit-msg": "kathari commitmsg"
     }
   },
   "browserslist": [
@@ -34,10 +41,18 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "devDependencies": {},
+  "devDependencies": {
+    "@kleros/kathari": "^0.14.0",
+    "husky": "^1.1.4",
+    "source-map-explorer": "^1.6.0",
+    "standard-version": "^4.4.0"
+  },
   "dependencies": {
+    "antd": "^3.10.8",
+    "polished": "^2.3.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
-    "react-scripts": "2.1.1"
+    "react-scripts": "2.1.1",
+    "styled-components": "^4.1.1"
   }
 }

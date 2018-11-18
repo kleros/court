@@ -1,12 +1,17 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { Button } from 'antd'
 
-ReactDOM.render(<App />, document.getElementById('root'));
+import styled from 'styled-components/macro'
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
-serviceWorker.unregister();
+import 'antd/dist/antd.css'
+
+const HelloWorld = styled(({ className }) => (
+  <div className={className}>
+    <Button type="primary">Hello World</Button>
+  </div>
+))`
+  border: 2px solid red;
+  width: 110px;
+`
+ReactDOM.render(<HelloWorld />, document.getElementById('root'))
