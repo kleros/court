@@ -1,0 +1,9 @@
+[build.environment]
+  YARN_FLAGS='--pure-lockfile'
+
+[context.production.environment]
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
