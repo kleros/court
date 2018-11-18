@@ -23,3 +23,12 @@ The Kleros court user interface.
 4.  Run `yarn` to install dependencies and then `yarn start` to start the dev server.
 
 ## Other Scripts
+
+- `yarn run prettify` - Apply prettier to the entire project.
+- `yarn run lint:styled` - Lint the entire project's .js files with styled components.
+- `yarn run lint:js` - Lint the entire project's .js files.
+- `yarn run lint:js --fix` - Fix fixable linting errors in .js files.
+- `yarn run lint` - Lint the entire project's .js files with styled components and .js files.
+- `yarn run cz` - Run commitizen.
+- `yarn run build` - Create a production build.
+- `yarn run build:analyze` - Analyze the production build using source-map-explorer.
