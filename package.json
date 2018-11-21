@@ -42,16 +42,18 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "@kleros/kathari": "^0.14.0",
+    "@kleros/kathari": "^0.15.2",
     "husky": "^1.1.4",
     "source-map-explorer": "^1.6.0",
     "standard-version": "^4.4.0"
   },
   "dependencies": {
     "antd": "^3.10.8",
+    "drizzle": "^1.2.4",
+    "drizzle-react": "^1.2.0",
     "polished": "^2.3.0",
-    "react": "^16.6.3",
-    "react-dom": "^16.6.3",
+    "react": "16.7.0-alpha.2",
+    "react-dom": "16.7.0-alpha.2",
     "react-scripts": "2.1.1",
     "styled-components": "^4.1.1"
   }
