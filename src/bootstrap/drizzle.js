@@ -17,6 +17,17 @@ const options = {
         42: { address: process.env.REACT_APP_PINAKION_KOVAN_ADDRESS }
       }
     }
-  ]
+  ],
+  events: { KlerosLiquid: ['NewPhase'] },
+  polls: {
+    accounts: 3000,
+    blocks: 3000
+  },
+  web3: {
+    fallback: {
+      type: 'ws',
+      url: process.env.REACT_APP_WEB3_FALLBACK_URL
+    }
+  }
 }
 export default new Drizzle(options, generateStore(options))
