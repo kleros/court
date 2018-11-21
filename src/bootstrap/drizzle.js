@@ -7,11 +7,15 @@ const options = {
   contracts: [
     {
       ...KlerosLiquid,
-      networks: { 42: { address: process.env.KLEROS_LIQUID_KOVAN_ADDRESS } }
+      networks: {
+        42: { address: process.env.REACT_APP_KLEROS_LIQUID_KOVAN_ADDRESS }
+      }
     },
     {
       ...Pinakion,
-      networks: { 42: { address: process.env.PINAKION_KOVAN_ADDRESS } }
+      networks: {
+        42: { address: process.env.REACT_APP_PINAKION_KOVAN_ADDRESS }
+      }
     }
   ]
 }
