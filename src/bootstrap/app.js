@@ -3,10 +3,9 @@ import { Helmet } from 'react-helmet'
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
 import Home from '../containers/home'
+import { DrizzleProvider, Initializer } from '../temp/drizzle-react-hooks'
 
 import drizzle from './drizzle'
-import { DrizzleProvider } from './drizzle-react'
-import Initializer from './initializer'
 
 import 'antd/dist/antd.css'
 
