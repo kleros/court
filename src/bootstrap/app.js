@@ -1,25 +1,22 @@
-import { Layout, Row, Col, Menu } from 'antd'
-import React from 'react'
-import { Helmet } from 'react-helmet'
-import { BrowserRouter, NavLink, Switch, Route } from 'react-router-dom'
-
-import { ReactComponent as Logo } from '../assets/images/logo.svg'
-import Home from '../containers/home'
+import '../components/theme.css'
+import { BrowserRouter, NavLink, Route, Switch } from 'react-router-dom'
+import { Col, Layout, Menu, Row } from 'antd'
 import { DrizzleProvider, Initializer } from '../temp/drizzle-react-hooks'
-
+import { Helmet } from 'react-helmet'
+import Home from '../containers/home'
+import { ReactComponent as Logo } from '../assets/images/logo.svg'
+import Notifications from '../components/notifications'
+import React from 'react'
 import drizzle from './drizzle'
-
 import styled from 'styled-components/macro'
 
-import '../components/theme.css'
-
-const StyledLogoCol = styled(Col)`
+const StyledCol = styled(Col)`
   line-height: 84px;
   text-align: center;
 `
 const StyledMenu = styled(Menu)`
   font-weight: bold;
-  line-height: 64px;
+  line-height: 64px !important;
   text-align: center;
 `
 export default () => (
@@ -37,9 +34,9 @@ export default () => (
           <Layout>
             <Layout.Header>
               <Row>
-                <StyledLogoCol span={4}>
+                <StyledCol span={4}>
                   <Logo />
-                </StyledLogoCol>
+                </StyledCol>
                 <Col span={16}>
                   <StyledMenu mode="horizontal" theme="dark">
                     <Menu.Item key="home">
@@ -62,9 +59,18 @@ export default () => (
                     </Menu.Item>
                   </StyledMenu>
                 </Col>
-                <StyledLogoCol span={4}>
-                  <Logo />
-                </StyledLogoCol>
+                <StyledCol span={4}>
+                  <Notifications
+                    notifications={[
+                      {
+                        date: new Date(),
+                        message: 'Message',
+                        to: '/',
+                        type: 'info'
+                      }
+                    ]}
+                  />
+                </StyledCol>
               </Row>
             </Layout.Header>
             <Layout.Content>

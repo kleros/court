@@ -1,12 +1,12 @@
-import PropTypes from 'prop-types'
 import React, {
   createContext,
-  useContext,
-  useState,
   useCallback,
+  useContext,
   useEffect,
-  useMemo
+  useMemo,
+  useState
 } from 'react'
+import PropTypes from 'prop-types'
 
 const Context = createContext()
 export const useDrizzle = () => useContext(Context)

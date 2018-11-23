@@ -1675,17 +1675,17 @@ mark {
   color: unset;
 }
 .ant-badge-count {
-  top: -10px;
-  height: 20px;
-  border-radius: 10px;
-  min-width: 20px;
+  top: -7.5px;
+  height: 15px;
+  border-radius: 7.5px;
+  min-width: 15px;
   background: #f5222d;
   color: #fff;
-  line-height: 20px;
+  line-height: 15px;
   text-align: center;
   padding: 0 6px;
   font-size: 12px;
-  font-weight: normal;
+  font-weight: bold;
   white-space: nowrap;
   box-shadow: 0 0 0 1px #fff;
   z-index: 10;
@@ -1698,9 +1698,9 @@ mark {
   padding: 0 8px;
 }
 .ant-badge-dot {
-  top: -3px;
-  height: 6px;
-  width: 6px;
+  top: -2px;
+  height: 4px;
+  width: 4px;
   border-radius: 100%;
   background: #f5222d;
   z-index: 10;
@@ -1718,8 +1718,8 @@ mark {
   vertical-align: baseline;
 }
 .ant-badge-status-dot {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
   display: inline-block;
   border-radius: 50%;
   vertical-align: middle;
@@ -1794,10 +1794,10 @@ mark {
 .ant-scroll-number-only {
   display: inline-block;
   transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-  height: 20px;
+  height: 15px;
 }
 .ant-scroll-number-only > p {
-  height: 20px;
+  height: 15px;
   margin: 0;
 }
 @keyframes antZoomBadgeIn {

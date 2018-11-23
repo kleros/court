@@ -1,5 +1,4 @@
 import { Drizzle, generateStore } from 'drizzle'
-
 import KlerosLiquid from '../assets/contracts/kleros-liquid.json'
 import Pinakion from '../assets/contracts/pinakion.json'
 

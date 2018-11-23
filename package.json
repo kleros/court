@@ -22,7 +22,8 @@
     "cz": "kathari cz",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "build:analyze": "source-map-explorer build/static/js/main.*"
+    "build:analyze": "source-map-explorer build/static/js/main.*",
+    "build:theme": "lessc --js ./src/components/theme.less ./src/components/theme.css"
   },
   "commitlint": {
     "extends": [
@@ -42,8 +43,9 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "@kleros/kathari": "^0.16.0",
+    "@kleros/kathari": "^0.18.0",
     "husky": "^1.1.4",
+    "less": "^3.8.1",
     "source-map-explorer": "^1.6.0",
     "standard-version": "^4.4.0"
   },
