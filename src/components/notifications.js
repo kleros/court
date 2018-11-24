@@ -1,9 +1,23 @@
-import { Badge, Popover } from 'antd'
-import { ReactComponent as Bell } from '../assets/images/bell.svg'
+import { Badge, List, Popover } from 'antd'
+import { ReactComponent as Bell } from '../assets/icons/bell.svg'
+import { ReactComponent as Info } from '../assets/icons/info.svg'
 import { NavLink } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import React from 'react'
 import styled from 'styled-components/macro'
+
+const Notification = ({ date: _date, message, to: _to, type }) => (
+  <List.Item>
+    <List.Item.Meta avatar={<Info className={type} />} description={message} />
+  </List.Item>
+)
+
+Notification.propTypes = {
+  date: PropTypes.instanceOf(Date).isRequired,
+  message: PropTypes.string.isRequired,
+  to: PropTypes.string.isRequired,
+  type: PropTypes.oneOf(['info', 'error', 'warning']).isRequired
+}
 
 const StyledNavLink = styled(NavLink)`
   float: right;
@@ -19,13 +33,13 @@ const StyledBadge = styled(Badge)`
 `
 const Notifications = ({ notifications }) => (
   <Popover
-    visible
+    content={<List dataSource={notifications} renderItem={Notification} />}
     title={
       <>
         Notifications <StyledNavLink to="/notifications">History</StyledNavLink>
       </>
     }
-    content={notifications.map(n => n.to)}
+    visible
   >
     <StyledBadge count={3}>
       <Bell />

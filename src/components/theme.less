@@ -532,3 +532,31 @@
 @list-item-meta-margin-bottom: @padding-md;
 @list-item-meta-avatar-margin-right: @padding-md;
 @list-item-meta-title-margin-bottom: @padding-sm;
+
+// Themed Icons
+svg {
+  &.primary .colored-icon {
+    fill: @primary-color !important;
+  }
+  &.info .colored-icon {
+    fill: @info-color !important;
+  }
+  &.success .colored-icon {
+    fill: @success-color !important;
+  }
+  &.processing .colored-icon {
+    fill: @processing-color !important;
+  }
+  &.error .colored-icon {
+    fill: @error-color !important;
+  }
+  &.highlight .colored-icon {
+    fill: @highlight-color !important;
+  }
+  &.warning .colored-icon {
+    fill: @warning-color !important;
+  }
+  &.normal .colored-icon {
+    fill: @normal-color !important;
+  }
+}

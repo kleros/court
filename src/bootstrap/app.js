@@ -19,6 +19,36 @@ const StyledMenu = styled(Menu)`
   line-height: 64px !important;
   text-align: center;
 `
+const notifications = [
+  {
+    date: new Date(),
+    message:
+      'Congratulations! You have been drawn as a juror to a case on Air Transport court.',
+    to: '/',
+    type: 'info'
+  },
+  {
+    date: new Date(),
+    message:
+      'Attention! You have 6h to vote on the case #127464 at Air Transport court.',
+    to: '/',
+    type: 'error'
+  },
+  {
+    date: new Date(),
+    message:
+      'Attention! You have 24h to vote on the case #127464 at Air Transport court.',
+    to: '/',
+    type: 'warning'
+  },
+  {
+    date: new Date(),
+    message:
+      'Congratulations! You have been drawn as a juror to a case on Air Transport court.',
+    to: '/',
+    type: 'info'
+  }
+]
 export default () => (
   <>
     <Helmet>
@@ -60,27 +90,18 @@ export default () => (
                   </StyledMenu>
                 </Col>
                 <StyledCol span={4}>
-                  <Notifications
-                    notifications={[
-                      {
-                        date: new Date(),
-                        message: 'Message',
-                        to: '/',
-                        type: 'info'
-                      }
-                    ]}
-                  />
+                  <Notifications notifications={notifications} />
                 </StyledCol>
               </Row>
             </Layout.Header>
             <Layout.Content>
               <Switch>
-                <Route exact path="/" component={Home} />
-                <Route exact path="/courts" component={Home} />
-                <Route exact path="/cases" component={Home} />
-                <Route exact path="/tokens" component={Home} />
-                <Route exact path="/governance" component={Home} />
-                <Route exact path="/guide" component={Home} />
+                <Route component={Home} exact path="/" />
+                <Route component={Home} exact path="/courts" />
+                <Route component={Home} exact path="/cases" />
+                <Route component={Home} exact path="/tokens" />
+                <Route component={Home} exact path="/governance" />
+                <Route component={Home} exact path="/guide" />
               </Switch>
             </Layout.Content>
           </Layout>

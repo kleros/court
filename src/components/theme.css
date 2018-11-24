@@ -18588,3 +18588,27 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
     opacity: 0;
   }
 }
+svg.primary .colored-icon {
+  fill: #1890ff !important;
+}
+svg.info .colored-icon {
+  fill: #1890ff !important;
+}
+svg.success .colored-icon {
+  fill: #52c41a !important;
+}
+svg.processing .colored-icon {
+  fill: #1890ff !important;
+}
+svg.error .colored-icon {
+  fill: #f5222d !important;
+}
+svg.highlight .colored-icon {
+  fill: #f5222d !important;
+}
+svg.warning .colored-icon {
+  fill: #faad14 !important;
+}
+svg.normal .colored-icon {
+  fill: #d9d9d9 !important;
+}
