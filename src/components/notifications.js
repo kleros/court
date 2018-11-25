@@ -18,6 +18,7 @@ const StyledListItem = styled(List.Item)`
 
     &-title {
       font-weight: normal;
+      line-height: 16px;
     }
 
     &-description {
@@ -32,7 +33,7 @@ const Notification = ({ date, message, to: _to, type }) => (
   <StyledListItem>
     <List.Item.Meta
       avatar={<Info className={type} />}
-      description={<TimeAgo>{date}</TimeAgo>}
+      description={<TimeAgo className={type}>{date}</TimeAgo>}
       title={message}
     />
   </StyledListItem>

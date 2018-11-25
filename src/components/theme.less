@@ -533,30 +533,49 @@
 @list-item-meta-avatar-margin-right: @padding-md;
 @list-item-meta-title-margin-bottom: @padding-sm;
 
-// Themed Icons
-svg {
-  &.primary .colored-icon {
-    fill: @primary-color !important;
-  }
-  &.info .colored-icon {
-    fill: @info-color !important;
-  }
-  &.success .colored-icon {
-    fill: @success-color !important;
-  }
-  &.processing .colored-icon {
-    fill: @processing-color !important;
-  }
-  &.error .colored-icon {
-    fill: @error-color !important;
-  }
-  &.highlight .colored-icon {
-    fill: @highlight-color !important;
-  }
-  &.warning .colored-icon {
-    fill: @warning-color !important;
-  }
-  &.normal .colored-icon {
-    fill: @normal-color !important;
-  }
+// Theme Colored
+.primary .theme-colored,
+.primary time {
+  color: @primary-color !important;
+  fill: @primary-color !important;
+}
+.info .theme-colored,
+.info time {
+  color: @info-color !important;
+  fill: @info-color !important;
+}
+.success .theme-colored,
+.success time {
+  color: @success-color !important;
+  fill: @success-color !important;
+}
+.processing .theme-colored,
+.processing time {
+  color: @processing-color !important;
+  fill: @processing-color !important;
+}
+.error .theme-colored,
+.error time {
+  color: @error-color !important;
+  fill: @error-color !important;
+}
+.highlight .theme-colored,
+.highlight time {
+  color: @highlight-color !important;
+  fill: @highlight-color !important;
+}
+.warning .theme-colored,
+.warning time {
+  color: @warning-color !important;
+  fill: @warning-color !important;
+}
+.normal .theme-colored,
+.normal time {
+  color: @normal-color !important;
+  fill: @normal-color !important;
+}
+
+// Time Ago Tooltip
+.rrui__tooltip {
+  z-index: 2000;
 }

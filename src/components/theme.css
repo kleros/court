@@ -18588,27 +18588,46 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
     opacity: 0;
   }
 }
-svg.primary .colored-icon {
+.primary .theme-colored,
+.primary time {
+  color: #1890ff !important;
   fill: #1890ff !important;
 }
-svg.info .colored-icon {
+.info .theme-colored,
+.info time {
+  color: #1890ff !important;
   fill: #1890ff !important;
 }
-svg.success .colored-icon {
+.success .theme-colored,
+.success time {
+  color: #52c41a !important;
   fill: #52c41a !important;
 }
-svg.processing .colored-icon {
+.processing .theme-colored,
+.processing time {
+  color: #1890ff !important;
   fill: #1890ff !important;
 }
-svg.error .colored-icon {
+.error .theme-colored,
+.error time {
+  color: #f5222d !important;
   fill: #f5222d !important;
 }
-svg.highlight .colored-icon {
+.highlight .theme-colored,
+.highlight time {
+  color: #f5222d !important;
   fill: #f5222d !important;
 }
-svg.warning .colored-icon {
+.warning .theme-colored,
+.warning time {
+  color: #faad14 !important;
   fill: #faad14 !important;
 }
-svg.normal .colored-icon {
+.normal .theme-colored,
+.normal time {
+  color: #d9d9d9 !important;
   fill: #d9d9d9 !important;
+}
+.rrui__tooltip {
+  z-index: 2000;
 }
