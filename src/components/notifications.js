@@ -29,13 +29,15 @@ const StyledListItem = styled(List.Item)`
     }
   }
 `
-const Notification = ({ date, message, to: _to, type }) => (
+const Notification = ({ date, message, to, type }) => (
   <StyledListItem>
-    <List.Item.Meta
-      avatar={<Info className={type} />}
-      description={<TimeAgo className={type}>{date}</TimeAgo>}
-      title={message}
-    />
+    <NavLink to={to}>
+      <List.Item.Meta
+        avatar={<Info className={type} />}
+        description={<TimeAgo className={type}>{date}</TimeAgo>}
+        title={message}
+      />
+    </NavLink>
   </StyledListItem>
 )
 
@@ -46,6 +48,12 @@ Notification.propTypes = {
   type: PropTypes.oneOf(['info', 'error', 'warning']).isRequired
 }
 
+const StyledList = styled(List)`
+  margin-right: -16px;
+  max-height: 380px;
+  overflow-y: scroll;
+  padding-right: 16px;
+`
 const StyledNavLink = styled(NavLink)`
   float: right;
   font-size: 10px;
@@ -61,7 +69,9 @@ const StyledBadge = styled(Badge)`
 const Notifications = ({ notifications }) => (
   <Popover
     arrowPointAtCenter
-    content={<List dataSource={notifications} renderItem={Notification} />}
+    content={
+      <StyledList dataSource={notifications} renderItem={Notification} />
+    }
     placement="bottomRight"
     title={
       <>
