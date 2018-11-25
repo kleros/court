@@ -4,12 +4,38 @@ import { ReactComponent as Info } from '../assets/icons/info.svg'
 import { NavLink } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import React from 'react'
+import TimeAgo from './time-ago'
 import styled from 'styled-components/macro'
 
-const Notification = ({ date: _date, message, to: _to, type }) => (
-  <List.Item>
-    <List.Item.Meta avatar={<Info className={type} />} description={message} />
-  </List.Item>
+const StyledListItem = styled(List.Item)`
+  max-width: 358px;
+  padding: 11px 17px 23px 18px;
+  position: relative;
+
+  .ant-list-item-meta {
+    align-items: center;
+    display: flex;
+
+    &-title {
+      font-weight: normal;
+    }
+
+    &-description {
+      bottom: 4px;
+      font-weight: bold;
+      position: absolute;
+      right: 6px;
+    }
+  }
+`
+const Notification = ({ date, message, to: _to, type }) => (
+  <StyledListItem>
+    <List.Item.Meta
+      avatar={<Info className={type} />}
+      description={<TimeAgo>{date}</TimeAgo>}
+      title={message}
+    />
+  </StyledListItem>
 )
 
 Notification.propTypes = {
@@ -25,7 +51,7 @@ const StyledNavLink = styled(NavLink)`
   line-height: 21px;
 `
 const StyledBadge = styled(Badge)`
-  sup {
+  .ant-badge-count {
     background: #009aff;
     box-shadow: 0 0 0 1px #1e075f;
     padding: 0 4px;
@@ -33,7 +59,9 @@ const StyledBadge = styled(Badge)`
 `
 const Notifications = ({ notifications }) => (
   <Popover
+    arrowPointAtCenter
     content={<List dataSource={notifications} renderItem={Notification} />}
+    placement="bottomRight"
     title={
       <>
         Notifications <StyledNavLink to="/notifications">History</StyledNavLink>

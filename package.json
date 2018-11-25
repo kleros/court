@@ -52,6 +52,7 @@
   "dependencies": {
     "antd": "^3.10.8",
     "drizzle": "^1.2.4",
+    "javascript-time-ago": "^1.0.32",
     "polished": "^2.3.0",
     "prop-types": "^15.6.2",
     "react": "16.7.0-alpha.2",
@@ -59,6 +60,7 @@
     "react-helmet": "^5.2.0",
     "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.1",
+    "react-time-ago": "^3.0.3",
     "styled-components": "^4.1.1"
   }
 }
