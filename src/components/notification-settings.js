@@ -68,6 +68,7 @@ const NotificationSettings = ({ settings }) => (
     content={<NotificationSettingsForm settings={settings} />}
     placement="bottomRight"
     title="Notification Settings"
+    trigger="click"
   >
     <Mail />
   </Popover>

@@ -78,6 +78,7 @@ const Notifications = ({ notifications }) => (
         Notifications <StyledNavLink to="/notifications">History</StyledNavLink>
       </>
     }
+    trigger="click"
   >
     <StyledBadge count={notifications.length}>
       <Bell />
