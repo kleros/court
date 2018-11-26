@@ -5,14 +5,17 @@ import { DrizzleProvider, Initializer } from '../temp/drizzle-react-hooks'
 import { Helmet } from 'react-helmet'
 import Home from '../containers/home'
 import { ReactComponent as Logo } from '../assets/images/logo.svg'
+import NotificationSettings from '../components/notification-settings'
 import Notifications from '../components/notifications'
 import React from 'react'
 import drizzle from './drizzle'
 import styled from 'styled-components/macro'
 
 const StyledCol = styled(Col)`
-  line-height: 84px;
-  text-align: center;
+  align-items: center;
+  display: flex;
+  height: 64px;
+  justify-content: space-evenly;
 `
 const StyledMenu = styled(Menu)`
   font-weight: bold;
@@ -91,6 +94,7 @@ export default () => (
                 </Col>
                 <StyledCol span={4}>
                   <Notifications notifications={notifications} />
+                  <NotificationSettings />
                 </StyledCol>
               </Row>
             </Layout.Header>
