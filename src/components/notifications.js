@@ -78,9 +78,8 @@ const Notifications = ({ notifications }) => (
         Notifications <StyledNavLink to="/notifications">History</StyledNavLink>
       </>
     }
-    visible
   >
-    <StyledBadge count={3}>
+    <StyledBadge count={notifications.length}>
       <Bell />
     </StyledBadge>
   </Popover>

@@ -68,7 +68,6 @@ const NotificationSettings = ({ settings }) => (
     content={<NotificationSettingsForm settings={settings} />}
     placement="bottomRight"
     title="Notification Settings"
-    visible
   >
     <Mail />
   </Popover>
