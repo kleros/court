@@ -52,6 +52,13 @@ const notifications = [
     type: 'info'
   }
 ]
+const settings = {
+  appeal: 'When a case I ruled is appealed.',
+  draw: 'When I am drawn as a juror.',
+  key: 'court',
+  lose: 'When I lose tokens.',
+  win: 'When I win arbitration fees.'
+}
 export default () => (
   <>
     <Helmet>
@@ -94,7 +101,7 @@ export default () => (
                 </Col>
                 <StyledCol span={4}>
                   <Notifications notifications={notifications} />
-                  <NotificationSettings />
+                  <NotificationSettings settings={settings} />
                 </StyledCol>
               </Row>
             </Layout.Header>
