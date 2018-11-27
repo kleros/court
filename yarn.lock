@@ -1055,10 +1055,10 @@
     log-update "^2.3.0"
     strip-ansi "^3.0.1"
 
-"@kleros/kathari@^0.19.0":
-  version "0.19.0"
-  resolved "https://registry.yarnpkg.com/@kleros/kathari/-/kathari-0.19.0.tgz#9a63a5f397092dc82aa165395f5c12f3460c5cb1"
-  integrity sha512-Lb/s5/Lpte38NFFopwZoZTBbo15olIAvrmY+0UqhOz15FxYQqbWy5nXZuu++8orOgh5/LYv7Qnx70vGmg/tobw==
+"@kleros/kathari@^0.20.0":
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/@kleros/kathari/-/kathari-0.20.0.tgz#ebab34f12071ea3e7f46daa2208e82c86484afe3"
+  integrity sha512-MK2sVCO2StclXdZWXZlF9hjyHaWpyRTXdVxuxLv5d/Rcy9InShQM0pFPB28gqCO6/B53WIZKYGzRHPy7MZvBLg==
   dependencies:
     "@commitlint/cli" "^7.2.1"
     "@commitlint/config-conventional" "^7.1.2"

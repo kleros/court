@@ -1,4 +1,4 @@
-import { Button, Checkbox, Divider, Form, Input, Popover } from 'antd'
+import { Alert, Button, Checkbox, Divider, Form, Input, Popover } from 'antd'
 import React, { useCallback, useState } from 'react'
 import { ReactComponent as Mail } from '../assets/icons/mail.svg'
 import PropTypes from 'prop-types'
@@ -22,7 +22,7 @@ const NotificationSettingsForm = Form.create()(
                 const settings = {
                   email: { S: email },
                   fullName: { S: fullName },
-                  phone: { S: phone || '' },
+                  phone: { S: phone || ' ' },
                   ...Object.keys(rest).reduce((acc, v) => {
                     acc[
                       `${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(
@@ -35,7 +35,7 @@ const NotificationSettingsForm = Form.create()(
                   }, {})
                 }
                 try {
-                  const res = await (await fetch(
+                  await (await fetch(
                     process.env.REACT_APP_PATCH_USER_SETTINGS_URL,
                     {
                       body: JSON.stringify({
@@ -52,9 +52,10 @@ const NotificationSettingsForm = Form.create()(
                       method: 'PATCH'
                     }
                   )).json()
-                  console.log(res)
+                  setStatus('success')
                 } catch (err2) {
                   console.error(err2)
+                  setStatus('error')
                 }
               }
             })
@@ -101,6 +102,19 @@ const NotificationSettingsForm = Form.create()(
         >
           Save
         </Button>
+        <Divider />
+        {status && status !== 'loading' && (
+          <Alert
+            closable
+            message={
+              status === 'success'
+                ? 'Saved settings.'
+                : 'Failed to save settings.'
+            }
+            showIcon
+            type={status}
+          />
+        )}
       </Form>
     )
   })`
