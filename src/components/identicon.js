@@ -35,12 +35,20 @@ const Identicon = ({ large, pinakion }) => {
         <List>
           <List.Item>
             <List.Item.Meta
-              description={`${drizzleState.accounts[0].slice(
-                0,
-                6
-              )}...${drizzleState.accounts[0].slice(
-                drizzleState.accounts[0].length - 4
-              )}`}
+              description={
+                <a
+                  href={`https://etherscan.io/address/${
+                    drizzleState.accounts[0]
+                  }`}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  {drizzleState.accounts[0].slice(0, 6)}...
+                  {drizzleState.accounts[0].slice(
+                    drizzleState.accounts[0].length - 4
+                  )}
+                </a>
+              }
               title="Address"
             />
           </List.Item>
