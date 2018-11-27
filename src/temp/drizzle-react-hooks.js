@@ -17,13 +17,25 @@ export const DrizzleProvider = ({ children, drizzle }) => {
     drizzleStatus: { initialized: false },
     web3: { status: 'initializing' }
   })
+  const cacheCall = useCallback(
+    (contractName, methodName, ...args) => {
+      const cacheKey = drizzle.contracts[contractName].methods[
+        methodName
+      ].cacheCall(...args)
+      return (
+        drizzleState.contracts[contractName][methodName][cacheKey] &&
+        drizzleState.contracts[contractName][methodName][cacheKey].value
+      )
+    },
+    [drizzle, drizzleState]
+  )
   const setAndCacheDrizzleState = useCallback(newDrizzleState => {
     setDrizzleState(newDrizzleState)
     localStorage.setItem(
       newDrizzleState.accounts[0],
       JSON.stringify(newDrizzleState)
     )
-  })
+  }, [])
   useEffect(
     () => {
       const cachedDrizzleState = JSON.parse(
@@ -44,11 +56,12 @@ export const DrizzleProvider = ({ children, drizzle }) => {
     <Context.Provider
       value={useMemo(
         () => ({
+          cacheCall,
           drizzle,
           drizzleState,
           setDrizzleState: setAndCacheDrizzleState
         }),
-        [drizzle, drizzleState, setAndCacheDrizzleState]
+        [cacheCall, drizzle, drizzleState, setAndCacheDrizzleState]
       )}
     >
       {children}

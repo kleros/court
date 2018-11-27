@@ -4,6 +4,7 @@ import { Col, Layout, Menu, Row } from 'antd'
 import { DrizzleProvider, Initializer } from '../temp/drizzle-react-hooks'
 import { Helmet } from 'react-helmet'
 import Home from '../containers/home'
+import Identicon from '../components/identicon'
 import { ReactComponent as Logo } from '../assets/images/logo.svg'
 import NotificationSettings from '../components/notification-settings'
 import Notifications from '../components/notifications'
@@ -102,6 +103,7 @@ export default () => (
                 <StyledCol span={4}>
                   <Notifications notifications={notifications} />
                   <NotificationSettings settings={settings} />
+                  <Identicon pinakion />
                 </StyledCol>
               </Row>
             </Layout.Header>
