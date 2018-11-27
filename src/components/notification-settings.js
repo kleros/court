@@ -60,7 +60,7 @@ const NotificationSettingsForm = Form.create()(
               }
             })
           },
-          [form.validateFieldsAndScroll]
+          [form.validateFieldsAndScroll, drizzleState.accounts[0]]
         )}
       >
         <Divider>I wish to be notified when:</Divider>
