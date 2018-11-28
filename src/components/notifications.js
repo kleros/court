@@ -61,8 +61,6 @@ const StyledNavLink = styled(NavLink)`
 `
 const StyledBadge = styled(Badge)`
   .ant-badge-count {
-    background: #009aff;
-    box-shadow: 0 0 0 1px #1e075f;
     padding: 0 4px;
   }
 `

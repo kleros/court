@@ -213,7 +213,7 @@
 
 // Layout
 @layout-body-background : #f0f2f5;
-@layout-header-background : #1E075F;
+@layout-header-background : #1e075f;
 @layout-footer-background : @layout-body-background;
 @layout-header-height : 64px;
 @layout-header-padding : 0 50px;
@@ -533,6 +533,12 @@
 @list-item-meta-margin-bottom: @padding-md;
 @list-item-meta-avatar-margin-right: @padding-md;
 @list-item-meta-title-margin-bottom: @padding-sm;
+
+// Custom Overrides
+.ant-badge-count {
+  background: @primary-color;
+  box-shadow: 0 0 0 1px @layout-header-background;
+}
 
 // Theme Colored
 .primary .theme-colored,

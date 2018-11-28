@@ -34,14 +34,14 @@ const notifications = [
   {
     date: new Date(),
     message:
-      'Attention! You have 6h to vote on the case #127464 at Air Transport court.',
+      'Attention! You have 6h to vote on the case number 127464 at Air Transport court.',
     to: '/',
     type: 'error'
   },
   {
     date: new Date(),
     message:
-      'Attention! You have 24h to vote on the case #127464 at Air Transport court.',
+      'Attention! You have 24h to vote on the case number 127464 at Air Transport court.',
     to: '/',
     type: 'warning'
   },
