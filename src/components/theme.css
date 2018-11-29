@@ -18592,45 +18592,59 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
   background: #009aff;
   box-shadow: 0 0 0 1px #1e075f;
 }
-.primary .theme-colored,
-.primary time {
-  color: #009aff !important;
-  fill: #009aff !important;
+.normal .theme-fill {
+  fill: #d9d9d9;
 }
-.info .theme-colored,
-.info time {
-  color: #009aff !important;
-  fill: #009aff !important;
-}
-.success .theme-colored,
-.success time {
-  color: #52c41a !important;
-  fill: #52c41a !important;
-}
-.processing .theme-colored,
-.processing time {
-  color: #009aff !important;
-  fill: #009aff !important;
-}
-.error .theme-colored,
-.error time {
-  color: #f5222d !important;
-  fill: #f5222d !important;
-}
-.highlight .theme-colored,
-.highlight time {
-  color: #f5222d !important;
-  fill: #f5222d !important;
-}
-.warning .theme-colored,
-.warning time {
-  color: #faad14 !important;
-  fill: #faad14 !important;
-}
-.normal .theme-colored,
 .normal time {
-  color: #d9d9d9 !important;
-  fill: #d9d9d9 !important;
+  color: #d9d9d9;
+}
+.warning .theme-fill {
+  fill: #faad14;
+}
+.warning time {
+  color: #faad14;
+}
+.highlight .theme-fill {
+  fill: #f5222d;
+}
+.highlight time {
+  color: #f5222d;
+}
+.error .theme-fill {
+  fill: #f5222d;
+}
+.error time {
+  color: #f5222d;
+}
+.processing .theme-fill {
+  fill: #009aff;
+}
+.processing time {
+  color: #009aff;
+}
+.success .theme-fill {
+  fill: #52c41a;
+}
+.success time {
+  color: #52c41a;
+}
+.info .theme-fill {
+  fill: #009aff;
+}
+.info time {
+  color: #009aff;
+}
+.secondary .theme-fill {
+  fill: #1e075f;
+}
+.secondary time {
+  color: #1e075f;
+}
+.primary .theme-fill {
+  fill: #009aff;
+}
+.primary time {
+  color: #009aff;
 }
 .rrui__tooltip {
   z-index: 2000;

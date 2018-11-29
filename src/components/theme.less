@@ -3,6 +3,7 @@
 // -------- Colors -----------
 @blue-6 : #009aff;
 @primary-color : @blue-6;
+@secondary-color : #1e075f;
 @info-color : @blue-6;
 @success-color : @green-6;
 @processing-color : @blue-6;
@@ -213,7 +214,7 @@
 
 // Layout
 @layout-body-background : #f0f2f5;
-@layout-header-background : #1e075f;
+@layout-header-background : @secondary-color;
 @layout-footer-background : @layout-body-background;
 @layout-header-height : 64px;
 @layout-header-padding : 0 50px;
@@ -541,46 +542,22 @@
 }
 
 // Theme Colored
-.primary .theme-colored,
-.primary time {
-  color: @primary-color !important;
-  fill: @primary-color !important;
+@theme-colors: primary, secondary, info, success, processing, error, highlight,
+  warning, normal;
+.loop(@i : length(@theme-colors)) when (@i > 0) {
+  @name: extract(@theme-colors, @i);
+  @theme-color: ~'@{@{name}-color}';
+  .@{name} {
+    .theme-fill {
+      fill: @theme-color;
+    }
+    time {
+      color: @theme-color;
+    }
+  }
+  .loop(@i - 1);
 }
-.info .theme-colored,
-.info time {
-  color: @info-color !important;
-  fill: @info-color !important;
-}
-.success .theme-colored,
-.success time {
-  color: @success-color !important;
-  fill: @success-color !important;
-}
-.processing .theme-colored,
-.processing time {
-  color: @processing-color !important;
-  fill: @processing-color !important;
-}
-.error .theme-colored,
-.error time {
-  color: @error-color !important;
-  fill: @error-color !important;
-}
-.highlight .theme-colored,
-.highlight time {
-  color: @highlight-color !important;
-  fill: @highlight-color !important;
-}
-.warning .theme-colored,
-.warning time {
-  color: @warning-color !important;
-  fill: @warning-color !important;
-}
-.normal .theme-colored,
-.normal time {
-  color: @normal-color !important;
-  fill: @normal-color !important;
-}
+.loop();
 
 // Time Ago Tooltip
 .rrui__tooltip {
