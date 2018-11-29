@@ -18646,6 +18646,9 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 .primary time {
   color: #009aff;
 }
+.secondary .theme-linear-background {
+  background: linear-gradient(to left, #1e075f, #4004a3);
+}
 .rrui__tooltip {
   z-index: 2000;
 }
