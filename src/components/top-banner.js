@@ -4,6 +4,9 @@ import React from 'react'
 import { ReactComponent as Underline } from '../assets/icons/underline.svg'
 import styled from 'styled-components/macro'
 
+const StyledCard = styled(Card)`
+  margin: 0 -9.375vw 28px;
+`
 const StyledRow = styled(Row)`
   line-height: 32px;
 `
@@ -16,7 +19,7 @@ const StyledUnderline = styled(Underline)`
   position: absolute;
 `
 const TopBanner = ({ description, extra, title }) => (
-  <Card>
+  <StyledCard>
     <StyledRow>
       <StyledTitleCol offset={2} span={6}>
         {title}
@@ -25,7 +28,7 @@ const TopBanner = ({ description, extra, title }) => (
       <Col span={12}>{description}</Col>
       <Col span={4}>{extra}</Col>
     </StyledRow>
-  </Card>
+  </StyledCard>
 )
 
 TopBanner.propTypes = {

@@ -23,6 +23,10 @@ const StyledMenu = styled(Menu)`
   line-height: 64px !important;
   text-align: center;
 `
+const StyledLayoutContent = styled(Layout.Content)`
+  background: white;
+  padding: 0 9.375vw;
+`
 const notifications = [
   {
     date: new Date(),
@@ -107,7 +111,7 @@ export default () => (
                 </StyledCol>
               </Row>
             </Layout.Header>
-            <Layout.Content>
+            <StyledLayoutContent>
               <Switch>
                 <Route component={Home} exact path="/" />
                 <Route component={Home} exact path="/courts" />
@@ -116,7 +120,7 @@ export default () => (
                 <Route component={Home} exact path="/governance" />
                 <Route component={Home} exact path="/guide" />
               </Switch>
-            </Layout.Content>
+            </StyledLayoutContent>
           </Layout>
         </BrowserRouter>
       </Initializer>

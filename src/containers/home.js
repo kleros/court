@@ -1,5 +1,6 @@
 import { Button } from 'antd'
 import { ReactComponent as DarkLogo } from '../assets/images/dark-logo.svg'
+import PNKBalanceCard from '../components/pnk-balance-card'
 import React from 'react'
 import TopBanner from '../components/top-banner'
 import WelcomeCard from '../components/welcome-card'
@@ -21,5 +22,6 @@ export default () => (
       text="Welcome"
       version={`Athena release ${version}`}
     />
+    <PNKBalanceCard />
   </>
 )
