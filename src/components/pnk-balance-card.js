@@ -111,6 +111,4 @@ const PNKBalanceCard = () => {
   )
 }
 
-PNKBalanceCard.propTypes = {}
-
 export default PNKBalanceCard
