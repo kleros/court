@@ -1,4 +1,6 @@
 import { List, Popover, Spin } from 'antd'
+import ETHAddress from './eth-address'
+import ETHAmount from './eth-amount'
 import PropTypes from 'prop-types'
 import React from 'react'
 import ReactBlockies from 'react-blockies'
@@ -12,7 +14,7 @@ const StyledReactBlockies = styled(ReactBlockies)`
   border-radius: ${({ large }) => (large ? '4' : '16')}px;
 `
 const Identicon = ({ large, pinakion }) => {
-  const { cacheCall, drizzle, drizzleState } = useDrizzle()
+  const { cacheCall, drizzleState } = useDrizzle()
   let PNK
   if (pinakion)
     PNK = cacheCall('MiniMeTokenERC20', 'balanceOf', drizzleState.accounts[0])
@@ -35,30 +37,19 @@ const Identicon = ({ large, pinakion }) => {
         <List>
           <List.Item>
             <List.Item.Meta
-              description={
-                <a
-                  href={`https://etherscan.io/address/${
-                    drizzleState.accounts[0]
-                  }`}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  {drizzleState.accounts[0].slice(0, 6)}...
-                  {drizzleState.accounts[0].slice(
-                    drizzleState.accounts[0].length - 4
-                  )}
-                </a>
-              }
+              description={<ETHAddress address={drizzleState.accounts[0]} />}
               title="Address"
             />
           </List.Item>
           <List.Item>
             <List.Item.Meta
-              description={Number(
-                drizzle.web3.utils.fromWei(
-                  drizzleState.accountBalances[drizzleState.accounts[0]]
-                )
-              ).toFixed(4)}
+              description={
+                <ETHAmount
+                  amount={
+                    drizzleState.accountBalances[drizzleState.accounts[0]]
+                  }
+                />
+              }
               title="ETH"
             />
           </List.Item>
@@ -71,11 +62,7 @@ const Identicon = ({ large, pinakion }) => {
             >
               <List.Item>
                 <List.Item.Meta
-                  description={
-                    PNK
-                      ? Number(drizzle.web3.utils.fromWei(PNK)).toFixed(4)
-                      : '...'
-                  }
+                  description={<ETHAmount amount={PNK} />}
                   title="PNK"
                 />
               </List.Item>
