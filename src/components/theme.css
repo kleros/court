@@ -18592,57 +18592,133 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
   background: #009aff;
   box-shadow: 0 0 0 1px #1e075f;
 }
+.normal.theme-fill,
 .normal .theme-fill {
   fill: #d9d9d9;
 }
+.normal.theme-stroke,
+.normal .theme-stroke {
+  stroke: #d9d9d9;
+}
+.normal.theme-color,
+.normal .theme-color,
 .normal time {
   color: #d9d9d9;
 }
+.warning.theme-fill,
 .warning .theme-fill {
   fill: #faad14;
 }
+.warning.theme-stroke,
+.warning .theme-stroke {
+  stroke: #faad14;
+}
+.warning.theme-color,
+.warning .theme-color,
 .warning time {
   color: #faad14;
 }
+.highlight.theme-fill,
 .highlight .theme-fill {
   fill: #f5222d;
 }
+.highlight.theme-stroke,
+.highlight .theme-stroke {
+  stroke: #f5222d;
+}
+.highlight.theme-color,
+.highlight .theme-color,
 .highlight time {
   color: #f5222d;
 }
+.error.theme-fill,
 .error .theme-fill {
   fill: #f5222d;
 }
+.error.theme-stroke,
+.error .theme-stroke {
+  stroke: #f5222d;
+}
+.error.theme-color,
+.error .theme-color,
 .error time {
   color: #f5222d;
 }
+.processing.theme-fill,
 .processing .theme-fill {
   fill: #009aff;
 }
+.processing.theme-stroke,
+.processing .theme-stroke {
+  stroke: #009aff;
+}
+.processing.theme-color,
+.processing .theme-color,
 .processing time {
   color: #009aff;
 }
+.success.theme-fill,
 .success .theme-fill {
   fill: #52c41a;
 }
+.success.theme-stroke,
+.success .theme-stroke {
+  stroke: #52c41a;
+}
+.success.theme-color,
+.success .theme-color,
 .success time {
   color: #52c41a;
 }
+.info.theme-fill,
 .info .theme-fill {
   fill: #009aff;
 }
+.info.theme-stroke,
+.info .theme-stroke {
+  stroke: #009aff;
+}
+.info.theme-color,
+.info .theme-color,
 .info time {
   color: #009aff;
 }
+.ternary.theme-fill,
+.ternary .theme-fill {
+  fill: #4004a3;
+}
+.ternary.theme-stroke,
+.ternary .theme-stroke {
+  stroke: #4004a3;
+}
+.ternary.theme-color,
+.ternary .theme-color,
+.ternary time {
+  color: #4004a3;
+}
+.secondary.theme-fill,
 .secondary .theme-fill {
   fill: #1e075f;
 }
+.secondary.theme-stroke,
+.secondary .theme-stroke {
+  stroke: #1e075f;
+}
+.secondary.theme-color,
+.secondary .theme-color,
 .secondary time {
   color: #1e075f;
 }
+.primary.theme-fill,
 .primary .theme-fill {
   fill: #009aff;
 }
+.primary.theme-stroke,
+.primary .theme-stroke {
+  stroke: #009aff;
+}
+.primary.theme-color,
+.primary .theme-color,
 .primary time {
   color: #009aff;
 }

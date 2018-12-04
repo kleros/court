@@ -1,6 +1,6 @@
 import { Alert, Button, Checkbox, Divider, Form, Input, Popover } from 'antd'
 import React, { useCallback, useState } from 'react'
-import { ReactComponent as Mail } from '../assets/icons/mail.svg'
+import { ReactComponent as Mail } from '../assets/images/mail.svg'
 import PropTypes from 'prop-types'
 import styled from 'styled-components/macro'
 import { useDrizzle } from '../temp/drizzle-react-hooks'

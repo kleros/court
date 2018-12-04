@@ -1,7 +1,7 @@
 import { Card, Col, Row } from 'antd'
 import PropTypes from 'prop-types'
 import React from 'react'
-import { ReactComponent as Underline } from '../assets/icons/underline.svg'
+import { ReactComponent as Underline } from '../assets/images/underline.svg'
 import styled from 'styled-components/macro'
 
 const StyledCard = styled(Card)`

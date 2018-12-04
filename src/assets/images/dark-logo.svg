@@ -1,5 +1,5 @@
 <svg width="278" height="110" viewBox="0 0 278 110" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<mask id="mask0" mask-type="alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="121" height="110">
+<mask id="mask0" masktype="alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="121" height="110">
 <rect width="121" height="110" fill="white"/>
 </mask>
 <g mask="url(#mask0)">

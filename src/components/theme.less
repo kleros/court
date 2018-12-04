@@ -4,6 +4,7 @@
 @blue-6 : #009aff;
 @primary-color : @blue-6;
 @secondary-color : #1e075f;
+@ternary-color : #4004a3;
 @info-color : @blue-6;
 @success-color : @green-6;
 @processing-color : @blue-6;
@@ -542,15 +543,22 @@
 }
 
 // Theme Colored
-@theme-colors: primary, secondary, info, success, processing, error, highlight,
-  warning, normal;
+@theme-colors: primary, secondary, ternary, info, success, processing, error,
+  highlight, warning, normal;
 .loop(@i : length(@theme-colors)) when (@i > 0) {
   @name: extract(@theme-colors, @i);
   @theme-color: ~'@{@{name}-color}';
   .@{name} {
+    &.theme-fill,
     .theme-fill {
       fill: @theme-color;
     }
+    &.theme-stroke,
+    .theme-stroke {
+      stroke: @theme-color;
+    }
+    &.theme-color,
+    .theme-color,
     time {
       color: @theme-color;
     }
@@ -560,7 +568,7 @@
 .loop();
 .secondary {
   .theme-linear-background {
-    background: linear-gradient(to left, @secondary-color, #4004a3);
+    background: linear-gradient(to left, @secondary-color, @ternary-color);
   }
 }
 

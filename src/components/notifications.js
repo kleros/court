@@ -1,6 +1,6 @@
 import { Badge, List, Popover } from 'antd'
-import { ReactComponent as Bell } from '../assets/icons/bell.svg'
-import { ReactComponent as Info } from '../assets/icons/info.svg'
+import { ReactComponent as Alert } from '../assets/images/alert.svg'
+import { ReactComponent as Bell } from '../assets/images/bell.svg'
 import { NavLink } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import React from 'react'
@@ -33,7 +33,7 @@ const Notification = ({ date, message, to, type }) => (
   <StyledListItem>
     <NavLink to={to}>
       <List.Item.Meta
-        avatar={<Info className={type} />}
+        avatar={<Alert className={type} />}
         description={<TimeAgo className={type}>{date}</TimeAgo>}
         title={message}
       />
