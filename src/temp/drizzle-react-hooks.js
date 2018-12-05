@@ -29,27 +29,9 @@ export const DrizzleProvider = ({ children, drizzle }) => {
     },
     [drizzle, drizzleState]
   )
-  const setAndCacheDrizzleState = useCallback(newDrizzleState => {
-    setDrizzleState(newDrizzleState)
-    localStorage.setItem(
-      newDrizzleState.accounts[0],
-      JSON.stringify(newDrizzleState)
-    )
-  }, [])
-  useEffect(
-    () => {
-      const cachedDrizzleState = JSON.parse(
-        localStorage.getItem(drizzleState.accounts[0])
-      )
-      if (cachedDrizzleState) setDrizzleState(cachedDrizzleState)
-    },
-    [drizzleState.accounts[0]]
-  )
   useEffect(
     () =>
-      drizzle.store.subscribe(() =>
-        setAndCacheDrizzleState(drizzle.store.getState())
-      ),
+      drizzle.store.subscribe(() => setDrizzleState(drizzle.store.getState())),
     [drizzle]
   )
   return (
@@ -58,10 +40,9 @@ export const DrizzleProvider = ({ children, drizzle }) => {
         () => ({
           cacheCall,
           drizzle,
-          drizzleState,
-          setDrizzleState: setAndCacheDrizzleState
+          drizzleState
         }),
-        [cacheCall, drizzle, drizzleState, setAndCacheDrizzleState]
+        [cacheCall, drizzle, drizzleState]
       )}
     >
       {children}
