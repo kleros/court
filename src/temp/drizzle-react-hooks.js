@@ -29,6 +29,25 @@ export const DrizzleProvider = ({ children, drizzle }) => {
     },
     [drizzle, drizzleState]
   )
+  const useCacheSend = useCallback(
+    (contractName, methodName) => {
+      const [stackIDs, setStackIDs] = useState([])
+      return {
+        send: (...args) =>
+          setStackIDs(stackIDs => [
+            ...stackIDs,
+            drizzle.contracts[contractName].methods[methodName].cacheSend(
+              ...args
+            )
+          ]),
+        transactions: stackIDs.map(
+          stackID =>
+            drizzleState.transactions[drizzleState.transactionStack[stackID]]
+        )
+      }
+    },
+    [drizzle, drizzleState]
+  )
   useEffect(
     () =>
       drizzle.store.subscribe(() => setDrizzleState(drizzle.store.getState())),
@@ -40,9 +59,10 @@ export const DrizzleProvider = ({ children, drizzle }) => {
         () => ({
           cacheCall,
           drizzle,
-          drizzleState
+          drizzleState,
+          useCacheSend
         }),
-        [cacheCall, drizzle, drizzleState]
+        [cacheCall, drizzle, drizzleState, useCacheSend]
       )}
     >
       {children}
