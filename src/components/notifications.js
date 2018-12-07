@@ -33,8 +33,8 @@ const Notification = ({ date, message, to, type }) => (
   <StyledListItem>
     <NavLink to={to}>
       <List.Item.Meta
-        avatar={<Alert className={type} />}
-        description={<TimeAgo className={type}>{date}</TimeAgo>}
+        avatar={<Alert className={`${type}-fill`} />}
+        description={<TimeAgo className={`${type}-color`}>{date}</TimeAgo>}
         title={message}
       />
     </NavLink>

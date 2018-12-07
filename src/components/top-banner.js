@@ -23,7 +23,7 @@ const TopBanner = ({ description, extra, title }) => (
     <StyledRow>
       <StyledTitleCol offset={2} span={6}>
         {title}
-        <StyledUnderline className="primary" />
+        <StyledUnderline className="primary-fill" />
       </StyledTitleCol>
       <Col span={12}>{description}</Col>
       <Col span={4}>{extra}</Col>

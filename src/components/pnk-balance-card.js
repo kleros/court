@@ -88,16 +88,16 @@ const PNKBalanceCard = () => {
                 </StyledDiv>
               </Col>
             </Row>
-            <StyledSectionArrow className="ternary" />
+            <StyledSectionArrow className="ternary-stroke" />
           </Col>
-          <Col className="ternary theme-color" span={8}>
+          <Col className="ternary-color theme-color" span={8}>
             <StyledTopDiv>You have</StyledTopDiv>
             <StyledCenterDiv>
               <ETHAmount amount={juror && juror.stakedTokens} /> PNK
             </StyledCenterDiv>
             <StyledBottomDiv>Staked</StyledBottomDiv>
           </Col>
-          <StyledCol className="ternary theme-color" span={8}>
+          <StyledCol className="ternary-color theme-color" span={8}>
             <StyledTopDiv>You have</StyledTopDiv>
             <StyledCenterDiv>
               <ETHAmount amount={juror && juror.lockedTokens} /> PNK

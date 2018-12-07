@@ -549,26 +549,42 @@
   @name: extract(@theme-colors, @i);
   @theme-color: ~'@{@{name}-color}';
   .@{name} {
-    &.theme-fill,
-    .theme-fill {
-      fill: @theme-color;
+    &-fill {
+      &.theme-fill,
+      & .theme-fill {
+        fill: @theme-color;
+      }
     }
-    &.theme-stroke,
-    .theme-stroke {
-      stroke: @theme-color;
+    &-stroke {
+      &.theme-stroke,
+      & .theme-stroke {
+        stroke: @theme-color;
+      }
     }
-    &.theme-color,
-    .theme-color,
-    time {
-      color: @theme-color;
+    &-background {
+      &.theme-background,
+      & .theme-background,
+      & .ant-card-head {
+        background: @theme-color;
+      }
+    }
+    &-color {
+      &.theme-color,
+      & .theme-color,
+      & time {
+        color: @theme-color;
+      }
     }
   }
   .loop(@i - 1);
 }
 .loop();
 .secondary {
-  .theme-linear-background {
-    background: linear-gradient(to left, @secondary-color, @ternary-color);
+  &-linear-background {
+    &.theme-linear-background,
+    & .theme-linear-background {
+      background: linear-gradient(to left, @secondary-color, @ternary-color);
+    }
   }
 }
 
