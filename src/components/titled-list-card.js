@@ -57,11 +57,12 @@ const StyledDivider = styled(Divider)`
   margin: 0;
   width: 100%;
 `
-const TitledListCard = ({ children, prefix, title }) => (
+const TitledListCard = ({ children, loading, prefix, title }) => (
   <StyledCard
     bordered={false}
     className="secondary-background"
     hoverable
+    loading={loading}
     title={
       <>
         <Hexagon className="ternary-fill" />
@@ -71,25 +72,33 @@ const TitledListCard = ({ children, prefix, title }) => (
       </>
     }
   >
-    {children.length === undefined
-      ? children
-      : children.map((c, i) =>
-          i < children.length - 1 ? (
-            <Fragment key={i}>
-              {c}
-              <StyledDivider />
-            </Fragment>
-          ) : (
-            c
-          )
-        )}
+    {children &&
+      (children.length === undefined
+        ? children
+        : children.map((c, i) =>
+            i < children.length - 1 ? (
+              <Fragment key={i}>
+                {c}
+                <StyledDivider />
+              </Fragment>
+            ) : (
+              c
+            )
+          ))}
   </StyledCard>
 )
 
 TitledListCard.propTypes = {
-  children: PropTypes.node.isRequired,
-  prefix: PropTypes.node.isRequired,
+  children: PropTypes.node,
+  loading: PropTypes.bool,
+  prefix: PropTypes.node,
   title: PropTypes.node.isRequired
+}
+
+TitledListCard.defaultProps = {
+  children: null,
+  loading: false,
+  prefix: null
 }
 
 export default TitledListCard

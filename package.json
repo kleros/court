@@ -51,6 +51,7 @@
   },
   "dependencies": {
     "antd": "^3.10.8",
+    "dataloader": "^1.4.0",
     "drizzle": "^1.2.4",
     "javascript-time-ago": "^1.0.32",
     "polished": "^2.3.0",
