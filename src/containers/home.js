@@ -1,4 +1,4 @@
-import { Button } from 'antd'
+import { Button, Col, Row } from 'antd'
 import CourtsListCard from '../components/courts-list-card'
 import { ReactComponent as DarkLogo } from '../assets/images/dark-logo.svg'
 import PNKBalanceCard from '../components/pnk-balance-card'
@@ -24,6 +24,16 @@ export default () => (
       version={`Athena release ${version}`}
     />
     <PNKBalanceCard />
-    <CourtsListCard />
+    <Row gutter={32}>
+      <Col span={6}>
+        <CourtsListCard />
+      </Col>
+      <Col span={6}>
+        <CourtsListCard />
+      </Col>
+      <Col span={12}>
+        <CourtsListCard />
+      </Col>
+    </Row>
   </>
 )
