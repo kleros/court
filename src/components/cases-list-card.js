@@ -7,6 +7,15 @@ import { useDrizzle } from '../temp/drizzle-react-hooks'
 const StyledListItem = styled(List.Item)`
   font-weight: bold;
   padding-left: 19px;
+  position: relative;
+
+  .ant-list-item-extra {
+    font-size: 18px;
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
 `
 const CasesListCard = () => {
   const { cacheCall, drizzleState, useCacheEvents } = useDrizzle()
@@ -46,8 +55,10 @@ const CasesListCard = () => {
       prefix={disputes.total}
       title="Cases"
     >
-      <StyledListItem extra={disputes.active}>Active</StyledListItem>
-      <StyledListItem extra={disputes.executed}>Executed</StyledListItem>
+      <StyledListItem extra={String(disputes.active)}>Active</StyledListItem>
+      <StyledListItem extra={String(disputes.executed)}>
+        Executed
+      </StyledListItem>
     </TitledListCard>
   )
 }

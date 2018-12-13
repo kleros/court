@@ -18607,6 +18607,7 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 }
 .normal-color.theme-color,
 .normal-color .theme-color,
+.normal-color .ant-list-item-extra,
 .normal-color time {
   color: #d9d9d9;
 }
@@ -18625,6 +18626,7 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 }
 .warning-color.theme-color,
 .warning-color .theme-color,
+.warning-color .ant-list-item-extra,
 .warning-color time {
   color: #faad14;
 }
@@ -18643,6 +18645,7 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 }
 .highlight-color.theme-color,
 .highlight-color .theme-color,
+.highlight-color .ant-list-item-extra,
 .highlight-color time {
   color: #f5222d;
 }
@@ -18661,6 +18664,7 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 }
 .error-color.theme-color,
 .error-color .theme-color,
+.error-color .ant-list-item-extra,
 .error-color time {
   color: #f5222d;
 }
@@ -18679,6 +18683,7 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 }
 .processing-color.theme-color,
 .processing-color .theme-color,
+.processing-color .ant-list-item-extra,
 .processing-color time {
   color: #009aff;
 }
@@ -18697,6 +18702,7 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 }
 .success-color.theme-color,
 .success-color .theme-color,
+.success-color .ant-list-item-extra,
 .success-color time {
   color: #52c41a;
 }
@@ -18715,6 +18721,7 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 }
 .info-color.theme-color,
 .info-color .theme-color,
+.info-color .ant-list-item-extra,
 .info-color time {
   color: #009aff;
 }
@@ -18733,6 +18740,7 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 }
 .ternary-color.theme-color,
 .ternary-color .theme-color,
+.ternary-color .ant-list-item-extra,
 .ternary-color time {
   color: #4004a3;
 }
@@ -18751,6 +18759,7 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 }
 .secondary-color.theme-color,
 .secondary-color .theme-color,
+.secondary-color .ant-list-item-extra,
 .secondary-color time {
   color: #1e075f;
 }
@@ -18769,6 +18778,7 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 }
 .primary-color.theme-color,
 .primary-color .theme-color,
+.primary-color .ant-list-item-extra,
 .primary-color time {
   color: #009aff;
 }

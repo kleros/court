@@ -60,7 +60,7 @@ const StyledDivider = styled(Divider)`
 const TitledListCard = ({ children, loading, prefix, title }) => (
   <StyledCard
     bordered={false}
-    className="secondary-background"
+    className="secondary-background ternary-color"
     hoverable
     loading={loading}
     title={
