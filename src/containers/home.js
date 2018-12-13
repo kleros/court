@@ -1,4 +1,5 @@
 import { Button, Col, Row } from 'antd'
+import CasesListCard from '../components/cases-list-card'
 import CourtsListCard from '../components/courts-list-card'
 import { ReactComponent as DarkLogo } from '../assets/images/dark-logo.svg'
 import PNKBalanceCard from '../components/pnk-balance-card'
@@ -29,7 +30,7 @@ export default () => (
         <CourtsListCard />
       </Col>
       <Col span={6}>
-        <CourtsListCard />
+        <CasesListCard />
       </Col>
       <Col span={12}>
         <CourtsListCard />
