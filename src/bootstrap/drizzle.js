@@ -24,7 +24,6 @@ const options = {
       }
     }
   ],
-  events: { KlerosLiquid: ['NewPhase'] },
   polls: {
     accounts: 3000,
     blocks: 3000
