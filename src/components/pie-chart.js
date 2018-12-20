@@ -4,7 +4,15 @@ import ReactMinimalPieChart from 'react-minimal-pie-chart'
 import styled from 'styled-components/macro'
 
 const StyledDiv = styled.div`
+  padding: 65px 45px 45px;
   position: relative;
+`
+const StyledTitleDiv = styled.div`
+  font-weight: medium;
+  left: 50%;
+  position: absolute;
+  top: 20px;
+  transform: translateX(-50%);
 `
 const StyledTooltipDiv = styled.div.attrs(({ x, y }) => ({
   style: { left: `${x}px`, top: `${y - 60}px` }
@@ -15,8 +23,9 @@ const StyledTooltipDiv = styled.div.attrs(({ x, y }) => ({
   padding: 10px 8px;
   position: absolute;
   white-space: nowrap;
+  z-index: 1;
 `
-const PieChart = ({ data }) => {
+const PieChart = ({ data, title }) => {
   const [state, setState] = useState({ dataIndex: null, x: null, y: null })
   const onMouseMove = useCallback(event => {
     const bounds = event.currentTarget.getBoundingClientRect()
@@ -35,6 +44,7 @@ const PieChart = ({ data }) => {
   const inPie = state.dataIndex !== null
   return (
     <StyledDiv onMouseMove={inPie ? onMouseMove : undefined}>
+      <StyledTitleDiv>{title}</StyledTitleDiv>
       <ReactMinimalPieChart
         className="ReactMinimalPieChart"
         data={data}
@@ -61,7 +71,8 @@ PieChart.propTypes = {
       tooltip: PropTypes.node.isRequired,
       value: PropTypes.number.isRequired
     }).isRequired
-  ).isRequired
+  ).isRequired,
+  title: PropTypes.node.isRequired
 }
 
 export default PieChart

@@ -22,7 +22,11 @@ const ETHAmount = ({ amount }) => {
 }
 
 ETHAmount.propTypes = {
-  amount: PropTypes.string
+  amount: PropTypes.oneOfType([
+    PropTypes.string.isRequired,
+    PropTypes.number.isRequired,
+    PropTypes.object.isRequired
+  ])
 }
 
 ETHAmount.defaultProps = {
