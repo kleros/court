@@ -3,6 +3,7 @@ import CasesListCard from '../components/cases-list-card'
 import CourtsListCard from '../components/courts-list-card'
 import { ReactComponent as DarkLogo } from '../assets/images/dark-logo.svg'
 import PNKBalanceCard from '../components/pnk-balance-card'
+import PNKStatsListCard from '../components/pnk-stats-list-card'
 import React from 'react'
 import TopBanner from '../components/top-banner'
 import WelcomeCard from '../components/welcome-card'
@@ -33,7 +34,7 @@ export default () => (
         <CasesListCard />
       </Col>
       <Col span={12}>
-        <CourtsListCard />
+        <PNKStatsListCard />
       </Col>
     </Row>
   </>

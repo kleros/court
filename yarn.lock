@@ -11660,6 +11660,13 @@ react-lifecycles-compat@^3.0.0, react-lifecycles-compat@^3.0.2, react-lifecycles
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
+react-minimal-pie-chart@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/react-minimal-pie-chart/-/react-minimal-pie-chart-3.3.0.tgz#408b94206ca4c880534205572e0dc075beb7e5a1"
+  integrity sha512-rD94w1R5yyAsvVdLd9TkV7DzAtacDnZLV73uU4JRJTe3BfCFXDOEU5AvHlj3wRfJca61uLa51r02lbo5ZHrjBg==
+  dependencies:
+    prop-types "^15.5.7"
+
 react-modal@^3.4.4:
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/react-modal/-/react-modal-3.6.1.tgz#54d27a1ec2b493bbc451c7efaa3557b6af82332d"

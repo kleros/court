@@ -18605,6 +18605,10 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 .normal-background .ant-card-head {
   background: #d9d9d9;
 }
+.normal-border-color.theme-border-color,
+.normal-border-color .theme-border-color {
+  border-color: #d9d9d9;
+}
 .normal-color.theme-color,
 .normal-color .theme-color,
 .normal-color .ant-list-item-extra,
@@ -18623,6 +18627,10 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 .warning-background .theme-background,
 .warning-background .ant-card-head {
   background: #faad14;
+}
+.warning-border-color.theme-border-color,
+.warning-border-color .theme-border-color {
+  border-color: #faad14;
 }
 .warning-color.theme-color,
 .warning-color .theme-color,
@@ -18643,6 +18651,10 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 .highlight-background .ant-card-head {
   background: #f5222d;
 }
+.highlight-border-color.theme-border-color,
+.highlight-border-color .theme-border-color {
+  border-color: #f5222d;
+}
 .highlight-color.theme-color,
 .highlight-color .theme-color,
 .highlight-color .ant-list-item-extra,
@@ -18661,6 +18673,10 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 .error-background .theme-background,
 .error-background .ant-card-head {
   background: #f5222d;
+}
+.error-border-color.theme-border-color,
+.error-border-color .theme-border-color {
+  border-color: #f5222d;
 }
 .error-color.theme-color,
 .error-color .theme-color,
@@ -18681,6 +18697,10 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 .processing-background .ant-card-head {
   background: #009aff;
 }
+.processing-border-color.theme-border-color,
+.processing-border-color .theme-border-color {
+  border-color: #009aff;
+}
 .processing-color.theme-color,
 .processing-color .theme-color,
 .processing-color .ant-list-item-extra,
@@ -18699,6 +18719,10 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 .success-background .theme-background,
 .success-background .ant-card-head {
   background: #52c41a;
+}
+.success-border-color.theme-border-color,
+.success-border-color .theme-border-color {
+  border-color: #52c41a;
 }
 .success-color.theme-color,
 .success-color .theme-color,
@@ -18719,6 +18743,10 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 .info-background .ant-card-head {
   background: #009aff;
 }
+.info-border-color.theme-border-color,
+.info-border-color .theme-border-color {
+  border-color: #009aff;
+}
 .info-color.theme-color,
 .info-color .theme-color,
 .info-color .ant-list-item-extra,
@@ -18737,6 +18765,10 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 .ternary-background .theme-background,
 .ternary-background .ant-card-head {
   background: #4004a3;
+}
+.ternary-border-color.theme-border-color,
+.ternary-border-color .theme-border-color {
+  border-color: #4004a3;
 }
 .ternary-color.theme-color,
 .ternary-color .theme-color,
@@ -18757,6 +18789,10 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 .secondary-background .ant-card-head {
   background: #1e075f;
 }
+.secondary-border-color.theme-border-color,
+.secondary-border-color .theme-border-color {
+  border-color: #1e075f;
+}
 .secondary-color.theme-color,
 .secondary-color .theme-color,
 .secondary-color .ant-list-item-extra,
@@ -18776,6 +18812,10 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 .primary-background .ant-card-head {
   background: #009aff;
 }
+.primary-border-color.theme-border-color,
+.primary-border-color .theme-border-color {
+  border-color: #009aff;
+}
 .primary-color.theme-color,
 .primary-color .theme-color,
 .primary-color .ant-list-item-extra,
@@ -18788,4 +18828,13 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 }
 .rrui__tooltip {
   z-index: 2000;
+}
+.ReactMinimalPieChart path:nth-child(3n) {
+  stroke: #009aff;
+}
+.ReactMinimalPieChart path:nth-child(3n + 1) {
+  stroke: #1e075f;
+}
+.ReactMinimalPieChart path:nth-child(3n + 2) {
+  stroke: #4004a3;
 }

@@ -49,7 +49,7 @@ const StyledSectionArrowBackground = styled(SectionArrowBackground)`
 `
 const PNKBalanceCard = () => {
   const { cacheCall, drizzleState } = useDrizzle()
-  const juror = cacheCall('KlerosLiquid', 'getJuror', drizzleState.accounts[0])
+  const juror = cacheCall('KlerosLiquid', 'jurors', drizzleState.accounts[0])
   return (
     <StyledCard hoverable>
       <Spin

@@ -568,6 +568,12 @@
         background: @theme-color;
       }
     }
+    &-border-color {
+      &.theme-border-color,
+      & .theme-border-color {
+        border-color: @theme-color;
+      }
+    }
     &-color {
       &.theme-color,
       & .theme-color,
@@ -592,4 +598,21 @@
 // Time Ago Tooltip
 .rrui__tooltip {
   z-index: 2000;
+}
+
+// React Minimal Pie Chart
+.ReactMinimalPieChart {
+  path {
+    &:nth-child(3n) {
+      stroke: @primary-color;
+    }
+
+    &:nth-child(3n + 1) {
+      stroke: @secondary-color;
+    }
+
+    &:nth-child(3n + 2) {
+      stroke: @ternary-color;
+    }
+  }
 }

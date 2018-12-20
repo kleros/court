@@ -12,10 +12,14 @@ const StyledListItem = styled(List.Item)`
 const CourtsListCard = () => {
   const { cacheCall, drizzleState } = useDrizzle()
   const load = useDataloader()
-  const juror = cacheCall('KlerosLiquid', 'getJuror', drizzleState.accounts[0])
+  const subcourtIDs = cacheCall(
+    'KlerosLiquid',
+    'getJuror',
+    drizzleState.accounts[0]
+  )
   const names =
-    juror &&
-    juror.subcourtIDs.map(ID => {
+    subcourtIDs &&
+    subcourtIDs.map(ID => {
       const policy = cacheCall('PolicyRegistry', 'policies', ID)
       if (policy) {
         const policyJSON = load(policy.fileURI)
