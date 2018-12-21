@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react'
+import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import ETHAmount from './eth-amount'
 import PieChart from './pie-chart'
 import { Spin } from 'antd'
 import TitledListCard from './titled-list-card'
 import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
-import { useDrizzle } from '../temp/drizzle-react-hooks'
 
 const loadingPieChartData = [{ tooltip: 'Loading...', value: 1 }]
 const StyledDiv = styled.div`
@@ -18,7 +18,10 @@ const StyledTitleSpan = styled.span`
   font-style: italic;
 `
 const PNKStatsListCard = () => {
-  const { cacheCall, drizzle, drizzleState, useCacheEvents } = useDrizzle()
+  const { cacheCall, drizzle, useCacheEvents } = useDrizzle()
+  const drizzleState = useDrizzleState(drizzleState => ({
+    accounts: drizzleState.accounts
+  }))
   const load = useDataloader()
   const subcourtIDs = cacheCall(
     'KlerosLiquid',

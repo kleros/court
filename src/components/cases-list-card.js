@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react'
+import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import { ReactComponent as Hourglass } from '../assets/images/hourglass.svg'
 import { List } from 'antd'
 import TimeAgo from './time-ago'
 import TitledListCard from './titled-list-card'
 import styled from 'styled-components/macro'
-import { useDrizzle } from '../temp/drizzle-react-hooks'
 
 const StyledListItem = styled(List.Item)`
   font-weight: bold;
@@ -38,7 +38,10 @@ const StyledHourglass = styled(Hourglass)`
   top: 13px;
 `
 const CasesListCard = () => {
-  const { cacheCall, drizzleState, useCacheEvents } = useDrizzle()
+  const { cacheCall, useCacheEvents } = useDrizzle()
+  const drizzleState = useDrizzleState(drizzleState => ({
+    accounts: drizzleState.accounts
+  }))
   const draws = useCacheEvents(
     'KlerosLiquid',
     'Draw',

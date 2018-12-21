@@ -1,11 +1,11 @@
 import { List, Popover, Spin } from 'antd'
+import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import ETHAddress from './eth-address'
 import ETHAmount from './eth-amount'
 import PropTypes from 'prop-types'
 import React from 'react'
 import ReactBlockies from 'react-blockies'
 import styled from 'styled-components/macro'
-import { useDrizzle } from '../temp/drizzle-react-hooks'
 
 const StyledDiv = styled.div`
   line-height: 100%;
@@ -14,7 +14,12 @@ const StyledReactBlockies = styled(ReactBlockies)`
   border-radius: ${({ large }) => (large ? '4' : '16')}px;
 `
 const Identicon = ({ large, pinakion }) => {
-  const { cacheCall, drizzleState } = useDrizzle()
+  const { cacheCall } = useDrizzle()
+  const drizzleState = useDrizzleState(drizzleState => ({
+    accountBalances: drizzleState.accountBalances,
+    accounts: drizzleState.accounts,
+    contracts: drizzleState.contracts
+  }))
   let PNK
   if (pinakion)
     PNK = cacheCall('MiniMeTokenERC20', 'balanceOf', drizzleState.accounts[0])

@@ -1,16 +1,19 @@
+import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import { List } from 'antd'
 import React from 'react'
 import TitledListCard from './titled-list-card'
 import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
-import { useDrizzle } from '../temp/drizzle-react-hooks'
 
 const StyledListItem = styled(List.Item)`
   font-weight: bold;
   padding-left: 19px;
 `
 const CourtsListCard = () => {
-  const { cacheCall, drizzleState } = useDrizzle()
+  const { cacheCall } = useDrizzle()
+  const drizzleState = useDrizzleState(drizzleState => ({
+    accounts: drizzleState.accounts
+  }))
   const load = useDataloader()
   const subcourtIDs = cacheCall(
     'KlerosLiquid',
