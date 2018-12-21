@@ -114,11 +114,11 @@ export default () => (
             <StyledLayoutContent>
               <Switch>
                 <Route component={Home} exact path="/" />
-                <Route component={Home} exact path="/courts" />
-                <Route component={Home} exact path="/cases" />
-                <Route component={Home} exact path="/tokens" />
-                <Route component={Home} exact path="/governance" />
-                <Route component={Home} exact path="/guide" />
+                <Route exact path="/courts" />
+                <Route exact path="/cases" />
+                <Route exact path="/tokens" />
+                <Route exact path="/governance" />
+                <Route exact path="/guide" />
               </Switch>
             </StyledLayoutContent>
           </Layout>

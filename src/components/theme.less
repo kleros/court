@@ -12,6 +12,7 @@
 @highlight-color : @red-6;
 @warning-color : @gold-6;
 @normal-color : #d9d9d9;
+@other-color : #4a4a4a;
 
 // Color used by default to control hover and active backgrounds and for
 // alert info backgrounds.
@@ -283,9 +284,9 @@
 //* Tooltip max width
 @tooltip-max-width: 250px;
 //** Tooltip text color
-@tooltip-color: #fff;
+@tooltip-color: @other-color;
 //** Tooltip background color
-@tooltip-bg: rgba(0, 0, 0, 0.75);
+@tooltip-bg: @normal-color;
 //** Tooltip arrow width
 @tooltip-arrow-width: 5px;
 //** Tooltip distance with trigger
@@ -544,7 +545,7 @@
 
 // Theme Colored
 @theme-colors: primary, secondary, ternary, info, success, processing, error,
-  highlight, warning, normal;
+  highlight, warning, normal, other;
 .loop(@i : length(@theme-colors)) when (@i > 0) {
   @name: extract(@theme-colors, @i);
   @theme-color: ~'@{@{name}-color}';
@@ -597,7 +598,10 @@
 
 // Time Ago Tooltip
 .rrui__tooltip {
-  z-index: 2000;
+  background: @tooltip-bg !important;
+  color: @tooltip-color !important;
+  font-style: italic !important;
+  z-index: 2000 !important;
 }
 
 // React Minimal Pie Chart
