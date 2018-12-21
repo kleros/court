@@ -114,18 +114,32 @@ DrizzleProvider.propTypes = {
   drizzle: PropTypes.shape({}).isRequired
 }
 
-export const Initializer = ({ children }) => {
+export const Initializer = ({
+  children,
+  error,
+  loadingContractsAndAccounts,
+  loadingWeb3
+}) => {
   const drizzleState = useDrizzleState(drizzleState => ({
     drizzleStatus: drizzleState.drizzleStatus,
     web3: drizzleState.web3
   }))
   if (drizzleState.drizzleStatus.initialized) return children
   if (drizzleState.web3.status === 'initialized')
-    return 'Loading contracts and accounts.'
-  if (drizzleState.web3.status === 'failed') return 'Error.'
-  return 'Loading web3.'
+    return loadingContractsAndAccounts
+  if (drizzleState.web3.status === 'failed') return error
+  return loadingWeb3
 }
 
 Initializer.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
+  error: PropTypes.node,
+  loadingContractsAndAccounts: PropTypes.node,
+  loadingWeb3: PropTypes.node
+}
+
+Initializer.defaultProps = {
+  error: 'Error.',
+  loadingContractsAndAccounts: 'Loading contracts and accounts.',
+  loadingWeb3: 'Loading web3.'
 }
