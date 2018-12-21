@@ -1,6 +1,7 @@
 import { Card, Col, Row, Spin } from 'antd'
 import ETHAddress from './eth-address'
 import ETHAmount from './eth-amount'
+import Hint from '../components/hint'
 import Identicon from '../components/identicon'
 import React from 'react'
 import { ReactComponent as SectionArrow } from '../assets/images/section-arrow.svg'
@@ -83,6 +84,7 @@ const PNKBalanceCard = () => {
                     amount={
                       drizzleState.accountBalances[drizzleState.accounts[0]]
                     }
+                    decimals={4}
                   />{' '}
                   ETH
                 </StyledDiv>
@@ -95,14 +97,42 @@ const PNKBalanceCard = () => {
             <StyledCenterDiv>
               <ETHAmount amount={juror && juror.stakedTokens} /> PNK
             </StyledCenterDiv>
-            <StyledBottomDiv>Staked</StyledBottomDiv>
+            <StyledBottomDiv>
+              Staked{' '}
+              <Hint
+                description="The more you stake, the higher your chances of being drawn as a juror."
+                title={
+                  <>
+                    <ETHAmount
+                      amount={juror && juror.stakedTokens}
+                      decimals={10}
+                    />{' '}
+                    PNK
+                  </>
+                }
+              />
+            </StyledBottomDiv>
           </Col>
           <StyledCol className="ternary-color theme-color" span={8}>
             <StyledTopDiv>You have</StyledTopDiv>
             <StyledCenterDiv>
               <ETHAmount amount={juror && juror.lockedTokens} /> PNK
             </StyledCenterDiv>
-            <StyledBottomDiv>Locked</StyledBottomDiv>
+            <StyledBottomDiv>
+              Locked{' '}
+              <Hint
+                description="This PNK is locked in active disputes for potential redistribution."
+                title={
+                  <>
+                    <ETHAmount
+                      amount={juror && juror.lockedTokens}
+                      decimals={10}
+                    />{' '}
+                    PNK
+                  </>
+                }
+              />
+            </StyledBottomDiv>
             <StyledSectionArrowBackground />
           </StyledCol>
         </Row>

@@ -12,12 +12,12 @@ const StyledSkeleton = styled(Skeleton)`
     margin: -3px 0;
   }
 `
-const ETHAmount = ({ amount }) => {
+const ETHAmount = ({ amount, decimals }) => {
   const { drizzle } = useDrizzle()
   return amount === null ? (
     <StyledSkeleton active paragraph={false} title={SkeletonTitleProps} />
   ) : (
-    Number(drizzle.web3.utils.fromWei(amount)).toFixed(4)
+    Number(drizzle.web3.utils.fromWei(amount)).toFixed(decimals)
   )
 }
 
@@ -26,11 +26,13 @@ ETHAmount.propTypes = {
     PropTypes.string.isRequired,
     PropTypes.number.isRequired,
     PropTypes.object.isRequired
-  ])
+  ]),
+  decimals: PropTypes.number
 }
 
 ETHAmount.defaultProps = {
-  amount: null
+  amount: null,
+  decimals: 0
 }
 
 export default ETHAmount

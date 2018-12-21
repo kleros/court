@@ -48,6 +48,7 @@ const Identicon = ({ large, pinakion }) => {
                   amount={
                     drizzleState.accountBalances[drizzleState.accounts[0]]
                   }
+                  decimals={4}
                 />
               }
               title="ETH"

@@ -22,7 +22,7 @@ const Hint = ({ description, title }) => (
       </>
     }
   >
-    <Info className="secondary-fill" />
+    <Info className="ternary-fill" />
   </Tooltip>
 )
 
