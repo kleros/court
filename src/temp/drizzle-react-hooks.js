@@ -62,7 +62,7 @@ export const DrizzleProvider = ({ children, drizzle }) => {
         )
       }
     },
-    [drizzle.contracts, drizzle.store]
+    [drizzle.store, drizzle.contracts]
   )
   const useCacheEvents = useCallback(
     (contractName, eventName, eventOptions) => {
