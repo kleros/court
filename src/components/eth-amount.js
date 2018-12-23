@@ -4,7 +4,7 @@ import { Skeleton } from 'antd'
 import styled from 'styled-components/macro'
 import { useDrizzle } from '../temp/drizzle-react-hooks'
 
-const SkeletonTitleProps = { width: 45 }
+const SkeletonTitleProps = { width: 30 }
 const StyledSkeleton = styled(Skeleton)`
   display: inline;
 
@@ -17,7 +17,11 @@ const ETHAmount = ({ amount, decimals }) => {
   return amount === null ? (
     <StyledSkeleton active paragraph={false} title={SkeletonTitleProps} />
   ) : (
-    Number(drizzle.web3.utils.fromWei(amount)).toFixed(decimals)
+    Number(
+      drizzle.web3.utils.fromWei(
+        typeof amount === 'number' ? String(amount) : amount
+      )
+    ).toFixed(decimals)
   )
 }
 

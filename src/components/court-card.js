@@ -1,9 +1,12 @@
 import { Button, Card } from 'antd'
 import React, { useMemo } from 'react'
+import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import { ReactComponent as Close } from '../assets/images/close.svg'
+import ETHAmount from './eth-amount'
 import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
 import PropTypes from 'prop-types'
 import styled from 'styled-components/macro'
+import { useDataloader } from '../bootstrap/dataloader'
 
 const StyledCard = styled(Card)`
   margin: 20px 0;
@@ -38,7 +41,24 @@ const StyledAmountDiv = styled.div`
   font-weight: bold;
 `
 const CourtCard = ({ ID }) => {
-  console.log(ID)
+  const { cacheCall } = useDrizzle()
+  const drizzleState = useDrizzleState(drizzleState => ({
+    accounts: drizzleState.accounts
+  }))
+  const load = useDataloader()
+  let name
+  const policy = cacheCall('PolicyRegistry', 'policies', ID)
+  if (policy) {
+    const policyJSON = load(policy.fileURI)
+    if (policyJSON) name = policyJSON.name
+  }
+  const stake = cacheCall(
+    'KlerosLiquid',
+    'stakeOf',
+    drizzleState.accounts[0],
+    ID
+  )
+  const subcourt = cacheCall('KlerosLiquid', 'courts', ID)
   return (
     <StyledCard
       actions={useMemo(
@@ -52,30 +72,46 @@ const CourtCard = ({ ID }) => {
       )}
       extra={<Close />}
       hoverable
-      loading={false}
-      title="Air Transport"
+      loading={name === undefined}
+      title={name}
     >
       <StyledCardGrid>
         <Hexagon className="ternary-fill" />
         <StyledDiv>
-          <StyledAmountDiv>0</StyledAmountDiv>PNK
+          <StyledAmountDiv>
+            <ETHAmount amount={stake} />
+          </StyledAmountDiv>
+          PNK
         </StyledDiv>
       </StyledCardGrid>
       <StyledCardGrid>
-        Min Stake<StyledAmountDiv>350 PNK</StyledAmountDiv>
+        Min Stake
+        <StyledAmountDiv>
+          <ETHAmount amount={subcourt && subcourt.minStake} /> PNK
+        </StyledAmountDiv>
       </StyledCardGrid>
       <StyledCardGrid>
-        Coherence Reward<StyledAmountDiv>0.01 ETH +</StyledAmountDiv>
+        Coherence Reward
+        <StyledAmountDiv>
+          <ETHAmount amount={subcourt && subcourt.jurorFee} decimals={2} /> ETH
+          +
+        </StyledAmountDiv>
       </StyledCardGrid>
       <StyledCardGrid>
-        Stake Locked Per Vote<StyledAmountDiv>200 PNK</StyledAmountDiv>
+        Stake Locked/Vote
+        <StyledAmountDiv>
+          <ETHAmount
+            amount={subcourt && (subcourt.minStake * subcourt.alpha) / 10000}
+          />{' '}
+          PNK
+        </StyledAmountDiv>
       </StyledCardGrid>
     </StyledCard>
   )
 }
 
 CourtCard.propTypes = {
-  ID: PropTypes.number.isRequired
+  ID: PropTypes.string.isRequired
 }
 
 export default CourtCard

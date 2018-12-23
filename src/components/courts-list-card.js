@@ -30,7 +30,7 @@ const CourtsListCard = () => {
       }
       return undefined
     })
-  const loading = !names || names.some(n => !n)
+  const loading = !names || names.some(n => n === undefined)
   return (
     <TitledListCard
       loading={loading}
