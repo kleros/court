@@ -1,13 +1,16 @@
 import { Alert, Button, Checkbox, Divider, Form, Input, Popover } from 'antd'
 import React, { useCallback, useState } from 'react'
+import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import { ReactComponent as Mail } from '../assets/images/mail.svg'
 import PropTypes from 'prop-types'
 import styled from 'styled-components/macro'
-import { useDrizzle } from '../temp/drizzle-react-hooks'
 
 const NotificationSettingsForm = Form.create()(
   styled(({ className, form, settings: { key, ...settings } }) => {
-    const { drizzle, drizzleState } = useDrizzle()
+    const { drizzle } = useDrizzle()
+    const drizzleState = useDrizzleState(drizzleState => ({
+      accounts: drizzleState.accounts
+    }))
     const [status, setStatus] = useState()
     return (
       <Form
