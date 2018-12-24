@@ -10,26 +10,29 @@ const StyledListItem = styled(List.Item)`
   padding-left: 19px;
 `
 const CourtsListCard = () => {
-  const { cacheCall } = useDrizzle()
+  const { useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
   }))
   const load = useDataloader()
-  const subcourtIDs = cacheCall(
+  const subcourtIDs = useCacheCall(
     'KlerosLiquid',
     'getJuror',
     drizzleState.account
   )
-  const names =
-    subcourtIDs &&
-    subcourtIDs.map(ID => {
-      const policy = cacheCall('PolicyRegistry', 'policies', ID)
-      if (policy) {
-        const policyJSON = load(policy.fileURI)
-        if (policyJSON) return policyJSON.name
-      }
-      return undefined
-    })
+  const names = useCacheCall(
+    ['PolicyRegistry'],
+    call =>
+      subcourtIDs &&
+      subcourtIDs.map(ID => {
+        const policy = call('PolicyRegistry', 'policies', ID)
+        if (policy) {
+          const policyJSON = load(policy.fileURI)
+          if (policyJSON) return policyJSON.name
+        }
+        return undefined
+      })
+  )
   const loading = !names || names.some(n => n === undefined)
   return (
     <TitledListCard

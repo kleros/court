@@ -38,7 +38,7 @@ const StyledHourglass = styled(Hourglass)`
   top: 13px;
 `
 const CasesListCard = () => {
-  const { cacheCall, useCacheEvents } = useDrizzle()
+  const { useCacheCall, useCacheEvents } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
   }))
@@ -53,42 +53,44 @@ const CasesListCard = () => {
       [drizzleState.account]
     )
   )
-  const disputes = draws
-    ? draws.reduce(
-        (acc, d) => {
-          if (!acc.IDs[d.returnValues._disputeID]) {
-            acc.IDs[d.returnValues._disputeID] = true
-            acc.total++
-            const dispute = cacheCall(
-              'KlerosLiquid',
-              'disputes',
-              d.returnValues._disputeID
-            )
-            if (dispute) {
-              acc[dispute.period === '4' ? 'executed' : 'active']++
-              if (dispute.period === '1' || dispute.period === '2') {
-                const subcourt = cacheCall(
-                  'KlerosLiquid',
-                  'getSubcourt',
-                  dispute.subcourtID
-                )
-                if (subcourt) {
-                  const deadline = new Date(
-                    (Number(dispute.lastPeriodChange) +
-                      Number(subcourt.timesPerPeriod[dispute.period])) *
-                      1000
+  const disputes = useCacheCall(['KlerosLiquid'], call =>
+    draws
+      ? draws.reduce(
+          (acc, d) => {
+            if (!acc.IDs[d.returnValues._disputeID]) {
+              acc.IDs[d.returnValues._disputeID] = true
+              acc.total++
+              const dispute = call(
+                'KlerosLiquid',
+                'disputes',
+                d.returnValues._disputeID
+              )
+              if (dispute) {
+                acc[dispute.period === '4' ? 'executed' : 'active']++
+                if (dispute.period === '1' || dispute.period === '2') {
+                  const subcourt = call(
+                    'KlerosLiquid',
+                    'getSubcourt',
+                    dispute.subcourtID
                   )
-                  if (!acc.deadline || deadline < acc.deadline)
-                    acc.deadline = deadline
-                } else acc.loading = true
-              }
-            } else acc.loading = true
-          }
-          return acc
-        },
-        { IDs: {}, active: 0, executed: 0, loading: false, total: 0 }
-      )
-    : { loading: true }
+                  if (subcourt) {
+                    const deadline = new Date(
+                      (Number(dispute.lastPeriodChange) +
+                        Number(subcourt.timesPerPeriod[dispute.period])) *
+                        1000
+                    )
+                    if (!acc.deadline || deadline < acc.deadline)
+                      acc.deadline = deadline
+                  } else acc.loading = true
+                }
+              } else acc.loading = true
+            }
+            return acc
+          },
+          { IDs: {}, active: 0, executed: 0, loading: false, total: 0 }
+        )
+      : { loading: true }
+  )
   return (
     <TitledListCard
       loading={disputes.loading}

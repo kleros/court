@@ -49,12 +49,12 @@ const StyledSectionArrowBackground = styled(SectionArrowBackground)`
   z-index: -1;
 `
 const PNKBalanceCard = () => {
-  const { cacheCall } = useDrizzle()
+  const { useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0],
     balance: drizzleState.accountBalances[drizzleState.accounts[0]]
   }))
-  const juror = cacheCall('KlerosLiquid', 'jurors', drizzleState.account)
+  const juror = useCacheCall('KlerosLiquid', 'jurors', drizzleState.account)
   return (
     <StyledCard hoverable>
       <Row>
@@ -69,7 +69,7 @@ const PNKBalanceCard = () => {
               </StyledDiv>
               <StyledDiv>
                 <ETHAmount
-                  amount={cacheCall(
+                  amount={useCacheCall(
                     'MiniMeTokenERC20',
                     'balanceOf',
                     drizzleState.account

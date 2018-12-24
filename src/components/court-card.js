@@ -41,19 +41,24 @@ const StyledAmountDiv = styled.div`
   font-weight: bold;
 `
 const CourtCard = ({ ID }) => {
-  const { cacheCall } = useDrizzle()
+  const { useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
   }))
   const load = useDataloader()
   let name
-  const policy = cacheCall('PolicyRegistry', 'policies', ID)
+  const policy = useCacheCall('PolicyRegistry', 'policies', ID)
   if (policy) {
     const policyJSON = load(policy.fileURI)
     if (policyJSON) name = policyJSON.name
   }
-  const stake = cacheCall('KlerosLiquid', 'stakeOf', drizzleState.account, ID)
-  const subcourt = cacheCall('KlerosLiquid', 'courts', ID)
+  const stake = useCacheCall(
+    'KlerosLiquid',
+    'stakeOf',
+    drizzleState.account,
+    ID
+  )
+  const subcourt = useCacheCall('KlerosLiquid', 'courts', ID)
   return (
     <StyledCard
       actions={useMemo(

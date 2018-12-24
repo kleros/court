@@ -18,33 +18,36 @@ const StyledTitleSpan = styled.span`
   font-style: italic;
 `
 const PNKStatsListCard = () => {
-  const { cacheCall, drizzle, useCacheEvents } = useDrizzle()
+  const { drizzle, useCacheCall, useCacheEvents } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
   }))
   const load = useDataloader()
-  const subcourtIDs = cacheCall(
+  const subcourtIDs = useCacheCall(
     'KlerosLiquid',
     'getJuror',
     drizzleState.account
   )
-  const subcourts =
-    subcourtIDs &&
-    subcourtIDs.map(ID => {
-      const subcourt = {}
-      subcourt.stake = cacheCall(
-        'KlerosLiquid',
-        'stakeOf',
-        drizzleState.account,
-        ID
-      )
-      const policy = cacheCall('PolicyRegistry', 'policies', ID)
-      if (policy) {
-        const policyJSON = load(policy.fileURI)
-        if (policyJSON) subcourt.name = policyJSON.name
-      }
-      return subcourt
-    })
+  const subcourts = useCacheCall(
+    ['KlerosLiquid', 'PolicyRegistry'],
+    call =>
+      subcourtIDs &&
+      subcourtIDs.map(ID => {
+        const subcourt = {}
+        subcourt.stake = call(
+          'KlerosLiquid',
+          'stakeOf',
+          drizzleState.account,
+          ID
+        )
+        const policy = call('PolicyRegistry', 'policies', ID)
+        if (policy) {
+          const policyJSON = load(policy.fileURI)
+          if (policyJSON) subcourt.name = policyJSON.name
+        }
+        return subcourt
+      })
+  )
   const loadingSubcourts =
     !subcourts || subcourts.some(s => s.stake === undefined)
   const draws = useCacheEvents(
@@ -58,47 +61,51 @@ const PNKStatsListCard = () => {
       [drizzleState.account]
     )
   )
-  const disputes = draws
-    ? draws.reduce(
-        (acc, d) => {
-          if (acc.atStakePerVoteByID[d.returnValues._disputeID] === undefined) {
-            acc.atStakePerVoteByID[d.returnValues._disputeID] = null
-            const dispute = cacheCall(
-              'KlerosLiquid',
-              'disputes',
-              d.returnValues._disputeID
-            )
-            const dispute2 = cacheCall(
-              'KlerosLiquid',
-              'getDispute',
-              d.returnValues._disputeID
-            )
-            if (dispute && dispute2) {
-              if (!dispute.period !== '4') {
-                acc.atStakePerVoteByID[
-                  d.returnValues._disputeID
-                ] = drizzle.web3.utils.toBN(
-                  dispute2.jurorAtStake[dispute2.jurorAtStake.length - 1]
-                )
-                acc.atStakeByID[
-                  d.returnValues._disputeID
-                ] = drizzle.web3.utils.toBN(0)
-              }
-            } else acc.loading = true
+  const disputes = useCacheCall(['KlerosLiquid'], call =>
+    draws
+      ? draws.reduce(
+          (acc, d) => {
+            if (
+              acc.atStakePerVoteByID[d.returnValues._disputeID] === undefined
+            ) {
+              acc.atStakePerVoteByID[d.returnValues._disputeID] = null
+              const dispute = call(
+                'KlerosLiquid',
+                'disputes',
+                d.returnValues._disputeID
+              )
+              const dispute2 = call(
+                'KlerosLiquid',
+                'getDispute',
+                d.returnValues._disputeID
+              )
+              if (dispute && dispute2) {
+                if (!dispute.period !== '4') {
+                  acc.atStakePerVoteByID[
+                    d.returnValues._disputeID
+                  ] = drizzle.web3.utils.toBN(
+                    dispute2.jurorAtStake[dispute2.jurorAtStake.length - 1]
+                  )
+                  acc.atStakeByID[
+                    d.returnValues._disputeID
+                  ] = drizzle.web3.utils.toBN(0)
+                }
+              } else acc.loading = true
+            }
+            if (acc.atStakePerVoteByID[d.returnValues._disputeID] !== null)
+              acc.atStakeByID[d.returnValues._disputeID] = acc.atStakeByID[
+                d.returnValues._disputeID
+              ].add(acc.atStakePerVoteByID[d.returnValues._disputeID])
+            return acc
+          },
+          {
+            atStakeByID: {},
+            atStakePerVoteByID: {},
+            loading: false
           }
-          if (acc.atStakePerVoteByID[d.returnValues._disputeID] !== null)
-            acc.atStakeByID[d.returnValues._disputeID] = acc.atStakeByID[
-              d.returnValues._disputeID
-            ].add(acc.atStakePerVoteByID[d.returnValues._disputeID])
-          return acc
-        },
-        {
-          atStakeByID: {},
-          atStakePerVoteByID: {},
-          loading: false
-        }
-      )
-    : { loading: true }
+        )
+      : { loading: true }
+  )
   return (
     <TitledListCard prefix="PNK" title="Stats">
       <StyledDiv>

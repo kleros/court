@@ -14,14 +14,14 @@ const StyledReactBlockies = styled(ReactBlockies)`
   border-radius: ${({ large }) => (large ? '4' : '16')}px;
 `
 const Identicon = ({ large, pinakion }) => {
-  const { cacheCall } = useDrizzle()
+  const { useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0],
     balance: drizzleState.accountBalances[drizzleState.accounts[0]]
   }))
   let PNK
   if (pinakion)
-    PNK = cacheCall('MiniMeTokenERC20', 'balanceOf', drizzleState.account)
+    PNK = useCacheCall('MiniMeTokenERC20', 'balanceOf', drizzleState.account)
   const content = (
     <StyledDiv>
       <StyledReactBlockies

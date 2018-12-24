@@ -5,11 +5,11 @@ import React from 'react'
 import TopBanner from '../components/top-banner'
 
 export default () => {
-  const { cacheCall } = useDrizzle()
+  const { useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
   }))
-  const subcourtIDs = cacheCall(
+  const subcourtIDs = useCacheCall(
     'KlerosLiquid',
     'getJuror',
     drizzleState.account
