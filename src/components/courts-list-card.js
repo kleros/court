@@ -12,13 +12,13 @@ const StyledListItem = styled(List.Item)`
 const CourtsListCard = () => {
   const { cacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    accounts: drizzleState.accounts
+    account: drizzleState.accounts[0]
   }))
   const load = useDataloader()
   const subcourtIDs = cacheCall(
     'KlerosLiquid',
     'getJuror',
-    drizzleState.accounts[0]
+    drizzleState.account
   )
   const names =
     subcourtIDs &&

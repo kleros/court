@@ -43,7 +43,7 @@ const StyledAmountDiv = styled.div`
 const CourtCard = ({ ID }) => {
   const { cacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    accounts: drizzleState.accounts
+    account: drizzleState.accounts[0]
   }))
   const load = useDataloader()
   let name
@@ -52,12 +52,7 @@ const CourtCard = ({ ID }) => {
     const policyJSON = load(policy.fileURI)
     if (policyJSON) name = policyJSON.name
   }
-  const stake = cacheCall(
-    'KlerosLiquid',
-    'stakeOf',
-    drizzleState.accounts[0],
-    ID
-  )
+  const stake = cacheCall('KlerosLiquid', 'stakeOf', drizzleState.account, ID)
   const subcourt = cacheCall('KlerosLiquid', 'courts', ID)
   return (
     <StyledCard

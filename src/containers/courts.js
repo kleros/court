@@ -7,12 +7,12 @@ import TopBanner from '../components/top-banner'
 export default () => {
   const { cacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    accounts: drizzleState.accounts
+    account: drizzleState.accounts[0]
   }))
   const subcourtIDs = cacheCall(
     'KlerosLiquid',
     'getJuror',
-    drizzleState.accounts[0]
+    drizzleState.account
   )
   return (
     <>

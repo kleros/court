@@ -20,13 +20,13 @@ const StyledTitleSpan = styled.span`
 const PNKStatsListCard = () => {
   const { cacheCall, drizzle, useCacheEvents } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    accounts: drizzleState.accounts
+    account: drizzleState.accounts[0]
   }))
   const load = useDataloader()
   const subcourtIDs = cacheCall(
     'KlerosLiquid',
     'getJuror',
-    drizzleState.accounts[0]
+    drizzleState.account
   )
   const subcourts =
     subcourtIDs &&
@@ -35,7 +35,7 @@ const PNKStatsListCard = () => {
       subcourt.stake = cacheCall(
         'KlerosLiquid',
         'stakeOf',
-        drizzleState.accounts[0],
+        drizzleState.account,
         ID
       )
       const policy = cacheCall('PolicyRegistry', 'policies', ID)
@@ -52,10 +52,10 @@ const PNKStatsListCard = () => {
     'Draw',
     useMemo(
       () => ({
-        filter: { _address: drizzleState.accounts[0] },
+        filter: { _address: drizzleState.account },
         fromBlock: 0
       }),
-      [drizzleState.accounts[0]]
+      [drizzleState.account]
     )
   )
   const disputes = draws

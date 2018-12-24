@@ -16,19 +16,18 @@ const StyledReactBlockies = styled(ReactBlockies)`
 const Identicon = ({ large, pinakion }) => {
   const { cacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    accountBalances: drizzleState.accountBalances,
-    accounts: drizzleState.accounts,
-    contracts: drizzleState.contracts
+    account: drizzleState.accounts[0],
+    balance: drizzleState.accountBalances[drizzleState.accounts[0]]
   }))
   let PNK
   if (pinakion)
-    PNK = cacheCall('MiniMeTokenERC20', 'balanceOf', drizzleState.accounts[0])
+    PNK = cacheCall('MiniMeTokenERC20', 'balanceOf', drizzleState.account)
   const content = (
     <StyledDiv>
       <StyledReactBlockies
         large={large}
         scale={large ? 7 : 4}
-        seed={drizzleState.accounts[0].toLowerCase()}
+        seed={drizzleState.account.toLowerCase()}
         size={large ? 14 : 8}
       />
     </StyledDiv>
@@ -42,30 +41,20 @@ const Identicon = ({ large, pinakion }) => {
         <List>
           <List.Item>
             <List.Item.Meta
-              description={<ETHAddress address={drizzleState.accounts[0]} />}
+              description={<ETHAddress address={drizzleState.account} />}
               title="Address"
             />
           </List.Item>
           <List.Item>
             <List.Item.Meta
               description={
-                <ETHAmount
-                  amount={
-                    drizzleState.accountBalances[drizzleState.accounts[0]]
-                  }
-                  decimals={4}
-                />
+                <ETHAmount amount={drizzleState.balance} decimals={4} />
               }
               title="ETH"
             />
           </List.Item>
           {pinakion && (
-            <Spin
-              spinning={
-                !drizzleState.contracts.MiniMeTokenERC20.synced ||
-                PNK === undefined
-              }
-            >
+            <Spin spinning={PNK === undefined}>
               <List.Item>
                 <List.Item.Meta
                   description={<ETHAmount amount={PNK} />}

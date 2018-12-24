@@ -121,13 +121,13 @@ export const Initializer = ({
   loadingWeb3
 }) => {
   const drizzleState = useDrizzleState(drizzleState => ({
-    drizzleStatus: drizzleState.drizzleStatus,
-    web3: drizzleState.web3
+    drizzleStatusInitialized: drizzleState.drizzleStatus.initialized,
+    web3Status: drizzleState.web3.status
   }))
-  if (drizzleState.drizzleStatus.initialized) return children
-  if (drizzleState.web3.status === 'initialized')
+  if (drizzleState.drizzleStatusInitialized) return children
+  if (drizzleState.web3Status === 'initialized')
     return loadingContractsAndAccounts
-  if (drizzleState.web3.status === 'failed') return error
+  if (drizzleState.web3Status === 'failed') return error
   return loadingWeb3
 }
 

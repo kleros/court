@@ -9,7 +9,7 @@ const NotificationSettingsForm = Form.create()(
   styled(({ className, form, settings: { key, ...settings } }) => {
     const { drizzle } = useDrizzle()
     const drizzleState = useDrizzleState(drizzleState => ({
-      accounts: drizzleState.accounts
+      account: drizzleState.accounts[0]
     }))
     const [status, setStatus] = useState()
     return (
@@ -43,11 +43,11 @@ const NotificationSettingsForm = Form.create()(
                     {
                       body: JSON.stringify({
                         payload: {
-                          address: drizzleState.accounts[0],
+                          address: drizzleState.account,
                           settings,
                           signature: await drizzle.web3.eth.personal.sign(
                             JSON.stringify(settings),
-                            drizzleState.accounts[0]
+                            drizzleState.account
                           )
                         }
                       }),
@@ -63,7 +63,7 @@ const NotificationSettingsForm = Form.create()(
               }
             })
           },
-          [form.validateFieldsAndScroll, drizzleState.accounts[0]]
+          [form.validateFieldsAndScroll, drizzleState.account]
         )}
       >
         <Divider>I wish to be notified when:</Divider>

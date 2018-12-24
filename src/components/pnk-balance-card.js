@@ -1,4 +1,4 @@
-import { Card, Col, Row, Spin } from 'antd'
+import { Card, Col, Row } from 'antd'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import ETHAddress from './eth-address'
 import ETHAmount from './eth-amount'
@@ -51,97 +51,83 @@ const StyledSectionArrowBackground = styled(SectionArrowBackground)`
 const PNKBalanceCard = () => {
   const { cacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    accountBalances: drizzleState.accountBalances,
-    accounts: drizzleState.accounts,
-    contracts: drizzleState.contracts
+    account: drizzleState.accounts[0],
+    balance: drizzleState.accountBalances[drizzleState.accounts[0]]
   }))
-  const juror = cacheCall('KlerosLiquid', 'jurors', drizzleState.accounts[0])
+  const juror = cacheCall('KlerosLiquid', 'jurors', drizzleState.account)
   return (
     <StyledCard hoverable>
-      <Spin
-        spinning={
-          !drizzleState.contracts.KlerosLiquid.synced ||
-          !drizzleState.contracts.MiniMeTokenERC20.synced
-        }
-      >
-        <Row>
-          <Col span={8}>
-            <Row>
-              <Col span={10}>
-                <Identicon large />
-              </Col>
-              <Col span={14}>
-                <StyledDiv>
-                  <ETHAddress address={drizzleState.accounts[0]} />
-                </StyledDiv>
-                <StyledDiv>
+      <Row>
+        <Col span={8}>
+          <Row>
+            <Col span={10}>
+              <Identicon large />
+            </Col>
+            <Col span={14}>
+              <StyledDiv>
+                <ETHAddress address={drizzleState.account} />
+              </StyledDiv>
+              <StyledDiv>
+                <ETHAmount
+                  amount={cacheCall(
+                    'MiniMeTokenERC20',
+                    'balanceOf',
+                    drizzleState.account
+                  )}
+                />{' '}
+                PNK
+              </StyledDiv>
+              <StyledDiv>
+                <ETHAmount amount={drizzleState.balance} decimals={4} /> ETH
+              </StyledDiv>
+            </Col>
+          </Row>
+          <StyledSectionArrow className="ternary-stroke" />
+        </Col>
+        <Col className="ternary-color theme-color" span={8}>
+          <StyledTopDiv>You have</StyledTopDiv>
+          <StyledCenterDiv>
+            <ETHAmount amount={juror && juror.stakedTokens} /> PNK
+          </StyledCenterDiv>
+          <StyledBottomDiv>
+            Staked{' '}
+            <Hint
+              description="The more you stake, the higher your chances of being drawn as a juror."
+              title={
+                <>
                   <ETHAmount
-                    amount={cacheCall(
-                      'MiniMeTokenERC20',
-                      'balanceOf',
-                      drizzleState.accounts[0]
-                    )}
+                    amount={juror && juror.stakedTokens}
+                    decimals={10}
                   />{' '}
                   PNK
-                </StyledDiv>
-                <StyledDiv>
+                </>
+              }
+            />
+          </StyledBottomDiv>
+        </Col>
+        <StyledCol className="ternary-color theme-color" span={8}>
+          <StyledTopDiv>You have</StyledTopDiv>
+          <StyledCenterDiv>
+            <ETHAmount amount={juror && juror.lockedTokens} /> PNK
+          </StyledCenterDiv>
+          <StyledBottomDiv>
+            Locked{' '}
+            <Hint
+              description="This PNK is locked in active disputes for potential redistribution."
+              title={
+                <>
                   <ETHAmount
-                    amount={
-                      drizzleState.accountBalances[drizzleState.accounts[0]]
-                    }
-                    decimals={4}
+                    amount={juror && juror.lockedTokens}
+                    decimals={10}
                   />{' '}
-                  ETH
-                </StyledDiv>
-              </Col>
-            </Row>
-            <StyledSectionArrow className="ternary-stroke" />
-          </Col>
-          <Col className="ternary-color theme-color" span={8}>
-            <StyledTopDiv>You have</StyledTopDiv>
-            <StyledCenterDiv>
-              <ETHAmount amount={juror && juror.stakedTokens} /> PNK
-            </StyledCenterDiv>
-            <StyledBottomDiv>
-              Staked{' '}
-              <Hint
-                description="The more you stake, the higher your chances of being drawn as a juror."
-                title={
-                  <>
-                    <ETHAmount
-                      amount={juror && juror.stakedTokens}
-                      decimals={10}
-                    />{' '}
-                    PNK
-                  </>
-                }
-              />
-            </StyledBottomDiv>
-          </Col>
-          <StyledCol className="ternary-color theme-color" span={8}>
-            <StyledTopDiv>You have</StyledTopDiv>
-            <StyledCenterDiv>
-              <ETHAmount amount={juror && juror.lockedTokens} /> PNK
-            </StyledCenterDiv>
-            <StyledBottomDiv>
-              Locked{' '}
-              <Hint
-                description="This PNK is locked in active disputes for potential redistribution."
-                title={
-                  <>
-                    <ETHAmount
-                      amount={juror && juror.lockedTokens}
-                      decimals={10}
-                    />{' '}
-                    PNK
-                  </>
-                }
-              />
-            </StyledBottomDiv>
-            <StyledSectionArrowBackground />
-          </StyledCol>
-        </Row>
-      </Spin>
+                  PNK
+                </>
+              }
+            />
+          </StyledBottomDiv>
+          <StyledSectionArrowBackground />
+        </StyledCol>
+      </Row>
     </StyledCard>
   )
 }

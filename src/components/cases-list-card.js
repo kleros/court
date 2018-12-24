@@ -40,17 +40,17 @@ const StyledHourglass = styled(Hourglass)`
 const CasesListCard = () => {
   const { cacheCall, useCacheEvents } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    accounts: drizzleState.accounts
+    account: drizzleState.accounts[0]
   }))
   const draws = useCacheEvents(
     'KlerosLiquid',
     'Draw',
     useMemo(
       () => ({
-        filter: { _address: drizzleState.accounts[0] },
+        filter: { _address: drizzleState.account },
         fromBlock: 0
       }),
-      [drizzleState.accounts[0]]
+      [drizzleState.account]
     )
   )
   const disputes = draws
