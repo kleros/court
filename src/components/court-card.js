@@ -1,5 +1,5 @@
 import { Button, Card } from 'antd'
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import { ReactComponent as Close } from '../assets/images/close.svg'
 import ETHAmount from './eth-amount'
@@ -40,7 +40,7 @@ const StyledDiv = styled.div`
 const StyledAmountDiv = styled.div`
   font-weight: bold;
 `
-const CourtCard = ({ ID }) => {
+const CourtCard = ({ ID, onClick }) => {
   const { useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
@@ -73,6 +73,7 @@ const CourtCard = ({ ID }) => {
       extra={<Close />}
       hoverable
       loading={name === undefined}
+      onClick={useCallback(() => onClick(ID), [onClick, ID])}
       title={name}
     >
       <StyledCardGrid>
@@ -111,7 +112,8 @@ const CourtCard = ({ ID }) => {
 }
 
 CourtCard.propTypes = {
-  ID: PropTypes.string.isRequired
+  ID: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired
 }
 
 export default CourtCard

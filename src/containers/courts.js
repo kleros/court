@@ -1,7 +1,8 @@
 import { Button, Col, Row, Spin } from 'antd'
+import React, { useState } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import CourtCard from '../components/court-card'
-import React from 'react'
+import CourtDrawer from '../components/court-drawer'
 import TopBanner from '../components/top-banner'
 
 export default () => {
@@ -9,6 +10,7 @@ export default () => {
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
   }))
+  const [activeID, setActiveID] = useState()
   const subcourtIDs = useCacheCall(
     'KlerosLiquid',
     'getJuror',
@@ -31,11 +33,14 @@ export default () => {
           {subcourtIDs &&
             subcourtIDs.map(ID => (
               <Col key={ID} span={8}>
-                <CourtCard ID={ID} />
+                <CourtCard ID={ID} onClick={setActiveID} />
               </Col>
             ))}
         </Row>
       </Spin>
+      {activeID !== undefined && (
+        <CourtDrawer ID={activeID} onClose={setActiveID} />
+      )}
     </>
   )
 }

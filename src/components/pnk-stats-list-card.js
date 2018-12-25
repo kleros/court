@@ -33,7 +33,7 @@ const PNKStatsListCard = () => {
     call =>
       subcourtIDs &&
       subcourtIDs.map(ID => {
-        const subcourt = {}
+        const subcourt = { name: undefined, stake: undefined }
         subcourt.stake = call(
           'KlerosLiquid',
           'stakeOf',
