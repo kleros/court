@@ -2,6 +2,7 @@ import { Col, Drawer, Row, Skeleton, Spin } from 'antd'
 import React, { useCallback, useState } from 'react'
 import Breadcrumbs from './breadcrumbs'
 import PropTypes from 'prop-types'
+import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components/macro'
 import { triangle } from 'polished'
 import { useDataloader } from '../bootstrap/dataloader'
@@ -109,11 +110,11 @@ const CourtDrawer = ({ ID, onClose }) => {
           <Row>
             <Col span={12}>
               <StyledDiv>Description</StyledDiv>
-              {subcourts[activeIndex].description}
+              <ReactMarkdown source={subcourts[activeIndex].description} />
             </Col>
             <Col span={12}>
               <StyledDiv>Summary</StyledDiv>
-              {subcourts[activeIndex].summary}
+              <ReactMarkdown source={subcourts[activeIndex].summary} />
             </Col>
           </Row>
         )}
