@@ -1,6 +1,6 @@
 {
   "name": "General Court",
-  "description": "> “Whoever controls the courts, controls the state.”\n>\n> Aristotle\n\n###### General Court\n\nThis is a sample description for a Kleros policy. It supports markdown!\n\n| Look | Tables |\n| ---- | ------ |\n| too  | ✔      |\n| how  | ✔      |\n| cool | ✔      |\n",
+  "description": "> “Whoever controls the courts, controls the state.”\n>\n> Aristotle\n\n#### General Court\n\nThis is a sample description for a Kleros policy. It supports markdown!\n\n| Look | Tables |\n| ---- | ------ |\n| too  | ✔      |\n| how  | ✔      |\n| cool | ✔      |\n",
   "summary": "You can also write code if you ever need to.\n\n```js\nimport React from 'react'\nimport ReactDOM from 'react-dom'\n\nReactDOM.render(\n  <div>Decentralize Justice!</div>,\n  document.getElementById('root')\n)\n```\n",
   "policies": [
     {
