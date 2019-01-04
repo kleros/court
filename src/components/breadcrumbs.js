@@ -13,45 +13,75 @@ const StyledBreadcrumbDiv = styled.div`
   top: 0;
   z-index: ${props => props.length - props.id};
 `
+const StyledBreadcrumb = styled(Breadcrumb)`
+  height: ${props => (props.large === 'true' ? 38 : 20)}px;
+  width: ${props => (props.large === 'true' ? 151 : 114)}px;
+`
 const StyledTitleDiv = styled.div`
   color: white;
-  font-size: 10px;
-  left: 20px;
+  font-size: ${props => (props.large ? 14 : 10)}px;
+  left: ${props => (props.large ? 16 : 20)}px;
+  line-height: ${props => (props.large ? 38 : 20)}px;
   ${props => props.active && 'font-weight: bold;'}
   position: absolute;
   top: 0;
   user-select: none;
 `
-const Breadcrumbs = ({ activeIndex, breadcrumbs, className, onClick }) => (
+const Breadcrumbs = ({
+  activeIndex,
+  breadcrumbs,
+  className,
+  colorIndex,
+  large,
+  onClick
+}) => (
   <StyledDiv className={className}>
-    {breadcrumbs.map((b, i) => (
+    {(Array.isArray(breadcrumbs) ? breadcrumbs : [breadcrumbs]).map((b, i) => (
       <StyledBreadcrumbDiv
         id={i}
         key={i}
         length={breadcrumbs.length}
-        onClick={useCallback(
-          ({ currentTarget: { id } }) => onClick(Number(id)),
-          [onClick]
-        )}
+        onClick={
+          onClick &&
+          useCallback(({ currentTarget: { id } }) => onClick(Number(id)), [
+            onClick
+          ])
+        }
       >
-        <Breadcrumb
-          className={`${['primary', 'secondary', 'ternary'][i % 3]}-fill`}
+        <StyledBreadcrumb
+          className={`${
+            ['primary', 'secondary', 'ternary'][
+              (colorIndex === null ? i : colorIndex) % 3
+            ]
+          }-fill`}
+          large={String(large)}
         />
-        <StyledTitleDiv active={i === activeIndex}>{b}</StyledTitleDiv>
+        <StyledTitleDiv active={i === activeIndex} large={large}>
+          {b}
+        </StyledTitleDiv>
       </StyledBreadcrumbDiv>
     ))}
   </StyledDiv>
 )
 
 Breadcrumbs.propTypes = {
-  activeIndex: PropTypes.number.isRequired,
-  breadcrumbs: PropTypes.arrayOf(PropTypes.node.isRequired).isRequired,
+  activeIndex: PropTypes.number,
+  breadcrumbs: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node.isRequired).isRequired,
+    PropTypes.node.isRequired
+  ]).isRequired,
   className: PropTypes.string,
-  onClick: PropTypes.func.isRequired
+  colorIndex: PropTypes.number,
+  large: PropTypes.bool,
+  onClick: PropTypes.func
 }
 
 Breadcrumbs.defaultProps = {
-  className: null
+  activeIndex: null,
+  className: null,
+  colorIndex: null,
+  large: false,
+  onClick: null
 }
 
 export default Breadcrumbs

@@ -35,12 +35,12 @@ const StyledTextCardGrid = styled(StyledCardGrid)`
   z-index: -1;
 `
 const WelcomeCard = ({ icon, text, version }) => (
-  <StyledCard bordered={false} className="secondary-linear-background">
+  <StyledCard bordered={false}>
     <StyledIconCardGrid>
       {icon}
       <StyledDiv>{version}</StyledDiv>
     </StyledIconCardGrid>
-    <StyledTextCardGrid className="theme-linear-background">
+    <StyledTextCardGrid className="secondary-linear-background theme-linear-background">
       {text}
     </StyledTextCardGrid>
   </StyledCard>

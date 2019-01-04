@@ -1,7 +1,8 @@
 import { Button, Col, Row, Spin } from 'antd'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import CourtCard from '../components/court-card'
+import CourtCascaderModal from '../components/court-cascader-modal'
 import CourtDrawer from '../components/court-drawer'
 import TopBanner from '../components/top-banner'
 
@@ -11,6 +12,7 @@ export default () => {
     account: drizzleState.accounts[0]
   }))
   const [activeID, setActiveID] = useState()
+  const [stakingID, setStakingID] = useState()
   const subcourtIDs = useCacheCall(
     'KlerosLiquid',
     'getJuror',
@@ -21,7 +23,11 @@ export default () => {
       <TopBanner
         description="Select courts and stake PNK."
         extra={
-          <Button size="large" type="primary">
+          <Button
+            onClick={useCallback(() => setStakingID(null), [])}
+            size="large"
+            type="primary"
+          >
             Select Court
           </Button>
         }
@@ -41,6 +47,7 @@ export default () => {
       {activeID !== undefined && (
         <CourtDrawer ID={activeID} onClose={setActiveID} />
       )}
+      {stakingID === null && <CourtCascaderModal onClick={setStakingID} />}
     </>
   )
 }
