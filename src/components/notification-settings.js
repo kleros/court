@@ -114,7 +114,6 @@ const NotificationSettingsForm = Form.create()(
                 ? 'Saved settings.'
                 : 'Failed to save settings.'
             }
-            showIcon
             type={status}
           />
         )}

@@ -40,7 +40,7 @@ const StyledDiv = styled.div`
 const StyledAmountDiv = styled.div`
   font-weight: bold;
 `
-const CourtCard = ({ ID, onClick }) => {
+const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
   const { useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
@@ -59,12 +59,18 @@ const CourtCard = ({ ID, onClick }) => {
     ID
   )
   const subcourt = useCacheCall('KlerosLiquid', 'courts', ID)
+  const onStakeClick = useCallback(
+    e => {
+      e.stopPropagation()
+      _onStakeClick(ID)
+    },
+    [_onStakeClick, ID]
+  )
   return (
     <StyledCard
       actions={useMemo(
         () => [
-          <Button size="large">Unstake</Button>,
-          <Button size="large" type="primary">
+          <Button onClick={onStakeClick} size="large" type="primary">
             Stake
           </Button>
         ],
@@ -113,7 +119,8 @@ const CourtCard = ({ ID, onClick }) => {
 
 CourtCard.propTypes = {
   ID: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired,
+  onStakeClick: PropTypes.func.isRequired
 }
 
 export default CourtCard

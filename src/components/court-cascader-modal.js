@@ -146,18 +146,16 @@ const CourtCascaderModal = ({ onClick }) => {
       centered
       footer={
         <Skeleton active loading={option.loading}>
-          {
-            <Row>
-              <Col span={12}>
-                <StyledDiv>Description</StyledDiv>
-                <ReactMarkdown source={option.description} />
-              </Col>
-              <Col span={12}>
-                <StyledDiv>Summary</StyledDiv>
-                <ReactMarkdown source={option.summary} />
-              </Col>
-            </Row>
-          }
+          <Row>
+            <Col span={12}>
+              <StyledDiv>Description</StyledDiv>
+              <ReactMarkdown source={option.description} />
+            </Col>
+            <Col span={12}>
+              <StyledDiv>Summary</StyledDiv>
+              <ReactMarkdown source={option.summary} />
+            </Col>
+          </Row>
         </Skeleton>
       }
       onCancel={useCallback(() => onClick(), [onClick])}

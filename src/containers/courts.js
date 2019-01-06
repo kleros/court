@@ -4,6 +4,7 @@ import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import CourtCard from '../components/court-card'
 import CourtCascaderModal from '../components/court-cascader-modal'
 import CourtDrawer from '../components/court-drawer'
+import StakeModal from '../components/stake-modal'
 import TopBanner from '../components/top-banner'
 
 export default () => {
@@ -39,7 +40,11 @@ export default () => {
           {subcourtIDs &&
             subcourtIDs.map(ID => (
               <Col key={ID} span={8}>
-                <CourtCard ID={ID} onClick={setActiveID} />
+                <CourtCard
+                  ID={ID}
+                  onClick={setActiveID}
+                  onStakeClick={setStakingID}
+                />
               </Col>
             ))}
         </Row>
@@ -47,7 +52,11 @@ export default () => {
       {activeID !== undefined && (
         <CourtDrawer ID={activeID} onClose={setActiveID} />
       )}
-      {stakingID === null && <CourtCascaderModal onClick={setStakingID} />}
+      {stakingID === undefined ? null : stakingID === null ? (
+        <CourtCascaderModal onClick={setStakingID} />
+      ) : (
+        <StakeModal ID={stakingID} onCancel={setStakingID} />
+      )}
     </>
   )
 }
