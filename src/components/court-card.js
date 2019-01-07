@@ -1,4 +1,4 @@
-import { Button, Card } from 'antd'
+import { Button, Card, Popconfirm } from 'antd'
 import React, { useCallback, useMemo } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import { ReactComponent as Close } from '../assets/images/close.svg'
@@ -41,7 +41,7 @@ const StyledAmountDiv = styled.div`
   font-weight: bold;
 `
 const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
-  const { useCacheCall } = useDrizzle()
+  const { useCacheCall, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
   }))
@@ -59,6 +59,7 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
     ID
   )
   const subcourt = useCacheCall('KlerosLiquid', 'courts', ID)
+  const { send, status } = useCacheSend('KlerosLiquid', 'setStake')
   const onStakeClick = useCallback(
     e => {
       e.stopPropagation()
@@ -76,9 +77,25 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
         ],
         []
       )}
-      extra={<Close />}
+      extra={
+        <Popconfirm
+          cancelText="No"
+          okText="Yes"
+          onClick={useCallback(e => e.stopPropagation(), [])}
+          onConfirm={useCallback(
+            e => {
+              e.stopPropagation()
+              send(ID, 0)
+            },
+            [ID]
+          )}
+          title="Unstake all of your PNK from this court?"
+        >
+          <Close />
+        </Popconfirm>
+      }
       hoverable
-      loading={name === undefined}
+      loading={name === undefined || (status && status !== 'error')}
       onClick={useCallback(() => onClick(ID), [onClick, ID])}
       title={name}
     >

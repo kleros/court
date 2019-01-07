@@ -80,10 +80,7 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
   const min = stake && minStake && minStake.sub(stake)
   const max = balance && stakedTokens && balance.sub(stakedTokens)
   const loading = !min || !max
-  const { send, transactions } = useCacheSend('KlerosLiquid', 'setStake')
-  const status =
-    transactions[transactions.length - 1] &&
-    transactions[transactions.length - 1].status
+  const { send, status } = useCacheSend('KlerosLiquid', 'setStake')
   const hasError = Object.values(form.getFieldsError()).some(v => v)
   return (
     <StyledModal

@@ -165,7 +165,7 @@ const CourtCascaderModal = ({ onClick }) => {
           <Button
             onClick={useCallback(
               () => onClick(subcourtIDs[subcourtIDs.length - 1]),
-              [onClick]
+              [onClick, subcourtIDs[subcourtIDs.length - 1]]
             )}
             size="small"
             type="primary"
