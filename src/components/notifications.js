@@ -1,7 +1,7 @@
 import { Badge, List, Popover } from 'antd'
 import { ReactComponent as Alert } from '../assets/images/alert.svg'
 import { ReactComponent as Bell } from '../assets/images/bell.svg'
-import { NavLink } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import React from 'react'
 import TimeAgo from './time-ago'
@@ -31,13 +31,13 @@ const StyledListItem = styled(List.Item)`
 `
 const Notification = ({ date, message, to, type }) => (
   <StyledListItem>
-    <NavLink to={to}>
+    <Link to={to}>
       <List.Item.Meta
         avatar={<Alert className={`${type}-fill`} />}
         description={<TimeAgo className={`${type}-color`}>{date}</TimeAgo>}
         title={message}
       />
-    </NavLink>
+    </Link>
   </StyledListItem>
 )
 
@@ -54,7 +54,7 @@ const StyledList = styled(List)`
   overflow-y: scroll;
   padding-right: 16px;
 `
-const StyledNavLink = styled(NavLink)`
+const StyledLink = styled(Link)`
   float: right;
   font-size: 10px;
   line-height: 21px;
@@ -73,7 +73,7 @@ const Notifications = ({ notifications }) => (
     placement="bottomRight"
     title={
       <>
-        Notifications <StyledNavLink to="/notifications">History</StyledNavLink>
+        Notifications <StyledLink to="/notifications">History</StyledLink>
       </>
     }
     trigger="click"
