@@ -43,9 +43,7 @@ const Breadcrumbs = ({
         length={breadcrumbs.length}
         onClick={
           onClick &&
-          useCallback(({ currentTarget: { id } }) => onClick(Number(id)), [
-            onClick
-          ])
+          useCallback(e => onClick(Number(e.currentTarget.id)), [onClick])
         }
       >
         <StyledBreadcrumb

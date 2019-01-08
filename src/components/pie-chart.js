@@ -27,10 +27,10 @@ const StyledTooltipDiv = styled.div.attrs(({ x, y }) => ({
 `
 const PieChart = ({ data, title }) => {
   const [state, setState] = useState({ dataIndex: null, x: null, y: null })
-  const onMouseMove = useCallback(event => {
-    const bounds = event.currentTarget.getBoundingClientRect()
-    const x = event.clientX - bounds.left
-    const y = event.clientY - bounds.top
+  const onMouseMove = useCallback(e => {
+    const bounds = e.currentTarget.getBoundingClientRect()
+    const x = e.clientX - bounds.left
+    const y = e.clientY - bounds.top
     setState(state => ({ ...state, x, y }))
   }, [])
   const onMouseOut = useCallback(
