@@ -68,19 +68,31 @@ const CasesListCard = () => {
               if (dispute) {
                 acc[dispute.period === '4' ? 'executed' : 'active']++
                 if (dispute.period === '1' || dispute.period === '2') {
-                  const subcourt = call(
+                  const dispute2 = call(
                     'KlerosLiquid',
-                    'getSubcourt',
-                    dispute.subcourtID
+                    'getDispute',
+                    d.returnValues._disputeID
                   )
-                  if (subcourt) {
-                    const deadline = new Date(
-                      (Number(dispute.lastPeriodChange) +
-                        Number(subcourt.timesPerPeriod[dispute.period])) *
-                        1000
-                    )
-                    if (!acc.deadline || deadline < acc.deadline)
-                      acc.deadline = deadline
+                  if (dispute2) {
+                    if (
+                      Number(d.returnValues._appeal) ===
+                      dispute2.jurorAtStake.length - 1
+                    ) {
+                      const subcourt = call(
+                        'KlerosLiquid',
+                        'getSubcourt',
+                        dispute.subcourtID
+                      )
+                      if (subcourt) {
+                        const deadline = new Date(
+                          (Number(dispute.lastPeriodChange) +
+                            Number(subcourt.timesPerPeriod[dispute.period])) *
+                            1000
+                        )
+                        if (!acc.deadline || deadline < acc.deadline)
+                          acc.deadline = deadline
+                      } else acc.loading = true
+                    }
                   } else acc.loading = true
                 }
               } else acc.loading = true
