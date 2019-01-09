@@ -76,7 +76,7 @@ const CasesListCard = () => {
                   if (dispute2) {
                     if (
                       Number(d.returnValues._appeal) ===
-                      dispute2.jurorAtStake.length - 1
+                      dispute2.votesLengths.length - 1
                     ) {
                       const subcourt = call(
                         'KlerosLiquid',

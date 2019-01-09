@@ -65,10 +65,8 @@ const PNKStatsListCard = () => {
     draws
       ? draws.reduce(
           (acc, d) => {
-            if (
-              acc.atStakePerVoteByID[d.returnValues._disputeID] === undefined
-            ) {
-              acc.atStakePerVoteByID[d.returnValues._disputeID] = null
+            if (acc.jurorAtStakeByID[d.returnValues._disputeID] === undefined) {
+              acc.jurorAtStakeByID[d.returnValues._disputeID] = null
               const dispute = call(
                 'KlerosLiquid',
                 'disputes',
@@ -81,26 +79,28 @@ const PNKStatsListCard = () => {
               )
               if (dispute && dispute2) {
                 if (!dispute.period !== '4') {
-                  acc.atStakePerVoteByID[
+                  acc.jurorAtStakeByID[
                     d.returnValues._disputeID
-                  ] = drizzle.web3.utils.toBN(
-                    dispute2.jurorAtStake[dispute2.jurorAtStake.length - 1]
-                  )
+                  ] = dispute2.jurorAtStake.map(drizzle.web3.utils.toBN)
                   acc.atStakeByID[
                     d.returnValues._disputeID
                   ] = drizzle.web3.utils.toBN(0)
                 }
               } else acc.loading = true
             }
-            if (acc.atStakePerVoteByID[d.returnValues._disputeID] !== null)
+            if (acc.jurorAtStakeByID[d.returnValues._disputeID] !== null)
               acc.atStakeByID[d.returnValues._disputeID] = acc.atStakeByID[
                 d.returnValues._disputeID
-              ].add(acc.atStakePerVoteByID[d.returnValues._disputeID])
+              ].add(
+                acc.jurorAtStakeByID[d.returnValues._disputeID][
+                  d.returnValues._appeal
+                ]
+              )
             return acc
           },
           {
             atStakeByID: {},
-            atStakePerVoteByID: {},
+            jurorAtStakeByID: {},
             loading: false
           }
         )
