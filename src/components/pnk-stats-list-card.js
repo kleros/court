@@ -134,16 +134,16 @@ const PNKStatsListCard = () => {
             data={
               disputes.loading
                 ? loadingPieChartData
-                : Object.entries(disputes.atStakeByID).map(s => ({
+                : Object.keys(disputes.atStakeByID).map(ID => ({
                     tooltip: (
                       <>
                         <StyledAmountSpan>
-                          <ETHAmount amount={s[1]} /> PNK
+                          <ETHAmount amount={disputes.atStakeByID[ID]} /> PNK
                         </StyledAmountSpan>
-                        <StyledTitleSpan> - Case {s[0]}</StyledTitleSpan>
+                        <StyledTitleSpan> - Case {ID}</StyledTitleSpan>
                       </>
                     ),
-                    value: Number(s[1])
+                    value: Number(disputes.atStakeByID[ID])
                   }))
             }
             title="Locked Tokens"

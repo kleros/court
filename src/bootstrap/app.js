@@ -2,6 +2,7 @@ import '../components/theme.css'
 import { BrowserRouter, NavLink, Route, Switch } from 'react-router-dom'
 import { Col, Layout, Menu, Row } from 'antd'
 import { DrizzleProvider, Initializer } from '../temp/drizzle-react-hooks'
+import { ArchonInitializer } from './archon'
 import Cases from '../containers/cases'
 import Courts from '../containers/courts'
 import { Helmet } from 'react-helmet'
@@ -77,54 +78,56 @@ export default () => (
     </Helmet>
     <DrizzleProvider drizzle={drizzle}>
       <Initializer>
-        <BrowserRouter>
-          <Layout>
-            <Layout.Header>
-              <Row>
-                <StyledCol span={4}>
-                  <Logo />
-                </StyledCol>
-                <Col span={16}>
-                  <StyledMenu mode="horizontal" theme="dark">
-                    <Menu.Item key="home">
-                      <NavLink to="/">Home</NavLink>
-                    </Menu.Item>
-                    <Menu.Item key="courts">
-                      <NavLink to="/courts">Courts</NavLink>
-                    </Menu.Item>
-                    <Menu.Item key="cases">
-                      <NavLink to="/cases">Cases</NavLink>
-                    </Menu.Item>
-                    <Menu.Item key="tokens">
-                      <NavLink to="/tokens">Tokens</NavLink>
-                    </Menu.Item>
-                    <Menu.Item key="governance">
-                      <NavLink to="/governance">Governance</NavLink>
-                    </Menu.Item>
-                    <Menu.Item key="guide">
-                      <NavLink to="/guide">Guide</NavLink>
-                    </Menu.Item>
-                  </StyledMenu>
-                </Col>
-                <StyledCol span={4}>
-                  <Notifications notifications={notifications} />
-                  <NotificationSettings settings={settings} />
-                  <Identicon pinakion />
-                </StyledCol>
-              </Row>
-            </Layout.Header>
-            <StyledLayoutContent>
-              <Switch>
-                <Route component={Home} exact path="/" />
-                <Route component={Courts} exact path="/courts" />
-                <Route component={Cases} exact path="/cases" />
-                <Route exact path="/tokens" />
-                <Route exact path="/governance" />
-                <Route exact path="/guide" />
-              </Switch>
-            </StyledLayoutContent>
-          </Layout>
-        </BrowserRouter>
+        <ArchonInitializer>
+          <BrowserRouter>
+            <Layout>
+              <Layout.Header>
+                <Row>
+                  <StyledCol span={4}>
+                    <Logo />
+                  </StyledCol>
+                  <Col span={16}>
+                    <StyledMenu mode="horizontal" theme="dark">
+                      <Menu.Item key="home">
+                        <NavLink to="/">Home</NavLink>
+                      </Menu.Item>
+                      <Menu.Item key="courts">
+                        <NavLink to="/courts">Courts</NavLink>
+                      </Menu.Item>
+                      <Menu.Item key="cases">
+                        <NavLink to="/cases">Cases</NavLink>
+                      </Menu.Item>
+                      <Menu.Item key="tokens">
+                        <NavLink to="/tokens">Tokens</NavLink>
+                      </Menu.Item>
+                      <Menu.Item key="governance">
+                        <NavLink to="/governance">Governance</NavLink>
+                      </Menu.Item>
+                      <Menu.Item key="guide">
+                        <NavLink to="/guide">Guide</NavLink>
+                      </Menu.Item>
+                    </StyledMenu>
+                  </Col>
+                  <StyledCol span={4}>
+                    <Notifications notifications={notifications} />
+                    <NotificationSettings settings={settings} />
+                    <Identicon pinakion />
+                  </StyledCol>
+                </Row>
+              </Layout.Header>
+              <StyledLayoutContent>
+                <Switch>
+                  <Route component={Home} exact path="/" />
+                  <Route component={Courts} exact path="/courts" />
+                  <Route component={Cases} exact path="/cases" />
+                  <Route exact path="/tokens" />
+                  <Route exact path="/governance" />
+                  <Route exact path="/guide" />
+                </Switch>
+              </StyledLayoutContent>
+            </Layout>
+          </BrowserRouter>
+        </ArchonInitializer>
       </Initializer>
     </DrizzleProvider>
   </>

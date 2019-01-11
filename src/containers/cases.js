@@ -1,6 +1,7 @@
 import { Button, Col, Divider, Radio, Row, Spin } from 'antd'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import CaseCard from '../components/case-card'
 import { Link } from 'react-router-dom'
 import TopBanner from '../components/top-banner'
 import styled from 'styled-components/macro'
@@ -76,7 +77,7 @@ export default () => {
         <Row gutter={48}>
           {disputes[filter ? 'activeIDs' : 'executedIDs'].map(ID => (
             <Col key={ID} span={8}>
-              {ID}
+              <CaseCard ID={ID} />
             </Col>
           ))}
         </Row>

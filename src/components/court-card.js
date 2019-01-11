@@ -9,7 +9,7 @@ import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
 
 const StyledCard = styled(Card)`
-  margin: 20px 0;
+  margin: 10px 0;
   text-align: center;
 
   .ant-card-actions {

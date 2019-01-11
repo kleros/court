@@ -50,6 +50,7 @@
     "standard-version": "^4.4.0"
   },
   "dependencies": {
+    "@kleros/archon": "^0.5.4",
     "antd": "^3.10.8",
     "dataloader": "^1.4.0",
     "debounce": "^1.2.0",
