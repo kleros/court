@@ -72,7 +72,7 @@ const StyledBreadcrumbs = styled(Breadcrumbs)`
 `
 const CourtCascaderModal = ({ onClick }) => {
   const { useCacheCall } = useDrizzle()
-  const load = useDataloader()
+  const load = useDataloader.load()
   const [subcourtIDs, setSubcourtIDs] = useState(['0'])
   const options = useCacheCall(['PolicyRegistry', 'KlerosLiquid'], call => {
     const options = [

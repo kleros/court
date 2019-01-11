@@ -14,7 +14,7 @@ const CourtsListCard = () => {
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
   }))
-  const load = useDataloader()
+  const load = useDataloader.load()
   const subcourtIDs = useCacheCall(
     'KlerosLiquid',
     'getJuror',

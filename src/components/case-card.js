@@ -6,7 +6,7 @@ import { ReactComponent as Gavel } from '../assets/images/gavel.svg'
 import PropTypes from 'prop-types'
 import TimeAgo from '../components/time-ago'
 import styled from 'styled-components/macro'
-import { useArchonArbitrableDataloader } from '../bootstrap/dataloader'
+import { useDataloader } from '../bootstrap/dataloader'
 
 const StyledCard = styled(Card)`
   margin: 10px 0;
@@ -83,8 +83,7 @@ const CaseCard = ({ ID }) => {
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
   }))
-  const getDispute = useArchonArbitrableDataloader.getDispute()
-  const getMetaEvidence = useArchonArbitrableDataloader.getMetaEvidence()
+  const getMetaEvidence = useDataloader.getMetaEvidence()
   const dispute = useCacheCall('KlerosLiquid', 'disputes', ID)
   const dispute2 = useCacheCall('KlerosLiquid', 'getDispute', ID)
   const draws = useCacheEvents(
@@ -143,19 +142,12 @@ const CaseCard = ({ ID }) => {
     return disputeData
   })
   let metaEvidence
-  if (dispute) {
-    const dispute2 = getDispute(
+  if (dispute)
+    metaEvidence = getMetaEvidence(
       dispute.arbitrated,
       drizzle.contracts.KlerosLiquid.address,
       ID
     )
-    if (dispute2)
-      metaEvidence = getMetaEvidence(
-        dispute.arbitrated,
-        dispute2.metaEvidenceID
-      )
-    else if (dispute2 === null) metaEvidence = null
-  }
   return (
     <StyledCard
       actions={useMemo(

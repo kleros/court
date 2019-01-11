@@ -45,7 +45,7 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
   }))
-  const load = useDataloader()
+  const load = useDataloader.load()
   let name
   const policy = useCacheCall('PolicyRegistry', 'policies', ID)
   if (policy) {

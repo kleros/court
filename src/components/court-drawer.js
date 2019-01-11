@@ -54,7 +54,7 @@ const StyledDiv = styled.div`
 `
 const CourtDrawer = ({ ID, onClose }) => {
   const { useCacheCall } = useDrizzle()
-  const load = useDataloader()
+  const load = useDataloader.load()
   const [activeIndex, setActiveIndex] = useState()
   const subcourts = useCacheCall(['PolicyRegistry', 'KlerosLiquid'], call => {
     const subcourts = []

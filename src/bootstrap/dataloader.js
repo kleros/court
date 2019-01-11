@@ -2,40 +2,38 @@ import { useRef, useState } from 'react'
 import Dataloader from 'dataloader'
 import archon from './archon'
 
-export const dataloader = new Dataloader(URLs =>
-  Promise.all(URLs.map(URL => fetch(URL).then(res => res.json())))
-)
-
-export const useDataloader = () => {
-  const [state, setState] = useState({})
-  const loadedRef = useRef({})
-  return URL =>
-    loadedRef.current[URL]
-      ? state[URL]
-      : dataloader.load(URL).then(json => {
-          loadedRef.current[URL] = true
-          setState(state => ({ ...state, [URL]: json }))
-        }) && undefined
+const funcs = {
+  getEvidence: (contractAddress, arbitratorAddress, disputeID, options) =>
+    archon.arbitrable
+      .getEvidence(contractAddress, arbitratorAddress, disputeID, {
+        strictHashes: true,
+        ...options
+      })
+      .catch(() => null),
+  getMetaEvidence: (contractAddress, arbitratorAddress, disputeID, options) =>
+    archon.arbitrable
+      .getDispute(contractAddress, arbitratorAddress, disputeID, {
+        strictHashes: true,
+        ...options
+      })
+      .then(d =>
+        archon.arbitrable.getMetaEvidence(contractAddress, d.metaEvidenceID, {
+          strictHashes: true,
+          ...options
+        })
+      )
+      .catch(() => null),
+  load: URI => fetch(URI).then(res => res.json())
 }
-
-export const archonArbitrableDataloaders = [
-  'getDispute',
-  'getMetaEvidence',
-  'getEvidence'
-].reduce((acc, f) => {
+export const dataloaders = Object.keys(funcs).reduce((acc, f) => {
   acc[f] = new Dataloader(
-    argsArr =>
-      Promise.all(
-        argsArr.map(args => archon.arbitrable[f](...args).catch(() => null))
-      ),
+    argsArr => Promise.all(argsArr.map(args => funcs[f](...args))),
     { cacheKeyFn: JSON.stringify }
   )
   return acc
 }, {})
 
-export const useArchonArbitrableDataloader = Object.keys(
-  archonArbitrableDataloaders
-).reduce((acc, f) => {
+export const useDataloader = Object.keys(dataloaders).reduce((acc, f) => {
   acc[f] = () => {
     const [state, setState] = useState({})
     const loadedRef = useRef({})
@@ -43,7 +41,7 @@ export const useArchonArbitrableDataloader = Object.keys(
       const key = JSON.stringify(args)
       return loadedRef.current[key]
         ? state[key]
-        : archonArbitrableDataloaders[f].load(args).then(res => {
+        : dataloaders[f].load(args).then(res => {
             loadedRef.current[key] = true
             setState(state => ({ ...state, [key]: res }))
           }) && undefined
