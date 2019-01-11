@@ -48,8 +48,8 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
   const load = useDataloader.load()
   let name
   const policy = useCacheCall('PolicyRegistry', 'policies', ID)
-  if (policy) {
-    const policyJSON = load(policy.fileURI)
+  if (policy !== undefined) {
+    const policyJSON = load(policy)
     if (policyJSON) name = policyJSON.name
   }
   const stake = useCacheCall(

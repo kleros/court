@@ -88,8 +88,8 @@ const CourtCascaderModal = ({ onClick }) => {
     let option = options[0]
     for (let i = 0; i < subcourtIDs.length; i++) {
       const policy = call('PolicyRegistry', 'policies', subcourtIDs[i])
-      if (policy) {
-        const policyJSON = load(policy.fileURI)
+      if (policy !== undefined) {
+        const policyJSON = load(policy)
         if (policyJSON) {
           option.description = policyJSON.description
           option.label = policyJSON.name
@@ -108,8 +108,8 @@ const CourtCascaderModal = ({ onClick }) => {
             value: c
           }
           const policy = call('PolicyRegistry', 'policies', c)
-          if (policy) {
-            const policyJSON = load(policy.fileURI)
+          if (policy !== undefined) {
+            const policyJSON = load(policy)
             if (policyJSON) {
               child.description = policyJSON.description
               child.label = policyJSON.name

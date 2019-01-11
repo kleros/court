@@ -26,8 +26,8 @@ const CourtsListCard = () => {
       subcourtIDs &&
       subcourtIDs.map(ID => {
         const policy = call('PolicyRegistry', 'policies', ID)
-        if (policy) {
-          const policyJSON = load(policy.fileURI)
+        if (policy !== undefined) {
+          const policyJSON = load(policy)
           if (policyJSON) return policyJSON.name
         }
         return undefined

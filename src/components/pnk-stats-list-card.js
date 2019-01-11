@@ -41,8 +41,8 @@ const PNKStatsListCard = () => {
           ID
         )
         const policy = call('PolicyRegistry', 'policies', ID)
-        if (policy) {
-          const policyJSON = load(policy.fileURI)
+        if (policy !== undefined) {
+          const policyJSON = load(policy)
           if (policyJSON) subcourt.name = policyJSON.name
         }
         return subcourt

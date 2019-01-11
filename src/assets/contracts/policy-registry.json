@@ -26,12 +26,8 @@
       "name": "policies",
       "outputs": [
         {
-          "name": "fileURI",
+          "name": "",
           "type": "string"
-        },
-        {
-          "name": "fileHash",
-          "type": "bytes32"
         }
       ],
       "payable": false,
@@ -59,13 +55,8 @@
         },
         {
           "indexed": false,
-          "name": "_fileURI",
+          "name": "_policy",
           "type": "string"
-        },
-        {
-          "indexed": false,
-          "name": "_fileHash",
-          "type": "bytes32"
         }
       ],
       "name": "PolicyUpdate",
@@ -93,12 +84,8 @@
           "type": "uint256"
         },
         {
-          "name": "_fileURI",
+          "name": "_policy",
           "type": "string"
-        },
-        {
-          "name": "_fileHash",
-          "type": "bytes32"
         }
       ],
       "name": "setPolicy",
@@ -108,25 +95,25 @@
       "type": "function"
     }
   ],
-  "bytecode": "0x608060405234801561001057600080fd5b5060405160208061056e833981016040525160008054600160a060020a03909216600160a060020a031990921691909117905561051c806100526000396000f3006080604052600436106100485763ffffffff60e060020a6000350416630c340a24811461004d578063bc0d43751461007e578063d3e89483146100a7578063e4c0aaf41461013f575b600080fd5b34801561005957600080fd5b50610062610160565b60408051600160a060020a039092168252519081900360200190f35b34801561008a57600080fd5b506100a560048035906024803590810191013560443561016f565b005b3480156100b357600080fd5b506100bf600435610312565b604080516020808201849052828252845192820192909252835190918291606083019186019080838360005b838110156101035781810151838201526020016100eb565b50505050905090810190601f1680156101305780820380516001836020036101000a031916815260200191505b50935050505060405180910390f35b34801561014b57600080fd5b506100a5600160a060020a03600435166103b4565b600054600160a060020a031681565b60008054600160a060020a031633146101cf576040805160e560020a62461bcd02815260206004820152602360248201526000805160206104d1833981519152604482015260e960020a6237b91702606482015290519081900360840190fd5b506000848152600160208181526040928390208083015484519283018190528483528154600261010095821615959095026000190116939093049382018490529287927f92eac1644e5b7aa3d44968da027bbd73d56f86e859d457b69bb9c7b53c3ec86b928592819060608201908590801561028c5780601f106102615761010080835404028352916020019161028c565b820191906000526020600020905b81548152906001019060200180831161026f57829003601f168201915b5050935050505060405180910390a26040805160606020601f870181900402820181018352918101858152909182919087908790819085018382808284375050509284525050506020908101849052600087815260018252604090208251805191926102fd92849290910190610435565b50602091909101516001909101555050505050565b60016020818152600092835260409283902080548451600294821615610100026000190190911693909304601f81018390048302840183019094528383529283918301828280156103a45780601f10610379576101008083540402835291602001916103a4565b820191906000526020600020905b81548152906001019060200180831161038757829003601f168201915b5050505050908060010154905082565b600054600160a060020a03163314610413576040805160e560020a62461bcd02815260206004820152602360248201526000805160206104d1833981519152604482015260e960020a6237b91702606482015290519081900360840190fd5b60008054600160a060020a031916600160a060020a0392909216919091179055565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f1061047657805160ff19168380011785556104a3565b828001600101855582156104a3579182015b828111156104a3578251825591602001919060010190610488565b506104af9291506104b3565b5090565b6104cd91905b808211156104af57600081556001016104b9565b90560043616e206f6e6c792062652063616c6c65642062792074686520676f7665726ea165627a7a7230582053ae5945f1980d5237bff8c5f46fd17d5927d8113a747b367241c3fb75dec7340029",
-  "deployedBytecode": "0x6080604052600436106100485763ffffffff60e060020a6000350416630c340a24811461004d578063bc0d43751461007e578063d3e89483146100a7578063e4c0aaf41461013f575b600080fd5b34801561005957600080fd5b50610062610160565b60408051600160a060020a039092168252519081900360200190f35b34801561008a57600080fd5b506100a560048035906024803590810191013560443561016f565b005b3480156100b357600080fd5b506100bf600435610312565b604080516020808201849052828252845192820192909252835190918291606083019186019080838360005b838110156101035781810151838201526020016100eb565b50505050905090810190601f1680156101305780820380516001836020036101000a031916815260200191505b50935050505060405180910390f35b34801561014b57600080fd5b506100a5600160a060020a03600435166103b4565b600054600160a060020a031681565b60008054600160a060020a031633146101cf576040805160e560020a62461bcd02815260206004820152602360248201526000805160206104d1833981519152604482015260e960020a6237b91702606482015290519081900360840190fd5b506000848152600160208181526040928390208083015484519283018190528483528154600261010095821615959095026000190116939093049382018490529287927f92eac1644e5b7aa3d44968da027bbd73d56f86e859d457b69bb9c7b53c3ec86b928592819060608201908590801561028c5780601f106102615761010080835404028352916020019161028c565b820191906000526020600020905b81548152906001019060200180831161026f57829003601f168201915b5050935050505060405180910390a26040805160606020601f870181900402820181018352918101858152909182919087908790819085018382808284375050509284525050506020908101849052600087815260018252604090208251805191926102fd92849290910190610435565b50602091909101516001909101555050505050565b60016020818152600092835260409283902080548451600294821615610100026000190190911693909304601f81018390048302840183019094528383529283918301828280156103a45780601f10610379576101008083540402835291602001916103a4565b820191906000526020600020905b81548152906001019060200180831161038757829003601f168201915b5050505050908060010154905082565b600054600160a060020a03163314610413576040805160e560020a62461bcd02815260206004820152602360248201526000805160206104d1833981519152604482015260e960020a6237b91702606482015290519081900360840190fd5b60008054600160a060020a031916600160a060020a0392909216919091179055565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f1061047657805160ff19168380011785556104a3565b828001600101855582156104a3579182015b828111156104a3578251825591602001919060010190610488565b506104af9291506104b3565b5090565b6104cd91905b808211156104af57600081556001016104b9565b90560043616e206f6e6c792062652063616c6c65642062792074686520676f7665726ea165627a7a7230582053ae5945f1980d5237bff8c5f46fd17d5927d8113a747b367241c3fb75dec7340029",
-  "sourceMap": "174:1819:0:-;;;1066:61;8:9:-1;5:2;;;30:1;27;20:12;5:2;1066:61:0;;;;;;;;;;;;;1105:8;:20;;-1:-1:-1;;;;;1105:20:0;;;-1:-1:-1;;;;;;1105:20:0;;;;;;;;;174:1819;;;;;;",
-  "deployedSourceMap": "174:1819:0:-;;;;;;;;;-1:-1:-1;;;174:1819:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;669:23;;8:9:-1;5:2;;;30:1;27;20:12;5:2;669:23:0;;;;;;;;-1:-1:-1;;;;;669:23:0;;;;;;;;;;;;;;1643:348;;8:9:-1;5:2;;;30:1;27;20:12;5:2;-1:-1;1643:348:0;;;;;;;;;;;;;;;;;;;;698:39;;8:9:-1;5:2;;;30:1;27;20:12;5:2;-1:-1;698:39:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;8:100:-1;33:3;30:1;27:10;8:100;;;90:11;;;84:18;71:11;;;64:39;52:2;45:10;8:100;;;12:14;698:39:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1291:90;;8:9:-1;5:2;;;30:1;27;20:12;5:2;-1:-1;1291:90:0;-1:-1:-1;;;;;1291:90:0;;;;;669:23;;;-1:-1:-1;;;;;669:23:0;;:::o;1643:348::-;1750:21;858:8;;-1:-1:-1;;;;;858:8:0;870:10;858:22;850:70;;;;;-1:-1:-1;;;;;850:70:0;;;;;;;;;;;;-1:-1:-1;;;;;;;;;;;850:70:0;;;;-1:-1:-1;;;;;850:70:0;;;;;;;;;;;;;;;-1:-1:-1;1774:21:0;;;;:8;:21;;;;;;;;;1852:15;;;;1810:58;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;1810:58:0;;;;;;;;;;;;1774:21;1783:11;;1810:58;;1774:21;;1810:58;;;;;;1774:21;;1810:58;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1902:82;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1932:8;;;;;;1902:82;;1932:8;;;;1902:82;;-1:-1:-1;;;1902:82:0;;;-1:-1:-1;;;1902:82:0;;;;;;;;1878:21;;;:8;:21;;;;;:106;;;;:21;;:106;;:21;;:106;;;;;:::i;:::-;-1:-1:-1;1878:106:0;;;;;;;;;;;-1:-1:-1;;;;;1643:348:0:o;698:39::-;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;698:39:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o;1291:90::-;858:8;;-1:-1:-1;;;;;858:8:0;870:10;858:22;850:70;;;;;-1:-1:-1;;;;;850:70:0;;;;;;;;;;;;-1:-1:-1;;;;;;;;;;;850:70:0;;;;-1:-1:-1;;;;;850:70:0;;;;;;;;;;;;;;;1359:8;:20;;-1:-1:-1;;;;;;1359:20:0;-1:-1:-1;;;;;1359:20:0;;;;;;;;;;1291:90::o;174:1819::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;174:1819:0;;;-1:-1:-1;174:1819:0;:::i;:::-;;;:::o;:::-;;;;;;;;;;;;;;;;;;;;:::o",
-  "source": "pragma solidity ^0.4.24;\n\n/**\n *  @title PolicyRegistry\n *  @author Enrique Piqueras - <epiquerass@gmail.com>\n *  @dev A contract to maintain a policy for each subcourt.\n */\ncontract PolicyRegistry {\n    /* Structs */\n\n    struct Policy {\n        string fileURI;\n        bytes32 fileHash;\n    }\n\n    /* Events */\n\n    /** @dev Emitted when a policy is updated.\n     *  @param _subcourtID The ID of the policy's subcourt.\n     *  @param _fileURI The URI to the file containing the policy text.\n     *  @param _fileHash The hash of the file's contents.\n     */\n    event PolicyUpdate(uint indexed _subcourtID, string _fileURI, bytes32 _fileHash);\n\n    /* Storage */\n\n    address public governor;\n    mapping(uint => Policy) public policies;\n\n    /* Modifiers */\n\n    /** @dev Requires that the sender is the governor. */\n    modifier onlyByGovernor() {require(governor == msg.sender, \"Can only be called by the governor.\"); _;}\n\n    /* Constructor */\n\n    /** @dev Constructs the `PolicyRegistry` contract.\n     *  @param _governor The governor's address.\n     */\n    constructor(address _governor) public {governor = _governor;}\n\n    /* External */\n\n    /** @dev Changes the `governor` storage variable.\n     *  @param _governor The new value for the `governor` storage variable.\n     */\n    function changeGovernor(address _governor) external onlyByGovernor {governor = _governor;}\n\n    /** @dev Sets the policy for the specified subcourt.\n     *  @param _subcourtID The ID of the specified subcourt.\n     *  @param _fileURI The URI to the file containing the policy text.\n     *  @param _fileHash The hash of the file's contents.\n     */\n    function setPolicy(uint _subcourtID, string _fileURI, bytes32 _fileHash) external onlyByGovernor {\n        Policy storage policy = policies[_subcourtID];\n        emit PolicyUpdate(_subcourtID, policy.fileURI, policy.fileHash);\n        policies[_subcourtID] = Policy({\n            fileURI: _fileURI,\n            fileHash: _fileHash\n        });\n    }\n}\n",
+  "bytecode": "0x608060405234801561001057600080fd5b506040516020806104ed833981016040525160008054600160a060020a03909216600160a060020a031990921691909117905561049b806100526000396000f3006080604052600436106100485763ffffffff60e060020a6000350416630c340a24811461004d578063d3e894831461007e578063e4c0aaf41461010b578063f00adf5e1461012e575b600080fd5b34801561005957600080fd5b50610062610152565b60408051600160a060020a039092168252519081900360200190f35b34801561008a57600080fd5b50610096600435610161565b6040805160208082528351818301528351919283929083019185019080838360005b838110156100d05781810151838201526020016100b8565b50505050905090810190601f1680156100fd5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b34801561011757600080fd5b5061012c600160a060020a03600435166101fb565b005b34801561013a57600080fd5b5061012c60048035906024803590810191013561027c565b600054600160a060020a031681565b60016020818152600092835260409283902080548451600294821615610100026000190190911693909304601f81018390048302840183019094528383529192908301828280156101f35780601f106101c8576101008083540402835291602001916101f3565b820191906000526020600020905b8154815290600101906020018083116101d657829003601f168201915b505050505081565b600054600160a060020a0316331461025a576040805160e560020a62461bcd0281526020600482015260236024820152600080516020610450833981519152604482015260e960020a6237b91702606482015290519081900360840190fd5b60008054600160a060020a031916600160a060020a0392909216919091179055565b600054600160a060020a031633146102db576040805160e560020a62461bcd0281526020600482015260236024820152600080516020610450833981519152604482015260e960020a6237b91702606482015290519081900360840190fd5b600083815260016020818152604092839020835182815281546002948116156101000260001901169390930491830182905286937f6363e8b93c0bbb112f6247819a99f3c99f4a3e0f8e119a64e5ceb6edb9b3cc7b9391928291820190849080156103875780601f1061035c57610100808354040283529160200191610387565b820191906000526020600020905b81548152906001019060200180831161036a57829003601f168201915b50509250505060405180910390a260008381526001602052604090206103ae9083836103b4565b50505050565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f106103f55782800160ff19823516178555610422565b82800160010185558215610422579182015b82811115610422578235825591602001919060010190610407565b5061042e929150610432565b5090565b61044c91905b8082111561042e5760008155600101610438565b90560043616e206f6e6c792062652063616c6c65642062792074686520676f7665726ea165627a7a723058200b12ada73837533d784a1122642c2287cc2541b245eb7c06ac05d0f1eaf447470029",
+  "deployedBytecode": "0x6080604052600436106100485763ffffffff60e060020a6000350416630c340a24811461004d578063d3e894831461007e578063e4c0aaf41461010b578063f00adf5e1461012e575b600080fd5b34801561005957600080fd5b50610062610152565b60408051600160a060020a039092168252519081900360200190f35b34801561008a57600080fd5b50610096600435610161565b6040805160208082528351818301528351919283929083019185019080838360005b838110156100d05781810151838201526020016100b8565b50505050905090810190601f1680156100fd5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b34801561011757600080fd5b5061012c600160a060020a03600435166101fb565b005b34801561013a57600080fd5b5061012c60048035906024803590810191013561027c565b600054600160a060020a031681565b60016020818152600092835260409283902080548451600294821615610100026000190190911693909304601f81018390048302840183019094528383529192908301828280156101f35780601f106101c8576101008083540402835291602001916101f3565b820191906000526020600020905b8154815290600101906020018083116101d657829003601f168201915b505050505081565b600054600160a060020a0316331461025a576040805160e560020a62461bcd0281526020600482015260236024820152600080516020610450833981519152604482015260e960020a6237b91702606482015290519081900360840190fd5b60008054600160a060020a031916600160a060020a0392909216919091179055565b600054600160a060020a031633146102db576040805160e560020a62461bcd0281526020600482015260236024820152600080516020610450833981519152604482015260e960020a6237b91702606482015290519081900360840190fd5b600083815260016020818152604092839020835182815281546002948116156101000260001901169390930491830182905286937f6363e8b93c0bbb112f6247819a99f3c99f4a3e0f8e119a64e5ceb6edb9b3cc7b9391928291820190849080156103875780601f1061035c57610100808354040283529160200191610387565b820191906000526020600020905b81548152906001019060200180831161036a57829003601f168201915b50509250505060405180910390a260008381526001602052604090206103ae9083836103b4565b50505050565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f106103f55782800160ff19823516178555610422565b82800160010185558215610422579182015b82811115610422578235825591602001919060010190610407565b5061042e929150610432565b5090565b61044c91905b8082111561042e5760008155600101610438565b90560043616e206f6e6c792062652063616c6c65642062792074686520676f7665726ea165627a7a723058200b12ada73837533d784a1122642c2287cc2541b245eb7c06ac05d0f1eaf447470029",
+  "sourceMap": "174:1385:10:-;;;871:61;8:9:-1;5:2;;;30:1;27;20:12;5:2;871:61:10;;;;;;;;;;;;;910:8;:20;;-1:-1:-1;;;;;910:20:10;;;-1:-1:-1;;;;;;910:20:10;;;;;;;;;174:1385;;;;;;",
+  "deployedSourceMap": "174:1385:10:-;;;;;;;;;-1:-1:-1;;;174:1385:10;;;;;;;;;;;;;;;;;;;;;;;;;;;;474:23;;8:9:-1;5:2;;;30:1;27;20:12;5:2;474:23:10;;;;;;;;-1:-1:-1;;;;;474:23:10;;;;;;;;;;;;;;503:39;;8:9:-1;5:2;;;30:1;27;20:12;5:2;-1:-1;503:39:10;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;8:100:-1;33:3;30:1;27:10;8:100;;;90:11;;;84:18;71:11;;;64:39;52:2;45:10;8:100;;;12:14;503:39:10;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1096:90;;8:9:-1;5:2;;;30:1;27;20:12;5:2;-1:-1;1096:90:10;-1:-1:-1;;;;;1096:90:10;;;;;;;1369:188;;8:9:-1;5:2;;;30:1;27;20:12;5:2;-1:-1;1369:188:10;;;;;;;;;;;;;;;;474:23;;;-1:-1:-1;;;;;474:23:10;;:::o;503:39::-;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;503:39:10;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o;1096:90::-;663:8;;-1:-1:-1;;;;;663:8:10;675:10;663:22;655:70;;;;;-1:-1:-1;;;;;655:70:10;;;;;;;;;;;;-1:-1:-1;;;;;;;;;;;655:70:10;;;;-1:-1:-1;;;;;655:70:10;;;;;;;;;;;;;;;1164:8;:20;;-1:-1:-1;;;;;;1164:20:10;-1:-1:-1;;;;;1164:20:10;;;;;;;;;;1096:90::o;1369:188::-;663:8;;-1:-1:-1;;;;;663:8:10;675:10;663:22;655:70;;;;;-1:-1:-1;;;;;655:70:10;;;;;;;;;;;;-1:-1:-1;;;;;;;;;;;655:70:10;;;;-1:-1:-1;;;;;655:70:10;;;;;;;;;;;;;;;1487:21;;;;:8;:21;;;;;;;;;1461:48;;;;;;;;;;;;;;-1:-1:-1;;1461:48:10;;;;;;;;;;;;1487:21;;1461:48;;1487:21;;1461:48;;;;;1487:21;;1461:48;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1519:21;;;;:8;:21;;;;;:31;;1543:7;;1519:31;:::i;:::-;;1369:188;;;:::o;174:1385::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;174:1385:10;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;174:1385:10;;;-1:-1:-1;174:1385:10;:::i;:::-;;;:::o;:::-;;;;;;;;;;;;;;;;;;;;:::o",
+  "source": "pragma solidity ^0.4.24;\n\n/**\n *  @title PolicyRegistry\n *  @author Enrique Piqueras - <epiquerass@gmail.com>\n *  @dev A contract to maintain a policy for each subcourt.\n */\ncontract PolicyRegistry {\n    /* Events */\n\n    /** @dev Emitted when a policy is updated.\n     *  @param _subcourtID The ID of the policy's subcourt.\n     *  @param _policy The URI of the policy JSON.\n     */\n    event PolicyUpdate(uint indexed _subcourtID, string _policy);\n\n    /* Storage */\n\n    address public governor;\n    mapping(uint => string) public policies;\n\n    /* Modifiers */\n\n    /** @dev Requires that the sender is the governor. */\n    modifier onlyByGovernor() {require(governor == msg.sender, \"Can only be called by the governor.\"); _;}\n\n    /* Constructor */\n\n    /** @dev Constructs the `PolicyRegistry` contract.\n     *  @param _governor The governor's address.\n     */\n    constructor(address _governor) public {governor = _governor;}\n\n    /* External */\n\n    /** @dev Changes the `governor` storage variable.\n     *  @param _governor The new value for the `governor` storage variable.\n     */\n    function changeGovernor(address _governor) external onlyByGovernor {governor = _governor;}\n\n    /** @dev Sets the policy for the specified subcourt.\n     *  @param _subcourtID The ID of the specified subcourt.\n     *  @param _policy The URI of the policy JSON.\n     */\n    function setPolicy(uint _subcourtID, string _policy) external onlyByGovernor {\n        emit PolicyUpdate(_subcourtID, policies[_subcourtID]);\n        policies[_subcourtID] = _policy;\n    }\n}\n",
   "sourcePath": "/Users/epiqueras/Work/kleros/kleros/contracts/kleros/PolicyRegistry.sol",
   "ast": {
     "absolutePath": "/Users/epiqueras/Work/kleros/kleros/contracts/kleros/PolicyRegistry.sol",
     "exportedSymbols": {
-      "PolicyRegistry": [90]
+      "PolicyRegistry": [8209]
     },
-    "id": 91,
+    "id": 8210,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1,
+        "id": 8139,
         "literals": ["solidity", "^", "0.4", ".24"],
         "nodeType": "PragmaDirective",
-        "src": "0:24:0"
+        "src": "0:24:10"
       },
       {
         "baseContracts": [],
@@ -134,92 +121,29 @@
         "contractKind": "contract",
         "documentation": " @title PolicyRegistry\n @author Enrique Piqueras - <epiquerass@gmail.com>\n @dev A contract to maintain a policy for each subcourt.",
         "fullyImplemented": true,
-        "id": 90,
-        "linearizedBaseContracts": [90],
+        "id": 8209,
+        "linearizedBaseContracts": [8209],
         "name": "PolicyRegistry",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
-            "canonicalName": "PolicyRegistry.Policy",
-            "id": 6,
-            "members": [
-              {
-                "constant": false,
-                "id": 3,
-                "name": "fileURI",
-                "nodeType": "VariableDeclaration",
-                "scope": 6,
-                "src": "247:14:0",
-                "stateVariable": false,
-                "storageLocation": "default",
-                "typeDescriptions": {
-                  "typeIdentifier": "t_string_storage_ptr",
-                  "typeString": "string"
-                },
-                "typeName": {
-                  "id": 2,
-                  "name": "string",
-                  "nodeType": "ElementaryTypeName",
-                  "src": "247:6:0",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_string_storage_ptr",
-                    "typeString": "string"
-                  }
-                },
-                "value": null,
-                "visibility": "internal"
-              },
-              {
-                "constant": false,
-                "id": 5,
-                "name": "fileHash",
-                "nodeType": "VariableDeclaration",
-                "scope": 6,
-                "src": "271:16:0",
-                "stateVariable": false,
-                "storageLocation": "default",
-                "typeDescriptions": {
-                  "typeIdentifier": "t_bytes32",
-                  "typeString": "bytes32"
-                },
-                "typeName": {
-                  "id": 4,
-                  "name": "bytes32",
-                  "nodeType": "ElementaryTypeName",
-                  "src": "271:7:0",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_bytes32",
-                    "typeString": "bytes32"
-                  }
-                },
-                "value": null,
-                "visibility": "internal"
-              }
-            ],
-            "name": "Policy",
-            "nodeType": "StructDefinition",
-            "scope": 90,
-            "src": "223:71:0",
-            "visibility": "public"
-          },
-          {
             "anonymous": false,
-            "documentation": "@dev Emitted when a policy is updated.\n @param _subcourtID The ID of the policy's subcourt.\n @param _fileURI The URI to the file containing the policy text.\n @param _fileHash The hash of the file's contents.",
-            "id": 14,
+            "documentation": "@dev Emitted when a policy is updated.\n @param _subcourtID The ID of the policy's subcourt.\n @param _policy The URI of the policy JSON.",
+            "id": 8145,
             "name": "PolicyUpdate",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 13,
+              "id": 8144,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 8,
+                  "id": 8141,
                   "indexed": true,
                   "name": "_subcourtID",
                   "nodeType": "VariableDeclaration",
-                  "scope": 14,
-                  "src": "582:24:0",
+                  "scope": 8145,
+                  "src": "407:24:10",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -227,10 +151,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 7,
+                    "id": 8140,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "582:4:0",
+                    "src": "407:4:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -241,12 +165,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 10,
+                  "id": 8143,
                   "indexed": false,
-                  "name": "_fileURI",
+                  "name": "_policy",
                   "nodeType": "VariableDeclaration",
-                  "scope": 14,
-                  "src": "608:15:0",
+                  "scope": 8145,
+                  "src": "433:14:10",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -254,10 +178,10 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 9,
+                    "id": 8142,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "608:6:0",
+                    "src": "433:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
                       "typeString": "string"
@@ -265,46 +189,19 @@
                   },
                   "value": null,
                   "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 12,
-                  "indexed": false,
-                  "name": "_fileHash",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 14,
-                  "src": "625:17:0",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_bytes32",
-                    "typeString": "bytes32"
-                  },
-                  "typeName": {
-                    "id": 11,
-                    "name": "bytes32",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "625:7:0",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_bytes32",
-                      "typeString": "bytes32"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
                 }
               ],
-              "src": "581:62:0"
+              "src": "406:42:10"
             },
-            "src": "563:81:0"
+            "src": "388:61:10"
           },
           {
             "constant": false,
-            "id": 16,
+            "id": 8147,
             "name": "governor",
             "nodeType": "VariableDeclaration",
-            "scope": 90,
-            "src": "669:23:0",
+            "scope": 8209,
+            "src": "474:23:10",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -312,10 +209,10 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 15,
+              "id": 8146,
               "name": "address",
               "nodeType": "ElementaryTypeName",
-              "src": "669:7:0",
+              "src": "474:7:10",
               "typeDescriptions": {
                 "typeIdentifier": "t_address",
                 "typeString": "address"
@@ -326,45 +223,43 @@
           },
           {
             "constant": false,
-            "id": 20,
+            "id": 8151,
             "name": "policies",
             "nodeType": "VariableDeclaration",
-            "scope": 90,
-            "src": "698:39:0",
+            "scope": 8209,
+            "src": "503:39:10",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Policy_$6_storage_$",
-              "typeString": "mapping(uint256 => struct PolicyRegistry.Policy)"
+              "typeIdentifier": "t_mapping$_t_uint256_$_t_string_storage_$",
+              "typeString": "mapping(uint256 => string)"
             },
             "typeName": {
-              "id": 19,
+              "id": 8150,
               "keyType": {
-                "id": 17,
+                "id": 8148,
                 "name": "uint",
                 "nodeType": "ElementaryTypeName",
-                "src": "706:4:0",
+                "src": "511:4:10",
                 "typeDescriptions": {
                   "typeIdentifier": "t_uint256",
                   "typeString": "uint256"
                 }
               },
               "nodeType": "Mapping",
-              "src": "698:23:0",
+              "src": "503:23:10",
               "typeDescriptions": {
-                "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Policy_$6_storage_$",
-                "typeString": "mapping(uint256 => struct PolicyRegistry.Policy)"
+                "typeIdentifier": "t_mapping$_t_uint256_$_t_string_storage_$",
+                "typeString": "mapping(uint256 => string)"
               },
               "valueType": {
-                "contractScope": null,
-                "id": 18,
-                "name": "Policy",
-                "nodeType": "UserDefinedTypeName",
-                "referencedDeclaration": 6,
-                "src": "714:6:0",
+                "id": 8149,
+                "name": "string",
+                "nodeType": "ElementaryTypeName",
+                "src": "519:6:10",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_struct$_Policy_$6_storage_ptr",
-                  "typeString": "struct PolicyRegistry.Policy"
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
                 }
               }
             },
@@ -373,9 +268,9 @@
           },
           {
             "body": {
-              "id": 31,
+              "id": 8162,
               "nodeType": "Block",
-              "src": "849:76:0",
+              "src": "654:76:10",
               "statements": [
                 {
                   "expression": {
@@ -387,19 +282,19 @@
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         },
-                        "id": 26,
+                        "id": 8157,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "leftExpression": {
                           "argumentTypes": null,
-                          "id": 23,
+                          "id": 8154,
                           "name": "governor",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 16,
-                          "src": "858:8:0",
+                          "referencedDeclaration": 8147,
+                          "src": "663:8:10",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
                             "typeString": "address"
@@ -411,18 +306,18 @@
                           "argumentTypes": null,
                           "expression": {
                             "argumentTypes": null,
-                            "id": 24,
+                            "id": 8155,
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 105,
-                            "src": "870:3:0",
+                            "referencedDeclaration": 11924,
+                            "src": "675:3:10",
                             "typeDescriptions": {
                               "typeIdentifier": "t_magic_message",
                               "typeString": "msg"
                             }
                           },
-                          "id": 25,
+                          "id": 8156,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -430,13 +325,13 @@
                           "memberName": "sender",
                           "nodeType": "MemberAccess",
                           "referencedDeclaration": null,
-                          "src": "870:10:0",
+                          "src": "675:10:10",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
                             "typeString": "address"
                           }
                         },
-                        "src": "858:22:0",
+                        "src": "663:22:10",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -445,14 +340,14 @@
                       {
                         "argumentTypes": null,
                         "hexValue": "43616e206f6e6c792062652063616c6c65642062792074686520676f7665726e6f722e",
-                        "id": 27,
+                        "id": 8158,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "kind": "string",
                         "lValueRequested": false,
                         "nodeType": "Literal",
-                        "src": "882:37:0",
+                        "src": "687:37:10",
                         "subdenomination": null,
                         "typeDescriptions": {
                           "typeIdentifier": "t_stringliteral_0a67387a01b638629562ce413604ca06df839cc408aaf6c072640f1a5c4f2346",
@@ -472,18 +367,18 @@
                           "typeString": "literal_string \"Can only be called by the governor.\""
                         }
                       ],
-                      "id": 22,
+                      "id": 8153,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [108, 109],
-                      "referencedDeclaration": 109,
-                      "src": "850:7:0",
+                      "overloadedDeclarations": [11927, 11928],
+                      "referencedDeclaration": 11928,
+                      "src": "655:7:10",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 28,
+                    "id": 8159,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -491,58 +386,58 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "850:70:0",
+                    "src": "655:70:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 29,
+                  "id": 8160,
                   "nodeType": "ExpressionStatement",
-                  "src": "850:70:0"
+                  "src": "655:70:10"
                 },
                 {
-                  "id": 30,
+                  "id": 8161,
                   "nodeType": "PlaceholderStatement",
-                  "src": "922:1:0"
+                  "src": "727:1:10"
                 }
               ]
             },
             "documentation": "@dev Requires that the sender is the governor. ",
-            "id": 32,
+            "id": 8163,
             "name": "onlyByGovernor",
             "nodeType": "ModifierDefinition",
             "parameters": {
-              "id": 21,
+              "id": 8152,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "846:2:0"
+              "src": "651:2:10"
             },
-            "src": "823:102:0",
+            "src": "628:102:10",
             "visibility": "internal"
           },
           {
             "body": {
-              "id": 41,
+              "id": 8172,
               "nodeType": "Block",
-              "src": "1104:23:0",
+              "src": "909:23:10",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 39,
+                    "id": 8170,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "argumentTypes": null,
-                      "id": 37,
+                      "id": 8168,
                       "name": "governor",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 16,
-                      "src": "1105:8:0",
+                      "referencedDeclaration": 8147,
+                      "src": "910:8:10",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
@@ -552,31 +447,31 @@
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "id": 38,
+                      "id": 8169,
                       "name": "_governor",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 34,
-                      "src": "1116:9:0",
+                      "referencedDeclaration": 8165,
+                      "src": "921:9:10",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "src": "1105:20:0",
+                    "src": "910:20:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
-                  "id": 40,
+                  "id": 8171,
                   "nodeType": "ExpressionStatement",
-                  "src": "1105:20:0"
+                  "src": "910:20:10"
                 }
               ]
             },
             "documentation": "@dev Constructs the `PolicyRegistry` contract.\n @param _governor The governor's address.",
-            "id": 42,
+            "id": 8173,
             "implemented": true,
             "isConstructor": true,
             "isDeclaredConst": false,
@@ -584,16 +479,16 @@
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 35,
+              "id": 8166,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 34,
+                  "id": 8165,
                   "name": "_governor",
                   "nodeType": "VariableDeclaration",
-                  "scope": 42,
-                  "src": "1078:17:0",
+                  "scope": 8173,
+                  "src": "883:17:10",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -601,10 +496,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 33,
+                    "id": 8164,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1078:7:0",
+                    "src": "883:7:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -614,43 +509,43 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1077:19:0"
+              "src": "882:19:10"
             },
             "payable": false,
             "returnParameters": {
-              "id": 36,
+              "id": 8167,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1104:0:0"
+              "src": "909:0:10"
             },
-            "scope": 90,
-            "src": "1066:61:0",
+            "scope": 8209,
+            "src": "871:61:10",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 53,
+              "id": 8184,
               "nodeType": "Block",
-              "src": "1358:23:0",
+              "src": "1163:23:10",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 51,
+                    "id": 8182,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "argumentTypes": null,
-                      "id": 49,
+                      "id": 8180,
                       "name": "governor",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 16,
-                      "src": "1359:8:0",
+                      "referencedDeclaration": 8147,
+                      "src": "1164:8:10",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
@@ -660,68 +555,68 @@
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "id": 50,
+                      "id": 8181,
                       "name": "_governor",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 44,
-                      "src": "1370:9:0",
+                      "referencedDeclaration": 8175,
+                      "src": "1175:9:10",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "src": "1359:20:0",
+                    "src": "1164:20:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
-                  "id": 52,
+                  "id": 8183,
                   "nodeType": "ExpressionStatement",
-                  "src": "1359:20:0"
+                  "src": "1164:20:10"
                 }
               ]
             },
             "documentation": "@dev Changes the `governor` storage variable.\n @param _governor The new value for the `governor` storage variable.",
-            "id": 54,
+            "id": 8185,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
             "modifiers": [
               {
                 "arguments": null,
-                "id": 47,
+                "id": 8178,
                 "modifierName": {
                   "argumentTypes": null,
-                  "id": 46,
+                  "id": 8177,
                   "name": "onlyByGovernor",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 32,
-                  "src": "1343:14:0",
+                  "referencedDeclaration": 8163,
+                  "src": "1148:14:10",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
                     "typeString": "modifier ()"
                   }
                 },
                 "nodeType": "ModifierInvocation",
-                "src": "1343:14:0"
+                "src": "1148:14:10"
               }
             ],
             "name": "changeGovernor",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 45,
+              "id": 8176,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 44,
+                  "id": 8175,
                   "name": "_governor",
                   "nodeType": "VariableDeclaration",
-                  "scope": 54,
-                  "src": "1315:17:0",
+                  "scope": 8185,
+                  "src": "1120:17:10",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -729,10 +624,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 43,
+                    "id": 8174,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1315:7:0",
+                    "src": "1120:7:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -742,115 +637,39 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1314:19:0"
+              "src": "1119:19:10"
             },
             "payable": false,
             "returnParameters": {
-              "id": 48,
+              "id": 8179,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1358:0:0"
+              "src": "1163:0:10"
             },
-            "scope": 90,
-            "src": "1291:90:0",
+            "scope": 8209,
+            "src": "1096:90:10",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
           },
           {
             "body": {
-              "id": 88,
+              "id": 8207,
               "nodeType": "Block",
-              "src": "1740:251:0",
+              "src": "1446:111:10",
               "statements": [
-                {
-                  "assignments": [66],
-                  "declarations": [
-                    {
-                      "constant": false,
-                      "id": 66,
-                      "name": "policy",
-                      "nodeType": "VariableDeclaration",
-                      "scope": 89,
-                      "src": "1750:21:0",
-                      "stateVariable": false,
-                      "storageLocation": "storage",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_struct$_Policy_$6_storage_ptr",
-                        "typeString": "struct PolicyRegistry.Policy"
-                      },
-                      "typeName": {
-                        "contractScope": null,
-                        "id": 65,
-                        "name": "Policy",
-                        "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 6,
-                        "src": "1750:6:0",
-                        "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_Policy_$6_storage_ptr",
-                          "typeString": "struct PolicyRegistry.Policy"
-                        }
-                      },
-                      "value": null,
-                      "visibility": "internal"
-                    }
-                  ],
-                  "id": 70,
-                  "initialValue": {
-                    "argumentTypes": null,
-                    "baseExpression": {
-                      "argumentTypes": null,
-                      "id": 67,
-                      "name": "policies",
-                      "nodeType": "Identifier",
-                      "overloadedDeclarations": [],
-                      "referencedDeclaration": 20,
-                      "src": "1774:8:0",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Policy_$6_storage_$",
-                        "typeString": "mapping(uint256 => struct PolicyRegistry.Policy storage ref)"
-                      }
-                    },
-                    "id": 69,
-                    "indexExpression": {
-                      "argumentTypes": null,
-                      "id": 68,
-                      "name": "_subcourtID",
-                      "nodeType": "Identifier",
-                      "overloadedDeclarations": [],
-                      "referencedDeclaration": 56,
-                      "src": "1783:11:0",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_uint256",
-                        "typeString": "uint256"
-                      }
-                    },
-                    "isConstant": false,
-                    "isLValue": true,
-                    "isPure": false,
-                    "lValueRequested": false,
-                    "nodeType": "IndexAccess",
-                    "src": "1774:21:0",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_struct$_Policy_$6_storage",
-                      "typeString": "struct PolicyRegistry.Policy storage ref"
-                    }
-                  },
-                  "nodeType": "VariableDeclarationStatement",
-                  "src": "1750:45:0"
-                },
                 {
                   "eventCall": {
                     "argumentTypes": null,
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 72,
+                        "id": 8195,
                         "name": "_subcourtID",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 56,
-                        "src": "1823:11:0",
+                        "referencedDeclaration": 8187,
+                        "src": "1474:11:10",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -858,60 +677,42 @@
                       },
                       {
                         "argumentTypes": null,
-                        "expression": {
+                        "baseExpression": {
                           "argumentTypes": null,
-                          "id": 73,
-                          "name": "policy",
+                          "id": 8196,
+                          "name": "policies",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 66,
-                          "src": "1836:6:0",
+                          "referencedDeclaration": 8151,
+                          "src": "1487:8:10",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_struct$_Policy_$6_storage_ptr",
-                            "typeString": "struct PolicyRegistry.Policy storage pointer"
+                            "typeIdentifier": "t_mapping$_t_uint256_$_t_string_storage_$",
+                            "typeString": "mapping(uint256 => string storage ref)"
                           }
                         },
-                        "id": 74,
+                        "id": 8198,
+                        "indexExpression": {
+                          "argumentTypes": null,
+                          "id": 8197,
+                          "name": "_subcourtID",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 8187,
+                          "src": "1496:11:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
                         "isConstant": false,
                         "isLValue": true,
                         "isPure": false,
                         "lValueRequested": false,
-                        "memberName": "fileURI",
-                        "nodeType": "MemberAccess",
-                        "referencedDeclaration": 3,
-                        "src": "1836:14:0",
+                        "nodeType": "IndexAccess",
+                        "src": "1487:21:10",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_storage",
                           "typeString": "string storage ref"
-                        }
-                      },
-                      {
-                        "argumentTypes": null,
-                        "expression": {
-                          "argumentTypes": null,
-                          "id": 75,
-                          "name": "policy",
-                          "nodeType": "Identifier",
-                          "overloadedDeclarations": [],
-                          "referencedDeclaration": 66,
-                          "src": "1852:6:0",
-                          "typeDescriptions": {
-                            "typeIdentifier": "t_struct$_Policy_$6_storage_ptr",
-                            "typeString": "struct PolicyRegistry.Policy storage pointer"
-                          }
-                        },
-                        "id": 76,
-                        "isConstant": false,
-                        "isLValue": true,
-                        "isPure": false,
-                        "lValueRequested": false,
-                        "memberName": "fileHash",
-                        "nodeType": "MemberAccess",
-                        "referencedDeclaration": 5,
-                        "src": "1852:15:0",
-                        "typeDescriptions": {
-                          "typeIdentifier": "t_bytes32",
-                          "typeString": "bytes32"
                         }
                       }
                     ],
@@ -924,24 +725,20 @@
                         {
                           "typeIdentifier": "t_string_storage",
                           "typeString": "string storage ref"
-                        },
-                        {
-                          "typeIdentifier": "t_bytes32",
-                          "typeString": "bytes32"
                         }
                       ],
-                      "id": 71,
+                      "id": 8194,
                       "name": "PolicyUpdate",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 14,
-                      "src": "1810:12:0",
+                      "referencedDeclaration": 8145,
+                      "src": "1461:12:10",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$_t_string_memory_ptr_$_t_bytes32_$returns$__$",
-                        "typeString": "function (uint256,string memory,bytes32)"
+                        "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (uint256,string memory)"
                       }
                     },
-                    "id": 77,
+                    "id": 8199,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -949,20 +746,20 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1810:58:0",
+                    "src": "1461:48:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 78,
+                  "id": 8200,
                   "nodeType": "EmitStatement",
-                  "src": "1805:63:0"
+                  "src": "1456:53:10"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 86,
+                    "id": 8205,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -971,26 +768,26 @@
                       "argumentTypes": null,
                       "baseExpression": {
                         "argumentTypes": null,
-                        "id": 79,
+                        "id": 8201,
                         "name": "policies",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 20,
-                        "src": "1878:8:0",
+                        "referencedDeclaration": 8151,
+                        "src": "1519:8:10",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Policy_$6_storage_$",
-                          "typeString": "mapping(uint256 => struct PolicyRegistry.Policy storage ref)"
+                          "typeIdentifier": "t_mapping$_t_uint256_$_t_string_storage_$",
+                          "typeString": "mapping(uint256 => string storage ref)"
                         }
                       },
-                      "id": 81,
+                      "id": 8203,
                       "indexExpression": {
                         "argumentTypes": null,
-                        "id": 80,
+                        "id": 8202,
                         "name": "_subcourtID",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 56,
-                        "src": "1887:11:0",
+                        "referencedDeclaration": 8187,
+                        "src": "1528:11:10",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -1001,122 +798,78 @@
                       "isPure": false,
                       "lValueRequested": true,
                       "nodeType": "IndexAccess",
-                      "src": "1878:21:0",
+                      "src": "1519:21:10",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_struct$_Policy_$6_storage",
-                        "typeString": "struct PolicyRegistry.Policy storage ref"
+                        "typeIdentifier": "t_string_storage",
+                        "typeString": "string storage ref"
                       }
                     },
                     "nodeType": "Assignment",
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "arguments": [
-                        {
-                          "argumentTypes": null,
-                          "id": 83,
-                          "name": "_fileURI",
-                          "nodeType": "Identifier",
-                          "overloadedDeclarations": [],
-                          "referencedDeclaration": 58,
-                          "src": "1932:8:0",
-                          "typeDescriptions": {
-                            "typeIdentifier": "t_string_calldata_ptr",
-                            "typeString": "string calldata"
-                          }
-                        },
-                        {
-                          "argumentTypes": null,
-                          "id": 84,
-                          "name": "_fileHash",
-                          "nodeType": "Identifier",
-                          "overloadedDeclarations": [],
-                          "referencedDeclaration": 60,
-                          "src": "1964:9:0",
-                          "typeDescriptions": {
-                            "typeIdentifier": "t_bytes32",
-                            "typeString": "bytes32"
-                          }
-                        }
-                      ],
-                      "expression": {
-                        "argumentTypes": null,
-                        "id": 82,
-                        "name": "Policy",
-                        "nodeType": "Identifier",
-                        "overloadedDeclarations": [],
-                        "referencedDeclaration": 6,
-                        "src": "1902:6:0",
-                        "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_struct$_Policy_$6_storage_ptr_$",
-                          "typeString": "type(struct PolicyRegistry.Policy storage pointer)"
-                        }
-                      },
-                      "id": 85,
-                      "isConstant": false,
-                      "isLValue": false,
-                      "isPure": false,
-                      "kind": "structConstructorCall",
-                      "lValueRequested": false,
-                      "names": ["fileURI", "fileHash"],
-                      "nodeType": "FunctionCall",
-                      "src": "1902:82:0",
+                      "id": 8204,
+                      "name": "_policy",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 8189,
+                      "src": "1543:7:10",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_struct$_Policy_$6_memory",
-                        "typeString": "struct PolicyRegistry.Policy memory"
+                        "typeIdentifier": "t_string_calldata_ptr",
+                        "typeString": "string calldata"
                       }
                     },
-                    "src": "1878:106:0",
+                    "src": "1519:31:10",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$_Policy_$6_storage",
-                      "typeString": "struct PolicyRegistry.Policy storage ref"
+                      "typeIdentifier": "t_string_storage",
+                      "typeString": "string storage ref"
                     }
                   },
-                  "id": 87,
+                  "id": 8206,
                   "nodeType": "ExpressionStatement",
-                  "src": "1878:106:0"
+                  "src": "1519:31:10"
                 }
               ]
             },
-            "documentation": "@dev Sets the policy for the specified subcourt.\n @param _subcourtID The ID of the specified subcourt.\n @param _fileURI The URI to the file containing the policy text.\n @param _fileHash The hash of the file's contents.",
-            "id": 89,
+            "documentation": "@dev Sets the policy for the specified subcourt.\n @param _subcourtID The ID of the specified subcourt.\n @param _policy The URI of the policy JSON.",
+            "id": 8208,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
             "modifiers": [
               {
                 "arguments": null,
-                "id": 63,
+                "id": 8192,
                 "modifierName": {
                   "argumentTypes": null,
-                  "id": 62,
+                  "id": 8191,
                   "name": "onlyByGovernor",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 32,
-                  "src": "1725:14:0",
+                  "referencedDeclaration": 8163,
+                  "src": "1431:14:10",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
                     "typeString": "modifier ()"
                   }
                 },
                 "nodeType": "ModifierInvocation",
-                "src": "1725:14:0"
+                "src": "1431:14:10"
               }
             ],
             "name": "setPolicy",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 61,
+              "id": 8190,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 56,
+                  "id": 8187,
                   "name": "_subcourtID",
                   "nodeType": "VariableDeclaration",
-                  "scope": 89,
-                  "src": "1662:16:0",
+                  "scope": 8208,
+                  "src": "1388:16:10",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1124,10 +877,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 55,
+                    "id": 8186,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1662:4:0",
+                    "src": "1388:4:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1138,11 +891,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 58,
-                  "name": "_fileURI",
+                  "id": 8189,
+                  "name": "_policy",
                   "nodeType": "VariableDeclaration",
-                  "scope": 89,
-                  "src": "1680:15:0",
+                  "scope": 8208,
+                  "src": "1406:14:10",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1150,10 +903,10 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 57,
+                    "id": 8188,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1680:6:0",
+                    "src": "1406:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
                       "typeString": "string"
@@ -1161,69 +914,43 @@
                   },
                   "value": null,
                   "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 60,
-                  "name": "_fileHash",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 89,
-                  "src": "1697:17:0",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_bytes32",
-                    "typeString": "bytes32"
-                  },
-                  "typeName": {
-                    "id": 59,
-                    "name": "bytes32",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1697:7:0",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_bytes32",
-                      "typeString": "bytes32"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
                 }
               ],
-              "src": "1661:54:0"
+              "src": "1387:34:10"
             },
             "payable": false,
             "returnParameters": {
-              "id": 64,
+              "id": 8193,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1740:0:0"
+              "src": "1446:0:10"
             },
-            "scope": 90,
-            "src": "1643:348:0",
+            "scope": 8209,
+            "src": "1369:188:10",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 91,
-        "src": "174:1819:0"
+        "scope": 8210,
+        "src": "174:1385:10"
       }
     ],
-    "src": "0:1994:0"
+    "src": "0:1560:10"
   },
   "legacyAST": {
     "absolutePath": "/Users/epiqueras/Work/kleros/kleros/contracts/kleros/PolicyRegistry.sol",
     "exportedSymbols": {
-      "PolicyRegistry": [90]
+      "PolicyRegistry": [8209]
     },
-    "id": 91,
+    "id": 8210,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1,
+        "id": 8139,
         "literals": ["solidity", "^", "0.4", ".24"],
         "nodeType": "PragmaDirective",
-        "src": "0:24:0"
+        "src": "0:24:10"
       },
       {
         "baseContracts": [],
@@ -1231,92 +958,29 @@
         "contractKind": "contract",
         "documentation": " @title PolicyRegistry\n @author Enrique Piqueras - <epiquerass@gmail.com>\n @dev A contract to maintain a policy for each subcourt.",
         "fullyImplemented": true,
-        "id": 90,
-        "linearizedBaseContracts": [90],
+        "id": 8209,
+        "linearizedBaseContracts": [8209],
         "name": "PolicyRegistry",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
-            "canonicalName": "PolicyRegistry.Policy",
-            "id": 6,
-            "members": [
-              {
-                "constant": false,
-                "id": 3,
-                "name": "fileURI",
-                "nodeType": "VariableDeclaration",
-                "scope": 6,
-                "src": "247:14:0",
-                "stateVariable": false,
-                "storageLocation": "default",
-                "typeDescriptions": {
-                  "typeIdentifier": "t_string_storage_ptr",
-                  "typeString": "string"
-                },
-                "typeName": {
-                  "id": 2,
-                  "name": "string",
-                  "nodeType": "ElementaryTypeName",
-                  "src": "247:6:0",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_string_storage_ptr",
-                    "typeString": "string"
-                  }
-                },
-                "value": null,
-                "visibility": "internal"
-              },
-              {
-                "constant": false,
-                "id": 5,
-                "name": "fileHash",
-                "nodeType": "VariableDeclaration",
-                "scope": 6,
-                "src": "271:16:0",
-                "stateVariable": false,
-                "storageLocation": "default",
-                "typeDescriptions": {
-                  "typeIdentifier": "t_bytes32",
-                  "typeString": "bytes32"
-                },
-                "typeName": {
-                  "id": 4,
-                  "name": "bytes32",
-                  "nodeType": "ElementaryTypeName",
-                  "src": "271:7:0",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_bytes32",
-                    "typeString": "bytes32"
-                  }
-                },
-                "value": null,
-                "visibility": "internal"
-              }
-            ],
-            "name": "Policy",
-            "nodeType": "StructDefinition",
-            "scope": 90,
-            "src": "223:71:0",
-            "visibility": "public"
-          },
-          {
             "anonymous": false,
-            "documentation": "@dev Emitted when a policy is updated.\n @param _subcourtID The ID of the policy's subcourt.\n @param _fileURI The URI to the file containing the policy text.\n @param _fileHash The hash of the file's contents.",
-            "id": 14,
+            "documentation": "@dev Emitted when a policy is updated.\n @param _subcourtID The ID of the policy's subcourt.\n @param _policy The URI of the policy JSON.",
+            "id": 8145,
             "name": "PolicyUpdate",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 13,
+              "id": 8144,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 8,
+                  "id": 8141,
                   "indexed": true,
                   "name": "_subcourtID",
                   "nodeType": "VariableDeclaration",
-                  "scope": 14,
-                  "src": "582:24:0",
+                  "scope": 8145,
+                  "src": "407:24:10",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1324,10 +988,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 7,
+                    "id": 8140,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "582:4:0",
+                    "src": "407:4:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1338,12 +1002,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 10,
+                  "id": 8143,
                   "indexed": false,
-                  "name": "_fileURI",
+                  "name": "_policy",
                   "nodeType": "VariableDeclaration",
-                  "scope": 14,
-                  "src": "608:15:0",
+                  "scope": 8145,
+                  "src": "433:14:10",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1351,10 +1015,10 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 9,
+                    "id": 8142,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "608:6:0",
+                    "src": "433:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
                       "typeString": "string"
@@ -1362,46 +1026,19 @@
                   },
                   "value": null,
                   "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 12,
-                  "indexed": false,
-                  "name": "_fileHash",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 14,
-                  "src": "625:17:0",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_bytes32",
-                    "typeString": "bytes32"
-                  },
-                  "typeName": {
-                    "id": 11,
-                    "name": "bytes32",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "625:7:0",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_bytes32",
-                      "typeString": "bytes32"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
                 }
               ],
-              "src": "581:62:0"
+              "src": "406:42:10"
             },
-            "src": "563:81:0"
+            "src": "388:61:10"
           },
           {
             "constant": false,
-            "id": 16,
+            "id": 8147,
             "name": "governor",
             "nodeType": "VariableDeclaration",
-            "scope": 90,
-            "src": "669:23:0",
+            "scope": 8209,
+            "src": "474:23:10",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -1409,10 +1046,10 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 15,
+              "id": 8146,
               "name": "address",
               "nodeType": "ElementaryTypeName",
-              "src": "669:7:0",
+              "src": "474:7:10",
               "typeDescriptions": {
                 "typeIdentifier": "t_address",
                 "typeString": "address"
@@ -1423,45 +1060,43 @@
           },
           {
             "constant": false,
-            "id": 20,
+            "id": 8151,
             "name": "policies",
             "nodeType": "VariableDeclaration",
-            "scope": 90,
-            "src": "698:39:0",
+            "scope": 8209,
+            "src": "503:39:10",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Policy_$6_storage_$",
-              "typeString": "mapping(uint256 => struct PolicyRegistry.Policy)"
+              "typeIdentifier": "t_mapping$_t_uint256_$_t_string_storage_$",
+              "typeString": "mapping(uint256 => string)"
             },
             "typeName": {
-              "id": 19,
+              "id": 8150,
               "keyType": {
-                "id": 17,
+                "id": 8148,
                 "name": "uint",
                 "nodeType": "ElementaryTypeName",
-                "src": "706:4:0",
+                "src": "511:4:10",
                 "typeDescriptions": {
                   "typeIdentifier": "t_uint256",
                   "typeString": "uint256"
                 }
               },
               "nodeType": "Mapping",
-              "src": "698:23:0",
+              "src": "503:23:10",
               "typeDescriptions": {
-                "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Policy_$6_storage_$",
-                "typeString": "mapping(uint256 => struct PolicyRegistry.Policy)"
+                "typeIdentifier": "t_mapping$_t_uint256_$_t_string_storage_$",
+                "typeString": "mapping(uint256 => string)"
               },
               "valueType": {
-                "contractScope": null,
-                "id": 18,
-                "name": "Policy",
-                "nodeType": "UserDefinedTypeName",
-                "referencedDeclaration": 6,
-                "src": "714:6:0",
+                "id": 8149,
+                "name": "string",
+                "nodeType": "ElementaryTypeName",
+                "src": "519:6:10",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_struct$_Policy_$6_storage_ptr",
-                  "typeString": "struct PolicyRegistry.Policy"
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
                 }
               }
             },
@@ -1470,9 +1105,9 @@
           },
           {
             "body": {
-              "id": 31,
+              "id": 8162,
               "nodeType": "Block",
-              "src": "849:76:0",
+              "src": "654:76:10",
               "statements": [
                 {
                   "expression": {
@@ -1484,19 +1119,19 @@
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         },
-                        "id": 26,
+                        "id": 8157,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "leftExpression": {
                           "argumentTypes": null,
-                          "id": 23,
+                          "id": 8154,
                           "name": "governor",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 16,
-                          "src": "858:8:0",
+                          "referencedDeclaration": 8147,
+                          "src": "663:8:10",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
                             "typeString": "address"
@@ -1508,18 +1143,18 @@
                           "argumentTypes": null,
                           "expression": {
                             "argumentTypes": null,
-                            "id": 24,
+                            "id": 8155,
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 105,
-                            "src": "870:3:0",
+                            "referencedDeclaration": 11924,
+                            "src": "675:3:10",
                             "typeDescriptions": {
                               "typeIdentifier": "t_magic_message",
                               "typeString": "msg"
                             }
                           },
-                          "id": 25,
+                          "id": 8156,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -1527,13 +1162,13 @@
                           "memberName": "sender",
                           "nodeType": "MemberAccess",
                           "referencedDeclaration": null,
-                          "src": "870:10:0",
+                          "src": "675:10:10",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
                             "typeString": "address"
                           }
                         },
-                        "src": "858:22:0",
+                        "src": "663:22:10",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -1542,14 +1177,14 @@
                       {
                         "argumentTypes": null,
                         "hexValue": "43616e206f6e6c792062652063616c6c65642062792074686520676f7665726e6f722e",
-                        "id": 27,
+                        "id": 8158,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "kind": "string",
                         "lValueRequested": false,
                         "nodeType": "Literal",
-                        "src": "882:37:0",
+                        "src": "687:37:10",
                         "subdenomination": null,
                         "typeDescriptions": {
                           "typeIdentifier": "t_stringliteral_0a67387a01b638629562ce413604ca06df839cc408aaf6c072640f1a5c4f2346",
@@ -1569,18 +1204,18 @@
                           "typeString": "literal_string \"Can only be called by the governor.\""
                         }
                       ],
-                      "id": 22,
+                      "id": 8153,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [108, 109],
-                      "referencedDeclaration": 109,
-                      "src": "850:7:0",
+                      "overloadedDeclarations": [11927, 11928],
+                      "referencedDeclaration": 11928,
+                      "src": "655:7:10",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 28,
+                    "id": 8159,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1588,58 +1223,58 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "850:70:0",
+                    "src": "655:70:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 29,
+                  "id": 8160,
                   "nodeType": "ExpressionStatement",
-                  "src": "850:70:0"
+                  "src": "655:70:10"
                 },
                 {
-                  "id": 30,
+                  "id": 8161,
                   "nodeType": "PlaceholderStatement",
-                  "src": "922:1:0"
+                  "src": "727:1:10"
                 }
               ]
             },
             "documentation": "@dev Requires that the sender is the governor. ",
-            "id": 32,
+            "id": 8163,
             "name": "onlyByGovernor",
             "nodeType": "ModifierDefinition",
             "parameters": {
-              "id": 21,
+              "id": 8152,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "846:2:0"
+              "src": "651:2:10"
             },
-            "src": "823:102:0",
+            "src": "628:102:10",
             "visibility": "internal"
           },
           {
             "body": {
-              "id": 41,
+              "id": 8172,
               "nodeType": "Block",
-              "src": "1104:23:0",
+              "src": "909:23:10",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 39,
+                    "id": 8170,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "argumentTypes": null,
-                      "id": 37,
+                      "id": 8168,
                       "name": "governor",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 16,
-                      "src": "1105:8:0",
+                      "referencedDeclaration": 8147,
+                      "src": "910:8:10",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
@@ -1649,31 +1284,31 @@
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "id": 38,
+                      "id": 8169,
                       "name": "_governor",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 34,
-                      "src": "1116:9:0",
+                      "referencedDeclaration": 8165,
+                      "src": "921:9:10",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "src": "1105:20:0",
+                    "src": "910:20:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
-                  "id": 40,
+                  "id": 8171,
                   "nodeType": "ExpressionStatement",
-                  "src": "1105:20:0"
+                  "src": "910:20:10"
                 }
               ]
             },
             "documentation": "@dev Constructs the `PolicyRegistry` contract.\n @param _governor The governor's address.",
-            "id": 42,
+            "id": 8173,
             "implemented": true,
             "isConstructor": true,
             "isDeclaredConst": false,
@@ -1681,16 +1316,16 @@
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 35,
+              "id": 8166,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 34,
+                  "id": 8165,
                   "name": "_governor",
                   "nodeType": "VariableDeclaration",
-                  "scope": 42,
-                  "src": "1078:17:0",
+                  "scope": 8173,
+                  "src": "883:17:10",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1698,10 +1333,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 33,
+                    "id": 8164,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1078:7:0",
+                    "src": "883:7:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -1711,43 +1346,43 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1077:19:0"
+              "src": "882:19:10"
             },
             "payable": false,
             "returnParameters": {
-              "id": 36,
+              "id": 8167,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1104:0:0"
+              "src": "909:0:10"
             },
-            "scope": 90,
-            "src": "1066:61:0",
+            "scope": 8209,
+            "src": "871:61:10",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 53,
+              "id": 8184,
               "nodeType": "Block",
-              "src": "1358:23:0",
+              "src": "1163:23:10",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 51,
+                    "id": 8182,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "argumentTypes": null,
-                      "id": 49,
+                      "id": 8180,
                       "name": "governor",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 16,
-                      "src": "1359:8:0",
+                      "referencedDeclaration": 8147,
+                      "src": "1164:8:10",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
@@ -1757,68 +1392,68 @@
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "id": 50,
+                      "id": 8181,
                       "name": "_governor",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 44,
-                      "src": "1370:9:0",
+                      "referencedDeclaration": 8175,
+                      "src": "1175:9:10",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "src": "1359:20:0",
+                    "src": "1164:20:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
-                  "id": 52,
+                  "id": 8183,
                   "nodeType": "ExpressionStatement",
-                  "src": "1359:20:0"
+                  "src": "1164:20:10"
                 }
               ]
             },
             "documentation": "@dev Changes the `governor` storage variable.\n @param _governor The new value for the `governor` storage variable.",
-            "id": 54,
+            "id": 8185,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
             "modifiers": [
               {
                 "arguments": null,
-                "id": 47,
+                "id": 8178,
                 "modifierName": {
                   "argumentTypes": null,
-                  "id": 46,
+                  "id": 8177,
                   "name": "onlyByGovernor",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 32,
-                  "src": "1343:14:0",
+                  "referencedDeclaration": 8163,
+                  "src": "1148:14:10",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
                     "typeString": "modifier ()"
                   }
                 },
                 "nodeType": "ModifierInvocation",
-                "src": "1343:14:0"
+                "src": "1148:14:10"
               }
             ],
             "name": "changeGovernor",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 45,
+              "id": 8176,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 44,
+                  "id": 8175,
                   "name": "_governor",
                   "nodeType": "VariableDeclaration",
-                  "scope": 54,
-                  "src": "1315:17:0",
+                  "scope": 8185,
+                  "src": "1120:17:10",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1826,10 +1461,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 43,
+                    "id": 8174,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1315:7:0",
+                    "src": "1120:7:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -1839,115 +1474,39 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1314:19:0"
+              "src": "1119:19:10"
             },
             "payable": false,
             "returnParameters": {
-              "id": 48,
+              "id": 8179,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1358:0:0"
+              "src": "1163:0:10"
             },
-            "scope": 90,
-            "src": "1291:90:0",
+            "scope": 8209,
+            "src": "1096:90:10",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
           },
           {
             "body": {
-              "id": 88,
+              "id": 8207,
               "nodeType": "Block",
-              "src": "1740:251:0",
+              "src": "1446:111:10",
               "statements": [
-                {
-                  "assignments": [66],
-                  "declarations": [
-                    {
-                      "constant": false,
-                      "id": 66,
-                      "name": "policy",
-                      "nodeType": "VariableDeclaration",
-                      "scope": 89,
-                      "src": "1750:21:0",
-                      "stateVariable": false,
-                      "storageLocation": "storage",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_struct$_Policy_$6_storage_ptr",
-                        "typeString": "struct PolicyRegistry.Policy"
-                      },
-                      "typeName": {
-                        "contractScope": null,
-                        "id": 65,
-                        "name": "Policy",
-                        "nodeType": "UserDefinedTypeName",
-                        "referencedDeclaration": 6,
-                        "src": "1750:6:0",
-                        "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_Policy_$6_storage_ptr",
-                          "typeString": "struct PolicyRegistry.Policy"
-                        }
-                      },
-                      "value": null,
-                      "visibility": "internal"
-                    }
-                  ],
-                  "id": 70,
-                  "initialValue": {
-                    "argumentTypes": null,
-                    "baseExpression": {
-                      "argumentTypes": null,
-                      "id": 67,
-                      "name": "policies",
-                      "nodeType": "Identifier",
-                      "overloadedDeclarations": [],
-                      "referencedDeclaration": 20,
-                      "src": "1774:8:0",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Policy_$6_storage_$",
-                        "typeString": "mapping(uint256 => struct PolicyRegistry.Policy storage ref)"
-                      }
-                    },
-                    "id": 69,
-                    "indexExpression": {
-                      "argumentTypes": null,
-                      "id": 68,
-                      "name": "_subcourtID",
-                      "nodeType": "Identifier",
-                      "overloadedDeclarations": [],
-                      "referencedDeclaration": 56,
-                      "src": "1783:11:0",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_uint256",
-                        "typeString": "uint256"
-                      }
-                    },
-                    "isConstant": false,
-                    "isLValue": true,
-                    "isPure": false,
-                    "lValueRequested": false,
-                    "nodeType": "IndexAccess",
-                    "src": "1774:21:0",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_struct$_Policy_$6_storage",
-                      "typeString": "struct PolicyRegistry.Policy storage ref"
-                    }
-                  },
-                  "nodeType": "VariableDeclarationStatement",
-                  "src": "1750:45:0"
-                },
                 {
                   "eventCall": {
                     "argumentTypes": null,
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 72,
+                        "id": 8195,
                         "name": "_subcourtID",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 56,
-                        "src": "1823:11:0",
+                        "referencedDeclaration": 8187,
+                        "src": "1474:11:10",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -1955,60 +1514,42 @@
                       },
                       {
                         "argumentTypes": null,
-                        "expression": {
+                        "baseExpression": {
                           "argumentTypes": null,
-                          "id": 73,
-                          "name": "policy",
+                          "id": 8196,
+                          "name": "policies",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 66,
-                          "src": "1836:6:0",
+                          "referencedDeclaration": 8151,
+                          "src": "1487:8:10",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_struct$_Policy_$6_storage_ptr",
-                            "typeString": "struct PolicyRegistry.Policy storage pointer"
+                            "typeIdentifier": "t_mapping$_t_uint256_$_t_string_storage_$",
+                            "typeString": "mapping(uint256 => string storage ref)"
                           }
                         },
-                        "id": 74,
+                        "id": 8198,
+                        "indexExpression": {
+                          "argumentTypes": null,
+                          "id": 8197,
+                          "name": "_subcourtID",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 8187,
+                          "src": "1496:11:10",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
                         "isConstant": false,
                         "isLValue": true,
                         "isPure": false,
                         "lValueRequested": false,
-                        "memberName": "fileURI",
-                        "nodeType": "MemberAccess",
-                        "referencedDeclaration": 3,
-                        "src": "1836:14:0",
+                        "nodeType": "IndexAccess",
+                        "src": "1487:21:10",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_storage",
                           "typeString": "string storage ref"
-                        }
-                      },
-                      {
-                        "argumentTypes": null,
-                        "expression": {
-                          "argumentTypes": null,
-                          "id": 75,
-                          "name": "policy",
-                          "nodeType": "Identifier",
-                          "overloadedDeclarations": [],
-                          "referencedDeclaration": 66,
-                          "src": "1852:6:0",
-                          "typeDescriptions": {
-                            "typeIdentifier": "t_struct$_Policy_$6_storage_ptr",
-                            "typeString": "struct PolicyRegistry.Policy storage pointer"
-                          }
-                        },
-                        "id": 76,
-                        "isConstant": false,
-                        "isLValue": true,
-                        "isPure": false,
-                        "lValueRequested": false,
-                        "memberName": "fileHash",
-                        "nodeType": "MemberAccess",
-                        "referencedDeclaration": 5,
-                        "src": "1852:15:0",
-                        "typeDescriptions": {
-                          "typeIdentifier": "t_bytes32",
-                          "typeString": "bytes32"
                         }
                       }
                     ],
@@ -2021,24 +1562,20 @@
                         {
                           "typeIdentifier": "t_string_storage",
                           "typeString": "string storage ref"
-                        },
-                        {
-                          "typeIdentifier": "t_bytes32",
-                          "typeString": "bytes32"
                         }
                       ],
-                      "id": 71,
+                      "id": 8194,
                       "name": "PolicyUpdate",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 14,
-                      "src": "1810:12:0",
+                      "referencedDeclaration": 8145,
+                      "src": "1461:12:10",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$_t_string_memory_ptr_$_t_bytes32_$returns$__$",
-                        "typeString": "function (uint256,string memory,bytes32)"
+                        "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (uint256,string memory)"
                       }
                     },
-                    "id": 77,
+                    "id": 8199,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -2046,20 +1583,20 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1810:58:0",
+                    "src": "1461:48:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 78,
+                  "id": 8200,
                   "nodeType": "EmitStatement",
-                  "src": "1805:63:0"
+                  "src": "1456:53:10"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 86,
+                    "id": 8205,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -2068,26 +1605,26 @@
                       "argumentTypes": null,
                       "baseExpression": {
                         "argumentTypes": null,
-                        "id": 79,
+                        "id": 8201,
                         "name": "policies",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 20,
-                        "src": "1878:8:0",
+                        "referencedDeclaration": 8151,
+                        "src": "1519:8:10",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Policy_$6_storage_$",
-                          "typeString": "mapping(uint256 => struct PolicyRegistry.Policy storage ref)"
+                          "typeIdentifier": "t_mapping$_t_uint256_$_t_string_storage_$",
+                          "typeString": "mapping(uint256 => string storage ref)"
                         }
                       },
-                      "id": 81,
+                      "id": 8203,
                       "indexExpression": {
                         "argumentTypes": null,
-                        "id": 80,
+                        "id": 8202,
                         "name": "_subcourtID",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 56,
-                        "src": "1887:11:0",
+                        "referencedDeclaration": 8187,
+                        "src": "1528:11:10",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -2098,122 +1635,78 @@
                       "isPure": false,
                       "lValueRequested": true,
                       "nodeType": "IndexAccess",
-                      "src": "1878:21:0",
+                      "src": "1519:21:10",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_struct$_Policy_$6_storage",
-                        "typeString": "struct PolicyRegistry.Policy storage ref"
+                        "typeIdentifier": "t_string_storage",
+                        "typeString": "string storage ref"
                       }
                     },
                     "nodeType": "Assignment",
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "arguments": [
-                        {
-                          "argumentTypes": null,
-                          "id": 83,
-                          "name": "_fileURI",
-                          "nodeType": "Identifier",
-                          "overloadedDeclarations": [],
-                          "referencedDeclaration": 58,
-                          "src": "1932:8:0",
-                          "typeDescriptions": {
-                            "typeIdentifier": "t_string_calldata_ptr",
-                            "typeString": "string calldata"
-                          }
-                        },
-                        {
-                          "argumentTypes": null,
-                          "id": 84,
-                          "name": "_fileHash",
-                          "nodeType": "Identifier",
-                          "overloadedDeclarations": [],
-                          "referencedDeclaration": 60,
-                          "src": "1964:9:0",
-                          "typeDescriptions": {
-                            "typeIdentifier": "t_bytes32",
-                            "typeString": "bytes32"
-                          }
-                        }
-                      ],
-                      "expression": {
-                        "argumentTypes": null,
-                        "id": 82,
-                        "name": "Policy",
-                        "nodeType": "Identifier",
-                        "overloadedDeclarations": [],
-                        "referencedDeclaration": 6,
-                        "src": "1902:6:0",
-                        "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_struct$_Policy_$6_storage_ptr_$",
-                          "typeString": "type(struct PolicyRegistry.Policy storage pointer)"
-                        }
-                      },
-                      "id": 85,
-                      "isConstant": false,
-                      "isLValue": false,
-                      "isPure": false,
-                      "kind": "structConstructorCall",
-                      "lValueRequested": false,
-                      "names": ["fileURI", "fileHash"],
-                      "nodeType": "FunctionCall",
-                      "src": "1902:82:0",
+                      "id": 8204,
+                      "name": "_policy",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 8189,
+                      "src": "1543:7:10",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_struct$_Policy_$6_memory",
-                        "typeString": "struct PolicyRegistry.Policy memory"
+                        "typeIdentifier": "t_string_calldata_ptr",
+                        "typeString": "string calldata"
                       }
                     },
-                    "src": "1878:106:0",
+                    "src": "1519:31:10",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$_Policy_$6_storage",
-                      "typeString": "struct PolicyRegistry.Policy storage ref"
+                      "typeIdentifier": "t_string_storage",
+                      "typeString": "string storage ref"
                     }
                   },
-                  "id": 87,
+                  "id": 8206,
                   "nodeType": "ExpressionStatement",
-                  "src": "1878:106:0"
+                  "src": "1519:31:10"
                 }
               ]
             },
-            "documentation": "@dev Sets the policy for the specified subcourt.\n @param _subcourtID The ID of the specified subcourt.\n @param _fileURI The URI to the file containing the policy text.\n @param _fileHash The hash of the file's contents.",
-            "id": 89,
+            "documentation": "@dev Sets the policy for the specified subcourt.\n @param _subcourtID The ID of the specified subcourt.\n @param _policy The URI of the policy JSON.",
+            "id": 8208,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
             "modifiers": [
               {
                 "arguments": null,
-                "id": 63,
+                "id": 8192,
                 "modifierName": {
                   "argumentTypes": null,
-                  "id": 62,
+                  "id": 8191,
                   "name": "onlyByGovernor",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 32,
-                  "src": "1725:14:0",
+                  "referencedDeclaration": 8163,
+                  "src": "1431:14:10",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
                     "typeString": "modifier ()"
                   }
                 },
                 "nodeType": "ModifierInvocation",
-                "src": "1725:14:0"
+                "src": "1431:14:10"
               }
             ],
             "name": "setPolicy",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 61,
+              "id": 8190,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 56,
+                  "id": 8187,
                   "name": "_subcourtID",
                   "nodeType": "VariableDeclaration",
-                  "scope": 89,
-                  "src": "1662:16:0",
+                  "scope": 8208,
+                  "src": "1388:16:10",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2221,10 +1714,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 55,
+                    "id": 8186,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1662:4:0",
+                    "src": "1388:4:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2235,11 +1728,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 58,
-                  "name": "_fileURI",
+                  "id": 8189,
+                  "name": "_policy",
                   "nodeType": "VariableDeclaration",
-                  "scope": 89,
-                  "src": "1680:15:0",
+                  "scope": 8208,
+                  "src": "1406:14:10",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2247,10 +1740,10 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 57,
+                    "id": 8188,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1680:6:0",
+                    "src": "1406:6:10",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage_ptr",
                       "typeString": "string"
@@ -2258,55 +1751,29 @@
                   },
                   "value": null,
                   "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 60,
-                  "name": "_fileHash",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 89,
-                  "src": "1697:17:0",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_bytes32",
-                    "typeString": "bytes32"
-                  },
-                  "typeName": {
-                    "id": 59,
-                    "name": "bytes32",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1697:7:0",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_bytes32",
-                      "typeString": "bytes32"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
                 }
               ],
-              "src": "1661:54:0"
+              "src": "1387:34:10"
             },
             "payable": false,
             "returnParameters": {
-              "id": 64,
+              "id": 8193,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1740:0:0"
+              "src": "1446:0:10"
             },
-            "scope": 90,
-            "src": "1643:348:0",
+            "scope": 8209,
+            "src": "1369:188:10",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 91,
-        "src": "174:1819:0"
+        "scope": 8210,
+        "src": "174:1385:10"
       }
     ],
-    "src": "0:1994:0"
+    "src": "0:1560:10"
   },
   "compiler": {
     "name": "solc",
@@ -2314,5 +1781,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.1",
-  "updatedAt": "2018-12-11T19:55:48.511Z"
+  "updatedAt": "2019-01-11T16:08:46.015Z"
 }

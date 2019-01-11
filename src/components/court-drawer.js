@@ -67,8 +67,8 @@ const CourtDrawer = ({ ID, onClose }) => {
         summary: undefined
       }
       const policy = call('PolicyRegistry', 'policies', subcourt.ID)
-      if (policy) {
-        const policyJSON = load(policy.fileURI)
+      if (policy !== undefined) {
+        const policyJSON = load(policy)
         if (policyJSON) {
           subcourt.description = policyJSON.description
           subcourt.name = policyJSON.name

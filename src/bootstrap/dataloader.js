@@ -23,7 +23,14 @@ const funcs = {
         })
       )
       .catch(() => null),
-  load: URI => fetch(URI).then(res => res.json())
+  load: (URI, options) =>
+    archon.utils
+      .validateFileFromURI(URI, {
+        strictHashes: true,
+        ...options
+      })
+      .then(res => res.file)
+      .catch(() => null)
 }
 export const dataloaders = Object.keys(funcs).reduce((acc, f) => {
   acc[f] = new Dataloader(
