@@ -8,22 +8,26 @@ import ReactBlockies from 'react-blockies'
 import styled from 'styled-components/macro'
 
 const StyledDiv = styled.div`
+  height: 32px;
   line-height: 100%;
+  width: 32px;
 `
 const StyledReactBlockies = styled(ReactBlockies)`
   border-radius: ${({ large }) => (large ? '4' : '16')}px;
 `
-const Identicon = ({ large, pinakion }) => {
+const Identicon = ({ account, className, large, pinakion }) => {
   const { useCacheCall } = useDrizzle()
-  const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0],
-    balance: drizzleState.accountBalances[drizzleState.accounts[0]]
-  }))
+  const drizzleState = account
+    ? { account }
+    : useDrizzleState(drizzleState => ({
+        account: drizzleState.accounts[0],
+        balance: drizzleState.accountBalances[drizzleState.accounts[0]]
+      }))
   let PNK
   if (pinakion)
     PNK = useCacheCall('MiniMeTokenERC20', 'balanceOf', drizzleState.account)
   const content = (
-    <StyledDiv>
+    <StyledDiv className={className}>
       <StyledReactBlockies
         large={large}
         scale={large ? 7 : 4}
@@ -45,16 +49,18 @@ const Identicon = ({ large, pinakion }) => {
               title="Address"
             />
           </List.Item>
-          <List.Item>
-            <List.Item.Meta
-              description={
-                <ETHAmount amount={drizzleState.balance} decimals={4} />
-              }
-              title="ETH"
-            />
-          </List.Item>
+          {!account && (
+            <List.Item>
+              <List.Item.Meta
+                description={
+                  <ETHAmount amount={drizzleState.balance} decimals={4} />
+                }
+                title="ETH"
+              />
+            </List.Item>
+          )}
           {pinakion && (
-            <Spin spinning={PNK === undefined}>
+            <Spin spinning={!PNK}>
               <List.Item>
                 <List.Item.Meta
                   description={<ETHAmount amount={PNK} />}
@@ -66,7 +72,7 @@ const Identicon = ({ large, pinakion }) => {
         </List>
       }
       placement="bottomRight"
-      title="Your Account"
+      title="Account"
       trigger="click"
     >
       {content}
@@ -75,11 +81,15 @@ const Identicon = ({ large, pinakion }) => {
 }
 
 Identicon.propTypes = {
+  account: PropTypes.string,
+  className: PropTypes.string,
   large: PropTypes.bool,
   pinakion: PropTypes.bool
 }
 
 Identicon.defaultProps = {
+  account: null,
+  className: null,
   large: false,
   pinakion: false
 }

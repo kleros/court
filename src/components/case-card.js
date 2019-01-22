@@ -3,6 +3,7 @@ import React, { useMemo } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import ETHAmount from '../components/eth-amount'
 import { ReactComponent as Gavel } from '../assets/images/gavel.svg'
+import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import TimeAgo from '../components/time-ago'
 import styled from 'styled-components/macro'
@@ -162,13 +163,15 @@ const CaseCard = ({ ID }) => {
               </StyledBigTextDiv>
             </>
           ),
-          <Button type="primary">See Details</Button>
+          <Link to={`/cases/${ID}`}>
+            <Button type="primary">See Details</Button>
+          </Link>
         ],
         [disputeData.deadline]
       )}
       extra={`Case #${ID}`}
       hoverable
-      loading={metaEvidence === undefined}
+      loading={!metaEvidence}
       title={
         <>
           <StyledGavel className="ternary-fill" />

@@ -77,8 +77,7 @@ const CourtDrawer = ({ ID, onClose }) => {
       }
       const _subcourt = call('KlerosLiquid', 'courts', subcourt.ID)
       if (_subcourt) nextID = _subcourt.parent
-      if (subcourt.name === undefined || _subcourt === undefined)
-        return undefined
+      if (subcourt.name === undefined || !_subcourt) return undefined
       subcourts.push(subcourt)
     }
     if (activeIndex === undefined) setActiveIndex(subcourts.length - 1)

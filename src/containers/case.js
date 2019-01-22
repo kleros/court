@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import CaseDetailsCard from '../components/case-details-card'
 import ETHAmount from '../components/eth-amount'
 import TimeAgo from '../components/time-ago'
 import TopBanner from '../components/top-banner'
@@ -91,6 +92,7 @@ export default ({
         }
         title="Case Details"
       />
+      <CaseDetailsCard ID={ID} />
     </>
   )
 }

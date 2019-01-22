@@ -48,8 +48,7 @@ const PNKStatsListCard = () => {
         return subcourt
       })
   )
-  const loadingSubcourts =
-    !subcourts || subcourts.some(s => s.stake === undefined)
+  const loadingSubcourts = !subcourts || subcourts.some(s => !s.stake)
   const draws = useCacheEvents(
     'KlerosLiquid',
     'Draw',

@@ -121,7 +121,7 @@ const CourtCascaderModal = ({ onClick }) => {
         })
       if (
         option.label === undefined ||
-        subcourt === undefined ||
+        !subcourt ||
         option.children.some(c => c.loading)
       ) {
         option.loading = true

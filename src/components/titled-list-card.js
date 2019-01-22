@@ -8,25 +8,29 @@ import styled from 'styled-components/macro'
 const StyledCard = styled(Card)`
   margin: 28px 0;
 
-  .ant-card-head {
-    color: white;
-    margin: 0 0 11px;
-  }
+  .ant-card {
+    &-head {
+      color: white;
+      margin: 0 0 11px;
+    }
 
-  .ant-card-body {
-    border: 1px solid silver;
-    border-radius: 3px;
-    box-shadow: 0px 3px 6px rgba(201, 201, 201, 0.5);
-    padding: 0;
+    &-body {
+      border: 1px solid silver;
+      border-radius: 3px;
+      box-shadow: 0 3px 6px rgba(201, 201, 201, 0.5);
+      padding: 0;
+    }
   }
 
   &.ant-card-wider-padding {
-    .ant-card-head {
-      padding: 0 24px;
-    }
+    .ant-card {
+      &-head {
+        padding: 0 24px;
+      }
 
-    .ant-card-body {
-      padding: 0;
+      &-body {
+        padding: 0;
+      }
     }
   }
 `
