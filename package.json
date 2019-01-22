@@ -22,7 +22,8 @@
     "cz": "kathari cz",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "build:analyze": "source-map-explorer build/static/js/main.*"
+    "build:analyze": "source-map-explorer build/static/js/main.*",
+    "build:theme": "lessc --js ./src/components/theme.less ./src/components/theme.css"
   },
   "commitlint": {
     "extends": [
@@ -42,17 +43,34 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "@kleros/kathari": "^0.14.0",
+    "@kleros/kathari": "^0.20.0",
     "husky": "^1.1.4",
+    "less": "^3.8.1",
     "source-map-explorer": "^1.6.0",
     "standard-version": "^4.4.0"
   },
   "dependencies": {
+    "@kleros/archon": "^0.5.4",
     "antd": "^3.10.8",
+    "dataloader": "^1.4.0",
+    "debounce": "^1.2.0",
+    "drizzle": "^1.2.4",
+    "is-image": "^2.0.0",
+    "is-text-path": "^1.0.1",
+    "is-video": "^1.0.1",
+    "javascript-time-ago": "^1.0.32",
     "polished": "^2.3.0",
-    "react": "^16.6.3",
-    "react-dom": "^16.6.3",
+    "prop-types": "^15.6.2",
+    "react": "16.7.0-alpha.2",
+    "react-blockies": "^1.4.0",
+    "react-dom": "16.7.0-alpha.2",
+    "react-helmet": "^5.2.0",
+    "react-markdown": "^4.0.4",
+    "react-minimal-pie-chart": "^3.3.0",
+    "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.1",
+    "react-time-ago": "^3.0.3",
+    "shallowequal": "^1.1.0",
     "styled-components": "^4.1.1"
   }
 }
