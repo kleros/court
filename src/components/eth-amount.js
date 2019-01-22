@@ -17,11 +17,7 @@ const ETHAmount = ({ amount, decimals }) => {
   return amount === null ? (
     <StyledSkeleton active paragraph={false} title={SkeletonTitleProps} />
   ) : (
-    Number(
-      drizzle.web3.utils.fromWei(
-        typeof amount === 'number' ? String(amount) : amount
-      )
-    ).toFixed(decimals)
+    Number(drizzle.web3.utils.fromWei(String(amount))).toFixed(decimals)
   )
 }
 
