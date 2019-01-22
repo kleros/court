@@ -14,6 +14,7 @@ import NotificationSettings from '../components/notification-settings'
 import Notifications from '../components/notifications'
 import React from 'react'
 import drizzle from './drizzle'
+import { register } from './service-worker'
 import styled from 'styled-components/macro'
 
 const StyledCol = styled(Col)`
@@ -134,3 +135,5 @@ export default () => (
     </DrizzleProvider>
   </>
 )
+
+register()
