@@ -261,7 +261,7 @@ const CaseDetailsCard = ({ ID }) => {
               votesData.loading || !metaEvidence || status === 'pending'
             }
           >
-            {!votesData.loading && metaEvidence && (
+            {!votesData.loading && metaEvidence ? (
               <>
                 <StyledDiv className="secondary-linear-background theme-linear-background">
                   {votesData.canVote
@@ -306,6 +306,8 @@ const CaseDetailsCard = ({ ID }) => {
                   </Button>
                 </StyledDiv>
               </>
+            ) : (
+              <StyledDiv className="secondary-linear-background theme-linear-background" />
             )}
           </Spin>
         ],
