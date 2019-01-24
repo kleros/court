@@ -27,13 +27,13 @@ export default () => (
     />
     <PNKBalanceCard />
     <Row gutter={32}>
-      <Col span={6}>
+      <Col lg={6}>
         <CourtsListCard />
       </Col>
-      <Col span={6}>
+      <Col lg={6}>
         <CasesListCard />
       </Col>
-      <Col span={12}>
+      <Col lg={12}>
         <PNKStatsListCard />
       </Col>
     </Row>

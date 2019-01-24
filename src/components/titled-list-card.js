@@ -6,7 +6,7 @@ import { ReactComponent as Underline } from '../assets/images/underline.svg'
 import styled from 'styled-components/macro'
 
 const StyledCard = styled(Card)`
-  margin: 28px 0;
+  margin: 28px 0 0;
 
   .ant-card {
     &-head {
@@ -45,7 +45,7 @@ const StyledPrefixDiv = styled.div`
 const StyledTitleDiv = styled.div`
   font-size: 24px;
   font-weight: medium;
-  left: 100px;
+  left: 95px;
   position: absolute;
   top: 53px;
   transform: translateY(-50%);

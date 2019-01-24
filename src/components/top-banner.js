@@ -15,15 +15,24 @@ const StyledUnderline = styled(Underline)`
   left: 0;
   position: absolute;
 `
+const StyledExtraCol = styled(Col)`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+`
 const TopBanner = ({ description, extra, title }) => (
   <StyledCard>
-    <Row align="middle" type="flex">
-      <StyledTitleCol offset={2} span={6}>
+    <Row align="middle" gutter={16} type="flex">
+      <StyledTitleCol md={8} xs={16}>
         {title}
         <StyledUnderline className="primary-fill" />
       </StyledTitleCol>
-      <Col span={12}>{description}</Col>
-      <Col span={4}>{extra}</Col>
+      <Col md={12} xs={0}>
+        {description}
+      </Col>
+      <StyledExtraCol md={4} xs={8}>
+        {extra}
+      </StyledExtraCol>
     </Row>
   </StyledCard>
 )

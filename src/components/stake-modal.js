@@ -3,9 +3,12 @@ import React, { useCallback, useMemo } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import ETHAmount from './eth-amount'
 import PropTypes from 'prop-types'
+import { fluidRange } from 'polished'
 import styled from 'styled-components/macro'
 
 const StyledModal = styled(Modal)`
+  max-width: 90%;
+
   .ant-modal {
     &-content {
       padding: 0 21px;
@@ -31,19 +34,38 @@ const StyledDiv = styled.div`
   border-radius: 3px;
   display: flex;
   flex-direction: column;
-  height: 100px;
   justify-content: center;
   margin-bottom: 24px;
+  ${fluidRange([
+    {
+      fromSize: '7px',
+      prop: 'fontSize',
+      toSize: '14px'
+    },
+    {
+      fromSize: '50px',
+      prop: 'height',
+      toSize: '100px'
+    },
+    {
+      fromSize: '60px',
+      prop: 'width',
+      toSize: '120px'
+    }
+  ])}
   position: relative;
-  width: 120px;
 `
 const StyledAmountDiv = styled.div`
-  font-size: 18px;
   font-weight: bold;
+  ${fluidRange({
+    fromSize: '7px',
+    prop: 'fontSize',
+    toSize: '14px'
+  })}
 `
 const StyledOperatorDiv = styled.div`
   font-size: 18px;
-  left: -13px;
+  left: -12px;
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
@@ -189,11 +211,7 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
       <Form>
         <Skeleton active loading={loading}>
           {!loading && (
-            <Form.Item
-              colon={false}
-              hasFeedback
-              label="How much PNK would you like to stake?"
-            >
+            <Form.Item colon={false} hasFeedback label="PNK">
               {form.getFieldDecorator('PNK', {
                 rules: [
                   { message: 'Please enter an amount of PNK.', required: true },

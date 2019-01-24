@@ -17,11 +17,52 @@ import drizzle from './drizzle'
 import { register } from './service-worker'
 import styled from 'styled-components/macro'
 
+const MenuItems = [
+  <Menu.Item key="home">
+    <NavLink to="/">Home</NavLink>
+  </Menu.Item>,
+  <Menu.Item key="courts">
+    <NavLink to="/courts">Courts</NavLink>
+  </Menu.Item>,
+  <Menu.Item key="cases">
+    <NavLink to="/cases">Cases</NavLink>
+  </Menu.Item>,
+  <Menu.Item key="tokens">
+    <NavLink to="/tokens">Tokens</NavLink>
+  </Menu.Item>,
+  // <Menu.Item key="governance">
+  //   <NavLink to="/governance">Governance</NavLink>
+  // </Menu.Item>,
+  <Menu.Item key="guide">
+    <NavLink to="/guide">Guide</NavLink>
+  </Menu.Item>
+]
+const StyledLayoutSider = styled(Layout.Sider)`
+  height: 100%;
+  position: fixed;
+  z-index: 2000;
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+
+  .ant-layout-sider-zero-width-trigger {
+    right: -50px;
+    top: 12px;
+    width: 50px;
+  }
+`
 const StyledCol = styled(Col)`
   align-items: center;
   display: flex;
   height: 64px;
   justify-content: space-evenly;
+
+  @media (max-width: 575px) {
+    &.ant-col-xs-0 {
+      display: none;
+    }
+  }
 `
 const StyledMenu = styled(Menu)`
   font-weight: bold;
@@ -30,7 +71,7 @@ const StyledMenu = styled(Menu)`
 `
 const StyledLayoutContent = styled(Layout.Content)`
   background: white;
-  padding: 0 9.375vw;
+  padding: 0 9.375vw 62px;
 `
 const notifications = [
   {
@@ -83,51 +124,39 @@ export default () => (
         <ArchonInitializer>
           <BrowserRouter>
             <Layout>
-              <Layout.Header>
-                <Row>
-                  <StyledCol span={4}>
-                    <Logo />
-                  </StyledCol>
-                  <Col span={16}>
-                    <StyledMenu mode="horizontal" theme="dark">
-                      <Menu.Item key="home">
-                        <NavLink to="/">Home</NavLink>
-                      </Menu.Item>
-                      <Menu.Item key="courts">
-                        <NavLink to="/courts">Courts</NavLink>
-                      </Menu.Item>
-                      <Menu.Item key="cases">
-                        <NavLink to="/cases">Cases</NavLink>
-                      </Menu.Item>
-                      <Menu.Item key="tokens">
-                        <NavLink to="/tokens">Tokens</NavLink>
-                      </Menu.Item>
-                      <Menu.Item key="governance">
-                        <NavLink to="/governance">Governance</NavLink>
-                      </Menu.Item>
-                      <Menu.Item key="guide">
-                        <NavLink to="/guide">Guide</NavLink>
-                      </Menu.Item>
-                    </StyledMenu>
-                  </Col>
-                  <StyledCol span={4}>
-                    <Notifications notifications={notifications} />
-                    <NotificationSettings settings={settings} />
-                    <Identicon pinakion />
-                  </StyledCol>
-                </Row>
-              </Layout.Header>
-              <StyledLayoutContent>
-                <Switch>
-                  <Route component={Home} exact path="/" />
-                  <Route component={Courts} exact path="/courts" />
-                  <Route component={Cases} exact path="/cases" />
-                  <Route component={Case} exact path="/cases/:ID" />
-                  <Route exact path="/tokens" />
-                  <Route exact path="/governance" />
-                  <Route exact path="/guide" />
-                </Switch>
-              </StyledLayoutContent>
+              <StyledLayoutSider breakpoint="md" collapsedWidth="0">
+                <Menu theme="dark">{MenuItems}</Menu>
+              </StyledLayoutSider>
+              <Layout>
+                <Layout.Header>
+                  <Row>
+                    <StyledCol md={3} sm={16} xs={0}>
+                      <Logo />
+                    </StyledCol>
+                    <Col md={16} xs={0}>
+                      <StyledMenu mode="horizontal" theme="dark">
+                        {MenuItems}
+                      </StyledMenu>
+                    </Col>
+                    <StyledCol md={5} sm={8} xs={24}>
+                      <Notifications notifications={notifications} />
+                      <NotificationSettings settings={settings} />
+                      <Identicon pinakion />
+                    </StyledCol>
+                  </Row>
+                </Layout.Header>
+                <StyledLayoutContent>
+                  <Switch>
+                    <Route component={Home} exact path="/" />
+                    <Route component={Courts} exact path="/courts" />
+                    <Route component={Cases} exact path="/cases" />
+                    <Route component={Case} exact path="/cases/:ID" />
+                    <Route exact path="/tokens" />
+                    {/* <Route exact path="/governance" /> */}
+                    <Route exact path="/guide" />
+                  </Switch>
+                </StyledLayoutContent>
+              </Layout>
             </Layout>
           </BrowserRouter>
         </ArchonInitializer>

@@ -29,6 +29,16 @@ const StyledDrawer = styled(Drawer)`
         position: absolute;
         top: 24px;
         transform: translateX(-50%);
+
+        @media (max-width: 575px) {
+          ${triangle({
+            foregroundColor: 'gainsboro',
+            height: '10px',
+            pointingDirection: 'top',
+            width: '20px'
+          })}
+          top: 12px;
+        }
       }
     }
 
@@ -107,11 +117,11 @@ const CourtDrawer = ({ ID, onClose }) => {
       <Skeleton active loading={loading}>
         {!loading && (
           <Row>
-            <Col span={12}>
+            <Col md={12}>
               <StyledDiv>Description</StyledDiv>
               <ReactMarkdown source={subcourts[activeIndex].description} />
             </Col>
-            <Col span={12}>
+            <Col md={12}>
               <StyledDiv>Summary</StyledDiv>
               <ReactMarkdown source={subcourts[activeIndex].summary} />
             </Col>

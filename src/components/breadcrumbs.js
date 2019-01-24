@@ -4,7 +4,10 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components/macro'
 
 const StyledDiv = styled.div`
+  height: ${props => (props.large ? 38 : 20)}px;
+  overflow-x: scroll;
   position: relative;
+  width: 100%;
 `
 const StyledBreadcrumbDiv = styled.div`
   cursor: pointer;
@@ -35,7 +38,7 @@ const Breadcrumbs = ({
   large,
   onClick
 }) => (
-  <StyledDiv className={className}>
+  <StyledDiv className={className} large={large}>
     {(Array.isArray(breadcrumbs) ? breadcrumbs : [breadcrumbs]).map((b, i) => (
       <StyledBreadcrumbDiv
         id={i}

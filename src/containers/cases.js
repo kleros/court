@@ -56,7 +56,7 @@ export default () => {
         extra={
           <Link to="/cases/history">
             <Button size="large" type="primary">
-              Cases History
+              History
             </Button>
           </Link>
         }
@@ -76,7 +76,7 @@ export default () => {
       <Spin spinning={disputes.loading}>
         <Row gutter={48}>
           {disputes[filter ? 'activeIDs' : 'executedIDs'].map(ID => (
-            <Col key={ID} span={8}>
+            <Col key={ID} md={12} xl={8}>
               <CaseCard ID={ID} />
             </Col>
           ))}

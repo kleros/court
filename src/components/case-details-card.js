@@ -11,13 +11,15 @@ import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
 
 const StyledCard = styled(Card)`
-  margin-bottom: 62px;
-
   .ant-card {
     &-head {
       margin: 0 46px;
       padding: 0;
       position: relative;
+
+      @media (max-width: 767px) {
+        margin: 0 23px;
+      }
 
       &-title {
         font-size: 24px;
@@ -26,6 +28,10 @@ const StyledCard = styled(Card)`
 
     &-body {
       padding: 44px 46px 23px;
+
+      @media (max-width: 767px) {
+        padding: 44px 23px 23px;
+      }
     }
 
     &-actions {
@@ -47,25 +53,25 @@ const StyledDiv = styled.div`
   display: flex;
   flex-direction: column;
   font-size: 24px;
-  padding: 30px 0;
+  padding: 30px 10px;
 `
 const StyledInputTextArea = styled(Input.TextArea)`
   background: rgba(255, 255, 255, 0.3);
   border: none;
   color: white;
-  height: 91px;
+  height: 91px !important;
   margin: 24px 0;
   width: 70%;
 `
 const StyledButtonsDiv = styled.div`
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: space-around;
   width: 70%;
 `
 const StyledButton = styled(Button)`
   flex: 0 0 35%;
-  margin: 20px 0 15px;
+  margin: 20px 5px 15px;
 `
 const StyledPoliciesButton = styled(Button)`
   padding-left: 40px;
@@ -80,7 +86,7 @@ const StyledDocument = styled(Document)`
   width: auto;
 `
 const StyledBreadcrumbs = styled(Breadcrumbs)`
-  bottom: 0;
+  bottom: -20px;
   font-size: 10px;
   left: 0;
   position: absolute;
@@ -371,7 +377,7 @@ const CaseDetailsCard = ({ ID }) => {
             {evidence && (
               <Row gutter={40}>
                 {Object.keys(evidenceBySubmitter).map(a => (
-                  <Col key={a} span={12}>
+                  <Col key={a} md={12}>
                     <StyledInnerCard
                       actions={useMemo(
                         () => [

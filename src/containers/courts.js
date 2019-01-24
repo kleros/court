@@ -29,7 +29,7 @@ export default () => {
             size="large"
             type="primary"
           >
-            Select Court
+            Browse
           </Button>
         }
         title="Courts"
@@ -39,7 +39,7 @@ export default () => {
         <Row gutter={40}>
           {subcourtIDs &&
             subcourtIDs.map(ID => (
-              <Col key={ID} span={8}>
+              <Col key={ID} md={12} xl={8}>
                 <CourtCard
                   ID={ID}
                   onClick={setActiveID}

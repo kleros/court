@@ -10,7 +10,7 @@ import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
 
 const StyledCard = styled(Card)`
-  margin: 10px 0;
+  margin: 20px 0 0;
 
   .ant-card {
     &-head {
@@ -64,7 +64,7 @@ const StyledCardGrid = styled(Card.Grid)`
   height: 73px;
   justify-content: center;
   margin-bottom: 20px;
-  padding: 0;
+  padding: 0 5px;
   text-align: center;
   width: 50%;
 
