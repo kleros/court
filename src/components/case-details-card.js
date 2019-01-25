@@ -258,6 +258,21 @@ const CaseDetailsCard = ({ ID }) => {
     ({ currentTarget: { id } }) => send(ID, votesData.voteIDs, id, 0),
     [ID, votesData.voteIDs]
   )
+  const metaEvidenceActions = useMemo(
+    () =>
+      metaEvidence && [
+        <Attachment
+          URI={metaEvidence.metaEvidenceJSON.fileURI}
+          description="This is the primary file uploaded with the dispute."
+          extension={metaEvidence.metaEvidenceJSON.fileTypeExtension}
+          title="Main File"
+        />,
+        <StyledInnerCardActionsTitleDiv className="ternary-color theme-color">
+          Primary Documents
+        </StyledInnerCardActionsTitleDiv>
+      ],
+    [metaEvidence]
+  )
   return (
     <StyledCard
       actions={useMemo(
@@ -350,25 +365,7 @@ const CaseDetailsCard = ({ ID }) => {
         <>
           <Row>
             <Col span={24}>
-              <StyledInnerCard
-                actions={useMemo(
-                  () => [
-                    <Attachment
-                      URI={metaEvidence.metaEvidenceJSON.fileURI}
-                      description="This is the primary file uploaded with the dispute."
-                      extension={
-                        metaEvidence.metaEvidenceJSON.fileTypeExtension
-                      }
-                      title="Main File"
-                    />,
-                    <StyledInnerCardActionsTitleDiv className="ternary-color theme-color">
-                      Primary Documents
-                    </StyledInnerCardActionsTitleDiv>
-                  ],
-                  [metaEvidence]
-                )}
-                hoverable
-              >
+              <StyledInnerCard actions={metaEvidenceActions} hoverable>
                 {metaEvidence.metaEvidenceJSON.description}
               </StyledInnerCard>
             </Col>
@@ -379,22 +376,20 @@ const CaseDetailsCard = ({ ID }) => {
                 {Object.keys(evidenceBySubmitter).map(a => (
                   <Col key={a} md={12}>
                     <StyledInnerCard
-                      actions={useMemo(
-                        () => [
-                          ...evidenceBySubmitter[a].map(e => (
-                            <Attachment
-                              URI={e.evidenceJSON.fileURI}
-                              description={e.evidenceJSON.description}
-                              extension={e.evidenceJSON.fileTypeExtension}
-                              title={e.evidenceJSON.name}
-                            />
-                          )),
+                      actions={evidenceBySubmitter[a]
+                        .map(e => (
+                          <Attachment
+                            URI={e.evidenceJSON.fileURI}
+                            description={e.evidenceJSON.description}
+                            extension={e.evidenceJSON.fileTypeExtension}
+                            title={e.evidenceJSON.name}
+                          />
+                        ))
+                        .concat(
                           <StyledInnerCardActionsTitleDiv className="ternary-color theme-color">
                             Evidence
                           </StyledInnerCardActionsTitleDiv>
-                        ],
-                        [evidence]
-                      )}
+                        )}
                       hoverable
                       title={
                         <>

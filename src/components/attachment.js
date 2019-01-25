@@ -11,7 +11,7 @@ import isVideo from 'is-video'
 import styled from 'styled-components/macro'
 
 const StyledPopover = styled(({ className, ...rest }) => (
-  <Popover overlayClassName={className} {...rest} />
+  <Popover className={className} overlayClassName={className} {...rest} />
 ))`
   .ant-popover {
     &-inner {

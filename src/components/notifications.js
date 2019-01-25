@@ -1,11 +1,12 @@
 import { Badge, List, Popover } from 'antd'
+import React, { useCallback } from 'react'
 import { ReactComponent as Alert } from '../assets/images/alert.svg'
 import { ReactComponent as Bell } from '../assets/images/bell.svg'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import React from 'react'
 import TimeAgo from './time-ago'
 import styled from 'styled-components/macro'
+import { useDrizzleState } from '../temp/drizzle-react-hooks'
 
 const StyledListItem = styled(List.Item)`
   max-width: 358px;
@@ -29,9 +30,9 @@ const StyledListItem = styled(List.Item)`
     }
   }
 `
-const Notification = ({ date, message, to, type }) => (
+const Notification = ({ ID, date, message, onNotificationClick, to, type }) => (
   <StyledListItem>
-    <Link to={to}>
+    <Link id={ID} onClick={onNotificationClick} to={to}>
       <List.Item.Meta
         avatar={<Alert className={`${type}-fill`} />}
         description={<TimeAgo className={`${type}-color`}>{date}</TimeAgo>}
@@ -42,12 +43,15 @@ const Notification = ({ date, message, to, type }) => (
 )
 
 Notification.propTypes = {
+  ID: PropTypes.string.isRequired,
   date: PropTypes.instanceOf(Date).isRequired,
   message: PropTypes.string.isRequired,
+  onNotificationClick: PropTypes.func.isRequired,
   to: PropTypes.string.isRequired,
   type: PropTypes.oneOf(['info', 'error', 'warning']).isRequired
 }
 
+const locale = { emptyText: 'No new notifications.' }
 const StyledList = styled(List)`
   margin-right: -16px;
   max-height: 380px;
@@ -64,35 +68,57 @@ const StyledBadge = styled(Badge)`
     padding: 0 4px;
   }
 `
-const Notifications = ({ notifications }) => (
-  <Popover
-    arrowPointAtCenter
-    content={
-      <StyledList dataSource={notifications} renderItem={Notification} />
-    }
-    placement="bottomRight"
-    title={
-      <>
-        Notifications <StyledLink to="/notifications">History</StyledLink>
-      </>
-    }
-    trigger="click"
-  >
-    <StyledBadge count={notifications.length}>
-      <Bell />
-    </StyledBadge>
-  </Popover>
-)
+const Notifications = ({ useNotifications }) => {
+  const drizzleState = useDrizzleState(drizzleState => ({
+    account: drizzleState.accounts[0],
+    networkID: drizzleState.web3.networkId
+  }))
+  const {
+    notifications: _notifications,
+    onNotificationClick
+  } = useNotifications(drizzleState.networkID)
+  let notifications
+  if (_notifications)
+    notifications = _notifications.filter(
+      n => n.account === drizzleState.account
+    )
+  return (
+    <Popover
+      arrowPointAtCenter
+      content={
+        <StyledList
+          dataSource={notifications}
+          loading={!notifications}
+          locale={locale}
+          renderItem={useCallback(
+            data => (
+              <Notification
+                {...data}
+                ID={data.key}
+                onNotificationClick={onNotificationClick}
+              />
+            ),
+            [onNotificationClick]
+          )}
+        />
+      }
+      placement="bottomRight"
+      title={
+        <>
+          Notifications <StyledLink to="/notifications">History</StyledLink>
+        </>
+      }
+      trigger="click"
+    >
+      <StyledBadge count={notifications && notifications.length}>
+        <Bell />
+      </StyledBadge>
+    </Popover>
+  )
+}
 
 Notifications.propTypes = {
-  notifications: PropTypes.arrayOf(
-    PropTypes.shape({
-      date: PropTypes.instanceOf(Date).isRequired,
-      message: PropTypes.string.isRequired,
-      to: PropTypes.string.isRequired,
-      type: PropTypes.oneOf(['info', 'error', 'warning']).isRequired
-    }).isRequired
-  ).isRequired
+  useNotifications: PropTypes.func.isRequired
 }
 
 export default Notifications

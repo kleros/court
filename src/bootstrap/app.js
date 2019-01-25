@@ -16,6 +16,7 @@ import React from 'react'
 import drizzle from './drizzle'
 import { register } from './service-worker'
 import styled from 'styled-components/macro'
+import useNotifications from './use-notifications'
 
 const MenuItems = [
   <Menu.Item key="home">
@@ -73,36 +74,6 @@ const StyledLayoutContent = styled(Layout.Content)`
   background: white;
   padding: 0 9.375vw 62px;
 `
-const notifications = [
-  {
-    date: new Date(),
-    message:
-      'Congratulations! You have been drawn as a juror to a case on Air Transport court.',
-    to: '/',
-    type: 'info'
-  },
-  {
-    date: new Date(),
-    message:
-      'Attention! You have 6h to vote on the case number 127464 at Air Transport court.',
-    to: '/',
-    type: 'error'
-  },
-  {
-    date: new Date(),
-    message:
-      'Attention! You have 24h to vote on the case number 127464 at Air Transport court.',
-    to: '/',
-    type: 'warning'
-  },
-  {
-    date: new Date(),
-    message:
-      'Congratulations! You have been drawn as a juror to a case on Air Transport court.',
-    to: '/',
-    type: 'info'
-  }
-]
 const settings = {
   appeal: 'When a case I ruled is appealed.',
   draw: 'When I am drawn as a juror.',
@@ -139,7 +110,7 @@ export default () => (
                       </StyledMenu>
                     </Col>
                     <StyledCol md={5} sm={8} xs={24}>
-                      <Notifications notifications={notifications} />
+                      <Notifications useNotifications={useNotifications} />
                       <NotificationSettings settings={settings} />
                       <Identicon pinakion />
                     </StyledCol>
