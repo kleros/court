@@ -1,23 +1,50 @@
 import '../components/theme.css'
 import { BrowserRouter, NavLink, Route, Switch } from 'react-router-dom'
-import { Col, Layout, Menu, Row } from 'antd'
+import { Col, Layout, Menu, Row, Spin, message } from 'antd'
 import { DrizzleProvider, Initializer } from '../temp/drizzle-react-hooks'
 import { ArchonInitializer } from './archon'
-import Case from '../containers/case'
-import Cases from '../containers/cases'
-import Courts from '../containers/courts'
 import { Helmet } from 'react-helmet'
-import Home from '../containers/home'
 import Identicon from '../components/identicon'
 import { ReactComponent as Logo } from '../assets/images/logo.svg'
 import NotificationSettings from '../components/notification-settings'
 import Notifications from '../components/notifications'
 import React from 'react'
 import drizzle from './drizzle'
+import loadable from '@loadable/component'
 import { register } from './service-worker'
 import styled from 'styled-components/macro'
 import useNotifications from './use-notifications'
 
+const StyledSpin = styled(Spin)`
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+`
+const Home = loadable(
+  () => import(/* webpackPrefetch: true */ '../containers/home'),
+  {
+    fallback: <StyledSpin />
+  }
+)
+const Courts = loadable(
+  () => import(/* webpackPrefetch: true */ '../containers/courts'),
+  {
+    fallback: <StyledSpin />
+  }
+)
+const Cases = loadable(
+  () => import(/* webpackPrefetch: true */ '../containers/cases'),
+  {
+    fallback: <StyledSpin />
+  }
+)
+const Case = loadable(
+  () => import(/* webpackPrefetch: true */ '../containers/case'),
+  {
+    fallback: <StyledSpin />
+  }
+)
 const MenuItems = [
   <Menu.Item key="home">
     <NavLink to="/">Home</NavLink>
@@ -30,14 +57,15 @@ const MenuItems = [
   </Menu.Item>,
   <Menu.Item key="tokens">
     <NavLink to="/tokens">Tokens</NavLink>
-  </Menu.Item>,
-  // <Menu.Item key="governance">
-  //   <NavLink to="/governance">Governance</NavLink>
-  // </Menu.Item>,
-  <Menu.Item key="guide">
-    <NavLink to="/guide">Guide</NavLink>
   </Menu.Item>
 ]
+const settings = {
+  appeal: 'When a case I ruled is appealed.',
+  draw: 'When I am drawn as a juror.',
+  key: 'court',
+  lose: 'When I lose tokens.',
+  win: 'When I win arbitration fees.'
+}
 const StyledLayoutSider = styled(Layout.Sider)`
   height: 100%;
   position: fixed;
@@ -74,13 +102,6 @@ const StyledLayoutContent = styled(Layout.Content)`
   background: white;
   padding: 0 9.375vw 62px;
 `
-const settings = {
-  appeal: 'When a case I ruled is appealed.',
-  draw: 'When I am drawn as a juror.',
-  key: 'court',
-  lose: 'When I lose tokens.',
-  win: 'When I win arbitration fees.'
-}
 export default () => (
   <>
     <Helmet>
@@ -123,8 +144,6 @@ export default () => (
                     <Route component={Cases} exact path="/cases" />
                     <Route component={Case} exact path="/cases/:ID" />
                     <Route exact path="/tokens" />
-                    {/* <Route exact path="/governance" /> */}
-                    <Route exact path="/guide" />
                   </Switch>
                 </StyledLayoutContent>
               </Layout>
@@ -136,4 +155,10 @@ export default () => (
   </>
 )
 
-register()
+register({
+  onUpdate: () =>
+    message.warning(
+      'An update is ready to be installed. Please restart the application.',
+      0
+    )
+})

@@ -7,7 +7,7 @@ const networkIDData = {
   42: { name: 'KOVAN', provider: 'https://kovan.infura.io' }
 }
 const handlers = {
-  async AppealDecision(_, klerosLiquid, block, event) {
+  AppealDecision: async (_, klerosLiquid, block, event) => {
     const dispute = await klerosLiquid.methods
       .disputes(event.returnValues._disputeID)
       .call()
@@ -30,7 +30,7 @@ const handlers = {
       }))
     }
   },
-  async Draw(_, klerosLiquid, block, event) {
+  Draw: async (_, klerosLiquid, block, event) => {
     const dispute = await klerosLiquid.methods
       .disputes(event.returnValues._disputeID)
       .call()
@@ -58,7 +58,7 @@ const handlers = {
         ]
     }
   },
-  async TokenAndETHShift(web3, _, block, event) {
+  TokenAndETHShift: async (web3, _, block, event) => {
     const time = block.timestamp * 1000
     if (Date.now() - time < 6.048e8)
       return [
@@ -81,7 +81,7 @@ const handlers = {
       ]
   }
 }
-export default networkID => {
+export default (networkID, onNewNotifications) => {
   const [notifications, setNotifications] = useState()
   const onNotificationClick = useCallback(
     ({ currentTarget: { id } }) =>
@@ -95,58 +95,67 @@ export default networkID => {
       }),
     []
   )
-  useEffect(() => {
-    const web3 = new Web3(networkIDData[networkID].provider)
-    const klerosLiquid = new web3.eth.Contract(
-      KlerosLiquid.abi,
-      process.env[
-        `REACT_APP_KLEROS_LIQUID_${networkIDData[networkID].name}_ADDRESS`
-      ]
-    )
-    let mounted = true
-    Promise.all([
-      klerosLiquid.getPastEvents('AppealDecision', { fromBlock: 0 }),
-      klerosLiquid.getPastEvents('Draw', { fromBlock: 0 }),
-      klerosLiquid.getPastEvents('TokenAndETHShift', { fromBlock: 0 })
-    ]).then(async ([events1, events2, events3]) => {
-      const notifications = []
-      for (const event of [...events1, ...events2, ...events3]) {
-        let _notifications = await handlers[event.event](
-          web3,
-          klerosLiquid,
-          await web3.eth.getBlock(event.blockNumber),
-          event
-        )
-        if (_notifications) {
-          _notifications = _notifications.filter(
-            n => !localStorage.getItem(n.key)
-          )
-          if (_notifications.length !== 0) notifications.push(..._notifications)
-        }
-      }
-      if (mounted) setNotifications(notifications.reverse())
-    })
-    const listener = klerosLiquid.events
-      .allEvents({ fromBlock: 0 })
-      .on('data', async event => {
-        if (handlers[event.event]) {
-          const notifications = handlers[event.event](
+  useEffect(
+    () => {
+      const web3 = new Web3(networkIDData[networkID].provider)
+      const klerosLiquid = new web3.eth.Contract(
+        KlerosLiquid.abi,
+        process.env[
+          `REACT_APP_KLEROS_LIQUID_${networkIDData[networkID].name}_ADDRESS`
+        ]
+      )
+      let mounted = true
+      Promise.all([
+        klerosLiquid.getPastEvents('AppealDecision', { fromBlock: 0 }),
+        klerosLiquid.getPastEvents('Draw', { fromBlock: 0 }),
+        klerosLiquid.getPastEvents('TokenAndETHShift', { fromBlock: 0 })
+      ]).then(async ([events1, events2, events3]) => {
+        const notifications = []
+        for (const event of [...events1, ...events2, ...events3]) {
+          let _notifications = await handlers[event.event](
             web3,
             klerosLiquid,
             await web3.eth.getBlock(event.blockNumber),
             event
           )
-          if (notifications && mounted)
-            setNotifications(_notifications => [
-              ...notifications.reverse(),
-              ..._notifications
-            ])
+          if (_notifications) {
+            _notifications = _notifications.filter(
+              n => !localStorage.getItem(n.key)
+            )
+            if (_notifications.length !== 0)
+              notifications.push(..._notifications)
+          }
+        }
+        if (mounted) {
+          setNotifications([...notifications].reverse())
+          onNewNotifications(notifications, onNotificationClick)
         }
       })
-    return () => {
-      listener.unsubscribe()
-      mounted = false
-    }
-  }, [])
+      const listener = klerosLiquid.events
+        .allEvents({ fromBlock: 0 })
+        .on('data', async event => {
+          if (handlers[event.event]) {
+            const notifications = handlers[event.event](
+              web3,
+              klerosLiquid,
+              await web3.eth.getBlock(event.blockNumber),
+              event
+            )
+            if (notifications && mounted) {
+              setNotifications(_notifications => [
+                ...[...notifications].reverse(),
+                ..._notifications
+              ])
+              onNewNotifications(notifications, onNotificationClick)
+            }
+          }
+        })
+      return () => {
+        listener.unsubscribe()
+        mounted = false
+      }
+    },
+    [networkID, onNewNotifications]
+  )
   return { notifications, onNotificationClick }
 }

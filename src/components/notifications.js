@@ -1,8 +1,8 @@
-import { Badge, List, Popover } from 'antd'
+import { Badge, List, Popover, notification } from 'antd'
+import { Link, withRouter } from 'react-router-dom'
 import React, { useCallback } from 'react'
 import { ReactComponent as Alert } from '../assets/images/alert.svg'
 import { ReactComponent as Bell } from '../assets/images/bell.svg'
-import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import TimeAgo from './time-ago'
 import styled from 'styled-components/macro'
@@ -52,6 +52,13 @@ Notification.propTypes = {
 }
 
 const locale = { emptyText: 'No new notifications.' }
+const StyledDiv = styled.div`
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+`
 const StyledList = styled(List)`
   margin-right: -16px;
   max-height: 380px;
@@ -68,7 +75,7 @@ const StyledBadge = styled(Badge)`
     padding: 0 4px;
   }
 `
-const Notifications = ({ useNotifications }) => {
+const Notifications = ({ history, useNotifications }) => {
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0],
     networkID: drizzleState.web3.networkId
@@ -76,7 +83,34 @@ const Notifications = ({ useNotifications }) => {
   const {
     notifications: _notifications,
     onNotificationClick
-  } = useNotifications(drizzleState.networkID)
+  } = useNotifications(
+    drizzleState.networkID,
+    useCallback(
+      async (notifications, onNotificationClick) => {
+        const onClick = _notification => () => {
+          notification.close(_notification.key)
+          onNotificationClick({ currentTarget: { id: _notification.key } })
+          history.push(_notification.to)
+        }
+        for (const _notification of notifications.filter(
+          n => n.account === drizzleState.account
+        )) {
+          notification[_notification.type]({
+            description: (
+              <>
+                {_notification.message}
+                <StyledDiv onClick={onClick(_notification)} />
+              </>
+            ),
+            key: _notification.key,
+            message: 'New Notification'
+          })
+          await new Promise(resolve => setTimeout(resolve, 500))
+        }
+      },
+      [history.push, drizzleState.account]
+    )
+  )
   let notifications
   if (_notifications)
     notifications = _notifications.filter(
@@ -118,7 +152,8 @@ const Notifications = ({ useNotifications }) => {
 }
 
 Notifications.propTypes = {
+  history: PropTypes.shape({}).isRequired,
   useNotifications: PropTypes.func.isRequired
 }
 
-export default Notifications
+export default withRouter(Notifications)

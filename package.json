@@ -51,6 +51,7 @@
   },
   "dependencies": {
     "@kleros/archon": "^0.5.4",
+    "@loadable/component": "^5.5.0",
     "antd": "^3.10.8",
     "dataloader": "^1.4.0",
     "debounce": "^1.2.0",
