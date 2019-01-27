@@ -9,6 +9,9 @@ import styled from 'styled-components/macro'
 const StyledRadioGroup = styled(Radio.Group)`
   float: right;
 `
+const StyledCol = styled(Col)`
+  color: gainsboro;
+`
 export default () => {
   const { useCacheCall, useCacheEvents } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
@@ -49,6 +52,7 @@ export default () => {
         )
       : { activeIDs: [], executedIDs: [], loading: true }
   )
+  const filteredDisputes = disputes[filter ? 'activeIDs' : 'executedIDs']
   return (
     <>
       <TopBanner
@@ -75,11 +79,17 @@ export default () => {
       <Divider />
       <Spin spinning={disputes.loading}>
         <Row gutter={48}>
-          {disputes[filter ? 'activeIDs' : 'executedIDs'].map(ID => (
-            <Col key={ID} md={12} xl={8}>
-              <CaseCard ID={ID} />
-            </Col>
-          ))}
+          {filteredDisputes.length === 0 ? (
+            <StyledCol>
+              You don't have any {filter ? 'active' : 'executed'} disputes.
+            </StyledCol>
+          ) : (
+            filteredDisputes.map(ID => (
+              <Col key={ID} md={12} xl={8}>
+                <CaseCard ID={ID} />
+              </Col>
+            ))
+          )}
         </Row>
       </Spin>
     </>

@@ -8,6 +8,7 @@ import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
 
 const loadingPieChartData = [{ tooltip: 'Loading...', value: 1 }]
+const emptyPieChartData = [{ tooltip: '0 PNK', value: 1 }]
 const StyledDiv = styled.div`
   display: flex;
 `
@@ -105,6 +106,8 @@ const PNKStatsListCard = () => {
         )
       : { loading: true }
   )
+  const disputesAtStakeByIDKeys =
+    !disputes.loading && Object.keys(disputes.atStakeByID)
   return (
     <TitledListCard prefix="PNK" title="Stats">
       <StyledDiv>
@@ -113,6 +116,8 @@ const PNKStatsListCard = () => {
             data={
               loadingSubcourts
                 ? loadingPieChartData
+                : subcourts.length === 0
+                ? emptyPieChartData
                 : subcourts.map(s => ({
                     tooltip: (
                       <Spin spinning={s.name === undefined}>
@@ -133,7 +138,9 @@ const PNKStatsListCard = () => {
             data={
               disputes.loading
                 ? loadingPieChartData
-                : Object.keys(disputes.atStakeByID).map(ID => ({
+                : disputesAtStakeByIDKeys.length === 0
+                ? emptyPieChartData
+                : disputesAtStakeByIDKeys.map(ID => ({
                     tooltip: (
                       <>
                         <StyledAmountSpan>

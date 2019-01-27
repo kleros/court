@@ -5,6 +5,7 @@
 @primary-color : @blue-6;
 @secondary-color : #1e075f;
 @ternary-color : #4004a3;
+@quaternary-color: #ead6fe;
 @info-color : @blue-6;
 @success-color : @green-6;
 @processing-color : @blue-6;
@@ -544,8 +545,8 @@
 }
 
 // Theme Colored
-@theme-colors: primary, secondary, ternary, info, success, processing, error,
-  highlight, warning, normal, other;
+@theme-colors: primary, secondary, ternary, quaternary, info, success,
+  processing, error, highlight, warning, normal, other;
 .loop(@i : length(@theme-colors)) when (@i > 0) {
   @name: extract(@theme-colors, @i);
   @theme-color: ~'@{@{name}-color}';

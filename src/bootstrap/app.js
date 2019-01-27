@@ -21,6 +21,12 @@ const StyledSpin = styled(Spin)`
   top: 50%;
   transform: translate(-50%, -50%);
 `
+const C404 = loadable(
+  () => import(/* webpackPrefetch: true */ '../containers/404'),
+  {
+    fallback: <StyledSpin />
+  }
+)
 const Home = loadable(
   () => import(/* webpackPrefetch: true */ '../containers/home'),
   {
@@ -40,7 +46,19 @@ const Cases = loadable(
   }
 )
 const Case = loadable(
-  () => import(/* webpackPrefetch: true */ '../containers/case'),
+  async ({
+    match: {
+      params: { ID }
+    }
+  }) => {
+    try {
+      await drizzle.contracts.KlerosLiquid.methods.disputes(ID).call()
+    } catch (err) {
+      console.error(err)
+      return C404
+    }
+    return import(/* webpackPrefetch: true */ '../containers/case')
+  },
   {
     fallback: <StyledSpin />
   }
@@ -112,7 +130,11 @@ export default () => (
       />
     </Helmet>
     <DrizzleProvider drizzle={drizzle}>
-      <Initializer>
+      <Initializer
+        error={<C404 Web3 />}
+        loadingContractsAndAccounts={<C404 Web3 />}
+        loadingWeb3={<StyledSpin />}
+      >
         <ArchonInitializer>
           <BrowserRouter>
             <Layout>
@@ -144,6 +166,7 @@ export default () => (
                     <Route component={Cases} exact path="/cases" />
                     <Route component={Case} exact path="/cases/:ID" />
                     <Route exact path="/tokens" />
+                    <Route component={C404} />
                   </Switch>
                 </StyledLayoutContent>
               </Layout>
