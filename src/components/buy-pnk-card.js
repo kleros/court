@@ -183,7 +183,7 @@ export default Form.create()(({ form }) => {
                   ? undefined
                   : drizzle.web3.utils.toWei((ETHSold / PNK).toFixed(18))
               }
-              decimals={18}
+              decimals={10}
             />{' '}
             ETH
           </StyledDiv>
