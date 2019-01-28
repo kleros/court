@@ -2,6 +2,7 @@ import { Button, Col, Row } from 'antd'
 import CasesListCard from '../components/cases-list-card'
 import CourtsListCard from '../components/courts-list-card'
 import { ReactComponent as DarkLogo } from '../assets/images/dark-logo.svg'
+import { Link } from 'react-router-dom'
 import PNKBalanceCard from '../components/pnk-balance-card'
 import PNKStatsListCard from '../components/pnk-stats-list-card'
 import React from 'react'
@@ -14,9 +15,11 @@ export default () => (
     <TopBanner
       description="Get started by buying PNK if you don't have any already."
       extra={
-        <Button size="large" type="primary">
-          Buy PNK
-        </Button>
+        <Link to="/tokens">
+          <Button size="large" type="primary">
+            Buy PNK
+          </Button>
+        </Link>
       }
       title="Welcome to the Kleros Juror Dashboard!"
     />

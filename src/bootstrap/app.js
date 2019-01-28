@@ -63,6 +63,12 @@ const Case = loadable(
     fallback: <StyledSpin />
   }
 )
+const Tokens = loadable(
+  () => import(/* webpackPrefetch: true */ '../containers/tokens'),
+  {
+    fallback: <StyledSpin />
+  }
+)
 const MenuItems = [
   <Menu.Item key="home">
     <NavLink to="/">Home</NavLink>
@@ -133,7 +139,7 @@ export default () => (
       <Initializer
         error={<C404 Web3 />}
         loadingContractsAndAccounts={<C404 Web3 />}
-        loadingWeb3={<StyledSpin />}
+        loadingWeb3={<StyledSpin tip="Connecting to your Web3 provider." />}
       >
         <ArchonInitializer>
           <BrowserRouter>
@@ -165,7 +171,7 @@ export default () => (
                     <Route component={Courts} exact path="/courts" />
                     <Route component={Cases} exact path="/cases" />
                     <Route component={Case} exact path="/cases/:ID" />
-                    <Route exact path="/tokens" />
+                    <Route component={Tokens} exact path="/tokens" />
                     <Route component={C404} />
                   </Switch>
                 </StyledLayoutContent>

@@ -1,8 +1,8 @@
-import { Button, Col, Divider, Radio, Row, Spin } from 'antd'
+import { Col, Divider, Radio, Row, Spin } from 'antd'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import CaseCard from '../components/case-card'
-import { Link } from 'react-router-dom'
+// import { Link } from 'react-router-dom'
 import TopBanner from '../components/top-banner'
 import styled from 'styled-components/macro'
 
@@ -57,13 +57,13 @@ export default () => {
     <>
       <TopBanner
         description="Select a case you have been drawn in, study the evidence, and vote."
-        extra={
-          <Link to="/cases/history">
-            <Button size="large" type="primary">
-              History
-            </Button>
-          </Link>
-        }
+        // extra={
+        //   <Link to="/cases/history">
+        //     <Button size="large" type="primary">
+        //       History
+        //     </Button>
+        //   </Link>
+        // }
         title="Cases"
       />
       My Cases

@@ -2,6 +2,7 @@ import { Drizzle, generateStore } from 'drizzle'
 import KlerosLiquid from '../assets/contracts/kleros-liquid.json'
 import Pinakion from '../assets/contracts/pinakion.json'
 import PolicyRegistry from '../assets/contracts/policy-registry.json'
+import UniswapExchange from '../assets/contracts/uniswap-exchange.json'
 
 const options = {
   contracts: [
@@ -21,6 +22,12 @@ const options = {
       ...PolicyRegistry,
       networks: {
         42: { address: process.env.REACT_APP_POLICY_REGISTRY_KOVAN_ADDRESS }
+      }
+    },
+    {
+      ...UniswapExchange,
+      networks: {
+        42: { address: process.env.REACT_APP_UNISWAP_EXCHANGE_KOVAN_ADDRESS }
       }
     }
   ],

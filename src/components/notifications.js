@@ -65,11 +65,11 @@ const StyledList = styled(List)`
   overflow-y: scroll;
   padding-right: 16px;
 `
-const StyledLink = styled(Link)`
-  float: right;
-  font-size: 10px;
-  line-height: 21px;
-`
+// const StyledLink = styled(Link)`
+//   float: right;
+//   font-size: 10px;
+//   line-height: 21px;
+// `
 const StyledBadge = styled(Badge)`
   .ant-badge-count {
     padding: 0 4px;
@@ -139,7 +139,8 @@ const Notifications = ({ history, useNotifications }) => {
       placement="bottomRight"
       title={
         <>
-          Notifications <StyledLink to="/notifications">History</StyledLink>
+          Notifications
+          {/* <StyledLink to="/notifications">History</StyledLink> */}
         </>
       }
       trigger="click"
