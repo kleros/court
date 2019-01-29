@@ -261,12 +261,14 @@ const CaseDetailsCard = ({ ID }) => {
   const metaEvidenceActions = useMemo(
     () =>
       metaEvidence && [
-        <Attachment
-          URI={metaEvidence.metaEvidenceJSON.fileURI}
-          description="This is the primary file uploaded with the dispute."
-          extension={metaEvidence.metaEvidenceJSON.fileTypeExtension}
-          title="Main File"
-        />,
+        metaEvidence.metaEvidenceJSON.fileURI && (
+          <Attachment
+            URI={metaEvidence.metaEvidenceJSON.fileURI}
+            description="This is the primary file uploaded with the dispute."
+            extension={metaEvidence.metaEvidenceJSON.fileTypeExtension}
+            title="Main File"
+          />
+        ),
         <StyledInnerCardActionsTitleDiv className="ternary-color theme-color">
           Primary Documents
         </StyledInnerCardActionsTitleDiv>
