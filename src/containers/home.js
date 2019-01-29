@@ -1,15 +1,19 @@
 import { Button, Col, Row } from 'antd'
 import CasesListCard from '../components/cases-list-card'
 import CourtsListCard from '../components/courts-list-card'
-import { ReactComponent as DarkLogo } from '../assets/images/dark-logo.svg'
 import { Link } from 'react-router-dom'
 import PNKBalanceCard from '../components/pnk-balance-card'
 import PNKStatsListCard from '../components/pnk-stats-list-card'
 import React from 'react'
 import TopBanner from '../components/top-banner'
 import WelcomeCard from '../components/welcome-card'
+import darkLogo from '../assets/images/dark-logo.png'
+import styled from 'styled-components/macro'
 import { version } from '../../package.json'
 
+const StyledImg = styled.img`
+  max-width: 90%;
+`
 export default () => (
   <>
     <TopBanner
@@ -24,7 +28,7 @@ export default () => (
       title="Welcome to the Kleros Juror Dashboard!"
     />
     <WelcomeCard
-      icon={<DarkLogo />}
+      icon={<StyledImg alt="Kleros Logo with Dark Text" src={darkLogo} />}
       text="Welcome"
       version={`Athena release ${version}`}
     />
