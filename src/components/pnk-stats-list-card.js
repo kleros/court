@@ -78,7 +78,7 @@ const PNKStatsListCard = () => {
                 d.returnValues._disputeID
               )
               if (dispute && dispute2) {
-                if (!dispute.period !== '4') {
+                if (dispute.period !== '4') {
                   acc.jurorAtStakeByID[
                     d.returnValues._disputeID
                   ] = dispute2.jurorAtStake.map(drizzle.web3.utils.toBN)
