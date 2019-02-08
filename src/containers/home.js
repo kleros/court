@@ -17,7 +17,7 @@ const StyledImg = styled.img`
 export default () => (
   <>
     <TopBanner
-      description="Get started by buying PNK if you don't have any already."
+      description="If you don't have some, buy PNK to get started."
       extra={
         <Link to="/tokens">
           <Button size="large" type="primary">
@@ -25,7 +25,7 @@ export default () => (
           </Button>
         </Link>
       }
-      title="Welcome to the Kleros Juror Dashboard!"
+      title="Kleros Juror Dashboard"
     />
     <WelcomeCard
       icon={<StyledImg alt="Kleros Logo with Dark Text" src={darkLogo} />}

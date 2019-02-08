@@ -1,9 +1,10 @@
+import React, { useEffect, useState } from 'react'
 import { Card } from 'antd'
 import PropTypes from 'prop-types'
-import React from 'react'
 import { fluidRange } from 'polished'
 import styled from 'styled-components/macro'
 
+let cachedShow = true
 const StyledCard = styled(Card)`
   z-index: 1;
 
@@ -68,17 +69,31 @@ const StyledTextCardGrid = styled(StyledCardGrid)`
     padding: calc(10% + 20px) 0 10%;
   }
 `
-const WelcomeCard = ({ icon, text, version }) => (
-  <StyledCard bordered={false}>
-    <StyledIconCardGrid>
-      {icon}
-      <StyledDiv>{version}</StyledDiv>
-    </StyledIconCardGrid>
-    <StyledTextCardGrid className="secondary-linear-background theme-linear-background">
-      {text}
-    </StyledTextCardGrid>
-  </StyledCard>
-)
+const WelcomeCard = ({ icon, text, version }) => {
+  const [show, setShow] = useState(cachedShow)
+  useEffect(() => {
+    if (show) {
+      const timeout = setTimeout(() => setShow(false), 5000)
+      return () => {
+        clearTimeout(timeout)
+        cachedShow = false
+      }
+    }
+  }, [])
+  return (
+    show && (
+      <StyledCard bordered={false}>
+        <StyledIconCardGrid>
+          {icon}
+          <StyledDiv>{version}</StyledDiv>
+        </StyledIconCardGrid>
+        <StyledTextCardGrid className="secondary-linear-background theme-linear-background">
+          {text}
+        </StyledTextCardGrid>
+      </StyledCard>
+    )
+  )
+}
 
 WelcomeCard.propTypes = {
   icon: PropTypes.node.isRequired,

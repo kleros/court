@@ -73,8 +73,8 @@ export default () => {
         onChange={useCallback(e => setFilter(e.target.value), [])}
         value={filter}
       >
-        <Radio.Button value>Active</Radio.Button>
-        <Radio.Button value={false}>Executed</Radio.Button>
+        <Radio.Button value>In Progress</Radio.Button>
+        <Radio.Button value={false}>Closed</Radio.Button>
       </StyledRadioGroup>
       <Divider />
       <Spin spinning={disputes.loading}>

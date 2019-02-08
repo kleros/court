@@ -10,6 +10,7 @@ import { ReactComponent as SectionArrowBackground } from '../assets/images/secti
 import styled from 'styled-components/macro'
 
 const StyledCard = styled(Card)`
+  cursor: initial;
   margin: 28px 0;
 
   .ant-card-body {
