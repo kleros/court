@@ -181,7 +181,7 @@ const CaseDetailsCard = ({ ID }) => {
         draws[draws.length - 1].returnValues._appeal,
         draws[draws.length - 1].returnValues._voteID
       )
-      if (dispute2 && vote)
+      if (dispute && dispute2 && vote)
         votesData = draws.reduce(
           (acc, d) => {
             if (
@@ -194,7 +194,7 @@ const CaseDetailsCard = ({ ID }) => {
             return acc
           },
           {
-            canVote: !vote.voted,
+            canVote: dispute.period === '2' && !vote.voted,
             loading: false,
             voteIDs: [],
             voted: vote.voted && vote.choice
