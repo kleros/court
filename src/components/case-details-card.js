@@ -7,6 +7,7 @@ import CourtDrawer from '../components/court-drawer'
 import { ReactComponent as Document } from '../assets/images/document.svg'
 import Identicon from '../components/identicon'
 import PropTypes from 'prop-types'
+import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
 
@@ -368,7 +369,9 @@ const CaseDetailsCard = ({ ID }) => {
           <Row>
             <Col span={24}>
               <StyledInnerCard actions={metaEvidenceActions} hoverable>
-                {metaEvidence.metaEvidenceJSON.description}
+                <ReactMarkdown
+                  source={metaEvidence.metaEvidenceJSON.description}
+                />
               </StyledInnerCard>
             </Col>
           </Row>
