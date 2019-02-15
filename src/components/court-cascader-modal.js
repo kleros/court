@@ -62,7 +62,7 @@ const StyledCascader = styled(Cascader)`
 
       &-item {
         height: 38px;
-        padding-left: 18px;
+        padding: 5px 18px;
       }
     }
   }
