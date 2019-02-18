@@ -31,6 +31,7 @@ const StyledCard = styled(Card)`
     }
 
     &-body {
+      height: 203px;
       padding: 17px 32px 0;
     }
 
