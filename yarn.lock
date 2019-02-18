@@ -1055,10 +1055,10 @@
     log-update "^2.3.0"
     strip-ansi "^3.0.1"
 
-"@kleros/archon@^0.5.6":
-  version "0.5.6"
-  resolved "https://registry.yarnpkg.com/@kleros/archon/-/archon-0.5.6.tgz#323794ef6e28a839036a2d5d3bc8d0ae1e01fa00"
-  integrity sha512-RVrDvTSfLWAZFOI63IOr7aI8ETud6tUQlLNOVGkrl/GmsN8XZaAM/LX1p1FPtSPP5NlIGAvMSu7iAbb3+0bgCg==
+"@kleros/archon@^0.5.7":
+  version "0.5.7"
+  resolved "https://registry.yarnpkg.com/@kleros/archon/-/archon-0.5.7.tgz#09b8e3b41d219576a6831a23fad62be5efb8d291"
+  integrity sha512-DNjfHu6LMnUmC+AapiwGTiUyIi4BdCdpQuNb4mmxHOKWnTqGJuxYzs9UtxG8wDJgpX6ThlJf8vGg7Ulhx/F8bA==
   dependencies:
     "@kleros/kleros-interaction" "^0.5.0"
     axios "^0.18.0"
