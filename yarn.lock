@@ -1068,10 +1068,10 @@
     multihashes "^0.4.14"
     web3 "1.0.0-beta.36"
 
-"@kleros/kathari@^0.20.0":
-  version "0.20.0"
-  resolved "https://registry.yarnpkg.com/@kleros/kathari/-/kathari-0.20.0.tgz#ebab34f12071ea3e7f46daa2208e82c86484afe3"
-  integrity sha512-MK2sVCO2StclXdZWXZlF9hjyHaWpyRTXdVxuxLv5d/Rcy9InShQM0pFPB28gqCO6/B53WIZKYGzRHPy7MZvBLg==
+"@kleros/kathari@^0.21.0":
+  version "0.21.0"
+  resolved "https://registry.yarnpkg.com/@kleros/kathari/-/kathari-0.21.0.tgz#71841b3ebb965357e0dd4e617fccee111bfdadd6"
+  integrity sha512-jWzmpNQAa82r204qz+PP6RawMuvTUMGUTrXGKfe6dlQ+ZfwfdYYYoy4J8n6Z0nGhfzO5k5xOM76blPaEQoGgFA==
   dependencies:
     "@commitlint/cli" "^7.2.1"
     "@commitlint/config-conventional" "^7.1.2"
@@ -1096,7 +1096,7 @@
     eslint-plugin-unicorn "^6.0.1"
     eslint-plugin-wyze "^3.4.0"
     lint-staged "^8.0.4"
-    prettier "^1.13.7"
+    prettier "^1.16.4"
     solium "^1.1.8"
     stylelint "^9.8.0"
     stylelint-config-recommended "^2.1.0"
@@ -11299,15 +11299,20 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier@^1.13.7, prettier@^1.14.3:
-  version "1.15.2"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.15.2.tgz#d31abe22afa4351efa14c7f8b94b58bb7452205e"
-  integrity sha512-YgPLFFA0CdKL4Eg2IHtUSjzj/BWgszDHiNQAe0VAIBse34148whfdzLagRL+QiKS+YfK5ftB6X4v/MBw8yCoug==
-
 prettier@^1.14.2:
   version "1.14.3"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.14.3.tgz#90238dd4c0684b7edce5f83b0fb7328e48bd0895"
   integrity sha512-qZDVnCrnpsRJJq5nSsiHCE3BYMED2OtsI+cmzIzF1QIfqm5ALf8tEJcO27zV1gKNKRPdhjO0dNWnrzssDQ1tFg==
+
+prettier@^1.14.3:
+  version "1.15.2"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.15.2.tgz#d31abe22afa4351efa14c7f8b94b58bb7452205e"
+  integrity sha512-YgPLFFA0CdKL4Eg2IHtUSjzj/BWgszDHiNQAe0VAIBse34148whfdzLagRL+QiKS+YfK5ftB6X4v/MBw8yCoug==
+
+prettier@^1.16.4:
+  version "1.16.4"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.16.4.tgz#73e37e73e018ad2db9c76742e2647e21790c9717"
+  integrity sha512-ZzWuos7TI5CKUeQAtFd6Zhm2s6EpAD/ZLApIhsF9pRvRtM1RFo61dM/4MSRUA0SuLugA/zgrZD8m0BaY46Og7g==
 
 pretty-bytes@^4.0.2:
   version "4.0.2"

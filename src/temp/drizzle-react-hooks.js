@@ -30,23 +30,20 @@ export const useDrizzleState = (mapState, args) => {
       setState(newState)
     }
   }
-  useEffect(
-    () => {
-      const debouncedHandler = debounce(() => {
-        const newState = mapStateRef.current(drizzle.store.getState())
-        if (!shallowequal(stateRef.current, newState)) {
-          stateRef.current = newState
-          setState(newState)
-        }
-      })
-      const unsubscribe = drizzle.store.subscribe(debouncedHandler)
-      return () => {
-        unsubscribe()
-        debouncedHandler.clear()
+  useEffect(() => {
+    const debouncedHandler = debounce(() => {
+      const newState = mapStateRef.current(drizzle.store.getState())
+      if (!shallowequal(stateRef.current, newState)) {
+        stateRef.current = newState
+        setState(newState)
       }
-    },
-    [drizzle.store]
-  )
+    })
+    const unsubscribe = drizzle.store.subscribe(debouncedHandler)
+    return () => {
+      unsubscribe()
+      debouncedHandler.clear()
+    }
+  }, [drizzle.store])
   return stateRef.current
 }
 
@@ -129,23 +126,20 @@ export const DrizzleProvider = ({ children, drizzle }) => {
           ),
         [contractName]
       )
-      useEffect(
-        () => {
-          let mounted = true
-          contract
-            .getPastEvents(eventName, eventOptions)
-            .then(pastEvents => mounted && setEvents(pastEvents))
-          const listener = drizzle.contracts[contractName].events[eventName]({
-            ...eventOptions,
-            fromBlock: 'latest'
-          }).on('data', event => setEvents(events => [...events, event]))
-          return () => {
-            listener.unsubscribe()
-            mounted = false
-          }
-        },
-        [contractName, eventName, eventOptions]
-      )
+      useEffect(() => {
+        let mounted = true
+        contract
+          .getPastEvents(eventName, eventOptions)
+          .then(pastEvents => mounted && setEvents(pastEvents))
+        const listener = drizzle.contracts[contractName].events[eventName]({
+          ...eventOptions,
+          fromBlock: 'latest'
+        }).on('data', event => setEvents(events => [...events, event]))
+        return () => {
+          listener.unsubscribe()
+          mounted = false
+        }
+      }, [contractName, eventName, eventOptions])
       return events
     },
     [drizzle.web3, drizzle.contracts]

@@ -259,23 +259,42 @@ const CaseDetailsCard = ({ ID }) => {
     ({ currentTarget: { id } }) => send(ID, votesData.voteIDs, id, 0),
     [ID, votesData.voteIDs]
   )
-  const metaEvidenceActions = useMemo(
-    () =>
-      metaEvidence && [
-        metaEvidence.metaEvidenceJSON.fileURI && (
+  const metaEvidenceActions = useMemo(() => {
+    if (metaEvidence) {
+      const actions = []
+      if (
+        metaEvidence.metaEvidenceJSON.fileURI ||
+        metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL
+      ) {
+        const previewURI =
+          metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL &&
+          `${
+            metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL
+          }?${encodeURIComponent(
+            JSON.stringify({
+              arbitrableContractAddress: dispute.arbitrated,
+              arbitratorContractAddress: drizzle.contracts.KlerosLiquid.address,
+              disputeID: ID
+            })
+          )}`
+        actions.push(
           <Attachment
-            URI={metaEvidence.metaEvidenceJSON.fileURI}
+            URI={metaEvidence.metaEvidenceJSON.fileURI || previewURI}
             description="This is the primary file uploaded with the dispute."
             extension={metaEvidence.metaEvidenceJSON.fileTypeExtension}
+            previewURI={previewURI}
             title="Main File"
           />
-        ),
+        )
+      }
+      actions.push(
         <StyledInnerCardActionsTitleDiv className="ternary-color theme-color">
           Primary Documents
         </StyledInnerCardActionsTitleDiv>
-      ],
-    [metaEvidence]
-  )
+      )
+      return actions
+    }
+  }, [metaEvidence])
   return (
     <StyledCard
       actions={useMemo(
@@ -382,14 +401,32 @@ const CaseDetailsCard = ({ ID }) => {
                   <Col key={a} md={12}>
                     <StyledInnerCard
                       actions={evidenceBySubmitter[a]
-                        .map(e => (
-                          <Attachment
-                            URI={e.evidenceJSON.fileURI}
-                            description={e.evidenceJSON.description}
-                            extension={e.evidenceJSON.fileTypeExtension}
-                            title={e.evidenceJSON.name}
-                          />
-                        ))
+                        .map(e => {
+                          const previewURI =
+                            metaEvidence.metaEvidenceJSON
+                              .evidenceDisplayInterfaceURL &&
+                            `${
+                              metaEvidence.metaEvidenceJSON
+                                .evidenceDisplayInterfaceURL
+                            }?${encodeURIComponent(
+                              JSON.stringify({
+                                arbitrableContractAddress: dispute.arbitrated,
+                                arbitratorContractAddress:
+                                  drizzle.contracts.KlerosLiquid.address,
+                                disputeID: ID,
+                                evidence: e
+                              })
+                            )}`
+                          return (
+                            <Attachment
+                              URI={e.evidenceJSON.fileURI || previewURI}
+                              description={e.evidenceJSON.description}
+                              extension={e.evidenceJSON.fileTypeExtension}
+                              previewURI={previewURI}
+                              title={e.evidenceJSON.name}
+                            />
+                          )
+                        })
                         .concat(
                           <StyledInnerCardActionsTitleDiv className="ternary-color theme-color">
                             Evidence
