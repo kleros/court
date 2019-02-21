@@ -188,14 +188,16 @@ const CaseDetailsCard = ({ ID }) => {
             if (
               Number(d.returnValues._appeal) ===
               dispute2.votesLengths.length - 1
-            ) {
-              acc.canVote = acc.canVote && true
+            )
               acc.voteIDs.push(d.returnValues._voteID)
-            }
             return acc
           },
           {
-            canVote: dispute.period === '2' && !vote.voted,
+            canVote:
+              !vote.voted &&
+              Number(draws[draws.length - 1].returnValues._appeal) ===
+                dispute2.votesLengths.length - 1 &&
+              dispute.period === '2',
             loading: false,
             voteIDs: [],
             voted: vote.voted && vote.choice
@@ -312,6 +314,8 @@ const CaseDetailsCard = ({ ID }) => {
                     : votesData.voted
                     ? `You chose: ${metaEvidence.metaEvidenceJSON.rulingOptions
                         .titles[votesData.voted - 1] || 'Refuse to Arbitrate'}.`
+                    : dispute.period === '0'
+                    ? 'Waiting for evidence.'
                     : 'You did not cast a vote.'}
                   {votesData.canVote && (
                     <StyledInputTextArea
