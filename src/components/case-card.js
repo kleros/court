@@ -103,8 +103,10 @@ const CaseCard = ({ ID }) => {
     let disputeData = {}
     if (dispute2 && draws) {
       const votesLengths = dispute2.votesLengths.map(drizzle.web3.utils.toBN)
-      const jurorAtStake = dispute2.jurorAtStake.map(drizzle.web3.utils.toBN)
-      const totalJurorFees = dispute2.totalJurorFees.map(
+      const tokensAtStakePerJuror = dispute2.tokensAtStakePerJuror.map(
+        drizzle.web3.utils.toBN
+      )
+      const totalFeesForJurors = dispute2.totalFeesForJurors.map(
         drizzle.web3.utils.toBN
       )
       const votesByAppeal = draws.reduce((acc, d) => {
@@ -115,9 +117,11 @@ const CaseCard = ({ ID }) => {
       }, {})
       disputeData = Object.keys(votesByAppeal).reduce(
         (acc, a) => {
-          acc.atStake = acc.atStake.add(votesByAppeal[a].mul(jurorAtStake[a]))
+          acc.atStake = acc.atStake.add(
+            votesByAppeal[a].mul(tokensAtStakePerJuror[a])
+          )
           acc.coherenceReward = acc.coherenceReward.add(
-            votesByAppeal[a].mul(totalJurorFees[a]).div(votesLengths[a])
+            votesByAppeal[a].mul(totalFeesForJurors[a]).div(votesLengths[a])
           )
           return acc
         },

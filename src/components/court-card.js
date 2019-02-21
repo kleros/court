@@ -123,8 +123,8 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
       <StyledCardGrid>
         Coherence Reward
         <StyledAmountDiv>
-          <ETHAmount amount={subcourt && subcourt.jurorFee} decimals={2} /> ETH
-          +
+          <ETHAmount amount={subcourt && subcourt.feeForJuror} decimals={2} />{' '}
+          ETH +
         </StyledAmountDiv>
       </StyledCardGrid>
       <StyledCardGrid>

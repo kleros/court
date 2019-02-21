@@ -65,8 +65,11 @@ const PNKStatsListCard = () => {
     draws
       ? draws.reduce(
           (acc, d) => {
-            if (acc.jurorAtStakeByID[d.returnValues._disputeID] === undefined) {
-              acc.jurorAtStakeByID[d.returnValues._disputeID] = null
+            if (
+              acc.tokensAtStakePerJurorByID[d.returnValues._disputeID] ===
+              undefined
+            ) {
+              acc.tokensAtStakePerJurorByID[d.returnValues._disputeID] = null
               const dispute = call(
                 'KlerosLiquid',
                 'disputes',
@@ -79,20 +82,24 @@ const PNKStatsListCard = () => {
               )
               if (dispute && dispute2) {
                 if (dispute.period !== '4') {
-                  acc.jurorAtStakeByID[
+                  acc.tokensAtStakePerJurorByID[
                     d.returnValues._disputeID
-                  ] = dispute2.jurorAtStake.map(drizzle.web3.utils.toBN)
+                  ] = dispute2.tokensAtStakePerJuror.map(
+                    drizzle.web3.utils.toBN
+                  )
                   acc.atStakeByID[
                     d.returnValues._disputeID
                   ] = drizzle.web3.utils.toBN(0)
                 }
               } else acc.loading = true
             }
-            if (acc.jurorAtStakeByID[d.returnValues._disputeID] !== null)
+            if (
+              acc.tokensAtStakePerJurorByID[d.returnValues._disputeID] !== null
+            )
               acc.atStakeByID[d.returnValues._disputeID] = acc.atStakeByID[
                 d.returnValues._disputeID
               ].add(
-                acc.jurorAtStakeByID[d.returnValues._disputeID][
+                acc.tokensAtStakePerJurorByID[d.returnValues._disputeID][
                   d.returnValues._appeal
                 ]
               )
@@ -100,8 +107,8 @@ const PNKStatsListCard = () => {
           },
           {
             atStakeByID: {},
-            jurorAtStakeByID: {},
-            loading: false
+            loading: false,
+            tokensAtStakePerJurorByID: {}
           }
         )
       : { loading: true }
