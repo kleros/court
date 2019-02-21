@@ -5,10 +5,21 @@ import archon from './archon'
 const funcs = {
   getEvidence: (contractAddress, arbitratorAddress, disputeID, options) =>
     archon.arbitrable
-      .getEvidence(contractAddress, arbitratorAddress, disputeID, {
+      .getDispute(contractAddress, arbitratorAddress, disputeID, {
         strictHashes: true,
         ...options
       })
+      .then(d =>
+        archon.arbitrable.getEvidence(
+          contractAddress,
+          arbitratorAddress,
+          d.evidenceGroupID,
+          {
+            strictHashes: true,
+            ...options
+          }
+        )
+      )
       .catch(() => null),
   getMetaEvidence: (contractAddress, arbitratorAddress, disputeID, options) =>
     archon.arbitrable

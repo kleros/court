@@ -1055,12 +1055,12 @@
     log-update "^2.3.0"
     strip-ansi "^3.0.1"
 
-"@kleros/archon@^0.5.7":
-  version "0.5.7"
-  resolved "https://registry.yarnpkg.com/@kleros/archon/-/archon-0.5.7.tgz#09b8e3b41d219576a6831a23fad62be5efb8d291"
-  integrity sha512-DNjfHu6LMnUmC+AapiwGTiUyIi4BdCdpQuNb4mmxHOKWnTqGJuxYzs9UtxG8wDJgpX6ThlJf8vGg7Ulhx/F8bA==
+"@kleros/archon@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@kleros/archon/-/archon-0.6.0.tgz#3fce182a72a0edf93662e0b92cf9332789b8e1de"
+  integrity sha512-vhrWMNkDbQ+90KmTjv/JdVJarJTXm6A13PB9ZwQghZee0d2iQZ0MdBLn3O0QRx/cYoFNYU5kahAeHdJBXTp3cw==
   dependencies:
-    "@kleros/kleros-interaction" "^0.5.0"
+    "@kleros/kleros-interaction" "^0.7.0"
     axios "^0.18.0"
     babel-runtime "^6.26.0"
     js-sha3 "^0.8.0"
@@ -1107,11 +1107,12 @@
     stylelint-scss "^3.4.0"
     stylelint-selector-bem-pattern "^2.0.0"
 
-"@kleros/kleros-interaction@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@kleros/kleros-interaction/-/kleros-interaction-0.5.0.tgz#b27fd8eea2c037853673977a1249accca670de0f"
-  integrity sha512-i4RusXPK1NY2wzsGnW4fwJ5cHmToCKa7m5c6I03odTNBX/gTy8WqAhhdOtSJqNNDZUt8EzEJ0azI9rOrmmt4mg==
+"@kleros/kleros-interaction@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@kleros/kleros-interaction/-/kleros-interaction-0.7.0.tgz#f416c3b370345d5a8c2f95366d6d741c97ecda81"
+  integrity sha512-31q0mt2BvskI5w8A4hsOlnXgsNoG3EdWo4U5TI86070pjdGhrKw9mDIJRt9BR1YRUPyCCUegzTlG+owyRgV/LQ==
   dependencies:
+    "@realitio/realitio-contracts" "^2.0.5"
     minimetoken "^0.2.0"
     openzeppelin-solidity "^1.12.0"
     solidity-bytes-utils "^0.0.5"
@@ -1144,6 +1145,11 @@
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.2.tgz#54c5a964462be3d4d78af631363c18d6fa91ac26"
   integrity sha512-yprFYuno9FtNsSHVlSWd+nRlmGoAbqbeCwOryP6sC/zoCjhpArcRMYp19EvpSUSizJAlsXEwJv+wcWS9XaXdMw==
+
+"@realitio/realitio-contracts@^2.0.5":
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/@realitio/realitio-contracts/-/realitio-contracts-2.0.5.tgz#785db5f1af064add917e91cd56f037243ff392a3"
+  integrity sha512-bt2dQxqd0VDqJwdOJn6t+dySGRe8YqaqmFwzWnB+R9ozREQPQ0kSfOnhFV7nFFZRdI2eEXP0M3p18l1WyGtrZg==
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
