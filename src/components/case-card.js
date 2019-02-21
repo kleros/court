@@ -117,7 +117,7 @@ const CaseCard = ({ ID }) => {
         (acc, a) => {
           acc.atStake = acc.atStake.add(votesByAppeal[a].mul(jurorAtStake[a]))
           acc.coherenceReward = acc.coherenceReward.add(
-            votesByAppeal[a].div(votesLengths[a]).mul(totalJurorFees[a])
+            votesByAppeal[a].mul(totalJurorFees[a]).div(votesLengths[a])
           )
           return acc
         },
