@@ -161,7 +161,7 @@ const CaseCard = ({ ID }) => {
           disputeData.deadline && (
             <>
               <StyledDiv className="primary-color theme-color">
-                Voting Deadline
+                Next Period In
               </StyledDiv>
               <StyledBigTextDiv className="primary-color theme-color">
                 <TimeAgo>{disputeData.deadline}</TimeAgo>

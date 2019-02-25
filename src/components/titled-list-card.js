@@ -6,6 +6,7 @@ import { ReactComponent as Underline } from '../assets/images/underline.svg'
 import styled from 'styled-components/macro'
 
 const StyledCard = styled(Card)`
+  cursor: initial;
   margin: 28px 0 0;
 
   .ant-card {
