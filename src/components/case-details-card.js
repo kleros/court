@@ -13,6 +13,8 @@ import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
 
 const StyledCard = styled(Card)`
+  cursor: initial;
+
   .ant-card {
     &-head {
       margin: 0 46px;
@@ -43,6 +45,7 @@ const StyledCard = styled(Card)`
         margin: 0;
 
         & > span {
+          cursor: initial;
           display: block;
         }
       }
@@ -94,6 +97,7 @@ const StyledBreadcrumbs = styled(Breadcrumbs)`
   position: absolute;
 `
 const StyledInnerCard = styled(Card)`
+  cursor: initial;
   margin-bottom: 38px;
 
   .ant-card {
