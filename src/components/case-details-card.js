@@ -136,6 +136,10 @@ const StyledInnerCard = styled(Card)`
     }
   }
 `
+const StyledIFrame = styled.iframe`
+  height: 215px;
+  width: 100%;
+`
 const StyledInnerCardActionsTitleDiv = styled.div`
   background: whitesmoke;
   border-radius: 6px 6px 0 0;
@@ -265,31 +269,15 @@ const CaseDetailsCard = ({ ID }) => {
   const metaEvidenceActions = useMemo(() => {
     if (metaEvidence) {
       const actions = []
-      if (
-        metaEvidence.metaEvidenceJSON.fileURI ||
-        metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL
-      ) {
-        const previewURI =
-          metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL &&
-          `${
-            metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL
-          }?${encodeURIComponent(
-            JSON.stringify({
-              arbitrableContractAddress: dispute.arbitrated,
-              arbitratorContractAddress: drizzle.contracts.KlerosLiquid.address,
-              disputeID: ID
-            })
-          )}`
+      if (metaEvidence.metaEvidenceJSON.fileURI)
         actions.push(
           <Attachment
-            URI={metaEvidence.metaEvidenceJSON.fileURI || previewURI}
+            URI={metaEvidence.metaEvidenceJSON.fileURI}
             description="This is the primary file uploaded with the dispute."
             extension={metaEvidence.metaEvidenceJSON.fileTypeExtension}
-            previewURI={previewURI}
             title="Main File"
           />
         )
-      }
       actions.push(
         <StyledInnerCardActionsTitleDiv className="ternary-color theme-color">
           Primary Documents
@@ -396,6 +384,22 @@ const CaseDetailsCard = ({ ID }) => {
                 <ReactMarkdown
                   source={metaEvidence.metaEvidenceJSON.description}
                 />
+                {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL && (
+                  <StyledIFrame
+                    frameBorder="0"
+                    src={`${
+                      metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL
+                    }?${encodeURIComponent(
+                      JSON.stringify({
+                        arbitrableContractAddress: dispute.arbitrated,
+                        arbitratorContractAddress:
+                          drizzle.contracts.KlerosLiquid.address,
+                        disputeID: ID
+                      })
+                    )}`}
+                    title="Metaevidence Display"
+                  />
+                )}
               </StyledInnerCard>
             </Col>
           </Row>
@@ -406,32 +410,14 @@ const CaseDetailsCard = ({ ID }) => {
                   <Col key={a} md={12}>
                     <StyledInnerCard
                       actions={evidenceBySubmitter[a]
-                        .map(e => {
-                          const previewURI =
-                            metaEvidence.metaEvidenceJSON
-                              .evidenceDisplayInterfaceURL &&
-                            `${
-                              metaEvidence.metaEvidenceJSON
-                                .evidenceDisplayInterfaceURL
-                            }?${encodeURIComponent(
-                              JSON.stringify({
-                                arbitrableContractAddress: dispute.arbitrated,
-                                arbitratorContractAddress:
-                                  drizzle.contracts.KlerosLiquid.address,
-                                disputeID: ID,
-                                evidence: e
-                              })
-                            )}`
-                          return (
-                            <Attachment
-                              URI={e.evidenceJSON.fileURI || previewURI}
-                              description={e.evidenceJSON.description}
-                              extension={e.evidenceJSON.fileTypeExtension}
-                              previewURI={previewURI}
-                              title={e.evidenceJSON.name}
-                            />
-                          )
-                        })
+                        .map(e => (
+                          <Attachment
+                            URI={e.evidenceJSON.fileURI}
+                            description={e.evidenceJSON.description}
+                            extension={e.evidenceJSON.fileTypeExtension}
+                            title={e.evidenceJSON.name}
+                          />
+                        ))
                         .concat(
                           <StyledInnerCardActionsTitleDiv className="ternary-color theme-color">
                             Evidence
