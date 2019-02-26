@@ -5,6 +5,7 @@ import Attachment from '../components/attachment'
 import Breadcrumbs from '../components/breadcrumbs'
 import CourtDrawer from '../components/court-drawer'
 import { ReactComponent as Document } from '../assets/images/document.svg'
+import ETHAddress from '../components/eth-address'
 import Identicon from '../components/identicon'
 import PropTypes from 'prop-types'
 import ReactMarkdown from 'react-markdown'
@@ -440,7 +441,9 @@ const CaseDetailsCard = ({ ID }) => {
                       title={
                         <>
                           <StyledIdenticon account={a} />
-                          {metaEvidence.metaEvidenceJSON.aliases[a] || '?'}
+                          {metaEvidence.metaEvidenceJSON.aliases[a] || (
+                            <ETHAddress address={a} />
+                          )}
                         </>
                       }
                     />
