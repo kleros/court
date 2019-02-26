@@ -187,7 +187,7 @@ export default () => (
 register({
   onUpdate: () =>
     message.warning(
-      'An update is ready to be installed. Please restart the application.',
+      'An update is ready to be installed. Please close and reopen all tabs.',
       0
     )
 })
