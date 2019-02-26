@@ -10,6 +10,7 @@ import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
 
 const StyledCard = styled(Card)`
+  cursor: initial;
   margin: 20px 0 0;
 
   .ant-card {
@@ -161,7 +162,7 @@ const CaseCard = ({ ID }) => {
           disputeData.deadline && (
             <>
               <StyledDiv className="primary-color theme-color">
-                Next Period In
+                Next Period
               </StyledDiv>
               <StyledBigTextDiv className="primary-color theme-color">
                 <TimeAgo>{disputeData.deadline}</TimeAgo>
