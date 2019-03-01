@@ -104,30 +104,34 @@ export default (networkID, onNewNotifications) => {
       ]
     )
     let mounted = true
-    Promise.all([
-      klerosLiquid.getPastEvents('AppealDecision', { fromBlock: 0 }),
-      klerosLiquid.getPastEvents('Draw', { fromBlock: 0 }),
-      klerosLiquid.getPastEvents('TokenAndETHShift', { fromBlock: 0 })
-    ]).then(async ([events1, events2, events3]) => {
-      const notifications = []
-      for (const event of [...events1, ...events2, ...events3]) {
-        let _notifications = await handlers[event.event](
-          web3,
-          klerosLiquid,
-          await web3.eth.getBlock(event.blockNumber),
-          event
-        )
-        if (_notifications) {
-          _notifications = _notifications.filter(
-            n => !localStorage.getItem(n.key)
+    web3.eth.getBlockNumber().then(blockNumber => {
+      const fromBlock = blockNumber - 256
+      Promise.all([
+        klerosLiquid.getPastEvents('AppealDecision', { fromBlock }),
+        klerosLiquid.getPastEvents('Draw', { fromBlock }),
+        klerosLiquid.getPastEvents('TokenAndETHShift', { fromBlock })
+      ]).then(async ([events1, events2, events3]) => {
+        const notifications = []
+        for (const event of [...events1, ...events2, ...events3]) {
+          let _notifications = await handlers[event.event](
+            web3,
+            klerosLiquid,
+            await web3.eth.getBlock(event.blockNumber),
+            event
           )
-          if (_notifications.length !== 0) notifications.push(..._notifications)
+          if (_notifications) {
+            _notifications = _notifications.filter(
+              n => !localStorage.getItem(n.key)
+            )
+            if (_notifications.length !== 0)
+              notifications.push(..._notifications)
+          }
         }
-      }
-      if (mounted) {
-        setNotifications([...notifications].reverse())
-        onNewNotifications(notifications, onNotificationClick)
-      }
+        if (mounted) {
+          setNotifications([...notifications].reverse())
+          onNewNotifications(notifications, onNotificationClick)
+        }
+      })
     })
     const listener = klerosLiquid.events
       .allEvents({ fromBlock: 0 })
