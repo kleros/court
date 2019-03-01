@@ -5,6 +5,9 @@ import ETHAmount from './eth-amount'
 import styled from 'styled-components/macro'
 
 const StyledCard = styled(Card)`
+  cursor: initial;
+  position: relative;
+
   .ant-card {
     &-head {
       color: white;
@@ -36,6 +39,17 @@ const StyledDiv = styled.div`
   margin: 10px 0;
   padding: 10px;
   text-align: center;
+`
+const StyledPoweredByDiv = styled.div`
+  bottom: 8px;
+  color: white;
+  font-size: 10px;
+  opacity: 0.5;
+  position: absolute;
+  right: 12px;
+`
+const StyledSpan = styled.span`
+  font-size: 24px;
 `
 export default Form.create()(({ form }) => {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle()
@@ -208,6 +222,15 @@ export default Form.create()(({ form }) => {
           Buy Now
         </Button>
       </Form>
+      <StyledPoweredByDiv>
+        powered by{' '}
+        <a href="https://uniswap.io" rel="noopener noreferrer" target="_blank">
+          {/* eslint-disable-next-line jsx-a11y/accessible-emoji */}
+          <StyledSpan aria-label="Uniswap Logo" role="img">
+            🦄
+          </StyledSpan>
+        </a>
+      </StyledPoweredByDiv>
     </StyledCard>
   )
 })

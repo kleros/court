@@ -5,6 +5,9 @@ import { ReactComponent as Idex } from '../assets/images/idex.svg'
 import React from 'react'
 import styled from 'styled-components/macro'
 
+const StyledCard = styled(Card)`
+  cursor: initial;
+`
 const StyledBitfinex = styled(Bitfinex)`
   height: 55px;
   padding: 0 20px;
@@ -20,7 +23,7 @@ const StyledIdex = styled(Idex)`
   width: 100%;
 `
 export default () => (
-  <Card hoverable title="Exchanges">
+  <StyledCard hoverable title="Exchanges">
     <a
       href="https://www.bitfinex.com"
       rel="noopener noreferrer"
@@ -44,5 +47,5 @@ export default () => (
     >
       <StyledIdex />
     </a>
-  </Card>
+  </StyledCard>
 )
