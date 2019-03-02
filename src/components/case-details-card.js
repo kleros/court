@@ -183,6 +183,7 @@ const CaseDetailsCard = ({ ID }) => {
   )
   const votesData = useCacheCall(['KlerosLiquid'], call => {
     let votesData = { loading: true }
+    const currentRuling = call('KlerosLiquid', 'currentRuling', ID)
     if (draws) {
       const vote = call(
         'KlerosLiquid',
@@ -207,7 +208,8 @@ const CaseDetailsCard = ({ ID }) => {
               Number(draws[draws.length - 1].returnValues._appeal) ===
                 dispute2.votesLengths.length - 1 &&
               dispute.period === '2',
-            loading: false,
+            currentRuling,
+            loading: !currentRuling,
             voteIDs: [],
             voted: vote.voted && vote.choice
           }
@@ -310,6 +312,10 @@ const CaseDetailsCard = ({ ID }) => {
                     : dispute.period === '0'
                     ? 'Waiting for evidence.'
                     : 'You did not cast a vote.'}
+                  {dispute.period === '4' &&
+                    ` The winning choice was "${metaEvidence.metaEvidenceJSON
+                      .rulingOptions.titles[votesData.currentRuling - 1] ||
+                      'Refuse to Arbitrate'}".`}
                   {votesData.canVote && (
                     <StyledInputTextArea
                       onChange={onJustificationChange}
