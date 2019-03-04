@@ -3,8 +3,8 @@ import KlerosLiquid from '../assets/contracts/kleros-liquid.json'
 import Web3 from 'web3'
 
 const networkIDData = {
-  1: { name: 'MAINNET', provider: 'https://mainnet.infura.io' },
-  42: { name: 'KOVAN', provider: 'https://kovan.infura.io' }
+  1: { name: '', provider: 'https://mainnet.infura.io' },
+  42: { name: '_KOVAN', provider: 'https://kovan.infura.io' }
 }
 const handlers = {
   AppealDecision: async (_, klerosLiquid, block, event) => {
@@ -100,7 +100,7 @@ export default (networkID, onNewNotifications) => {
     const klerosLiquid = new web3.eth.Contract(
       KlerosLiquid.abi,
       process.env[
-        `REACT_APP_KLEROS_LIQUID_${networkIDData[networkID].name}_ADDRESS`
+        `REACT_APP_KLEROS_LIQUID${networkIDData[networkID].name}_ADDRESS`
       ]
     )
     let mounted = true
