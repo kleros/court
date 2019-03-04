@@ -9,24 +9,28 @@ const options = {
     {
       ...KlerosLiquid,
       networks: {
+        1: { address: process.env.REACT_APP_KLEROS_LIQUID_ADDRESS },
         42: { address: process.env.REACT_APP_KLEROS_LIQUID_KOVAN_ADDRESS }
       }
     },
     {
       ...Pinakion,
       networks: {
+        1: { address: process.env.REACT_APP_PINAKION_ADDRESS },
         42: { address: process.env.REACT_APP_PINAKION_KOVAN_ADDRESS }
       }
     },
     {
       ...PolicyRegistry,
       networks: {
+        1: { address: process.env.REACT_APP_POLICY_REGISTRY_ADDRESS },
         42: { address: process.env.REACT_APP_POLICY_REGISTRY_KOVAN_ADDRESS }
       }
     },
     {
       ...UniswapExchange,
       networks: {
+        1: { address: process.env.REACT_APP_UNISWAP_EXCHANGE_ADDRESS },
         42: { address: process.env.REACT_APP_UNISWAP_EXCHANGE_KOVAN_ADDRESS }
       }
     }

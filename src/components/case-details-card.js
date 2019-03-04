@@ -263,7 +263,7 @@ const CaseDetailsCard = ({ ID }) => {
         return acc
       }, {})
   }
-  const { send, status } = useCacheSend('KlerosLiquid', 'vote')
+  const { send, status } = useCacheSend('KlerosLiquid', 'castVote')
   const onJustificationChange = useCallback(
     ({ currentTarget: { value } }) => setJustification(value),
     []
