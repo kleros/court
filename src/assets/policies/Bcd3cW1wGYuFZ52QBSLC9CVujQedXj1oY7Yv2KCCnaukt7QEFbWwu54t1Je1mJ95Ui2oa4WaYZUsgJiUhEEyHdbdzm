@@ -1,0 +1,5 @@
+{
+  "name": "Non-technical",
+  "description": "**Court Purpose**\nThis court is for jurors ruling on challenged tokens from our TCR Dapp with Ethfinex. Challenged submission from the (Insert URL) Token Curated List will be resolved in this court unless appealed.",
+  "summary": "**Guidelines:**\n- Jurors should carefully check all required fields in each submitted case\n- Contract addresses are an attack vector and should be checked carefully.\n- Attached Logos should be PNG format with a transparent background.\n- Project names and tickers should be carefully checked.\n- In case of duplicates, only the first submission should be accepted. The most recent submissions appear highest in the list."
+}

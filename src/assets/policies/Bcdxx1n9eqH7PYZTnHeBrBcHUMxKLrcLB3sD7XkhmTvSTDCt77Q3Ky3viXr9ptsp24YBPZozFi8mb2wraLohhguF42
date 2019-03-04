@@ -1,0 +1,5 @@
+{
+  "name": "General Court",
+  "description": "**Court Purpose**\n\nThe General court exists as the top court in the hierarchy. All appeals made in subcourts will make their way to the General Court.",
+  "summary": "**Guidelines:** \n- Jurors should cast their vote with a suitable verification.\n- Jurors should not rule in favor of a side who have engaged in immoral activities (example: rule reject on “revenge porn” images even if they would otherwise fit into the category).\n- “Refuse to arbitrate” should be used for disputes where both sides of the dispute have engaged in activities which are immoral (ex: refuse to rule on an assassination market dispute).\n- Immoral activities include: Murder, slavery, rape, violence, theft and perjury.\n- Jurors should attempt to interpret disputes according to the \"spirit of the dispute\" unless the arbitrable contract or the policies of the subcourt state otherwise.\n- Jurors should interpret disputes without assuming the existence of gods, spirits or other supernatural beings unless the arbitrable contract or the policies of the subcourt state otherwise."
+}
