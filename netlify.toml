@@ -18,3 +18,9 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+[[redirects]]
+  from = "http://kleros-court.netlify.com/*"
+  to = "http://court.kleros.io/:splat"
+  status = 301
+  force = true
