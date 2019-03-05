@@ -20,6 +20,7 @@ const StyledModal = styled(Modal)`
     }
 
     &-body {
+      background: whitesmoke;
       height: 320px;
       overflow-x: scroll;
       position: relative;
