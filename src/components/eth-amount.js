@@ -21,7 +21,7 @@ const ETHAmount = ({ amount, decimals }) => {
       drizzle.web3.utils.fromWei(
         typeof amount === 'number'
           ? amount.toLocaleString('fullwide', { useGrouping: false })
-          : amount
+          : String(amount)
       )
     ).toFixed(decimals)
   )
