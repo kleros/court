@@ -127,8 +127,8 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                 ID,
                 String(
                   stake.add(
-                    drizzle.web3.utils.toBN(
-                      drizzle.web3.utils.toWei(
+                    drizzle.web3.utils.toWei(
+                      drizzle.web3.utils.toBN(
                         typeof values.PNK === 'string'
                           ? values.PNK
                           : String(values.PNK)
@@ -225,8 +225,8 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                         _value === '-'
                       )
                         return callback()
-                      const value = drizzle.web3.utils.toBN(
-                        drizzle.web3.utils.toWei(
+                      const value = drizzle.web3.utils.toWei(
+                        drizzle.web3.utils.toBN(
                           typeof _value === 'string' ? _value : String(_value)
                         )
                       )
@@ -250,8 +250,8 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                         _value === '-'
                       )
                         return callback()
-                      const value = drizzle.web3.utils.toBN(
-                        drizzle.web3.utils.toWei(
+                      const value = drizzle.web3.utils.toWei(
+                        drizzle.web3.utils.toBN(
                           typeof _value === 'string' ? _value : String(_value)
                         )
                       )
