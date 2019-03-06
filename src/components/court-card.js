@@ -47,7 +47,7 @@ const StyledAmountDiv = styled.div`
   font-weight: bold;
 `
 const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
-  const { useCacheCall, useCacheSend } = useDrizzle()
+  const { drizzle, useCacheCall, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
   }))
@@ -131,7 +131,13 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
         Stake Locked/Vote
         <StyledAmountDiv>
           <ETHAmount
-            amount={subcourt && (subcourt.minStake * subcourt.alpha) / 10000}
+            amount={
+              subcourt &&
+              drizzle.web3.utils
+                .toBN(subcourt.minStake)
+                .mul(drizzle.web3.utils.toBN(subcourt.alpha))
+                .div(drizzle.web3.utils.toBN('10000'))
+            }
           />{' '}
           PNK
         </StyledAmountDiv>
