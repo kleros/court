@@ -213,6 +213,7 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
           {!loading && (
             <Form.Item colon={false} hasFeedback label="PNK">
               {form.getFieldDecorator('PNK', {
+                initialValue: drizzle.web3.utils.fromWei(String(max)),
                 rules: [
                   { message: 'Please enter an amount of PNK.', required: true },
                   {
