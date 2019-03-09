@@ -162,7 +162,12 @@ const CaseCard = ({ ID }) => {
           disputeData.deadline && (
             <>
               <StyledDiv className="primary-color theme-color">
-                Next Period
+                {
+                  ['Evidence', 'Commit', 'Vote', 'Appeal', 'Execute'][
+                    dispute.period
+                  ]
+                }{' '}
+                Period Over
               </StyledDiv>
               <StyledBigTextDiv className="primary-color theme-color">
                 <TimeAgo>{disputeData.deadline}</TimeAgo>

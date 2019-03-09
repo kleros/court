@@ -85,7 +85,14 @@ export default ({
         extra={
           disputeData.deadline && (
             <>
-              <StyledDiv>Next Period</StyledDiv>
+              <StyledDiv>
+                {
+                  ['Evidence', 'Commit', 'Vote', 'Appeal', 'Execute'][
+                    dispute.period
+                  ]
+                }{' '}
+                Period Over
+              </StyledDiv>
               <StyledBigTextDiv>
                 <TimeAgo className="primary-color theme-color">
                   {disputeData.deadline}
