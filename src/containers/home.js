@@ -1,39 +1,46 @@
 import { Button, Col, Row } from 'antd'
 import CasesListCard from '../components/cases-list-card'
 import CourtsListCard from '../components/courts-list-card'
-import { ReactComponent as DarkLogo } from '../assets/images/dark-logo.svg'
+import { Link } from 'react-router-dom'
 import PNKBalanceCard from '../components/pnk-balance-card'
 import PNKStatsListCard from '../components/pnk-stats-list-card'
 import React from 'react'
 import TopBanner from '../components/top-banner'
 import WelcomeCard from '../components/welcome-card'
+import darkLogo from '../assets/images/dark-logo.png'
+import styled from 'styled-components/macro'
 import { version } from '../../package.json'
 
+const StyledImg = styled.img`
+  max-width: 90%;
+`
 export default () => (
   <>
     <TopBanner
-      description="Get started by buying PNK if you don't have any already."
+      description="If you don't have some, buy PNK to get started."
       extra={
-        <Button size="large" type="primary">
-          Buy PNK
-        </Button>
+        <Link to="/tokens">
+          <Button size="large" type="primary">
+            Buy PNK
+          </Button>
+        </Link>
       }
-      title="Welcome to the Kleros Juror Dashboard!"
+      title="Kleros Juror Dashboard"
     />
     <WelcomeCard
-      icon={<DarkLogo />}
+      icon={<StyledImg alt="Kleros Logo with Dark Text" src={darkLogo} />}
       text="Welcome"
       version={`Athena release ${version}`}
     />
     <PNKBalanceCard />
     <Row gutter={32}>
-      <Col span={6}>
+      <Col lg={6}>
         <CourtsListCard />
       </Col>
-      <Col span={6}>
+      <Col lg={6}>
         <CasesListCard />
       </Col>
-      <Col span={12}>
+      <Col lg={12}>
         <PNKStatsListCard />
       </Col>
     </Row>

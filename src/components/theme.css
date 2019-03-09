@@ -18776,6 +18776,29 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 .info-color time {
   color: #009aff;
 }
+.quaternary-fill.theme-fill,
+.quaternary-fill .theme-fill {
+  fill: #ead6fe;
+}
+.quaternary-stroke.theme-stroke,
+.quaternary-stroke .theme-stroke {
+  stroke: #ead6fe;
+}
+.quaternary-background.theme-background,
+.quaternary-background .theme-background,
+.quaternary-background .ant-card-head {
+  background: #ead6fe;
+}
+.quaternary-border-color.theme-border-color,
+.quaternary-border-color .theme-border-color {
+  border-color: #ead6fe;
+}
+.quaternary-color.theme-color,
+.quaternary-color .theme-color,
+.quaternary-color .ant-list-item-extra,
+.quaternary-color time {
+  color: #ead6fe;
+}
 .ternary-fill.theme-fill,
 .ternary-fill .theme-fill {
   fill: #4004a3;

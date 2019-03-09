@@ -5,19 +5,25 @@ import Attachment from '../components/attachment'
 import Breadcrumbs from '../components/breadcrumbs'
 import CourtDrawer from '../components/court-drawer'
 import { ReactComponent as Document } from '../assets/images/document.svg'
+import ETHAddress from '../components/eth-address'
 import Identicon from '../components/identicon'
 import PropTypes from 'prop-types'
+import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
 
 const StyledCard = styled(Card)`
-  margin-bottom: 62px;
+  cursor: initial;
 
   .ant-card {
     &-head {
       margin: 0 46px;
       padding: 0;
       position: relative;
+
+      @media (max-width: 767px) {
+        margin: 0 23px;
+      }
 
       &-title {
         font-size: 24px;
@@ -26,6 +32,10 @@ const StyledCard = styled(Card)`
 
     &-body {
       padding: 44px 46px 23px;
+
+      @media (max-width: 767px) {
+        padding: 44px 23px 23px;
+      }
     }
 
     &-actions {
@@ -35,6 +45,7 @@ const StyledCard = styled(Card)`
         margin: 0;
 
         & > span {
+          cursor: initial;
           display: block;
         }
       }
@@ -47,25 +58,25 @@ const StyledDiv = styled.div`
   display: flex;
   flex-direction: column;
   font-size: 24px;
-  padding: 30px 0;
+  padding: 30px 10px;
 `
 const StyledInputTextArea = styled(Input.TextArea)`
   background: rgba(255, 255, 255, 0.3);
   border: none;
   color: white;
-  height: 91px;
+  height: 91px !important;
   margin: 24px 0;
   width: 70%;
 `
 const StyledButtonsDiv = styled.div`
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: space-around;
   width: 70%;
 `
 const StyledButton = styled(Button)`
   flex: 0 0 35%;
-  margin: 20px 0 15px;
+  margin: 20px 5px 15px;
 `
 const StyledPoliciesButton = styled(Button)`
   padding-left: 40px;
@@ -80,12 +91,13 @@ const StyledDocument = styled(Document)`
   width: auto;
 `
 const StyledBreadcrumbs = styled(Breadcrumbs)`
-  bottom: 0;
+  bottom: -20px;
   font-size: 10px;
   left: 0;
   position: absolute;
 `
 const StyledInnerCard = styled(Card)`
+  cursor: initial;
   margin-bottom: 38px;
 
   .ant-card {
@@ -128,6 +140,10 @@ const StyledInnerCard = styled(Card)`
     }
   }
 `
+const StyledIFrame = styled.iframe`
+  height: 215px;
+  width: 100%;
+`
 const StyledInnerCardActionsTitleDiv = styled.div`
   background: whitesmoke;
   border-radius: 6px 6px 0 0;
@@ -167,6 +183,7 @@ const CaseDetailsCard = ({ ID }) => {
   )
   const votesData = useCacheCall(['KlerosLiquid'], call => {
     let votesData = { loading: true }
+    const currentRuling = call('KlerosLiquid', 'currentRuling', ID)
     if (draws) {
       const vote = call(
         'KlerosLiquid',
@@ -175,21 +192,24 @@ const CaseDetailsCard = ({ ID }) => {
         draws[draws.length - 1].returnValues._appeal,
         draws[draws.length - 1].returnValues._voteID
       )
-      if (dispute2 && vote)
+      if (dispute && dispute2 && vote)
         votesData = draws.reduce(
           (acc, d) => {
             if (
               Number(d.returnValues._appeal) ===
               dispute2.votesLengths.length - 1
-            ) {
-              acc.canVote = acc.canVote && true
+            )
               acc.voteIDs.push(d.returnValues._voteID)
-            }
             return acc
           },
           {
-            canVote: !vote.voted,
-            loading: false,
+            canVote:
+              !vote.voted &&
+              Number(draws[draws.length - 1].returnValues._appeal) ===
+                dispute2.votesLengths.length - 1 &&
+              dispute.period === '2',
+            currentRuling,
+            loading: !currentRuling,
             voteIDs: [],
             voted: vote.voted && vote.choice
           }
@@ -243,7 +263,7 @@ const CaseDetailsCard = ({ ID }) => {
         return acc
       }, {})
   }
-  const { send, status } = useCacheSend('KlerosLiquid', 'vote')
+  const { send, status } = useCacheSend('KlerosLiquid', 'castVote')
   const onJustificationChange = useCallback(
     ({ currentTarget: { value } }) => setJustification(value),
     []
@@ -252,6 +272,26 @@ const CaseDetailsCard = ({ ID }) => {
     ({ currentTarget: { id } }) => send(ID, votesData.voteIDs, id, 0),
     [ID, votesData.voteIDs]
   )
+  const metaEvidenceActions = useMemo(() => {
+    if (metaEvidence) {
+      const actions = []
+      if (metaEvidence.metaEvidenceJSON.fileURI)
+        actions.push(
+          <Attachment
+            URI={metaEvidence.metaEvidenceJSON.fileURI}
+            description="This is the primary file uploaded with the dispute."
+            extension={metaEvidence.metaEvidenceJSON.fileTypeExtension}
+            title="Main File"
+          />
+        )
+      actions.push(
+        <StyledInnerCardActionsTitleDiv className="ternary-color theme-color">
+          Primary Documents
+        </StyledInnerCardActionsTitleDiv>
+      )
+      return actions
+    }
+  }, [metaEvidence])
   return (
     <StyledCard
       actions={useMemo(
@@ -269,7 +309,13 @@ const CaseDetailsCard = ({ ID }) => {
                     : votesData.voted
                     ? `You chose: ${metaEvidence.metaEvidenceJSON.rulingOptions
                         .titles[votesData.voted - 1] || 'Refuse to Arbitrate'}.`
+                    : dispute.period === '0'
+                    ? 'Waiting for evidence.'
                     : 'You did not cast a vote.'}
+                  {dispute.period === '4' &&
+                    ` The winning choice was "${metaEvidence.metaEvidenceJSON
+                      .rulingOptions.titles[votesData.currentRuling - 1] ||
+                      'Refuse to Arbitrate'}".`}
                   {votesData.canVote && (
                     <StyledInputTextArea
                       onChange={onJustificationChange}
@@ -344,26 +390,26 @@ const CaseDetailsCard = ({ ID }) => {
         <>
           <Row>
             <Col span={24}>
-              <StyledInnerCard
-                actions={useMemo(
-                  () => [
-                    <Attachment
-                      URI={metaEvidence.metaEvidenceJSON.fileURI}
-                      description="This is the primary file uploaded with the dispute."
-                      extension={
-                        metaEvidence.metaEvidenceJSON.fileTypeExtension
-                      }
-                      title="Main File"
-                    />,
-                    <StyledInnerCardActionsTitleDiv className="ternary-color theme-color">
-                      Primary Documents
-                    </StyledInnerCardActionsTitleDiv>
-                  ],
-                  [metaEvidence]
+              <StyledInnerCard actions={metaEvidenceActions} hoverable>
+                <ReactMarkdown
+                  source={metaEvidence.metaEvidenceJSON.description}
+                />
+                {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL && (
+                  <StyledIFrame
+                    frameBorder="0"
+                    src={`${
+                      metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL
+                    }?${encodeURIComponent(
+                      JSON.stringify({
+                        arbitrableContractAddress: dispute.arbitrated,
+                        arbitratorContractAddress:
+                          drizzle.contracts.KlerosLiquid.address,
+                        disputeID: ID
+                      })
+                    )}`}
+                    title="Metaevidence Display"
+                  />
                 )}
-                hoverable
-              >
-                {metaEvidence.metaEvidenceJSON.description}
               </StyledInnerCard>
             </Col>
           </Row>
@@ -371,29 +417,29 @@ const CaseDetailsCard = ({ ID }) => {
             {evidence && (
               <Row gutter={40}>
                 {Object.keys(evidenceBySubmitter).map(a => (
-                  <Col key={a} span={12}>
+                  <Col key={a} md={12}>
                     <StyledInnerCard
-                      actions={useMemo(
-                        () => [
-                          ...evidenceBySubmitter[a].map(e => (
-                            <Attachment
-                              URI={e.evidenceJSON.fileURI}
-                              description={e.evidenceJSON.description}
-                              extension={e.evidenceJSON.fileTypeExtension}
-                              title={e.evidenceJSON.name}
-                            />
-                          )),
+                      actions={evidenceBySubmitter[a]
+                        .map(e => (
+                          <Attachment
+                            URI={e.evidenceJSON.fileURI}
+                            description={e.evidenceJSON.description}
+                            extension={e.evidenceJSON.fileTypeExtension}
+                            title={e.evidenceJSON.name}
+                          />
+                        ))
+                        .concat(
                           <StyledInnerCardActionsTitleDiv className="ternary-color theme-color">
                             Evidence
                           </StyledInnerCardActionsTitleDiv>
-                        ],
-                        [evidence]
-                      )}
+                        )}
                       hoverable
                       title={
                         <>
                           <StyledIdenticon account={a} />
-                          {metaEvidence.metaEvidenceJSON.aliases[a] || '?'}
+                          {metaEvidence.metaEvidenceJSON.aliases[a] || (
+                            <ETHAddress address={a} />
+                          )}
                         </>
                       }
                     />

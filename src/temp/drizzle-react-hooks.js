@@ -13,28 +13,38 @@ import shallowequal from 'shallowequal'
 
 const Context = createContext()
 export const useDrizzle = () => useContext(Context)
-export const useDrizzleState = mapState => {
+export const useDrizzleState = (mapState, args) => {
   const { drizzle } = useDrizzle()
-  const [state, setState] = useState(mapState(drizzle.store.getState()))
-  const stateRef = useRef(state)
-  useEffect(
-    () => {
-      const debouncedHandler = debounce(() => {
-        const newState = mapState(drizzle.store.getState())
-        if (!shallowequal(stateRef.current, newState)) {
-          stateRef.current = newState
-          setState(newState)
-        }
-      })
-      const unsubscribe = drizzle.store.subscribe(debouncedHandler)
-      return () => {
-        unsubscribe()
-        debouncedHandler.clear()
-      }
-    },
-    [drizzle.store]
+  const mapStateRef = useRef(mapState)
+  mapStateRef.current = mapState
+  const argsRef = useRef(args)
+  const [state, setState] = useState(
+    mapStateRef.current(drizzle.store.getState())
   )
-  return state
+  const stateRef = useRef(state)
+  if (!shallowequal(argsRef.current, args)) {
+    argsRef.current = args
+    const newState = mapStateRef.current(drizzle.store.getState())
+    if (!shallowequal(stateRef.current, newState)) {
+      stateRef.current = newState
+      setState(newState)
+    }
+  }
+  useEffect(() => {
+    const debouncedHandler = debounce(() => {
+      const newState = mapStateRef.current(drizzle.store.getState())
+      if (!shallowequal(stateRef.current, newState)) {
+        stateRef.current = newState
+        setState(newState)
+      }
+    })
+    const unsubscribe = drizzle.store.subscribe(debouncedHandler)
+    return () => {
+      unsubscribe()
+      debouncedHandler.clear()
+    }
+  }, [drizzle.store])
+  return stateRef.current
 }
 
 export const DrizzleProvider = ({ children, drizzle }) => {
@@ -61,7 +71,7 @@ export const DrizzleProvider = ({ children, drizzle }) => {
               ][cacheKey].value
           }
         }
-      })
+      }, args)
       return isFunction
         ? methodNameOrFunction((contractName, methodName, ...args) => {
             const cacheKey = drizzle.contracts[contractName].methods[
@@ -116,19 +126,20 @@ export const DrizzleProvider = ({ children, drizzle }) => {
           ),
         [contractName]
       )
-      useEffect(
-        () => {
-          contract
-            .getPastEvents(eventName, eventOptions)
-            .then(pastEvents => setEvents(pastEvents))
-          const listener = drizzle.contracts[contractName].events[eventName]({
-            ...eventOptions,
-            fromBlock: 'latest'
-          }).on('data', event => setEvents(events => [...events, event]))
-          return listener.unsubscribe.bind(listener)
-        },
-        [contractName, eventName, eventOptions]
-      )
+      useEffect(() => {
+        let mounted = true
+        contract
+          .getPastEvents(eventName, eventOptions)
+          .then(pastEvents => mounted && setEvents(pastEvents))
+        const listener = drizzle.contracts[contractName].events[eventName]({
+          ...eventOptions,
+          fromBlock: 'latest'
+        }).on('data', event => setEvents(events => [...events, event]))
+        return () => {
+          listener.unsubscribe()
+          mounted = false
+        }
+      }, [contractName, eventName, eventOptions])
       return events
     },
     [drizzle.web3, drizzle.contracts]

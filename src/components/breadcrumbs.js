@@ -4,10 +4,14 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components/macro'
 
 const StyledDiv = styled.div`
+  height: ${props => (props.large ? 38 : 20)}px;
+  overflow-x: auto;
   position: relative;
+  width: 100%;
 `
 const StyledBreadcrumbDiv = styled.div`
   cursor: pointer;
+  height: ${props => (props.large ? 38 : 20)}px;
   left: ${props => props.id * 100}px;
   position: absolute;
   top: 0;
@@ -35,11 +39,12 @@ const Breadcrumbs = ({
   large,
   onClick
 }) => (
-  <StyledDiv className={className}>
+  <StyledDiv className={className} large={large}>
     {(Array.isArray(breadcrumbs) ? breadcrumbs : [breadcrumbs]).map((b, i) => (
       <StyledBreadcrumbDiv
         id={i}
         key={i}
+        large={large}
         length={breadcrumbs.length}
         onClick={
           onClick &&

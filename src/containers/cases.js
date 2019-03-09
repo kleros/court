@@ -1,13 +1,16 @@
-import { Button, Col, Divider, Radio, Row, Spin } from 'antd'
+import { Col, Divider, Radio, Row, Spin } from 'antd'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import CaseCard from '../components/case-card'
-import { Link } from 'react-router-dom'
+// import { Link } from 'react-router-dom'
 import TopBanner from '../components/top-banner'
 import styled from 'styled-components/macro'
 
 const StyledRadioGroup = styled(Radio.Group)`
   float: right;
+`
+const StyledCol = styled(Col)`
+  color: gainsboro;
 `
 export default () => {
   const { useCacheCall, useCacheEvents } = useDrizzle()
@@ -49,17 +52,18 @@ export default () => {
         )
       : { activeIDs: [], executedIDs: [], loading: true }
   )
+  const filteredDisputes = disputes[filter ? 'activeIDs' : 'executedIDs']
   return (
     <>
       <TopBanner
         description="Select a case you have been drawn in, study the evidence, and vote."
-        extra={
-          <Link to="/cases/history">
-            <Button size="large" type="primary">
-              Cases History
-            </Button>
-          </Link>
-        }
+        // extra={
+        //   <Link to="/cases/history">
+        //     <Button size="large" type="primary">
+        //       History
+        //     </Button>
+        //   </Link>
+        // }
         title="Cases"
       />
       My Cases
@@ -69,17 +73,23 @@ export default () => {
         onChange={useCallback(e => setFilter(e.target.value), [])}
         value={filter}
       >
-        <Radio.Button value>Active</Radio.Button>
-        <Radio.Button value={false}>Executed</Radio.Button>
+        <Radio.Button value>In Progress</Radio.Button>
+        <Radio.Button value={false}>Closed</Radio.Button>
       </StyledRadioGroup>
       <Divider />
       <Spin spinning={disputes.loading}>
         <Row gutter={48}>
-          {disputes[filter ? 'activeIDs' : 'executedIDs'].map(ID => (
-            <Col key={ID} span={8}>
-              <CaseCard ID={ID} />
-            </Col>
-          ))}
+          {filteredDisputes.length === 0 ? (
+            <StyledCol>
+              You don't have any {filter ? 'active' : 'executed'} disputes.
+            </StyledCol>
+          ) : (
+            filteredDisputes.map(ID => (
+              <Col key={ID} md={12} xl={8}>
+                <CaseCard ID={ID} />
+              </Col>
+            ))
+          )}
         </Row>
       </Spin>
     </>

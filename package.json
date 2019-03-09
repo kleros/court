@@ -43,14 +43,15 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "@kleros/kathari": "^0.20.0",
+    "@kleros/kathari": "^0.21.0",
     "husky": "^1.1.4",
     "less": "^3.8.1",
     "source-map-explorer": "^1.6.0",
     "standard-version": "^4.4.0"
   },
   "dependencies": {
-    "@kleros/archon": "^0.5.4",
+    "@kleros/archon": "^0.6.0",
+    "@loadable/component": "^5.5.0",
     "antd": "^3.10.8",
     "dataloader": "^1.4.0",
     "debounce": "^1.2.0",
@@ -71,6 +72,7 @@
     "react-scripts": "2.1.1",
     "react-time-ago": "^3.0.3",
     "shallowequal": "^1.1.0",
-    "styled-components": "^4.1.1"
+    "styled-components": "^4.1.1",
+    "web3": "^1.0.0-beta.37"
   }
 }

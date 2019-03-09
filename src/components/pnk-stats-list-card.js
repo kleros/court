@@ -8,6 +8,7 @@ import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
 
 const loadingPieChartData = [{ tooltip: 'Loading...', value: 1 }]
+const emptyPieChartData = [{ tooltip: '0 PNK', value: 1 }]
 const StyledDiv = styled.div`
   display: flex;
 `
@@ -64,8 +65,11 @@ const PNKStatsListCard = () => {
     draws
       ? draws.reduce(
           (acc, d) => {
-            if (acc.jurorAtStakeByID[d.returnValues._disputeID] === undefined) {
-              acc.jurorAtStakeByID[d.returnValues._disputeID] = null
+            if (
+              acc.tokensAtStakePerJurorByID[d.returnValues._disputeID] ===
+              undefined
+            ) {
+              acc.tokensAtStakePerJurorByID[d.returnValues._disputeID] = null
               const dispute = call(
                 'KlerosLiquid',
                 'disputes',
@@ -77,21 +81,25 @@ const PNKStatsListCard = () => {
                 d.returnValues._disputeID
               )
               if (dispute && dispute2) {
-                if (!dispute.period !== '4') {
-                  acc.jurorAtStakeByID[
+                if (dispute.period !== '4') {
+                  acc.tokensAtStakePerJurorByID[
                     d.returnValues._disputeID
-                  ] = dispute2.jurorAtStake.map(drizzle.web3.utils.toBN)
+                  ] = dispute2.tokensAtStakePerJuror.map(
+                    drizzle.web3.utils.toBN
+                  )
                   acc.atStakeByID[
                     d.returnValues._disputeID
                   ] = drizzle.web3.utils.toBN(0)
                 }
               } else acc.loading = true
             }
-            if (acc.jurorAtStakeByID[d.returnValues._disputeID] !== null)
+            if (
+              acc.tokensAtStakePerJurorByID[d.returnValues._disputeID] !== null
+            )
               acc.atStakeByID[d.returnValues._disputeID] = acc.atStakeByID[
                 d.returnValues._disputeID
               ].add(
-                acc.jurorAtStakeByID[d.returnValues._disputeID][
+                acc.tokensAtStakePerJurorByID[d.returnValues._disputeID][
                   d.returnValues._appeal
                 ]
               )
@@ -99,12 +107,14 @@ const PNKStatsListCard = () => {
           },
           {
             atStakeByID: {},
-            jurorAtStakeByID: {},
-            loading: false
+            loading: false,
+            tokensAtStakePerJurorByID: {}
           }
         )
       : { loading: true }
   )
+  const disputesAtStakeByIDKeys =
+    !disputes.loading && Object.keys(disputes.atStakeByID)
   return (
     <TitledListCard prefix="PNK" title="Stats">
       <StyledDiv>
@@ -113,6 +123,8 @@ const PNKStatsListCard = () => {
             data={
               loadingSubcourts
                 ? loadingPieChartData
+                : subcourts.length === 0
+                ? emptyPieChartData
                 : subcourts.map(s => ({
                     tooltip: (
                       <Spin spinning={s.name === undefined}>
@@ -133,7 +145,9 @@ const PNKStatsListCard = () => {
             data={
               disputes.loading
                 ? loadingPieChartData
-                : Object.keys(disputes.atStakeByID).map(ID => ({
+                : disputesAtStakeByIDKeys.length === 0
+                ? emptyPieChartData
+                : disputesAtStakeByIDKeys.map(ID => ({
                     tooltip: (
                       <>
                         <StyledAmountSpan>

@@ -8,6 +8,8 @@ import { useDataloader } from '../bootstrap/dataloader'
 import { useDrizzle } from '../temp/drizzle-react-hooks'
 
 const StyledModal = styled(Modal)`
+  width: 90% !important;
+
   .ant-modal {
     &-header {
       padding: 0;
@@ -18,7 +20,9 @@ const StyledModal = styled(Modal)`
     }
 
     &-body {
+      background: whitesmoke;
       height: 320px;
+      overflow-x: scroll;
       position: relative;
     }
 
@@ -49,8 +53,8 @@ const StyledCascader = styled(Cascader)`
   & ~ div .popupClassName {
     background: whitesmoke;
     left: 0 !important;
+    min-width: 100%;
     top: 0 !important;
-    width: 100%;
 
     .ant-cascader-menu {
       height: 320px;
@@ -59,13 +63,14 @@ const StyledCascader = styled(Cascader)`
 
       &-item {
         height: 38px;
-        padding-left: 18px;
+        padding: 5px 18px;
       }
     }
   }
 `
 const StyledBreadcrumbs = styled(Breadcrumbs)`
   left: ${props => props.colorIndex * 135}px;
+  pointer-events: none;
   position: absolute;
   top: ${props => props.columnIndex * 38 + 28}px;
   z-index: ${props => props.optionLength - props.colorIndex + 2000};
@@ -147,11 +152,11 @@ const CourtCascaderModal = ({ onClick }) => {
       footer={
         <Skeleton active loading={option.loading}>
           <Row>
-            <Col span={12}>
+            <Col md={12}>
               <StyledDiv>Description</StyledDiv>
               <ReactMarkdown source={option.description} />
             </Col>
-            <Col span={12}>
+            <Col md={12}>
               <StyledDiv>Summary</StyledDiv>
               <ReactMarkdown source={option.summary} />
             </Col>
@@ -175,7 +180,6 @@ const CourtCascaderModal = ({ onClick }) => {
         </StyledTitleDiv>
       }
       visible
-      width="90%"
     >
       <StyledCascader
         changeOnSelect

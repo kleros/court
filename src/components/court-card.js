@@ -9,7 +9,7 @@ import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
 
 const StyledCard = styled(Card)`
-  margin: 10px 0;
+  margin: 20px 0 0;
   text-align: center;
 
   .ant-card-actions {
@@ -24,6 +24,12 @@ const StyledCardGrid = styled(Card.Grid)`
   box-shadow: none;
   position: relative;
   width: 50%;
+
+  @media (max-width: 767px) {
+    border-right: none !important;
+    padding: 8.5px;
+    width: 100%;
+  }
 
   &:first-child {
     border-right: 1px solid silver;
@@ -117,8 +123,8 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
       <StyledCardGrid>
         Coherence Reward
         <StyledAmountDiv>
-          <ETHAmount amount={subcourt && subcourt.jurorFee} decimals={2} /> ETH
-          +
+          <ETHAmount amount={subcourt && subcourt.feeForJuror} decimals={2} />{' '}
+          ETH +
         </StyledAmountDiv>
       </StyledCardGrid>
       <StyledCardGrid>

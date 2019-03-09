@@ -10,7 +10,8 @@ import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
 
 const StyledCard = styled(Card)`
-  margin: 10px 0;
+  cursor: initial;
+  margin: 20px 0 0;
 
   .ant-card {
     &-head {
@@ -31,6 +32,7 @@ const StyledCard = styled(Card)`
     }
 
     &-body {
+      height: 203px;
       padding: 17px 32px 0;
     }
 
@@ -64,7 +66,7 @@ const StyledCardGrid = styled(Card.Grid)`
   height: 73px;
   justify-content: center;
   margin-bottom: 20px;
-  padding: 0;
+  padding: 0 5px;
   text-align: center;
   width: 50%;
 
@@ -102,8 +104,10 @@ const CaseCard = ({ ID }) => {
     let disputeData = {}
     if (dispute2 && draws) {
       const votesLengths = dispute2.votesLengths.map(drizzle.web3.utils.toBN)
-      const jurorAtStake = dispute2.jurorAtStake.map(drizzle.web3.utils.toBN)
-      const totalJurorFees = dispute2.totalJurorFees.map(
+      const tokensAtStakePerJuror = dispute2.tokensAtStakePerJuror.map(
+        drizzle.web3.utils.toBN
+      )
+      const totalFeesForJurors = dispute2.totalFeesForJurors.map(
         drizzle.web3.utils.toBN
       )
       const votesByAppeal = draws.reduce((acc, d) => {
@@ -114,9 +118,11 @@ const CaseCard = ({ ID }) => {
       }, {})
       disputeData = Object.keys(votesByAppeal).reduce(
         (acc, a) => {
-          acc.atStake = acc.atStake.add(votesByAppeal[a].mul(jurorAtStake[a]))
+          acc.atStake = acc.atStake.add(
+            votesByAppeal[a].mul(tokensAtStakePerJuror[a])
+          )
           acc.coherenceReward = acc.coherenceReward.add(
-            votesByAppeal[a].div(votesLengths[a]).mul(totalJurorFees[a])
+            votesByAppeal[a].mul(totalFeesForJurors[a]).div(votesLengths[a])
           )
           return acc
         },
@@ -156,7 +162,7 @@ const CaseCard = ({ ID }) => {
           disputeData.deadline && (
             <>
               <StyledDiv className="primary-color theme-color">
-                Voting Deadline
+                Next Period
               </StyledDiv>
               <StyledBigTextDiv className="primary-color theme-color">
                 <TimeAgo>{disputeData.deadline}</TimeAgo>

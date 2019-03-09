@@ -1,7 +1,7 @@
+import { Divider, Popover } from 'antd'
 import { ReactComponent as Document } from '../assets/images/document.svg'
 import { ReactComponent as Image } from '../assets/images/image.svg'
 import { ReactComponent as Link } from '../assets/images/link.svg'
-import { Popover } from 'antd'
 import PropTypes from 'prop-types'
 import React from 'react'
 import { ReactComponent as Video } from '../assets/images/video.svg'
@@ -11,7 +11,7 @@ import isVideo from 'is-video'
 import styled from 'styled-components/macro'
 
 const StyledPopover = styled(({ className, ...rest }) => (
-  <Popover overlayClassName={className} {...rest} />
+  <Popover className={className} overlayClassName={className} {...rest} />
 ))`
   .ant-popover {
     &-inner {
@@ -23,40 +23,73 @@ const StyledPopover = styled(({ className, ...rest }) => (
     }
   }
 `
-const Attachment = ({ URI, description, extension: _extension, title }) => {
+const StyledIFrame = styled.iframe`
+  height: 400px;
+  margin-top: -8px;
+  width: 300px;
+`
+const Attachment = ({
+  URI,
+  description,
+  extension: _extension,
+  previewURI,
+  title
+}) => {
   const extension = `.${_extension}`
   let Component
-  if (isTextPath(extension)) Component = Document
+  if (!URI || isTextPath(extension)) Component = Document
   else if (isImage(extension)) Component = Image
   else if (isVideo(extension)) Component = Video
   else Component = Link
+  Component = <Component className="ternary-fill theme-fill" />
   return (
     <StyledPopover
       arrowPointAtCenter
       className="ternary-border-color theme-border-color ternary-color theme-color"
-      content={description}
+      content={
+        previewURI ? (
+          <>
+            {description}
+            <Divider dashed />
+            <StyledIFrame
+              frameBorder="0"
+              src={previewURI}
+              title="Attachment Preview"
+            />
+          </>
+        ) : (
+          description
+        )
+      }
       title={title}
     >
-      <a
-        href={URI.replace(/^\/ipfs\//, 'https://ipfs.kleros.io/ipfs/')}
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        <Component className="ternary-fill theme-fill" />
-      </a>
+      {URI ? (
+        <a
+          href={URI.replace(/^\/ipfs\//, 'https://ipfs.kleros.io/ipfs/')}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          {Component}
+        </a>
+      ) : (
+        Component
+      )}
     </StyledPopover>
   )
 }
 
 Attachment.propTypes = {
-  URI: PropTypes.string.isRequired,
+  URI: PropTypes.string,
   description: PropTypes.string.isRequired,
   extension: PropTypes.string,
+  previewURI: PropTypes.string,
   title: PropTypes.string.isRequired
 }
 
 Attachment.defaultProps = {
-  extension: null
+  URI: null,
+  extension: null,
+  previewURI: null
 }
 
 export default Attachment

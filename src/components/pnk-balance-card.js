@@ -10,25 +10,41 @@ import { ReactComponent as SectionArrowBackground } from '../assets/images/secti
 import styled from 'styled-components/macro'
 
 const StyledCard = styled(Card)`
-  height: 136px;
+  cursor: initial;
   margin: 28px 0;
 
   .ant-card-body {
     padding: 18px 36px;
+
+    @media (max-width: 991px) {
+      padding: 18px;
+    }
   }
 `
 const StyledDiv = styled.div`
   font-weight: bold;
   margin: 8px 0;
+
+  @media (max-width: 991px) {
+    text-align: right;
+  }
 `
 const StyledSectionArrow = styled(SectionArrow)`
   position: absolute;
-  right: 30px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
+
+  @media (max-width: 991px) {
+    display: none;
+  }
 `
 const StyledTopDiv = styled.div`
   font-weight: medium;
+
+  @media (max-width: 991px) {
+    margin-top: 30px;
+  }
 `
 const StyledCenterDiv = styled.div`
   font-size: 36px;
@@ -42,11 +58,16 @@ const StyledCol = styled(Col)`
   z-index: 0;
 `
 const StyledSectionArrowBackground = styled(SectionArrowBackground)`
-  height: 134px;
+  height: 138px;
   position: absolute;
   right: -37px;
   top: -18px;
+  width: 100%;
   z-index: -1;
+
+  @media (max-width: 991px) {
+    right: -19px;
+  }
 `
 const PNKBalanceCard = () => {
   const { useCacheCall } = useDrizzle()
@@ -58,12 +79,12 @@ const PNKBalanceCard = () => {
   return (
     <StyledCard hoverable>
       <Row>
-        <Col span={8}>
+        <Col lg={8}>
           <Row>
-            <Col span={10}>
+            <Col lg={11} xs={12}>
               <Identicon large />
             </Col>
-            <Col span={14}>
+            <Col lg={13} xs={12}>
               <StyledDiv>
                 <ETHAddress address={drizzleState.account} />
               </StyledDiv>
@@ -84,7 +105,7 @@ const PNKBalanceCard = () => {
           </Row>
           <StyledSectionArrow className="ternary-stroke" />
         </Col>
-        <Col className="ternary-color theme-color" span={8}>
+        <Col className="ternary-color theme-color" lg={8}>
           <StyledTopDiv>You have</StyledTopDiv>
           <StyledCenterDiv>
             <ETHAmount amount={juror && juror.stakedTokens} /> PNK
@@ -105,7 +126,7 @@ const PNKBalanceCard = () => {
             />
           </StyledBottomDiv>
         </Col>
-        <StyledCol className="ternary-color theme-color" span={8}>
+        <StyledCol className="ternary-color theme-color" lg={8}>
           <StyledTopDiv>You have</StyledTopDiv>
           <StyledCenterDiv>
             <ETHAmount amount={juror && juror.lockedTokens} /> PNK

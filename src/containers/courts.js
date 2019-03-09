@@ -6,7 +6,12 @@ import CourtCascaderModal from '../components/court-cascader-modal'
 import CourtDrawer from '../components/court-drawer'
 import StakeModal from '../components/stake-modal'
 import TopBanner from '../components/top-banner'
+import styled from 'styled-components/macro'
 
+const StyledCol = styled(Col)`
+  color: gainsboro;
+  margin-top: 10px;
+`
 export default () => {
   const { useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
@@ -29,7 +34,7 @@ export default () => {
             size="large"
             type="primary"
           >
-            Select Court
+            Browse
           </Button>
         }
         title="Courts"
@@ -38,14 +43,18 @@ export default () => {
       <Spin spinning={!subcourtIDs}>
         <Row gutter={40}>
           {subcourtIDs &&
-            subcourtIDs.map(ID => (
-              <Col key={ID} span={8}>
-                <CourtCard
-                  ID={ID}
-                  onClick={setActiveID}
-                  onStakeClick={setStakingID}
-                />
-              </Col>
+            (subcourtIDs.length === 0 ? (
+              <StyledCol>You don't have stake in any courts.</StyledCol>
+            ) : (
+              subcourtIDs.map(ID => (
+                <Col key={ID} md={12} xl={8}>
+                  <CourtCard
+                    ID={ID}
+                    onClick={setActiveID}
+                    onStakeClick={setStakingID}
+                  />
+                </Col>
+              ))
             ))}
         </Row>
       </Spin>

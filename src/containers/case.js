@@ -37,7 +37,9 @@ export default ({
   const disputeData = useCacheCall(['KlerosLiquid'], call => {
     let disputeData = {}
     if (dispute2 && draws) {
-      const jurorAtStake = dispute2.jurorAtStake.map(drizzle.web3.utils.toBN)
+      const tokensAtStakePerJuror = dispute2.tokensAtStakePerJuror.map(
+        drizzle.web3.utils.toBN
+      )
       const votesByAppeal = draws.reduce((acc, d) => {
         acc[d.returnValues._appeal] = acc[d.returnValues._appeal]
           ? acc[d.returnValues._appeal].add(drizzle.web3.utils.toBN(1))
@@ -46,7 +48,9 @@ export default ({
       }, {})
       disputeData = Object.keys(votesByAppeal).reduce(
         (acc, a) => {
-          acc.atStake = acc.atStake.add(votesByAppeal[a].mul(jurorAtStake[a]))
+          acc.atStake = acc.atStake.add(
+            votesByAppeal[a].mul(tokensAtStakePerJuror[a])
+          )
           return acc
         },
         {
@@ -81,7 +85,7 @@ export default ({
         extra={
           disputeData.deadline && (
             <>
-              <StyledDiv>Voting Deadline</StyledDiv>
+              <StyledDiv>Next Period</StyledDiv>
               <StyledBigTextDiv>
                 <TimeAgo className="primary-color theme-color">
                   {disputeData.deadline}
