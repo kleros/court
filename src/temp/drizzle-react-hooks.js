@@ -115,9 +115,13 @@ export const DrizzleProvider = ({ children, drizzle }) => {
     },
     [drizzle.contracts]
   )
+  const eventsCache = useRef({})
   const useCacheEvents = useCallback(
     (contractName, eventName, eventOptions) => {
-      const [events, setEvents] = useState()
+      const cacheKey = JSON.stringify([contractName, eventName, eventOptions])
+      const [events, setEvents] = useState(
+        eventsCache.current[cacheKey] && eventsCache.current[cacheKey].events
+      )
       const contract = useMemo(
         () =>
           new drizzle.web3.eth.Contract(
@@ -127,17 +131,42 @@ export const DrizzleProvider = ({ children, drizzle }) => {
         [contractName]
       )
       useEffect(() => {
-        let mounted = true
-        contract
-          .getPastEvents(eventName, eventOptions)
-          .then(pastEvents => mounted && setEvents(pastEvents))
-        const listener = drizzle.contracts[contractName].events[eventName]({
-          ...eventOptions,
-          fromBlock: 'latest'
-        }).on('data', event => setEvents(events => [...events, event]))
+        if (!eventsCache.current[cacheKey]) {
+          eventsCache.current[cacheKey] = {
+            events: undefined,
+            listener: undefined,
+            subscriptions: []
+          }
+          contract.getPastEvents(eventName, eventOptions).then(pastEvents => {
+            eventsCache.current[cacheKey].events = pastEvents
+            eventsCache.current[cacheKey].subscriptions.forEach(subscription =>
+              subscription(eventsCache.current[cacheKey].events)
+            )
+          })
+          eventsCache.current[cacheKey].listener = drizzle.contracts[
+            contractName
+          ].events[eventName]({
+            ...eventOptions,
+            fromBlock: 'latest'
+          }).on('data', event => {
+            eventsCache.current[cacheKey].events = [
+              ...eventsCache.current[cacheKey].events,
+              event
+            ]
+            eventsCache.current[cacheKey].subscriptions.forEach(subscription =>
+              subscription(eventsCache.current[cacheKey].events)
+            )
+          })
+        }
+        eventsCache.current[cacheKey].subscriptions.push(setEvents)
         return () => {
-          listener.unsubscribe()
-          mounted = false
+          const index = eventsCache.current[cacheKey].subscriptions.indexOf(
+            setEvents
+          )
+          eventsCache.current[cacheKey].subscriptions = [
+            ...eventsCache.current[cacheKey].subscriptions.slice(0, index),
+            ...eventsCache.current[cacheKey].subscriptions.slice(index + 1)
+          ]
         }
       }, [contractName, eventName, eventOptions])
       return events
