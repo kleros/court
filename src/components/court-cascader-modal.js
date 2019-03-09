@@ -8,6 +8,7 @@ import { useDataloader } from '../bootstrap/dataloader'
 import { useDrizzle } from '../temp/drizzle-react-hooks'
 
 const StyledModal = styled(Modal)`
+  position: relative;
   width: 90% !important;
 
   .ant-modal {
@@ -21,18 +22,26 @@ const StyledModal = styled(Modal)`
 
     &-body {
       background: whitesmoke;
-      height: 320px;
+      height: 286px;
       overflow-x: scroll;
       position: relative;
     }
 
     &-footer {
-      height: 250px;
+      height: 284px;
       overflow-y: scroll;
-      padding: 18px 42px 28px;
+      padding: 52px 42px 28px;
       text-align: left;
     }
   }
+`
+const StyledButton = styled(Button)`
+  border-radius: 0;
+  left: 0;
+  position: absolute;
+  top: 340px;
+  width: 100%;
+  z-index: 1;
 `
 const StyledDiv = styled.div`
   font-size: 18px;
@@ -57,7 +66,7 @@ const StyledCascader = styled(Cascader)`
     top: 0 !important;
 
     .ant-cascader-menu {
-      height: 320px;
+      height: 286px;
       padding-top: 28px;
       width: 135px;
 
@@ -150,33 +159,34 @@ const CourtCascaderModal = ({ onClick }) => {
     <StyledModal
       centered
       footer={
-        <Skeleton active loading={option.loading}>
-          <Row>
-            <Col md={12}>
-              <StyledDiv>Description</StyledDiv>
-              <ReactMarkdown source={option.description} />
-            </Col>
-            <Col md={12}>
-              <StyledDiv>Summary</StyledDiv>
-              <ReactMarkdown source={option.summary} />
-            </Col>
-          </Row>
-        </Skeleton>
-      }
-      onCancel={useCallback(() => onClick(), [onClick])}
-      title={
-        <StyledTitleDiv className="secondary-linear-background theme-linear-background">
-          Select Court{' '}
-          <Button
+        <>
+          <StyledButton
             onClick={useCallback(
               () => onClick(subcourtIDs[subcourtIDs.length - 1]),
               [onClick, subcourtIDs[subcourtIDs.length - 1]]
             )}
-            size="small"
             type="primary"
           >
             Stake
-          </Button>
+          </StyledButton>
+          <Skeleton active loading={option.loading}>
+            <Row>
+              <Col md={12}>
+                <StyledDiv>Description</StyledDiv>
+                <ReactMarkdown source={option.description} />
+              </Col>
+              <Col md={12}>
+                <StyledDiv>Summary</StyledDiv>
+                <ReactMarkdown source={option.summary} />
+              </Col>
+            </Row>
+          </Skeleton>
+        </>
+      }
+      onCancel={useCallback(() => onClick(), [onClick])}
+      title={
+        <StyledTitleDiv className="secondary-linear-background theme-linear-background">
+          Select Court
         </StyledTitleDiv>
       }
       visible
