@@ -163,7 +163,7 @@ const CaseDetailsCard = ({ ID }) => {
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
   }))
-  const load = useDataloader.load()
+  const loadPolicy = useDataloader.loadPolicy()
   const getMetaEvidence = useDataloader.getMetaEvidence()
   const getEvidence = useDataloader.getEvidence()
   const [activeSubcourtID, setActiveSubcourtID] = useState()
@@ -231,7 +231,7 @@ const CaseDetailsCard = ({ ID }) => {
         }
         const policy = call('PolicyRegistry', 'policies', subcourt.ID)
         if (policy !== undefined) {
-          const policyJSON = load(policy)
+          const policyJSON = loadPolicy(policy)
           if (policyJSON) subcourt.name = policyJSON.name
         }
         const _subcourt = call('KlerosLiquid', 'courts', subcourt.ID)

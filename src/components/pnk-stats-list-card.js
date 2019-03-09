@@ -23,7 +23,7 @@ const PNKStatsListCard = () => {
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
   }))
-  const load = useDataloader.load()
+  const loadPolicy = useDataloader.loadPolicy()
   const subcourtIDs = useCacheCall(
     'KlerosLiquid',
     'getJuror',
@@ -43,7 +43,7 @@ const PNKStatsListCard = () => {
         )
         const policy = call('PolicyRegistry', 'policies', ID)
         if (policy !== undefined) {
-          const policyJSON = load(policy)
+          const policyJSON = loadPolicy(policy)
           if (policyJSON) subcourt.name = policyJSON.name
         }
         return subcourt
