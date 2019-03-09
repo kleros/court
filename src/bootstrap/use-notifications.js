@@ -20,7 +20,7 @@ const handlers = {
       }
       return (await klerosLiquid.getPastEvents('Draw', {
         filter: { _disputeID: event.returnValues._disputeID },
-        fromBlock: 0
+        fromBlock: process.env.REACT_APP_DRAW_EVENT_LISTENER_BLOCK_NUMBER
       })).map(d => ({
         ...notification,
         account: d.returnValues._address,
