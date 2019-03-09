@@ -176,7 +176,7 @@ const CaseDetailsCard = ({ ID }) => {
     useMemo(
       () => ({
         filter: { _address: drizzleState.account, _disputeID: ID },
-        fromBlock: 0
+        fromBlock: process.env.REACT_APP_DRAW_EVENT_LISTENER_BLOCK_NUMBER
       }),
       [drizzleState.account, ID]
     )
