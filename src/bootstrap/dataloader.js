@@ -6,7 +6,6 @@ const funcs = {
   getEvidence: (contractAddress, arbitratorAddress, disputeID, options) =>
     archon.arbitrable
       .getDispute(contractAddress, arbitratorAddress, disputeID, {
-        strictHashes: true,
         ...options
       })
       .then(d =>
@@ -15,16 +14,18 @@ const funcs = {
           arbitratorAddress,
           d.evidenceGroupID,
           {
-            strictHashes: true,
             ...options
           }
         )
       )
-      .catch(() => null),
+      .then(evidence =>
+        evidence.filter(
+          e => e.evidenceJSONValid && (!e.evidenceJSON.fileURI || e.fileValid)
+        )
+      ),
   getMetaEvidence: (contractAddress, arbitratorAddress, disputeID, options) =>
     archon.arbitrable
       .getDispute(contractAddress, arbitratorAddress, disputeID, {
-        strictHashes: true,
         ...options
       })
       .then(d =>
@@ -33,7 +34,13 @@ const funcs = {
           ...options
         })
       )
-      .catch(() => null),
+      .catch(() => ({
+        metaEvidenceJSON: {
+          description:
+            'The data for this case is not formatted correctly or has been tampered since the time of its submission. Please refuse to arbitrate this case.',
+          title: 'Invalid or tampered case data, refuse to arbitrate.'
+        }
+      })),
   load: (URI, options) =>
     archon.utils
       .validateFileFromURI(URI, {

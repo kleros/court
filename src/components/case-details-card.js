@@ -324,20 +324,21 @@ const CaseDetailsCard = ({ ID }) => {
                     />
                   )}
                   <StyledButtonsDiv>
-                    {metaEvidence.metaEvidenceJSON.rulingOptions.titles.map(
-                      (t, i) => (
-                        <StyledButton
-                          disabled={!votesData.canVote}
-                          id={i + 1}
-                          key={t}
-                          onClick={onVoteClick}
-                          size="large"
-                          type="primary"
-                        >
-                          {t}
-                        </StyledButton>
-                      )
-                    )}
+                    {metaEvidence.metaEvidenceJSON.rulingOptions &&
+                      metaEvidence.metaEvidenceJSON.rulingOptions.titles.map(
+                        (t, i) => (
+                          <StyledButton
+                            disabled={!votesData.canVote}
+                            id={i + 1}
+                            key={t}
+                            onClick={onVoteClick}
+                            size="large"
+                            type="primary"
+                          >
+                            {t}
+                          </StyledButton>
+                        )
+                      )}
                   </StyledButtonsDiv>
                 </StyledDiv>
                 <StyledDiv className="secondary-background theme-background">
