@@ -5,6 +5,7 @@ import ETHAmount from './eth-amount'
 import PropTypes from 'prop-types'
 import { fluidRange } from 'polished'
 import styled from 'styled-components/macro'
+import { useDataloader } from '../bootstrap/dataloader'
 
 const StyledModal = styled(Modal)`
   max-width: 90%;
@@ -82,6 +83,13 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
   }))
+  const load = useDataloader.load()
+  let name
+  const policy = useCacheCall('PolicyRegistry', 'policies', ID)
+  if (policy !== undefined) {
+    const policyJSON = load(policy)
+    if (policyJSON) name = policyJSON.name
+  }
   const _balance = useCacheCall(
     'MiniMeTokenERC20',
     'balanceOf',
@@ -140,7 +148,7 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
           }),
         [form.validateFieldsAndScroll, ID, stake]
       )}
-      title="Stake PNK in the Court"
+      title={`Stake PNK in ${name || '-'}`}
       visible
       width="480px"
     >
