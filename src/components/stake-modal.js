@@ -211,7 +211,12 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
       <Form>
         <Skeleton active loading={loading}>
           {!loading && (
-            <Form.Item colon={false} hasFeedback label="PNK">
+            <Form.Item
+              colon={false}
+              extra="Enter a negative value to unstake."
+              hasFeedback
+              label="PNK"
+            >
               {form.getFieldDecorator('PNK', {
                 initialValue: drizzle.web3.utils.fromWei(String(max)),
                 rules: [
