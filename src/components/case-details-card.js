@@ -185,14 +185,20 @@ const CaseDetailsCard = ({ ID }) => {
     let votesData = { loading: true }
     const currentRuling = call('KlerosLiquid', 'currentRuling', ID)
     if (draws) {
-      const vote = call(
-        'KlerosLiquid',
-        'getVote',
-        ID,
-        draws[draws.length - 1].returnValues._appeal,
-        draws[draws.length - 1].returnValues._voteID
-      )
-      if (dispute && dispute2 && vote)
+      const drawnInCurrentRound =
+        draws.length > 0 &&
+        Number(draws[draws.length - 1].returnValues._appeal) ===
+          dispute2.votesLengths.length - 1
+      const vote =
+        drawnInCurrentRound &&
+        call(
+          'KlerosLiquid',
+          'getVote',
+          ID,
+          draws[draws.length - 1].returnValues._appeal,
+          draws[draws.length - 1].returnValues._voteID
+        )
+      if (dispute && dispute2 && (!drawnInCurrentRound || vote))
         votesData = draws.reduce(
           (acc, d) => {
             if (
@@ -204,11 +210,9 @@ const CaseDetailsCard = ({ ID }) => {
           },
           {
             canVote:
-              !vote.voted &&
-              Number(draws[draws.length - 1].returnValues._appeal) ===
-                dispute2.votesLengths.length - 1 &&
-              dispute.period === '2',
+              dispute.period === '2' && drawnInCurrentRound && !vote.voted,
             currentRuling,
+            drawnInCurrentRound,
             loading: !currentRuling,
             voteIDs: [],
             voted: vote.voted && vote.choice
@@ -304,14 +308,24 @@ const CaseDetailsCard = ({ ID }) => {
             {!votesData.loading && metaEvidence ? (
               <>
                 <StyledDiv className="secondary-linear-background theme-linear-background">
-                  {votesData.canVote
-                    ? 'What is your verdict?'
-                    : votesData.voted
-                    ? `You chose: ${metaEvidence.metaEvidenceJSON.rulingOptions
-                        .titles[votesData.voted - 1] || 'Refuse to Arbitrate'}.`
-                    : dispute.period === '0'
-                    ? 'Waiting for evidence.'
-                    : 'You did not cast a vote.'}
+                  {votesData.drawnInCurrentRound
+                    ? votesData.canVote
+                      ? 'What is your verdict?'
+                      : votesData.voted
+                      ? `You chose: ${
+                          votesData.voted === '0'
+                            ? 'Refuse to Arbitrate'
+                            : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                                metaEvidence.metaEvidenceJSON.rulingOptions
+                                  .titles &&
+                                metaEvidence.metaEvidenceJSON.rulingOptions
+                                  .titles[votesData.voted - 1]) ||
+                              'Unknown Choice'
+                        }.`
+                      : dispute.period === '0'
+                      ? 'Waiting for evidence.'
+                      : 'You did not cast a vote.'
+                    : 'You were not drawn in the current round.'}
                   {dispute.period === '4' &&
                     ` The winning choice was "${metaEvidence.metaEvidenceJSON
                       .rulingOptions.titles[votesData.currentRuling - 1] ||
@@ -438,7 +452,8 @@ const CaseDetailsCard = ({ ID }) => {
                       title={
                         <>
                           <StyledIdenticon account={a} />
-                          {metaEvidence.metaEvidenceJSON.aliases[a] || (
+                          {(metaEvidence.metaEvidenceJSON.aliases &&
+                            metaEvidence.metaEvidenceJSON.aliases[a]) || (
                             <ETHAddress address={a} />
                           )}
                         </>

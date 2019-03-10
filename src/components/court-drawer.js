@@ -116,7 +116,7 @@ const CourtDrawer = ({ ID, onClose }) => {
     >
       <Skeleton active loading={loading}>
         {!loading && (
-          <Row>
+          <Row gutter={16}>
             <Col md={12}>
               <StyledDiv>Description</StyledDiv>
               <ReactMarkdown source={subcourts[activeIndex].description} />

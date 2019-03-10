@@ -170,7 +170,7 @@ const CourtCascaderModal = ({ onClick }) => {
             Stake
           </StyledButton>
           <Skeleton active loading={option.loading}>
-            <Row>
+            <Row gutter={16}>
               <Col md={12}>
                 <StyledDiv>Description</StyledDiv>
                 <ReactMarkdown source={option.description} />
