@@ -140,7 +140,13 @@ export default Form.create()(({ form }) => {
                     return callback()
                   const value = drizzle.web3.utils.toBN(
                     drizzle.web3.utils.toWei(
-                      typeof _value === 'string' ? _value : String(_value)
+                      typeof _value === 'number'
+                        ? _value.toLocaleString('fullwide', {
+                            useGrouping: false
+                          })
+                        : typeof _value === 'string'
+                        ? _value
+                        : String(_value)
                     )
                   )
                   callback(
@@ -167,7 +173,13 @@ export default Form.create()(({ form }) => {
                     return callback()
                   const value = drizzle.web3.utils.toBN(
                     drizzle.web3.utils.toWei(
-                      typeof _value === 'string' ? _value : String(_value)
+                      typeof _value === 'number'
+                        ? _value.toLocaleString('fullwide', {
+                            useGrouping: false
+                          })
+                        : typeof _value === 'string'
+                        ? _value
+                        : String(_value)
                     )
                   )
                   callback(
@@ -180,11 +192,13 @@ export default Form.create()(({ form }) => {
             ]
           })(
             <StyledInputNumber
-              parser={useCallback(
-                s => s.replace(/(?!^-|\.)\D|\.(?![^.]*$)/g, '').slice(0, 20),
-                []
-              )}
-              precision={18}
+              parser={useCallback(s => {
+                s = s.replace(/(?!^-|\.)\D|\.(?![^.]*$)/g, '')
+                const index = s.indexOf('.')
+                return index === -1
+                  ? s
+                  : `${s.slice(0, index)}${s.slice(index, index + 19)}`
+              }, [])}
             />
           )}
         </StyledFormItem>
