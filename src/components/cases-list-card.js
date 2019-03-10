@@ -87,10 +87,7 @@ const CasesListCard = () => {
                       d.returnValues._appeal,
                       d.returnValues._voteID
                     )
-                    if (vote)
-                      acc[vote.voted ? 'active' : 'votePending'].push(
-                        d.returnValues._disputeID
-                      )
+                    if (vote) acc[vote.voted ? 'active' : 'votePending']++
                     else acc.loading = true
                     const subcourt = call(
                       'KlerosLiquid',
