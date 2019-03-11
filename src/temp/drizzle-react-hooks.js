@@ -205,8 +205,13 @@ export const Initializer = ({
     drizzleStatusInitialized: drizzleState.drizzleStatus.initialized,
     web3Status: drizzleState.web3.status
   }))
+  const [timedOut, setTimedOut] = useState(false)
+  useEffect(() => {
+    const timeout = setTimeout(() => setTimedOut(true), 3000)
+    return () => clearTimeout(timeout)
+  }, [])
   if (drizzleState.drizzleStatusInitialized) return children
-  if (drizzleState.web3Status === 'initialized')
+  if (drizzleState.web3Status === 'initialized' && timedOut)
     return loadingContractsAndAccounts
   if (drizzleState.web3Status === 'failed') return error
   return loadingWeb3
