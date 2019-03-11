@@ -10,7 +10,13 @@ import { useDataloader } from '../bootstrap/dataloader'
 const loadingPieChartData = [{ tooltip: 'Loading...', value: 1 }]
 const emptyPieChartData = [{ tooltip: '0 PNK', value: 1 }]
 const StyledDiv = styled.div`
+  align-items: center;
   display: flex;
+  justify-content: center;
+
+  & > div {
+    flex: 1;
+  }
 `
 const StyledAmountSpan = styled.span`
   font-weight: bold;
