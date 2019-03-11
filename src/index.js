@@ -4,9 +4,12 @@ import React, { PureComponent } from 'react'
 import App from './bootstrap/app'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components/macro'
+import { version } from '../package.json'
 
 Sentry.init({
-  dsn: 'https://e8aad23ddbdd41b98dab47bb4c59422c@sentry.io/1412425'
+  dsn: 'https://e8aad23ddbdd41b98dab47bb4c59422c@sentry.io/1412425',
+  environment: process.env.REACT_APP_CONTEXT,
+  release: `court@${version}`
 })
 const StyledAlert = styled(Alert)`
   left: 50%;

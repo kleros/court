@@ -1,5 +1,6 @@
 [build.environment]
   YARN_FLAGS='--pure-lockfile'
+  REACT_APP_CONTEXT='staging'
   REACT_APP_KLEROS_LIQUID_KOVAN_ADDRESS='0x60b2abfdfad9c0873242f59f2a8c32a3cc682f80'
   REACT_APP_PINAKION_KOVAN_ADDRESS='0x1ee318dbc19267dbce08f54a66ab198f73ede356'
   REACT_APP_POLICY_REGISTRY_KOVAN_ADDRESS='0xfc53d1d6ddc2c6cdd403cb7dbf0f26140d82e12d'
@@ -13,6 +14,7 @@
   REACT_APP_PATCH_USER_SETTINGS_URL='https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/user-settings'
 
 [context.production.environment]
+  REACT_APP_CONTEXT='production'
   REACT_APP_PATCH_USER_SETTINGS_URL='https://hgyxlve79a.execute-api.us-east-2.amazonaws.com/production/user-settings'
 
 [[redirects]]
