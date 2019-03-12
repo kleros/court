@@ -40,7 +40,7 @@ const StyledPrefixDiv = styled.div`
   font-weight: bold;
   left: 53px;
   position: absolute;
-  top: 53px;
+  top: 51px;
   transform: translate(-50%, -50%);
 `
 const StyledTitleDiv = styled.div`

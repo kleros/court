@@ -64,7 +64,7 @@ const StyledDiv = styled.div`
 `
 const CourtDrawer = ({ ID, onClose }) => {
   const { useCacheCall } = useDrizzle()
-  const load = useDataloader.load()
+  const loadPolicy = useDataloader.loadPolicy()
   const [activeIndex, setActiveIndex] = useState()
   const subcourts = useCacheCall(['PolicyRegistry', 'KlerosLiquid'], call => {
     const subcourts = []
@@ -78,7 +78,7 @@ const CourtDrawer = ({ ID, onClose }) => {
       }
       const policy = call('PolicyRegistry', 'policies', subcourt.ID)
       if (policy !== undefined) {
-        const policyJSON = load(policy)
+        const policyJSON = loadPolicy(policy)
         if (policyJSON) {
           subcourt.description = policyJSON.description
           subcourt.name = policyJSON.name
@@ -116,7 +116,7 @@ const CourtDrawer = ({ ID, onClose }) => {
     >
       <Skeleton active loading={loading}>
         {!loading && (
-          <Row>
+          <Row gutter={16}>
             <Col md={12}>
               <StyledDiv>Description</StyledDiv>
               <ReactMarkdown source={subcourts[activeIndex].description} />

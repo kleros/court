@@ -163,7 +163,7 @@ const CaseDetailsCard = ({ ID }) => {
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
   }))
-  const load = useDataloader.load()
+  const loadPolicy = useDataloader.loadPolicy()
   const getMetaEvidence = useDataloader.getMetaEvidence()
   const getEvidence = useDataloader.getEvidence()
   const [activeSubcourtID, setActiveSubcourtID] = useState()
@@ -184,15 +184,21 @@ const CaseDetailsCard = ({ ID }) => {
   const votesData = useCacheCall(['KlerosLiquid'], call => {
     let votesData = { loading: true }
     const currentRuling = call('KlerosLiquid', 'currentRuling', ID)
-    if (draws) {
-      const vote = call(
-        'KlerosLiquid',
-        'getVote',
-        ID,
-        draws[draws.length - 1].returnValues._appeal,
-        draws[draws.length - 1].returnValues._voteID
-      )
-      if (dispute && dispute2 && vote)
+    if (dispute2 && draws) {
+      const drawnInCurrentRound =
+        draws.length > 0 &&
+        Number(draws[draws.length - 1].returnValues._appeal) ===
+          dispute2.votesLengths.length - 1
+      const vote =
+        drawnInCurrentRound &&
+        call(
+          'KlerosLiquid',
+          'getVote',
+          ID,
+          draws[draws.length - 1].returnValues._appeal,
+          draws[draws.length - 1].returnValues._voteID
+        )
+      if (dispute && (!drawnInCurrentRound || vote))
         votesData = draws.reduce(
           (acc, d) => {
             if (
@@ -204,11 +210,9 @@ const CaseDetailsCard = ({ ID }) => {
           },
           {
             canVote:
-              !vote.voted &&
-              Number(draws[draws.length - 1].returnValues._appeal) ===
-                dispute2.votesLengths.length - 1 &&
-              dispute.period === '2',
+              dispute.period === '2' && drawnInCurrentRound && !vote.voted,
             currentRuling,
+            drawnInCurrentRound,
             loading: !currentRuling,
             voteIDs: [],
             voted: vote.voted && vote.choice
@@ -231,7 +235,7 @@ const CaseDetailsCard = ({ ID }) => {
         }
         const policy = call('PolicyRegistry', 'policies', subcourt.ID)
         if (policy !== undefined) {
-          const policyJSON = load(policy)
+          const policyJSON = loadPolicy(policy)
           if (policyJSON) subcourt.name = policyJSON.name
         }
         const _subcourt = call('KlerosLiquid', 'courts', subcourt.ID)
@@ -304,14 +308,24 @@ const CaseDetailsCard = ({ ID }) => {
             {!votesData.loading && metaEvidence ? (
               <>
                 <StyledDiv className="secondary-linear-background theme-linear-background">
-                  {votesData.canVote
-                    ? 'What is your verdict?'
-                    : votesData.voted
-                    ? `You chose: ${metaEvidence.metaEvidenceJSON.rulingOptions
-                        .titles[votesData.voted - 1] || 'Refuse to Arbitrate'}.`
-                    : dispute.period === '0'
-                    ? 'Waiting for evidence.'
-                    : 'You did not cast a vote.'}
+                  {votesData.drawnInCurrentRound
+                    ? votesData.canVote
+                      ? 'What is your verdict?'
+                      : votesData.voted
+                      ? `You chose: ${
+                          votesData.voted === '0'
+                            ? 'Refuse to Arbitrate'
+                            : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                                metaEvidence.metaEvidenceJSON.rulingOptions
+                                  .titles &&
+                                metaEvidence.metaEvidenceJSON.rulingOptions
+                                  .titles[votesData.voted - 1]) ||
+                              'Unknown Choice'
+                        }.`
+                      : dispute.period === '0'
+                      ? 'Waiting for evidence.'
+                      : 'You did not cast a vote.'
+                    : 'You were not drawn in the current round.'}
                   {dispute.period === '4' &&
                     ` The winning choice was "${metaEvidence.metaEvidenceJSON
                       .rulingOptions.titles[votesData.currentRuling - 1] ||
@@ -324,20 +338,21 @@ const CaseDetailsCard = ({ ID }) => {
                     />
                   )}
                   <StyledButtonsDiv>
-                    {metaEvidence.metaEvidenceJSON.rulingOptions.titles.map(
-                      (t, i) => (
-                        <StyledButton
-                          disabled={!votesData.canVote}
-                          id={i + 1}
-                          key={t}
-                          onClick={onVoteClick}
-                          size="large"
-                          type="primary"
-                        >
-                          {t}
-                        </StyledButton>
-                      )
-                    )}
+                    {metaEvidence.metaEvidenceJSON.rulingOptions &&
+                      metaEvidence.metaEvidenceJSON.rulingOptions.titles.map(
+                        (t, i) => (
+                          <StyledButton
+                            disabled={!votesData.canVote}
+                            id={i + 1}
+                            key={t}
+                            onClick={onVoteClick}
+                            size="large"
+                            type="primary"
+                          >
+                            {t}
+                          </StyledButton>
+                        )
+                      )}
                   </StyledButtonsDiv>
                 </StyledDiv>
                 <StyledDiv className="secondary-background theme-background">
@@ -437,7 +452,8 @@ const CaseDetailsCard = ({ ID }) => {
                       title={
                         <>
                           <StyledIdenticon account={a} />
-                          {metaEvidence.metaEvidenceJSON.aliases[a] || (
+                          {(metaEvidence.metaEvidenceJSON.aliases &&
+                            metaEvidence.metaEvidenceJSON.aliases[a]) || (
                             <ETHAddress address={a} />
                           )}
                         </>

@@ -33,14 +33,18 @@ const StyledCardGrid = styled(Card.Grid)`
 
   &:first-child {
     border-right: 1px solid silver;
-    padding: 8.5px;
+    padding: 3px 0 0;
   }
+`
+const StyledHexagon = styled(Hexagon)`
+  height: 81px;
+  width: 71px;
 `
 const StyledDiv = styled.div`
   color: white;
   left: 50%;
   position: absolute;
-  top: 45%;
+  top: 50%;
   transform: translate(-50%, -50%);
 `
 const StyledAmountDiv = styled.div`
@@ -51,11 +55,11 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
   }))
-  const load = useDataloader.load()
+  const loadPolicy = useDataloader.loadPolicy()
   let name
   const policy = useCacheCall('PolicyRegistry', 'policies', ID)
   if (policy !== undefined) {
-    const policyJSON = load(policy)
+    const policyJSON = loadPolicy(policy)
     if (policyJSON) name = policyJSON.name
   }
   const stake = useCacheCall(
@@ -106,7 +110,7 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
       title={name}
     >
       <StyledCardGrid>
-        <Hexagon className="ternary-fill" />
+        <StyledHexagon className="ternary-fill" />
         <StyledDiv>
           <StyledAmountDiv>
             <ETHAmount amount={stake} />

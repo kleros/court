@@ -55,51 +55,65 @@ const CasesListCard = () => {
   )
   const disputes = useCacheCall(['KlerosLiquid'], call =>
     draws
-      ? draws.reduce(
+      ? Object.values(
+          draws.reduce((acc, d) => {
+            acc[d.returnValues._disputeID] = d
+            return acc
+          }, {})
+        ).reduce(
           (acc, d) => {
-            if (!acc.IDs[d.returnValues._disputeID]) {
-              acc.IDs[d.returnValues._disputeID] = true
-              acc.total++
-              const dispute = call(
-                'KlerosLiquid',
-                'disputes',
-                d.returnValues._disputeID
-              )
-              if (dispute) {
-                acc[dispute.period === '4' ? 'executed' : 'active']++
-                if (dispute.period === '1' || dispute.period === '2') {
-                  const dispute2 = call(
-                    'KlerosLiquid',
-                    'getDispute',
-                    d.returnValues._disputeID
-                  )
-                  if (dispute2) {
-                    if (
-                      Number(d.returnValues._appeal) ===
-                      dispute2.votesLengths.length - 1
-                    ) {
-                      const subcourt = call(
-                        'KlerosLiquid',
-                        'getSubcourt',
-                        dispute.subcourtID
-                      )
-                      if (subcourt) {
-                        const deadline = new Date(
-                          (Number(dispute.lastPeriodChange) +
-                            Number(subcourt.timesPerPeriod[dispute.period])) *
-                            1000
+            acc.total++
+            const dispute = call(
+              'KlerosLiquid',
+              'disputes',
+              d.returnValues._disputeID
+            )
+            if (dispute)
+              if (dispute.period === '1' || dispute.period === '2') {
+                const dispute2 = call(
+                  'KlerosLiquid',
+                  'getDispute',
+                  d.returnValues._disputeID
+                )
+                if (dispute2)
+                  if (
+                    Number(d.returnValues._appeal) ===
+                    dispute2.votesLengths.length - 1
+                  ) {
+                    const vote = call(
+                      'KlerosLiquid',
+                      'getVote',
+                      d.returnValues._disputeID,
+                      d.returnValues._appeal,
+                      d.returnValues._voteID
+                    )
+                    if (vote)
+                      if (vote.voted) acc.active++
+                      else {
+                        acc.votePending++
+                        const subcourt = call(
+                          'KlerosLiquid',
+                          'getSubcourt',
+                          dispute.subcourtID
                         )
-                        if (!acc.deadline || deadline < acc.deadline)
-                          acc.deadline = deadline
-                      } else acc.loading = true
-                    }
-                  } else acc.loading = true
-                }
-              } else acc.loading = true
-            }
+                        if (subcourt) {
+                          const deadline = new Date(
+                            (Number(dispute.lastPeriodChange) +
+                              Number(subcourt.timesPerPeriod[dispute.period])) *
+                              1000
+                          )
+                          if (!acc.deadline || deadline < acc.deadline)
+                            acc.deadline = deadline
+                        } else acc.loading = true
+                      }
+                    else acc.loading = true
+                  } else acc.active++
+                else acc.loading = true
+              } else acc[dispute.period === '4' ? 'executed' : 'active']++
+            else acc.loading = true
             return acc
           },
-          { IDs: {}, active: 0, executed: 0, loading: false, total: 0 }
+          { active: 0, executed: 0, loading: false, total: 0, votePending: 0 }
         )
       : { loading: true }
   )
@@ -109,10 +123,11 @@ const CasesListCard = () => {
       prefix={disputes.total}
       title="Cases"
     >
-      <StyledListItem extra={String(disputes.active)}>Active</StyledListItem>
-      <StyledListItem extra={String(disputes.executed)}>
-        Executed
+      <StyledListItem extra={String(disputes.votePending)}>
+        Vote Pending
       </StyledListItem>
+      <StyledListItem extra={String(disputes.active)}>Active</StyledListItem>
+      <StyledListItem extra={String(disputes.executed)}>Closed</StyledListItem>
       {disputes.deadline && (
         <StyledDiv className="primary-color theme-color">
           <StyledDeadlineDiv>Next voting deadline</StyledDeadlineDiv>

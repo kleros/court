@@ -86,7 +86,7 @@ const StyledBreadcrumbs = styled(Breadcrumbs)`
 `
 const CourtCascaderModal = ({ onClick }) => {
   const { useCacheCall } = useDrizzle()
-  const load = useDataloader.load()
+  const loadPolicy = useDataloader.loadPolicy()
   const [subcourtIDs, setSubcourtIDs] = useState(['0'])
   const options = useCacheCall(['PolicyRegistry', 'KlerosLiquid'], call => {
     const options = [
@@ -103,7 +103,7 @@ const CourtCascaderModal = ({ onClick }) => {
     for (let i = 0; i < subcourtIDs.length; i++) {
       const policy = call('PolicyRegistry', 'policies', subcourtIDs[i])
       if (policy !== undefined) {
-        const policyJSON = load(policy)
+        const policyJSON = loadPolicy(policy)
         if (policyJSON) {
           option.description = policyJSON.description
           option.label = policyJSON.name
@@ -123,7 +123,7 @@ const CourtCascaderModal = ({ onClick }) => {
           }
           const policy = call('PolicyRegistry', 'policies', c)
           if (policy !== undefined) {
-            const policyJSON = load(policy)
+            const policyJSON = loadPolicy(policy)
             if (policyJSON) {
               child.description = policyJSON.description
               child.label = policyJSON.name
@@ -170,7 +170,7 @@ const CourtCascaderModal = ({ onClick }) => {
             Stake
           </StyledButton>
           <Skeleton active loading={option.loading}>
-            <Row>
+            <Row gutter={16}>
               <Col md={12}>
                 <StyledDiv>Description</StyledDiv>
                 <ReactMarkdown source={option.description} />

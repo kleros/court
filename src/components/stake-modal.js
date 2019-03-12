@@ -83,11 +83,11 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
   }))
-  const load = useDataloader.load()
+  const loadPolicy = useDataloader.loadPolicy()
   let name
   const policy = useCacheCall('PolicyRegistry', 'policies', ID)
   if (policy !== undefined) {
-    const policyJSON = load(policy)
+    const policyJSON = loadPolicy(policy)
     if (policyJSON) name = policyJSON.name
   }
   const _balance = useCacheCall(
@@ -241,7 +241,13 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                         return callback()
                       const value = drizzle.web3.utils.toBN(
                         drizzle.web3.utils.toWei(
-                          typeof _value === 'string' ? _value : String(_value)
+                          typeof _value === 'number'
+                            ? _value.toLocaleString('fullwide', {
+                                useGrouping: false
+                              })
+                            : typeof _value === 'string'
+                            ? _value
+                            : String(_value)
                         )
                       )
                       callback(value.gte(min) ? undefined : true)
@@ -266,7 +272,13 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                         return callback()
                       const value = drizzle.web3.utils.toBN(
                         drizzle.web3.utils.toWei(
-                          typeof _value === 'string' ? _value : String(_value)
+                          typeof _value === 'number'
+                            ? _value.toLocaleString('fullwide', {
+                                useGrouping: false
+                              })
+                            : typeof _value === 'string'
+                            ? _value
+                            : String(_value)
                         )
                       )
                       callback(value.lte(max) ? undefined : true)
@@ -275,12 +287,13 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                 ]
               })(
                 <StyledInputNumber
-                  parser={useCallback(
-                    s =>
-                      s.replace(/(?!^-|\.)\D|\.(?![^.]*$)/g, '').slice(0, 20),
-                    []
-                  )}
-                  precision={18}
+                  parser={useCallback(s => {
+                    s = s.replace(/(?!^-|\.)\D|\.(?![^.]*$)/g, '')
+                    const index = s.indexOf('.')
+                    return index === -1
+                      ? s
+                      : `${s.slice(0, index)}${s.slice(index, index + 19)}`
+                  }, [])}
                 />
               )}
             </Form.Item>

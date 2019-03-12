@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import { fluidRange } from 'polished'
 import styled from 'styled-components/macro'
 
-let cachedShow = true
 const StyledCard = styled(Card)`
   z-index: 1;
 
@@ -70,14 +69,12 @@ const StyledTextCardGrid = styled(StyledCardGrid)`
   }
 `
 const WelcomeCard = ({ icon, text, version }) => {
-  const [show, setShow] = useState(cachedShow)
+  const [show, setShow] = useState(!localStorage.getItem('shownWelcome'))
   useEffect(() => {
     if (show) {
+      localStorage.setItem('shownWelcome', true)
       const timeout = setTimeout(() => setShow(false), 5000)
-      return () => {
-        clearTimeout(timeout)
-        cachedShow = false
-      }
+      return () => clearTimeout(timeout)
     }
   }, [])
   return (

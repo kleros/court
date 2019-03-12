@@ -52,6 +52,7 @@
   "dependencies": {
     "@kleros/archon": "^0.6.0",
     "@loadable/component": "^5.5.0",
+    "@sentry/browser": "^4.6.4",
     "antd": "^3.10.8",
     "dataloader": "^1.4.0",
     "debounce": "^1.2.0",

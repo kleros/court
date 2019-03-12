@@ -134,7 +134,7 @@ const PNKBalanceCard = () => {
           <StyledBottomDiv>
             Locked{' '}
             <Hint
-              description="This PNK is locked in active disputes for potential redistribution."
+              description="These PNK are locked in active disputes for potential redistribution."
               title={
                 <>
                   <ETHAmount

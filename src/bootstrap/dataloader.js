@@ -6,7 +6,6 @@ const funcs = {
   getEvidence: (contractAddress, arbitratorAddress, disputeID, options) =>
     archon.arbitrable
       .getDispute(contractAddress, arbitratorAddress, disputeID, {
-        strictHashes: true,
         ...options
       })
       .then(d =>
@@ -15,16 +14,18 @@ const funcs = {
           arbitratorAddress,
           d.evidenceGroupID,
           {
-            strictHashes: true,
             ...options
           }
         )
       )
-      .catch(() => null),
+      .then(evidence =>
+        evidence.filter(
+          e => e.evidenceJSONValid && (!e.evidenceJSON.fileURI || e.fileValid)
+        )
+      ),
   getMetaEvidence: (contractAddress, arbitratorAddress, disputeID, options) =>
     archon.arbitrable
       .getDispute(contractAddress, arbitratorAddress, disputeID, {
-        strictHashes: true,
         ...options
       })
       .then(d =>
@@ -33,15 +34,26 @@ const funcs = {
           ...options
         })
       )
-      .catch(() => null),
-  load: (URI, options) =>
+      .catch(() => ({
+        metaEvidenceJSON: {
+          description:
+            'The data for this case is not formatted correctly or has been tampered since the time of its submission. Please refuse to arbitrate this case.',
+          title: 'Invalid or tampered case data, refuse to arbitrate.'
+        }
+      })),
+  loadPolicy: (URI, options) =>
     archon.utils
       .validateFileFromURI(URI, {
         strictHashes: true,
         ...options
       })
       .then(res => res.file)
-      .catch(() => null)
+      .catch(() => ({
+        description: 'Please contact the governance team.',
+        name: 'Invalid Court Data',
+        summary:
+          'The data for this court is not formatted correctly or has been tampered since the time of its submission.'
+      }))
 }
 export const dataloaders = Object.keys(funcs).reduce((acc, f) => {
   acc[f] = new Dataloader(
