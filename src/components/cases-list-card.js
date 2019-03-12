@@ -87,22 +87,26 @@ const CasesListCard = () => {
                       d.returnValues._appeal,
                       d.returnValues._voteID
                     )
-                    if (vote) acc[vote.voted ? 'active' : 'votePending']++
+                    if (vote)
+                      if (vote.voted) acc.active++
+                      else {
+                        acc.votePending++
+                        const subcourt = call(
+                          'KlerosLiquid',
+                          'getSubcourt',
+                          dispute.subcourtID
+                        )
+                        if (subcourt) {
+                          const deadline = new Date(
+                            (Number(dispute.lastPeriodChange) +
+                              Number(subcourt.timesPerPeriod[dispute.period])) *
+                              1000
+                          )
+                          if (!acc.deadline || deadline < acc.deadline)
+                            acc.deadline = deadline
+                        } else acc.loading = true
+                      }
                     else acc.loading = true
-                    const subcourt = call(
-                      'KlerosLiquid',
-                      'getSubcourt',
-                      dispute.subcourtID
-                    )
-                    if (subcourt) {
-                      const deadline = new Date(
-                        (Number(dispute.lastPeriodChange) +
-                          Number(subcourt.timesPerPeriod[dispute.period])) *
-                          1000
-                      )
-                      if (!acc.deadline || deadline < acc.deadline)
-                        acc.deadline = deadline
-                    } else acc.loading = true
                   } else acc.active++
                 else acc.loading = true
               } else acc[dispute.period === '4' ? 'executed' : 'active']++
