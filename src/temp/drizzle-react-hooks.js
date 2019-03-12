@@ -207,7 +207,7 @@ export const Initializer = ({
   }))
   const [timedOut, setTimedOut] = useState(false)
   useEffect(() => {
-    const timeout = setTimeout(() => setTimedOut(true), 3000)
+    const timeout = setTimeout(() => setTimedOut(true), 5000)
     return () => clearTimeout(timeout)
   }, [])
   if (drizzleState.drizzleStatusInitialized) return children
