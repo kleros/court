@@ -184,7 +184,7 @@ const CaseDetailsCard = ({ ID }) => {
   const votesData = useCacheCall(['KlerosLiquid'], call => {
     let votesData = { loading: true }
     const currentRuling = call('KlerosLiquid', 'currentRuling', ID)
-    if (draws) {
+    if (dispute2 && draws) {
       const drawnInCurrentRound =
         draws.length > 0 &&
         Number(draws[draws.length - 1].returnValues._appeal) ===
@@ -198,7 +198,7 @@ const CaseDetailsCard = ({ ID }) => {
           draws[draws.length - 1].returnValues._appeal,
           draws[draws.length - 1].returnValues._voteID
         )
-      if (dispute && dispute2 && (!drawnInCurrentRound || vote))
+      if (dispute && (!drawnInCurrentRound || vote))
         votesData = draws.reduce(
           (acc, d) => {
             if (
