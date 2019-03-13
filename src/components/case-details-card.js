@@ -327,9 +327,17 @@ const CaseDetailsCard = ({ ID }) => {
                       : 'You did not cast a vote.'
                     : 'You were not drawn in the current round.'}
                   {dispute.period === '4' &&
-                    ` The winning choice was "${metaEvidence.metaEvidenceJSON
-                      .rulingOptions.titles[votesData.currentRuling - 1] ||
-                      'Refuse to Arbitrate'}".`}
+                    ` The winning choice was "${
+                      votesData.currentRuling === '0'
+                        ? 'Refuse to Arbitrate'
+                        : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                            metaEvidence.metaEvidenceJSON.rulingOptions
+                              .titles &&
+                            metaEvidence.metaEvidenceJSON.rulingOptions.titles[
+                              votesData.currentRuling - 1
+                            ]) ||
+                          'Unknown Choice'
+                    }".`}
                   {votesData.canVote && (
                     <StyledInputTextArea
                       onChange={onJustificationChange}
@@ -339,6 +347,7 @@ const CaseDetailsCard = ({ ID }) => {
                   )}
                   <StyledButtonsDiv>
                     {metaEvidence.metaEvidenceJSON.rulingOptions &&
+                      metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
                       metaEvidence.metaEvidenceJSON.rulingOptions.titles.map(
                         (t, i) => (
                           <StyledButton
