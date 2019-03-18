@@ -75,7 +75,11 @@ const PNKBalanceCard = () => {
     account: drizzleState.accounts[0],
     balance: drizzleState.accountBalances[drizzleState.accounts[0]]
   }))
-  const juror = useCacheCall('KlerosLiquid', 'jurors', drizzleState.account)
+  const juror = useCacheCall(
+    'KlerosLiquidExtraViews',
+    'getJuror',
+    drizzleState.account
+  )
   return (
     <StyledCard hoverable>
       <Row>

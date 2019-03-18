@@ -96,10 +96,14 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
     drizzleState.account
   )
   const balance = _balance && drizzle.web3.utils.toBN(_balance)
-  const juror = useCacheCall('KlerosLiquid', 'jurors', drizzleState.account)
+  const juror = useCacheCall(
+    'KlerosLiquidExtraViews',
+    'getJuror',
+    drizzleState.account
+  )
   const stakedTokens = juror && drizzle.web3.utils.toBN(juror.stakedTokens)
   const _stake = useCacheCall(
-    'KlerosLiquid',
+    'KlerosLiquidExtraViews',
     'stakeOf',
     drizzleState.account,
     ID
