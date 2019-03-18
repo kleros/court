@@ -6,6 +6,7 @@ import styled from 'styled-components/macro'
 const StyledDiv = styled.div`
   height: ${props => (props.large ? 38 : 20)}px;
   overflow-x: auto;
+  overflow-y: hidden;
   position: relative;
   width: 100%;
 `
