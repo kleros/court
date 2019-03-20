@@ -11,6 +11,7 @@ import PropTypes from 'prop-types'
 import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
+import web3Salt from '../temp/web3-salt'
 
 const StyledCard = styled(Card)`
   cursor: initial;
@@ -184,7 +185,7 @@ const CaseDetailsCard = ({ ID }) => {
   const votesData = useCacheCall(['KlerosLiquid'], call => {
     let votesData = { loading: true }
     const currentRuling = call('KlerosLiquid', 'currentRuling', ID)
-    if (dispute2 && draws) {
+    if (dispute && dispute2 && draws) {
       const drawnInCurrentRound =
         draws.length > 0 &&
         Number(draws[draws.length - 1].returnValues._appeal) ===
@@ -198,7 +199,14 @@ const CaseDetailsCard = ({ ID }) => {
           draws[draws.length - 1].returnValues._appeal,
           draws[draws.length - 1].returnValues._voteID
         )
-      if (dispute && (!drawnInCurrentRound || vote))
+      const subcourt =
+        drawnInCurrentRound &&
+        call('KlerosLiquid', 'courts', dispute.subcourtID)
+      if (!drawnInCurrentRound || (vote && subcourt)) {
+        const committed =
+          drawnInCurrentRound &&
+          vote.commit !==
+            '0x0000000000000000000000000000000000000000000000000000000000000000'
         votesData = draws.reduce(
           (acc, d) => {
             if (
@@ -210,7 +218,12 @@ const CaseDetailsCard = ({ ID }) => {
           },
           {
             canVote:
-              dispute.period === '2' && drawnInCurrentRound && !vote.voted,
+              drawnInCurrentRound &&
+              ((dispute.period === '1' && !committed) ||
+                (dispute.period === '2' &&
+                  (!subcourt.hiddenVotes || committed) &&
+                  !vote.voted)),
+            committed,
             currentRuling,
             drawnInCurrentRound,
             loading: !currentRuling,
@@ -218,6 +231,7 @@ const CaseDetailsCard = ({ ID }) => {
             voted: vote.voted && vote.choice
           }
         )
+      }
     }
     return votesData
   })
@@ -231,6 +245,7 @@ const CaseDetailsCard = ({ ID }) => {
       ) {
         const subcourt = {
           ID: nextID,
+          hiddenVotes: undefined,
           name: undefined
         }
         const policy = call('PolicyRegistry', 'policies', subcourt.ID)
@@ -239,7 +254,10 @@ const CaseDetailsCard = ({ ID }) => {
           if (policyJSON) subcourt.name = policyJSON.name
         }
         const _subcourt = call('KlerosLiquid', 'courts', subcourt.ID)
-        if (_subcourt) nextID = _subcourt.parent
+        if (_subcourt) {
+          nextID = _subcourt.parent
+          subcourt.hiddenVotes = _subcourt.hiddenVotes
+        }
         if (subcourt.name === undefined || !_subcourt) return undefined
         subcourts.push(subcourt)
       }
@@ -267,14 +285,60 @@ const CaseDetailsCard = ({ ID }) => {
         return acc
       }, {})
   }
-  const { send, status } = useCacheSend('KlerosLiquid', 'castVote')
+  const { send: sendCommit, status: sendCommitStatus } = useCacheSend(
+    'KlerosLiquid',
+    'castCommit'
+  )
+  const { send: sendVote, status: sendVoteStatus } = useCacheSend(
+    'KlerosLiquid',
+    'castVote'
+  )
   const onJustificationChange = useCallback(
     ({ currentTarget: { value } }) => setJustification(value),
     []
   )
   const onVoteClick = useCallback(
-    ({ currentTarget: { id } }) => send(ID, votesData.voteIDs, id, 0),
-    [ID, votesData.voteIDs]
+    async ({ currentTarget: { id } }) => {
+      if (dispute.period === '1')
+        sendCommit(
+          ID,
+          votesData.voteIDs,
+          drizzle.web3.utils.soliditySha3(
+            id,
+            await web3Salt(
+              drizzle.web3,
+              drizzleState.account,
+              'Kleros Court Commit',
+              ID,
+              dispute2.votesLengths.length - 1
+            )
+          )
+        )
+      else
+        sendVote(
+          ID,
+          votesData.voteIDs,
+          id,
+          subcourts[subcourts.length - 1].hiddenVotes
+            ? await web3Salt(
+                drizzle.web3,
+                drizzleState.account,
+                'Kleros Court Commit',
+                ID,
+                dispute2.votesLengths.length - 1
+              )
+            : 0
+        )
+    },
+    [
+      dispute && dispute.period,
+      ID,
+      votesData.voteIDs,
+      drizzle.web3,
+      drizzleState.account,
+      dispute2 && dispute2.votesLengths.length,
+      subcourts && subcourts[subcourts.length - 1].hiddenVotes
+    ]
   )
   const metaEvidenceActions = useMemo(() => {
     if (metaEvidence) {
@@ -302,10 +366,14 @@ const CaseDetailsCard = ({ ID }) => {
         () => [
           <Spin
             spinning={
-              votesData.loading || !metaEvidence || status === 'pending'
+              votesData.loading ||
+              !subcourts ||
+              !metaEvidence ||
+              sendCommitStatus === 'pending' ||
+              sendVoteStatus === 'pending'
             }
           >
-            {!votesData.loading && metaEvidence ? (
+            {!votesData.loading && subcourts && metaEvidence ? (
               <>
                 <StyledDiv className="secondary-linear-background theme-linear-background">
                   {votesData.drawnInCurrentRound
@@ -324,6 +392,12 @@ const CaseDetailsCard = ({ ID }) => {
                         }.`
                       : dispute.period === '0'
                       ? 'Waiting for evidence.'
+                      : dispute.period === '1'
+                      ? 'Waiting to reveal your vote.'
+                      : subcourts[subcourts.length - 1].hiddenVotes
+                      ? votesData.committed
+                        ? 'You did not reveal your vote.'
+                        : 'You did not commit a vote.'
                       : 'You did not cast a vote.'
                     : 'You were not drawn in the current round.'}
                   {dispute.period === '4' &&
@@ -383,8 +457,12 @@ const CaseDetailsCard = ({ ID }) => {
         ],
         [
           votesData.canVote,
+          votesData.committed,
+          votesData.currentRuling,
+          votesData.drawnInCurrentRound,
           votesData.loading,
           votesData.voted,
+          subcourts && subcourts[subcourts.length - 1].hiddenVotes,
           metaEvidence,
           justification
         ]
