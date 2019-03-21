@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/browser'
 import { Alert, Button } from 'antd'
 import React, { PureComponent } from 'react'
+import { ReactComponent as Acropolis } from './assets/images/acropolis.svg'
 import App from './bootstrap/app'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components/macro'
@@ -11,6 +12,14 @@ Sentry.init({
   environment: process.env.REACT_APP_CONTEXT,
   release: `court@${version}`
 })
+const StyledDiv = styled.div`
+  height: 100vh;
+  width: 100vw;
+`
+const StyledAcropolis = styled(Acropolis)`
+  height: auto;
+  width: 100%;
+`
 const StyledAlert = styled(Alert)`
   left: 50%;
   position: fixed;
@@ -38,16 +47,19 @@ class SentryApp extends PureComponent {
   render() {
     const { error } = this.state
     return error ? (
-      <StyledAlert
-        banner
-        description={
-          <StyledButton onClick={onReportFeedbackClick} type="primary">
-            Report Feedback
-          </StyledButton>
-        }
-        message="An unexpected error occurred."
-        type="error"
-      />
+      <StyledDiv className="quaternary-background theme-background">
+        <StyledAcropolis />
+        <StyledAlert
+          banner
+          description={
+            <StyledButton onClick={onReportFeedbackClick} type="primary">
+              Report Feedback
+            </StyledButton>
+          }
+          message="An unexpected error occurred in Athens."
+          type="error"
+        />
+      </StyledDiv>
     ) : (
       <App />
     )
