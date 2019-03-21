@@ -11,6 +11,7 @@ import PropTypes from 'prop-types'
 import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
+import web3DeriveAccount from '../temp/web3-derive-account'
 import web3Salt from '../temp/web3-salt'
 
 const StyledCard = styled(Card)`
@@ -314,7 +315,7 @@ const CaseDetailsCard = ({ ID }) => {
             )
           )
         )
-      else
+      else {
         sendVote(
           ID,
           votesData.voteIDs,
@@ -329,6 +330,62 @@ const CaseDetailsCard = ({ ID }) => {
               )
             : 0
         )
+        const derivedAccount = await web3DeriveAccount(
+          drizzle.web3,
+          drizzleState.account,
+          'Kleros Court Secret'
+        )
+        const votes = {
+          IDs: votesData.voteIDs,
+          appeal: dispute2.votesLengths.length - 1,
+          disputeID: ID,
+          justification
+        }
+        if (
+          (await (await fetch(process.env.REACT_APP_PUT_JUSTIFICATIONS_URL, {
+            body: JSON.stringify({
+              payload: {
+                address: drizzleState.account,
+                signature: derivedAccount.sign(JSON.stringify(votes)).signature,
+                votes
+              }
+            }),
+            headers: { 'Content-Type': 'application/json' },
+            method: 'PUT'
+          })).json()).error
+        ) {
+          const settings = {
+            derivedAccountAddressForJustifications: {
+              S: derivedAccount.address
+            }
+          }
+          await (await fetch(process.env.REACT_APP_PATCH_USER_SETTINGS_URL, {
+            body: JSON.stringify({
+              payload: {
+                address: drizzleState.account,
+                settings,
+                signature: await drizzle.web3.eth.personal.sign(
+                  JSON.stringify(settings),
+                  drizzleState.account
+                )
+              }
+            }),
+            headers: { 'Content-Type': 'application/json' },
+            method: 'PATCH'
+          })).json()
+          await (await fetch(process.env.REACT_APP_PUT_JUSTIFICATIONS_URL, {
+            body: JSON.stringify({
+              payload: {
+                address: drizzleState.account,
+                signature: derivedAccount.sign(JSON.stringify(votes)).signature,
+                votes
+              }
+            }),
+            headers: { 'Content-Type': 'application/json' },
+            method: 'PUT'
+          })).json()
+        }
+      }
     },
     [
       dispute && dispute.period,
@@ -337,7 +394,8 @@ const CaseDetailsCard = ({ ID }) => {
       drizzle.web3,
       drizzleState.account,
       dispute2 && dispute2.votesLengths.length,
-      subcourts && subcourts[subcourts.length - 1].hiddenVotes
+      subcourts && subcourts[subcourts.length - 1].hiddenVotes,
+      justification
     ]
   )
   const metaEvidenceActions = useMemo(() => {
@@ -412,7 +470,7 @@ const CaseDetailsCard = ({ ID }) => {
                             ]) ||
                           'Unknown Choice'
                     }".`}
-                  {votesData.canVote && (
+                  {votesData.canVote && dispute.period === '2' && (
                     <StyledInputTextArea
                       onChange={onJustificationChange}
                       placeholder="Justify your vote here..."

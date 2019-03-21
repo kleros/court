@@ -16,10 +16,12 @@
   REACT_APP_WEB3_FALLBACK_URL='wss://mainnet.infura.io/ws'
   REACT_APP_DRAW_EVENT_LISTENER_BLOCK_NUMBER='7303699'
   REACT_APP_PATCH_USER_SETTINGS_URL='https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/user-settings'
+  REACT_APP_PUT_JUSTIFICATIONS_URL='https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/justifications'
 
 [context.production.environment]
   REACT_APP_CONTEXT='production'
   REACT_APP_PATCH_USER_SETTINGS_URL='https://hgyxlve79a.execute-api.us-east-2.amazonaws.com/production/user-settings'
+  REACT_APP_PUT_JUSTIFICATIONS_URL='https://hgyxlve79a.execute-api.us-east-2.amazonaws.com/production/justifications'
 
 [[redirects]]
   from = "/*"
