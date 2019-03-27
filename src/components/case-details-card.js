@@ -331,10 +331,10 @@ const CaseDetailsCard = ({ ID }) => {
             : 0
         )
         API.putJustifications(drizzle.web3, drizzleState.account, {
-          IDs: votesData.voteIDs,
           appeal: dispute2.votesLengths.length - 1,
           disputeID: ID,
-          justification
+          justification,
+          voteIDs: votesData.voteIDs
         })
       }
     },
