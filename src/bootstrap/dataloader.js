@@ -37,7 +37,7 @@ const funcs = {
       .catch(() => ({
         metaEvidenceJSON: {
           description:
-            'The data for this case is not formatted correctly or has been tampered since the time of its submission. Please refuse to arbitrate this case.',
+            'The data for this case is not formatted correctly or has been tampered since the time of its submission. Please refresh the page and refuse to arbitrate if the problem persists.',
           title: 'Invalid or tampered case data, refuse to arbitrate.'
         }
       })),
