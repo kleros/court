@@ -1,13 +1,14 @@
-import { Button, Card, Col, Input, Row, Skeleton, Spin } from 'antd'
+import { Button, Card, Col, Divider, Input, Row, Skeleton, Spin } from 'antd'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import { API } from '../bootstrap/api'
-import Attachment from '../components/attachment'
-import Breadcrumbs from '../components/breadcrumbs'
-import CourtDrawer from '../components/court-drawer'
+import Attachment from './attachment'
+import Breadcrumbs from './breadcrumbs'
+import CaseRoundHistory from './case-round-history'
+import CourtDrawer from './court-drawer'
 import { ReactComponent as Document } from '../assets/images/document.svg'
-import ETHAddress from '../components/eth-address'
-import Identicon from '../components/identicon'
+import ETHAddress from './eth-address'
+import Identicon from './identicon'
 import PropTypes from 'prop-types'
 import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components/macro'
@@ -560,6 +561,19 @@ const CaseDetailsCard = ({ ID }) => {
               </Row>
             )}
           </Skeleton>
+          <Divider>History</Divider>
+          {dispute2 &&
+            dispute2.votesLengths.map((_, i) => (
+              <CaseRoundHistory
+                ID={ID}
+                disabled={
+                  dispute.period !== '4' &&
+                  i === dispute2.votesLengths.length - 1
+                }
+                key={i}
+                round={i}
+              />
+            ))}
         </>
       )}
       {activeSubcourtID !== undefined && (

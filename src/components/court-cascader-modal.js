@@ -1,6 +1,6 @@
 import { Button, Cascader, Col, Modal, Row, Skeleton } from 'antd'
 import React, { useCallback, useState } from 'react'
-import Breadcrumbs from '../components/breadcrumbs'
+import Breadcrumbs from './breadcrumbs'
 import PropTypes from 'prop-types'
 import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components/macro'
