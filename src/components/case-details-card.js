@@ -509,9 +509,10 @@ const CaseDetailsCard = ({ ID }) => {
                 {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL && (
                   <StyledIFrame
                     frameBorder="0"
-                    src={`${
-                      metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL
-                    }?${encodeURIComponent(
+                    src={`${metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL.replace(
+                      /^\/ipfs\//,
+                      'https://ipfs.kleros.io/ipfs/'
+                    )}?${encodeURIComponent(
                       JSON.stringify({
                         arbitrableContractAddress: dispute.arbitrated,
                         arbitratorContractAddress:
