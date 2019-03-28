@@ -16,6 +16,11 @@ const funcs = [
   },
   {
     URL: process.env.REACT_APP_JUSTIFICATIONS_URL,
+    method: 'GET',
+    name: 'getJustifications'
+  },
+  {
+    URL: process.env.REACT_APP_JUSTIFICATIONS_URL,
     method: 'PUT',
     name: 'putJustifications',
     payload: 'justification'
@@ -32,11 +37,14 @@ export const API = funcs.reduce((acc, f) => {
     const func = () =>
       fetch(f.URL, {
         body: JSON.stringify({
-          payload: {
-            address: account,
-            signature: derivedAccount.sign(JSON.stringify(payload)).signature,
-            [f.payload]: payload
-          }
+          payload: f.payload
+            ? {
+                address: account,
+                signature: derivedAccount.sign(JSON.stringify(payload))
+                  .signature,
+                [f.payload]: payload
+              }
+            : payload
         }),
         headers: { 'Content-Type': 'application/json' },
         method: f.method === 'GET' ? 'POST' : f.method

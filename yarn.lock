@@ -1068,10 +1068,10 @@
     multihashes "^0.4.14"
     web3 "1.0.0-beta.36"
 
-"@kleros/kathari@^0.21.0":
-  version "0.21.0"
-  resolved "https://registry.yarnpkg.com/@kleros/kathari/-/kathari-0.21.0.tgz#71841b3ebb965357e0dd4e617fccee111bfdadd6"
-  integrity sha512-jWzmpNQAa82r204qz+PP6RawMuvTUMGUTrXGKfe6dlQ+ZfwfdYYYoy4J8n6Z0nGhfzO5k5xOM76blPaEQoGgFA==
+"@kleros/kathari@^0.22.0":
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/@kleros/kathari/-/kathari-0.22.0.tgz#9027d550378f103f56f5f548693694f2f09df7c0"
+  integrity sha512-YJ1JpYrzKJvWgSGWyXxSwAqrzsV9Y5vBSOw+LrdoJYTE06kleJVZN1ILNBc3M1U4H4KRmNJBf6kXqW/a4WWiWA==
   dependencies:
     "@commitlint/cli" "^7.2.1"
     "@commitlint/config-conventional" "^7.1.2"
