@@ -506,10 +506,10 @@ const CaseDetailsCard = ({ ID }) => {
                 <ReactMarkdown
                   source={metaEvidence.metaEvidenceJSON.description}
                 />
-                {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL && (
+                {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
                   <StyledIFrame
                     frameBorder="0"
-                    src={`${metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL.replace(
+                    src={`${metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI.replace(
                       /^\/ipfs\//,
                       'https://ipfs.kleros.io/ipfs/'
                     )}?${encodeURIComponent(
@@ -520,7 +520,7 @@ const CaseDetailsCard = ({ ID }) => {
                         disputeID: ID
                       })
                     )}`}
-                    title="Metaevidence Display"
+                    title="MetaEvidence Display"
                   />
                 )}
               </StyledInnerCard>
