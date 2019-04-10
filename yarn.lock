@@ -1055,14 +1055,15 @@
     log-update "^2.3.0"
     strip-ansi "^3.0.1"
 
-"@kleros/archon@^0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@kleros/archon/-/archon-0.6.0.tgz#3fce182a72a0edf93662e0b92cf9332789b8e1de"
-  integrity sha512-vhrWMNkDbQ+90KmTjv/JdVJarJTXm6A13PB9ZwQghZee0d2iQZ0MdBLn3O0QRx/cYoFNYU5kahAeHdJBXTp3cw==
+"@kleros/archon@^0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@kleros/archon/-/archon-0.8.0.tgz#5a871ac8b6a72ee8eb7b5b16914fbf2d1b4af8cd"
+  integrity sha512-GOyd6+sW7WLsbOnaFGNf6XYjMdn4aIeGsRv+Fdkx727MPQTe0TsUWAhsdm6ntn2EUd6dDs5GlfsAgK66sRdB8w==
   dependencies:
     "@kleros/kleros-interaction" "^0.7.0"
     axios "^0.18.0"
     babel-runtime "^6.26.0"
+    iframe "^1.0.0"
     js-sha3 "^0.8.0"
     lodash "^4.17.4"
     multihashes "^0.4.14"
@@ -7168,6 +7169,11 @@ iferr@^0.1.5:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/iferr/-/iferr-0.1.5.tgz#c60eed69e6d8fdb6b3104a1fcbca1c192dc5b501"
   integrity sha1-xg7taebY/bazEEofy8ocGS3FtQE=
+
+iframe@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/iframe/-/iframe-1.0.0.tgz#58e74822b178a0579d09cd169640fb9537470ef5"
+  integrity sha1-WOdIIrF4oFedCc0WlkD7lTdHDvU=
 
 ignore-walk@^3.0.1:
   version "3.0.1"
