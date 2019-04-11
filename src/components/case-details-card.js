@@ -1,4 +1,14 @@
-import { Button, Card, Col, Divider, Input, Row, Skeleton, Spin } from 'antd'
+import {
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  Divider,
+  Input,
+  Row,
+  Skeleton,
+  Spin
+} from 'antd'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import { API } from '../bootstrap/api'
@@ -76,6 +86,10 @@ const StyledButtonsDiv = styled.div`
   flex-wrap: wrap;
   justify-content: space-around;
   width: 70%;
+
+  &:first-child {
+    margin-top: 20px;
+  }
 `
 const StyledButton = styled(Button)`
   flex: 0 0 35%;
@@ -171,6 +185,7 @@ const CaseDetailsCard = ({ ID }) => {
   const getEvidence = useDataloader.getEvidence()
   const [activeSubcourtID, setActiveSubcourtID] = useState()
   const [justification, setJustification] = useState()
+  const [complexRuling, setComplexRuling] = useState()
   const dispute = useCacheCall('KlerosLiquid', 'disputes', ID)
   const dispute2 = useCacheCall('KlerosLiquid', 'getDispute', ID)
   const draws = useCacheEvents(
@@ -429,24 +444,62 @@ const CaseDetailsCard = ({ ID }) => {
                       value={justification}
                     />
                   )}
-                  <StyledButtonsDiv>
-                    {metaEvidence.metaEvidenceJSON.rulingOptions &&
-                      metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
-                      metaEvidence.metaEvidenceJSON.rulingOptions.titles.map(
-                        (t, i) => (
+                  {metaEvidence.metaEvidenceJSON.rulingOptions && (
+                    <>
+                      {metaEvidence.metaEvidenceJSON.rulingOptions.type !==
+                        'single-select' && (
+                        <StyledButtonsDiv>
+                          {metaEvidence.metaEvidenceJSON.rulingOptions.type ===
+                          'multiple-select' ? (
+                            <Checkbox.Group
+                              disabled={!votesData.canVote}
+                              name="ruling"
+                              onChange={setComplexRuling}
+                              options={metaEvidence.metaEvidenceJSON.rulingOptions.titles.slice(
+                                0,
+                                255
+                              )}
+                              value={complexRuling}
+                            />
+                          ) : metaEvidence.metaEvidenceJSON.rulingOptions
+                              .type === 'datetime' ? (
+                            'date'
+                          ) : (
+                            'number'
+                          )}
+                        </StyledButtonsDiv>
+                      )}
+                      <StyledButtonsDiv>
+                        {metaEvidence.metaEvidenceJSON.rulingOptions.type ===
+                        'single-select' ? (
+                          metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
+                          metaEvidence.metaEvidenceJSON.rulingOptions.titles
+                            .slice(0, 2 ** 256 - 2)
+                            .map((t, i) => (
+                              <StyledButton
+                                disabled={!votesData.canVote}
+                                id={i + 1}
+                                key={t}
+                                onClick={onVoteClick}
+                                size="large"
+                                type="primary"
+                              >
+                                {t}
+                              </StyledButton>
+                            ))
+                        ) : (
                           <StyledButton
                             disabled={!votesData.canVote}
-                            id={i + 1}
-                            key={t}
                             onClick={onVoteClick}
                             size="large"
                             type="primary"
                           >
-                            {t}
+                            Submit
                           </StyledButton>
-                        )
-                      )}
-                  </StyledButtonsDiv>
+                        )}
+                      </StyledButtonsDiv>
+                    </>
+                  )}
                 </StyledDiv>
                 <StyledDiv className="secondary-background theme-background">
                   <Button
@@ -474,7 +527,8 @@ const CaseDetailsCard = ({ ID }) => {
           votesData.voted,
           subcourts && subcourts[subcourts.length - 1].hiddenVotes,
           metaEvidence,
-          justification
+          justification,
+          complexRuling
         ]
       )}
       extra={
