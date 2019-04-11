@@ -15,23 +15,26 @@ const CourtsListCard = () => {
     account: drizzleState.accounts[0]
   }))
   const loadPolicy = useDataloader.loadPolicy()
-  const subcourtIDs = useCacheCall(
-    'KlerosLiquid',
+  const juror = useCacheCall(
+    'KlerosLiquidExtraViews',
     'getJuror',
     drizzleState.account
   )
   const names = useCacheCall(
     ['PolicyRegistry'],
     call =>
-      subcourtIDs &&
-      subcourtIDs.map(ID => {
-        const policy = call('PolicyRegistry', 'policies', ID)
-        if (policy !== undefined) {
-          const policyJSON = loadPolicy(policy)
-          if (policyJSON) return policyJSON.name
-        }
-        return undefined
-      })
+      juror &&
+      juror.subcourtIDs
+        .filter(ID => ID !== '0')
+        .map(ID => String(ID - 1))
+        .map(ID => {
+          const policy = call('PolicyRegistry', 'policies', ID)
+          if (policy !== undefined) {
+            const policyJSON = loadPolicy(policy)
+            if (policyJSON) return policyJSON.name
+          }
+          return undefined
+        })
   )
   const loading = !names || names.some(n => n === undefined)
   return (

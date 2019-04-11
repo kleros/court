@@ -1,16 +1,29 @@
-import { Button, Card, Col, Input, Row, Skeleton, Spin } from 'antd'
+import {
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  Divider,
+  Input,
+  Row,
+  Skeleton,
+  Spin
+} from 'antd'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
-import Attachment from '../components/attachment'
-import Breadcrumbs from '../components/breadcrumbs'
-import CourtDrawer from '../components/court-drawer'
+import { API } from '../bootstrap/api'
+import Attachment from './attachment'
+import Breadcrumbs from './breadcrumbs'
+import CaseRoundHistory from './case-round-history'
+import CourtDrawer from './court-drawer'
 import { ReactComponent as Document } from '../assets/images/document.svg'
-import ETHAddress from '../components/eth-address'
-import Identicon from '../components/identicon'
+import ETHAddress from './eth-address'
+import Identicon from './identicon'
 import PropTypes from 'prop-types'
 import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
+import web3Salt from '../temp/web3-salt'
 
 const StyledCard = styled(Card)`
   cursor: initial;
@@ -73,6 +86,10 @@ const StyledButtonsDiv = styled.div`
   flex-wrap: wrap;
   justify-content: space-around;
   width: 70%;
+
+  &:first-child {
+    margin-top: 20px;
+  }
 `
 const StyledButton = styled(Button)`
   flex: 0 0 35%;
@@ -168,6 +185,7 @@ const CaseDetailsCard = ({ ID }) => {
   const getEvidence = useDataloader.getEvidence()
   const [activeSubcourtID, setActiveSubcourtID] = useState()
   const [justification, setJustification] = useState()
+  const [complexRuling, setComplexRuling] = useState()
   const dispute = useCacheCall('KlerosLiquid', 'disputes', ID)
   const dispute2 = useCacheCall('KlerosLiquid', 'getDispute', ID)
   const draws = useCacheEvents(
@@ -184,7 +202,7 @@ const CaseDetailsCard = ({ ID }) => {
   const votesData = useCacheCall(['KlerosLiquid'], call => {
     let votesData = { loading: true }
     const currentRuling = call('KlerosLiquid', 'currentRuling', ID)
-    if (dispute2 && draws) {
+    if (dispute && dispute2 && draws) {
       const drawnInCurrentRound =
         draws.length > 0 &&
         Number(draws[draws.length - 1].returnValues._appeal) ===
@@ -198,7 +216,14 @@ const CaseDetailsCard = ({ ID }) => {
           draws[draws.length - 1].returnValues._appeal,
           draws[draws.length - 1].returnValues._voteID
         )
-      if (dispute && (!drawnInCurrentRound || vote))
+      const subcourt =
+        drawnInCurrentRound &&
+        call('KlerosLiquid', 'courts', dispute.subcourtID)
+      if (!drawnInCurrentRound || (vote && subcourt)) {
+        const committed =
+          drawnInCurrentRound &&
+          vote.commit !==
+            '0x0000000000000000000000000000000000000000000000000000000000000000'
         votesData = draws.reduce(
           (acc, d) => {
             if (
@@ -210,7 +235,12 @@ const CaseDetailsCard = ({ ID }) => {
           },
           {
             canVote:
-              dispute.period === '2' && drawnInCurrentRound && !vote.voted,
+              drawnInCurrentRound &&
+              ((dispute.period === '1' && !committed) ||
+                (dispute.period === '2' &&
+                  (!subcourt.hiddenVotes || committed) &&
+                  !vote.voted)),
+            committed,
             currentRuling,
             drawnInCurrentRound,
             loading: !currentRuling,
@@ -218,6 +248,7 @@ const CaseDetailsCard = ({ ID }) => {
             voted: vote.voted && vote.choice
           }
         )
+      }
     }
     return votesData
   })
@@ -231,6 +262,7 @@ const CaseDetailsCard = ({ ID }) => {
       ) {
         const subcourt = {
           ID: nextID,
+          hiddenVotes: undefined,
           name: undefined
         }
         const policy = call('PolicyRegistry', 'policies', subcourt.ID)
@@ -239,7 +271,10 @@ const CaseDetailsCard = ({ ID }) => {
           if (policyJSON) subcourt.name = policyJSON.name
         }
         const _subcourt = call('KlerosLiquid', 'courts', subcourt.ID)
-        if (_subcourt) nextID = _subcourt.parent
+        if (_subcourt) {
+          nextID = _subcourt.parent
+          subcourt.hiddenVotes = _subcourt.hiddenVotes
+        }
         if (subcourt.name === undefined || !_subcourt) return undefined
         subcourts.push(subcourt)
       }
@@ -267,14 +302,68 @@ const CaseDetailsCard = ({ ID }) => {
         return acc
       }, {})
   }
-  const { send, status } = useCacheSend('KlerosLiquid', 'castVote')
+  const { send: sendCommit, status: sendCommitStatus } = useCacheSend(
+    'KlerosLiquid',
+    'castCommit'
+  )
+  const { send: sendVote, status: sendVoteStatus } = useCacheSend(
+    'KlerosLiquid',
+    'castVote'
+  )
   const onJustificationChange = useCallback(
     ({ currentTarget: { value } }) => setJustification(value),
     []
   )
   const onVoteClick = useCallback(
-    ({ currentTarget: { id } }) => send(ID, votesData.voteIDs, id, 0),
-    [ID, votesData.voteIDs]
+    async ({ currentTarget: { id } }) => {
+      if (dispute.period === '1')
+        sendCommit(
+          ID,
+          votesData.voteIDs,
+          drizzle.web3.utils.soliditySha3(
+            id,
+            await web3Salt(
+              drizzle.web3,
+              drizzleState.account,
+              'Kleros Court Commit',
+              ID,
+              dispute2.votesLengths.length - 1
+            )
+          )
+        )
+      else {
+        sendVote(
+          ID,
+          votesData.voteIDs,
+          id,
+          subcourts[subcourts.length - 1].hiddenVotes
+            ? await web3Salt(
+                drizzle.web3,
+                drizzleState.account,
+                'Kleros Court Commit',
+                ID,
+                dispute2.votesLengths.length - 1
+              )
+            : 0
+        )
+        API.putJustifications(drizzle.web3, drizzleState.account, {
+          appeal: dispute2.votesLengths.length - 1,
+          disputeID: ID,
+          justification,
+          voteIDs: votesData.voteIDs
+        })
+      }
+    },
+    [
+      dispute && dispute.period,
+      ID,
+      votesData.voteIDs,
+      drizzle.web3,
+      drizzleState.account,
+      dispute2 && dispute2.votesLengths.length,
+      subcourts && subcourts[subcourts.length - 1].hiddenVotes,
+      justification
+    ]
   )
   const metaEvidenceActions = useMemo(() => {
     if (metaEvidence) {
@@ -302,10 +391,14 @@ const CaseDetailsCard = ({ ID }) => {
         () => [
           <Spin
             spinning={
-              votesData.loading || !metaEvidence || status === 'pending'
+              votesData.loading ||
+              !subcourts ||
+              !metaEvidence ||
+              sendCommitStatus === 'pending' ||
+              sendVoteStatus === 'pending'
             }
           >
-            {!votesData.loading && metaEvidence ? (
+            {!votesData.loading && subcourts && metaEvidence ? (
               <>
                 <StyledDiv className="secondary-linear-background theme-linear-background">
                   {votesData.drawnInCurrentRound
@@ -324,6 +417,12 @@ const CaseDetailsCard = ({ ID }) => {
                         }.`
                       : dispute.period === '0'
                       ? 'Waiting for evidence.'
+                      : dispute.period === '1'
+                      ? 'Waiting to reveal your vote.'
+                      : subcourts[subcourts.length - 1].hiddenVotes
+                      ? votesData.committed
+                        ? 'You did not reveal your vote.'
+                        : 'You did not commit a vote.'
                       : 'You did not cast a vote.'
                     : 'You were not drawn in the current round.'}
                   {dispute.period === '4' &&
@@ -338,31 +437,69 @@ const CaseDetailsCard = ({ ID }) => {
                             ]) ||
                           'Unknown Choice'
                     }".`}
-                  {votesData.canVote && (
+                  {votesData.canVote && dispute.period === '2' && (
                     <StyledInputTextArea
                       onChange={onJustificationChange}
                       placeholder="Justify your vote here..."
                       value={justification}
                     />
                   )}
-                  <StyledButtonsDiv>
-                    {metaEvidence.metaEvidenceJSON.rulingOptions &&
-                      metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
-                      metaEvidence.metaEvidenceJSON.rulingOptions.titles.map(
-                        (t, i) => (
+                  {metaEvidence.metaEvidenceJSON.rulingOptions && (
+                    <>
+                      {metaEvidence.metaEvidenceJSON.rulingOptions.type !==
+                        'single-select' && (
+                        <StyledButtonsDiv>
+                          {metaEvidence.metaEvidenceJSON.rulingOptions.type ===
+                          'multiple-select' ? (
+                            <Checkbox.Group
+                              disabled={!votesData.canVote}
+                              name="ruling"
+                              onChange={setComplexRuling}
+                              options={metaEvidence.metaEvidenceJSON.rulingOptions.titles.slice(
+                                0,
+                                255
+                              )}
+                              value={complexRuling}
+                            />
+                          ) : metaEvidence.metaEvidenceJSON.rulingOptions
+                              .type === 'datetime' ? (
+                            'date'
+                          ) : (
+                            'number'
+                          )}
+                        </StyledButtonsDiv>
+                      )}
+                      <StyledButtonsDiv>
+                        {metaEvidence.metaEvidenceJSON.rulingOptions.type ===
+                        'single-select' ? (
+                          metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
+                          metaEvidence.metaEvidenceJSON.rulingOptions.titles
+                            .slice(0, 2 ** 256 - 2)
+                            .map((t, i) => (
+                              <StyledButton
+                                disabled={!votesData.canVote}
+                                id={i + 1}
+                                key={t}
+                                onClick={onVoteClick}
+                                size="large"
+                                type="primary"
+                              >
+                                {t}
+                              </StyledButton>
+                            ))
+                        ) : (
                           <StyledButton
                             disabled={!votesData.canVote}
-                            id={i + 1}
-                            key={t}
                             onClick={onVoteClick}
                             size="large"
                             type="primary"
                           >
-                            {t}
+                            Submit
                           </StyledButton>
-                        )
-                      )}
-                  </StyledButtonsDiv>
+                        )}
+                      </StyledButtonsDiv>
+                    </>
+                  )}
                 </StyledDiv>
                 <StyledDiv className="secondary-background theme-background">
                   <Button
@@ -383,10 +520,15 @@ const CaseDetailsCard = ({ ID }) => {
         ],
         [
           votesData.canVote,
+          votesData.committed,
+          votesData.currentRuling,
+          votesData.drawnInCurrentRound,
           votesData.loading,
           votesData.voted,
+          subcourts && subcourts[subcourts.length - 1].hiddenVotes,
           metaEvidence,
-          justification
+          justification,
+          complexRuling
         ]
       )}
       extra={
@@ -418,12 +560,13 @@ const CaseDetailsCard = ({ ID }) => {
                 <ReactMarkdown
                   source={metaEvidence.metaEvidenceJSON.description}
                 />
-                {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL && (
+                {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
                   <StyledIFrame
                     frameBorder="0"
-                    src={`${
-                      metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL
-                    }?${encodeURIComponent(
+                    src={`${metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI.replace(
+                      /^\/ipfs\//,
+                      'https://ipfs.kleros.io/ipfs/'
+                    )}?${encodeURIComponent(
                       JSON.stringify({
                         arbitrableContractAddress: dispute.arbitrated,
                         arbitratorContractAddress:
@@ -431,7 +574,7 @@ const CaseDetailsCard = ({ ID }) => {
                         disputeID: ID
                       })
                     )}`}
-                    title="Metaevidence Display"
+                    title="MetaEvidence Display"
                   />
                 )}
               </StyledInnerCard>
@@ -473,6 +616,19 @@ const CaseDetailsCard = ({ ID }) => {
               </Row>
             )}
           </Skeleton>
+          <Divider>History</Divider>
+          {dispute2 &&
+            dispute2.votesLengths.map((_, i) => (
+              <CaseRoundHistory
+                ID={ID}
+                disabled={
+                  dispute.period !== '4' &&
+                  i === dispute2.votesLengths.length - 1
+                }
+                key={i}
+                round={i}
+              />
+            ))}
         </>
       )}
       {activeSubcourtID !== undefined && (

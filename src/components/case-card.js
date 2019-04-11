@@ -1,11 +1,11 @@
 import { Button, Card } from 'antd'
 import React, { useMemo } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
-import ETHAmount from '../components/eth-amount'
+import ETHAmount from './eth-amount'
 import { ReactComponent as Gavel } from '../assets/images/gavel.svg'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import TimeAgo from '../components/time-ago'
+import TimeAgo from './time-ago'
 import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
 
