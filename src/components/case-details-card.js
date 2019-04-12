@@ -6,11 +6,16 @@ import {
   DatePicker,
   Divider,
   Input,
+  InputNumber,
   Row,
   Skeleton,
   Spin
 } from 'antd'
 import React, { useCallback, useMemo, useState } from 'react'
+import {
+  minNumber as _minNumber,
+  maxNumber
+} from '@realitio/realitio-lib/formatters/question'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import { API } from '../bootstrap/api'
 import Attachment from './attachment'
@@ -22,10 +27,17 @@ import ETHAddress from './eth-address'
 import Identicon from './identicon'
 import PropTypes from 'prop-types'
 import ReactMarkdown from 'react-markdown'
-import { maxNumber } from '@realitio/realitio-lib/formatters/question'
 import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
 import web3Salt from '../temp/web3-salt'
+
+const minNumber = _minNumber.bind({
+  maxNumber: (...args) => {
+    const result = maxNumber(...args)
+    result.neg = result.negated
+    return result
+  }
+})
 
 const StyledCard = styled(Card)`
   cursor: initial;
@@ -321,7 +333,7 @@ const CaseDetailsCard = ({ ID }) => {
       maxNumber({
         decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
         type: metaEvidence.metaEvidenceJSON.rulingOptions.type
-      }).lt(date.unix()),
+      }).lt(date.unix() + 1),
     [
       metaEvidence &&
         metaEvidence.metaEvidenceJSON.rulingOptions &&
@@ -489,7 +501,46 @@ const CaseDetailsCard = ({ ID }) => {
                               value={complexRuling}
                             />
                           ) : (
-                            'number'
+                            <InputNumber
+                              disabled={!votesData.canVote}
+                              max={Number(
+                                metaEvidence.metaEvidenceJSON.rulingOptions
+                                  .type === 'int'
+                                  ? maxNumber({
+                                      decimals:
+                                        metaEvidence.metaEvidenceJSON
+                                          .rulingOptions.precision,
+                                      type:
+                                        metaEvidence.metaEvidenceJSON
+                                          .rulingOptions.type
+                                    })
+                                  : maxNumber({
+                                      decimals:
+                                        metaEvidence.metaEvidenceJSON
+                                          .rulingOptions.precision,
+                                      type:
+                                        metaEvidence.metaEvidenceJSON
+                                          .rulingOptions.type
+                                    }).minus(1)
+                              )}
+                              min={Number(
+                                minNumber({
+                                  decimals:
+                                    metaEvidence.metaEvidenceJSON.rulingOptions
+                                      .precision,
+                                  type:
+                                    metaEvidence.metaEvidenceJSON.rulingOptions
+                                      .type
+                                })
+                              )}
+                              onChange={setComplexRuling}
+                              precision={
+                                metaEvidence.metaEvidenceJSON.rulingOptions
+                                  .precision
+                              }
+                              size="large"
+                              value={complexRuling}
+                            />
                           )}
                         </StyledButtonsDiv>
                       )}
