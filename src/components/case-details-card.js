@@ -3,6 +3,7 @@ import {
   Card,
   Checkbox,
   Col,
+  DatePicker,
   Divider,
   Input,
   Row,
@@ -21,6 +22,7 @@ import ETHAddress from './eth-address'
 import Identicon from './identicon'
 import PropTypes from 'prop-types'
 import ReactMarkdown from 'react-markdown'
+import { maxNumber } from '@realitio/realitio-lib/formatters/question'
 import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
 import web3Salt from '../temp/web3-salt'
@@ -314,6 +316,21 @@ const CaseDetailsCard = ({ ID }) => {
     ({ currentTarget: { value } }) => setJustification(value),
     []
   )
+  const disabledDate = useCallback(
+    date =>
+      maxNumber({
+        decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
+        type: metaEvidence.metaEvidenceJSON.rulingOptions.type
+      }).lt(date.unix()),
+    [
+      metaEvidence &&
+        metaEvidence.metaEvidenceJSON.rulingOptions &&
+        metaEvidence.metaEvidenceJSON.rulingOptions.precision,
+      metaEvidence &&
+        metaEvidence.metaEvidenceJSON.rulingOptions &&
+        metaEvidence.metaEvidenceJSON.rulingOptions.type
+    ]
+  )
   const onVoteClick = useCallback(
     async ({ currentTarget: { id } }) => {
       if (dispute.period === '1')
@@ -463,7 +480,14 @@ const CaseDetailsCard = ({ ID }) => {
                             />
                           ) : metaEvidence.metaEvidenceJSON.rulingOptions
                               .type === 'datetime' ? (
-                            'date'
+                            <DatePicker
+                              disabled={!votesData.canVote}
+                              disabledDate={disabledDate}
+                              onChange={setComplexRuling}
+                              showTime
+                              size="large"
+                              value={complexRuling}
+                            />
                           ) : (
                             'number'
                           )}
@@ -474,7 +498,7 @@ const CaseDetailsCard = ({ ID }) => {
                         'single-select' ? (
                           metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
                           metaEvidence.metaEvidenceJSON.rulingOptions.titles
-                            .slice(0, 2 ** 256 - 2)
+                            .slice(0, 2 ** 256 - 1)
                             .map((t, i) => (
                               <StyledButton
                                 disabled={!votesData.canVote}
@@ -528,6 +552,7 @@ const CaseDetailsCard = ({ ID }) => {
           subcourts && subcourts[subcourts.length - 1].hiddenVotes,
           metaEvidence,
           justification,
+          disabledDate,
           complexRuling
         ]
       )}
