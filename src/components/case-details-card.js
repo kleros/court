@@ -333,7 +333,7 @@ const CaseDetailsCard = ({ ID }) => {
       maxNumber({
         decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
         type: metaEvidence.metaEvidenceJSON.rulingOptions.type
-      }).lt(date.unix() + 1),
+      }).lte(date.unix() + 1),
     [
       metaEvidence &&
         metaEvidence.metaEvidenceJSON.rulingOptions &&
