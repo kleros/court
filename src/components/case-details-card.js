@@ -486,10 +486,25 @@ const CaseDetailsCard = ({ ID }) => {
                         votesData.voted === '0'
                           ? 'Refuse to Arbitrate'
                           : (metaEvidence.metaEvidenceJSON.rulingOptions &&
-                              metaEvidence.metaEvidenceJSON.rulingOptions
-                                .titles &&
-                              metaEvidence.metaEvidenceJSON.rulingOptions
-                                .titles[votesData.voted - 1]) ||
+                              realitioLibQuestionFormatter.getAnswerString(
+                                {
+                                  decimals:
+                                    metaEvidence.metaEvidenceJSON.rulingOptions
+                                      .precision,
+                                  outcomes:
+                                    metaEvidence.metaEvidenceJSON.rulingOptions
+                                      .titles,
+                                  type:
+                                    metaEvidence.metaEvidenceJSON.rulingOptions
+                                      .type
+                                },
+                                realitioLibQuestionFormatter.padToBytes32(
+                                  drizzle.web3.utils
+                                    .toBN(votesData.voted)
+                                    .sub(drizzle.web3.utils.toBN('1'))
+                                    .toString(16)
+                                )
+                              )) ||
                             'Unknown Choice'
                       }.`
                     : dispute.period === '0'
