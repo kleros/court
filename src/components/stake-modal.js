@@ -298,6 +298,7 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                       ? s
                       : `${s.slice(0, index)}${s.slice(index, index + 19)}`
                   }, [])}
+                  precision={0}
                 />
               )}
             </Form.Item>
