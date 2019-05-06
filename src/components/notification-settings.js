@@ -83,20 +83,26 @@ const NotificationSettings = Form.create()(
                   {Object.keys(settings).map(s => (
                     <Form.Item key={s}>
                       {form.getFieldDecorator(s, {
-                        initialValue:
-                          userSettings.payload.settings.Item[
-                            `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(
-                              1
-                            )}`}`
-                          ].BOOL,
+                        initialValue: userSettings.payload.settings.Item[
+                          `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(
+                            1
+                          )}`}`
+                        ]
+                          ? userSettings.payload.settings.Item[
+                              `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(
+                                1
+                              )}`}`
+                            ].BOOL
+                          : false,
                         valuePropName: 'checked'
                       })(<Checkbox>{settings[s]}</Checkbox>)}
                     </Form.Item>
                   ))}
                   <Form.Item hasFeedback>
                     {form.getFieldDecorator('fullName', {
-                      initialValue:
-                        userSettings.payload.settings.Item.fullName.S,
+                      initialValue: userSettings.payload.settings.Item.fullName
+                        ? userSettings.payload.settings.Item.fullName.S
+                        : '',
                       rules: [
                         { message: 'Please enter your name.', required: true }
                       ]
@@ -104,7 +110,9 @@ const NotificationSettings = Form.create()(
                   </Form.Item>
                   <Form.Item hasFeedback>
                     {form.getFieldDecorator('email', {
-                      initialValue: userSettings.payload.settings.Item.email.S,
+                      initialValue: userSettings.payload.settings.Item.email
+                        ? userSettings.payload.settings.Item.email.S
+                        : '',
                       rules: [
                         { message: 'Please enter your email.', required: true },
                         {
@@ -116,7 +124,9 @@ const NotificationSettings = Form.create()(
                   </Form.Item>
                   <Form.Item hasFeedback>
                     {form.getFieldDecorator('phone', {
-                      initialValue: userSettings.payload.settings.Item.phone.S,
+                      initialValue: userSettings.payload.settings.Item.phone
+                        ? userSettings.payload.settings.Item.phone.S
+                        : '',
                       rules: [
                         {
                           message: 'Please enter a valid phone number.',
