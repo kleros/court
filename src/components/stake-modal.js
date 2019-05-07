@@ -122,6 +122,7 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
       centered
       closable={false}
       confirmLoading={loading || status === 'pending'}
+      maskClosable={false}
       okButtonProps={useMemo(
         () => ({
           disabled: hasError,
