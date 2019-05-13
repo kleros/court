@@ -365,7 +365,7 @@ const CaseDetailsCard = ({ ID }) => {
             : []
           break
         case 'datetime':
-          choice = complexRuling.getTime() / 1000
+          choice = complexRuling.unix()
           break
         case 'uint':
           choice = complexRuling
