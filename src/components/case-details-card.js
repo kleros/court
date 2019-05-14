@@ -750,8 +750,16 @@ const CaseDetailsCard = ({ ID }) => {
               </Row>
             )}
           </Skeleton>
-          <Divider>History</Divider>
           {dispute2 &&
+            metaEvidence &&
+            metaEvidence.metaEvidenceJSON.rulingOptions &&
+            metaEvidence.metaEvidenceJSON.rulingOptions.type ===
+              'single-select' && <Divider>History</Divider>}
+          {dispute2 &&
+            metaEvidence &&
+            metaEvidence.metaEvidenceJSON.rulingOptions &&
+            metaEvidence.metaEvidenceJSON.rulingOptions.type ===
+              'single-select' &&
             dispute2.votesLengths.map((_, i) => (
               <CaseRoundHistory
                 ID={ID}
