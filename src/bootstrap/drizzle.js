@@ -1,7 +1,6 @@
 import { Drizzle, generateStore } from 'drizzle'
 import Kleros from '../assets/contracts/kleros.json'
 import KlerosLiquid from '../assets/contracts/kleros-liquid.json'
-import KlerosLiquidExtraViews from '../assets/contracts/kleros-liquid-extra-views.json'
 import Pinakion from '../assets/contracts/pinakion.json'
 import PolicyRegistry from '../assets/contracts/policy-registry.json'
 import UniswapExchange from '../assets/contracts/uniswap-exchange.json'
@@ -20,15 +19,6 @@ const options = {
       networks: {
         1: { address: process.env.REACT_APP_KLEROS_LIQUID_ADDRESS },
         42: { address: process.env.REACT_APP_KLEROS_LIQUID_KOVAN_ADDRESS }
-      }
-    },
-    {
-      ...KlerosLiquidExtraViews,
-      networks: {
-        1: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_ADDRESS },
-        42: {
-          address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_KOVAN_ADDRESS
-        }
       }
     },
     {

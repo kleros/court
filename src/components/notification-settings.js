@@ -1,19 +1,9 @@
-import {
-  Alert,
-  Button,
-  Checkbox,
-  Divider,
-  Form,
-  Input,
-  Popover,
-  Skeleton
-} from 'antd'
-import React, { useCallback } from 'react'
+import { Alert, Button, Checkbox, Divider, Form, Input, Popover } from 'antd'
+import React, { useCallback, useState } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import { ReactComponent as Mail } from '../assets/images/mail.svg'
 import PropTypes from 'prop-types'
 import styled from 'styled-components/macro'
-import { useAPI } from '../bootstrap/api'
 
 const StyledForm = styled(Form)`
   max-width: 250px;
@@ -24,26 +14,7 @@ const NotificationSettings = Form.create()(
     const drizzleState = useDrizzleState(drizzleState => ({
       account: drizzleState.accounts[0]
     }))
-    const userSettings = useAPI.getUserSettings(
-      drizzle.web3,
-      drizzleState.account,
-      {
-        email: true,
-        fullName: true,
-        phone: true,
-        ...Object.keys(settings).reduce((acc, v) => {
-          acc[
-            `${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`
-          ] = true
-          return acc
-        }, {})
-      }
-    )
-    const loading = userSettings === 'pending'
-    const { send, state } = useAPI.patchUserSettings(
-      drizzle.web3,
-      drizzleState.account
-    )
+    const [status, setStatus] = useState()
     return (
       <Popover
         arrowPointAtCenter
@@ -54,8 +25,9 @@ const NotificationSettings = Form.create()(
                 e.preventDefault()
                 form.validateFieldsAndScroll(async (err, values) => {
                   if (!err) {
+                    setStatus('loading')
                     const { email, fullName, phone, ...rest } = values
-                    send({
+                    const settings = {
                       email: { S: email },
                       fullName: { S: fullName },
                       phone: { S: phone || ' ' },
@@ -69,91 +41,85 @@ const NotificationSettings = Form.create()(
                         }
                         return acc
                       }, {})
-                    })
+                    }
+                    try {
+                      await (await fetch(
+                        process.env.REACT_APP_PATCH_USER_SETTINGS_URL,
+                        {
+                          body: JSON.stringify({
+                            payload: {
+                              address: drizzleState.account,
+                              settings,
+                              signature: await drizzle.web3.eth.personal.sign(
+                                JSON.stringify(settings),
+                                drizzleState.account
+                              )
+                            }
+                          }),
+                          headers: { 'Content-Type': 'application/json' },
+                          method: 'PATCH'
+                        }
+                      )).json()
+                      setStatus('success')
+                    } catch (err2) {
+                      console.error(err2)
+                      setStatus('error')
+                    }
                   }
                 })
               },
-              [form.validateFieldsAndScroll, drizzle.web3, drizzleState.account]
+              [form.validateFieldsAndScroll, drizzleState.account]
             )}
           >
             <Divider>I wish to be notified when:</Divider>
-            <Skeleton active loading={loading} title={false}>
-              {!loading && (
-                <>
-                  {Object.keys(settings).map(s => (
-                    <Form.Item key={s}>
-                      {form.getFieldDecorator(s, {
-                        initialValue: userSettings.payload.settings.Item[
-                          `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(
-                            1
-                          )}`}`
-                        ]
-                          ? userSettings.payload.settings.Item[
-                              `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(
-                                1
-                              )}`}`
-                            ].BOOL
-                          : false,
-                        valuePropName: 'checked'
-                      })(<Checkbox>{settings[s]}</Checkbox>)}
-                    </Form.Item>
-                  ))}
-                  <Form.Item hasFeedback>
-                    {form.getFieldDecorator('fullName', {
-                      initialValue: userSettings.payload.settings.Item.fullName
-                        ? userSettings.payload.settings.Item.fullName.S
-                        : '',
-                      rules: [
-                        { message: 'Please enter your name.', required: true }
-                      ]
-                    })(<Input placeholder="Name" />)}
-                  </Form.Item>
-                  <Form.Item hasFeedback>
-                    {form.getFieldDecorator('email', {
-                      initialValue: userSettings.payload.settings.Item.email
-                        ? userSettings.payload.settings.Item.email.S
-                        : '',
-                      rules: [
-                        { message: 'Please enter your email.', required: true },
-                        {
-                          message: 'Please enter a valid email.',
-                          type: 'email'
-                        }
-                      ]
-                    })(<Input placeholder="Email" />)}
-                  </Form.Item>
-                  <Form.Item hasFeedback>
-                    {form.getFieldDecorator('phone', {
-                      initialValue: userSettings.payload.settings.Item.phone
-                        ? userSettings.payload.settings.Item.phone.S
-                        : '',
-                      rules: [
-                        {
-                          message: 'Please enter a valid phone number.',
-                          pattern: /^\d+$/
-                        }
-                      ]
-                    })(<Input placeholder="Phone (Optional)" />)}
-                  </Form.Item>
-                  <Button
-                    disabled={Object.values(form.getFieldsError()).some(v => v)}
-                    htmlType="submit"
-                    loading={state === 'pending'}
-                    type="primary"
-                  >
-                    Save
-                  </Button>
-                </>
-              )}
-            </Skeleton>
+            {Object.keys(settings).map(s => (
+              <Form.Item key={s}>
+                {form.getFieldDecorator(s, {
+                  valuePropName: 'checked'
+                })(<Checkbox>{settings[s]}</Checkbox>)}
+              </Form.Item>
+            ))}
+            <Form.Item hasFeedback>
+              {form.getFieldDecorator('fullName', {
+                rules: [{ message: 'Please enter your name.', required: true }]
+              })(<Input placeholder="Name" />)}
+            </Form.Item>
+            <Form.Item hasFeedback>
+              {form.getFieldDecorator('email', {
+                rules: [
+                  { message: 'Please enter your email.', required: true },
+                  { message: 'Please enter a valid email.', type: 'email' }
+                ]
+              })(<Input placeholder="Email" />)}
+            </Form.Item>
+            <Form.Item hasFeedback>
+              {form.getFieldDecorator('phone', {
+                rules: [
+                  {
+                    message: 'Please enter a valid phone number.',
+                    pattern: /^\d+$/
+                  }
+                ]
+              })(<Input placeholder="Phone (Optional)" />)}
+            </Form.Item>
+            <Button
+              disabled={Object.values(form.getFieldsError()).some(v => v)}
+              htmlType="submit"
+              loading={status === 'loading'}
+              type="primary"
+            >
+              Save
+            </Button>
             <Divider />
-            {state && state !== 'pending' && (
+            {status && status !== 'loading' && (
               <Alert
                 closable
                 message={
-                  state.error ? 'Failed to save settings.' : 'Saved settings.'
+                  status === 'success'
+                    ? 'Saved settings.'
+                    : 'Failed to save settings.'
                 }
-                type={state.error ? 'error' : 'success'}
+                type={status}
               />
             )}
           </StyledForm>

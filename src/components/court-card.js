@@ -63,7 +63,7 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
     if (policyJSON) name = policyJSON.name
   }
   const stake = useCacheCall(
-    'KlerosLiquidExtraViews',
+    'KlerosLiquid',
     'stakeOf',
     drizzleState.account,
     ID

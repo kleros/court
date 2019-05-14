@@ -2,8 +2,8 @@ import { Card, Col, Row } from 'antd'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import ETHAddress from './eth-address'
 import ETHAmount from './eth-amount'
-import Hint from './hint'
-import Identicon from './identicon'
+import Hint from '../components/hint'
+import Identicon from '../components/identicon'
 import React from 'react'
 import { ReactComponent as SectionArrow } from '../assets/images/section-arrow.svg'
 import { ReactComponent as SectionArrowBackground } from '../assets/images/section-arrow-background.svg'
@@ -75,11 +75,7 @@ const PNKBalanceCard = () => {
     account: drizzleState.accounts[0],
     balance: drizzleState.accountBalances[drizzleState.accounts[0]]
   }))
-  const juror = useCacheCall(
-    'KlerosLiquidExtraViews',
-    'getJuror',
-    drizzleState.account
-  )
+  const juror = useCacheCall('KlerosLiquid', 'jurors', drizzleState.account)
   return (
     <StyledCard hoverable>
       <Row>

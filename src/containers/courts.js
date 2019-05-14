@@ -19,8 +19,8 @@ export default () => {
   }))
   const [activeID, setActiveID] = useState()
   const [stakingID, setStakingID] = useState()
-  const juror = useCacheCall(
-    'KlerosLiquidExtraViews',
+  const subcourtIDs = useCacheCall(
+    'KlerosLiquid',
     'getJuror',
     drizzleState.account
   )
@@ -40,24 +40,21 @@ export default () => {
         title="Courts"
       />
       My Courts
-      <Spin spinning={!juror}>
+      <Spin spinning={!subcourtIDs}>
         <Row gutter={40}>
-          {juror &&
-            (juror.subcourtIDs.filter(ID => ID !== '0').length === 0 ? (
+          {subcourtIDs &&
+            (subcourtIDs.length === 0 ? (
               <StyledCol>You don't have stake in any courts.</StyledCol>
             ) : (
-              juror.subcourtIDs
-                .filter(ID => ID !== '0')
-                .map(ID => String(ID - 1))
-                .map(ID => (
-                  <Col key={ID} md={12} xl={8}>
-                    <CourtCard
-                      ID={ID}
-                      onClick={setActiveID}
-                      onStakeClick={setStakingID}
-                    />
-                  </Col>
-                ))
+              subcourtIDs.map(ID => (
+                <Col key={ID} md={12} xl={8}>
+                  <CourtCard
+                    ID={ID}
+                    onClick={setActiveID}
+                    onStakeClick={setStakingID}
+                  />
+                </Col>
+              ))
             ))}
         </Row>
       </Spin>

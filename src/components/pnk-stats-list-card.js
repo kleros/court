@@ -30,33 +30,30 @@ const PNKStatsListCard = () => {
     account: drizzleState.accounts[0]
   }))
   const loadPolicy = useDataloader.loadPolicy()
-  const juror = useCacheCall(
-    'KlerosLiquidExtraViews',
+  const subcourtIDs = useCacheCall(
+    'KlerosLiquid',
     'getJuror',
     drizzleState.account
   )
   const subcourts = useCacheCall(
-    ['KlerosLiquidExtraViews', 'PolicyRegistry'],
+    ['KlerosLiquid', 'PolicyRegistry'],
     call =>
-      juror &&
-      juror.subcourtIDs
-        .filter(ID => ID !== '0')
-        .map(ID => String(ID - 1))
-        .map(ID => {
-          const subcourt = { name: undefined, stake: undefined }
-          subcourt.stake = call(
-            'KlerosLiquidExtraViews',
-            'stakeOf',
-            drizzleState.account,
-            ID
-          )
-          const policy = call('PolicyRegistry', 'policies', ID)
-          if (policy !== undefined) {
-            const policyJSON = loadPolicy(policy)
-            if (policyJSON) subcourt.name = policyJSON.name
-          }
-          return subcourt
-        })
+      subcourtIDs &&
+      subcourtIDs.map(ID => {
+        const subcourt = { name: undefined, stake: undefined }
+        subcourt.stake = call(
+          'KlerosLiquid',
+          'stakeOf',
+          drizzleState.account,
+          ID
+        )
+        const policy = call('PolicyRegistry', 'policies', ID)
+        if (policy !== undefined) {
+          const policyJSON = loadPolicy(policy)
+          if (policyJSON) subcourt.name = policyJSON.name
+        }
+        return subcourt
+      })
   )
   const loadingSubcourts = !subcourts || subcourts.some(s => !s.stake)
   const draws = useCacheEvents(
