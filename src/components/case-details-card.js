@@ -1,16 +1,42 @@
-import { Button, Card, Col, Input, Row, Skeleton, Spin } from 'antd'
+import * as realitioLibQuestionFormatter from '@realitio/realitio-lib/formatters/question'
+import {
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  DatePicker,
+  Divider,
+  Input,
+  InputNumber,
+  Row,
+  Skeleton,
+  Spin
+} from 'antd'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
-import Attachment from '../components/attachment'
-import Breadcrumbs from '../components/breadcrumbs'
-import CourtDrawer from '../components/court-drawer'
+import { API } from '../bootstrap/api'
+import Attachment from './attachment'
+import Breadcrumbs from './breadcrumbs'
+import CaseRoundHistory from './case-round-history'
+import CourtDrawer from './court-drawer'
 import { ReactComponent as Document } from '../assets/images/document.svg'
-import ETHAddress from '../components/eth-address'
-import Identicon from '../components/identicon'
+import ETHAddress from './eth-address'
+import Identicon from './identicon'
 import PropTypes from 'prop-types'
 import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
+import web3Salt from '../temp/web3-salt'
+
+realitioLibQuestionFormatter.minNumber = realitioLibQuestionFormatter.minNumber.bind(
+  {
+    maxNumber: (...args) => {
+      const result = realitioLibQuestionFormatter.maxNumber(...args)
+      result.neg = result.negated
+      return result
+    }
+  }
+)
 
 const StyledCard = styled(Card)`
   cursor: initial;
@@ -73,6 +99,14 @@ const StyledButtonsDiv = styled.div`
   flex-wrap: wrap;
   justify-content: space-around;
   width: 70%;
+
+  &:first-child {
+    margin-top: 20px;
+  }
+
+  .ant-checkbox-group-item.ant-checkbox-wrapper span {
+    color: white;
+  }
 `
 const StyledButton = styled(Button)`
   flex: 0 0 35%;
@@ -133,6 +167,7 @@ const StyledInnerCard = styled(Card)`
           top: 0;
         }
 
+        /* stylelint-disable-next-line no-descending-specificity */
         & > span {
           display: inline-block;
         }
@@ -168,6 +203,7 @@ const CaseDetailsCard = ({ ID }) => {
   const getEvidence = useDataloader.getEvidence()
   const [activeSubcourtID, setActiveSubcourtID] = useState()
   const [justification, setJustification] = useState()
+  const [complexRuling, setComplexRuling] = useState()
   const dispute = useCacheCall('KlerosLiquid', 'disputes', ID)
   const dispute2 = useCacheCall('KlerosLiquid', 'getDispute', ID)
   const draws = useCacheEvents(
@@ -184,7 +220,7 @@ const CaseDetailsCard = ({ ID }) => {
   const votesData = useCacheCall(['KlerosLiquid'], call => {
     let votesData = { loading: true }
     const currentRuling = call('KlerosLiquid', 'currentRuling', ID)
-    if (dispute2 && draws) {
+    if (dispute && dispute2 && draws) {
       const drawnInCurrentRound =
         draws.length > 0 &&
         Number(draws[draws.length - 1].returnValues._appeal) ===
@@ -198,7 +234,14 @@ const CaseDetailsCard = ({ ID }) => {
           draws[draws.length - 1].returnValues._appeal,
           draws[draws.length - 1].returnValues._voteID
         )
-      if (dispute && (!drawnInCurrentRound || vote))
+      const subcourt =
+        drawnInCurrentRound &&
+        call('KlerosLiquid', 'courts', dispute.subcourtID)
+      if (!drawnInCurrentRound || (vote && subcourt)) {
+        const committed =
+          drawnInCurrentRound &&
+          vote.commit !==
+            '0x0000000000000000000000000000000000000000000000000000000000000000'
         votesData = draws.reduce(
           (acc, d) => {
             if (
@@ -210,7 +253,12 @@ const CaseDetailsCard = ({ ID }) => {
           },
           {
             canVote:
-              dispute.period === '2' && drawnInCurrentRound && !vote.voted,
+              drawnInCurrentRound &&
+              ((dispute.period === '1' && !committed) ||
+                (dispute.period === '2' &&
+                  (!subcourt.hiddenVotes || committed) &&
+                  !vote.voted)),
+            committed,
             currentRuling,
             drawnInCurrentRound,
             loading: !currentRuling,
@@ -218,6 +266,7 @@ const CaseDetailsCard = ({ ID }) => {
             voted: vote.voted && vote.choice
           }
         )
+      }
     }
     return votesData
   })
@@ -231,6 +280,7 @@ const CaseDetailsCard = ({ ID }) => {
       ) {
         const subcourt = {
           ID: nextID,
+          hiddenVotes: undefined,
           name: undefined
         }
         const policy = call('PolicyRegistry', 'policies', subcourt.ID)
@@ -239,7 +289,10 @@ const CaseDetailsCard = ({ ID }) => {
           if (policyJSON) subcourt.name = policyJSON.name
         }
         const _subcourt = call('KlerosLiquid', 'courts', subcourt.ID)
-        if (_subcourt) nextID = _subcourt.parent
+        if (_subcourt) {
+          nextID = _subcourt.parent
+          subcourt.hiddenVotes = _subcourt.hiddenVotes
+        }
         if (subcourt.name === undefined || !_subcourt) return undefined
         subcourts.push(subcourt)
       }
@@ -267,14 +320,128 @@ const CaseDetailsCard = ({ ID }) => {
         return acc
       }, {})
   }
-  const { send, status } = useCacheSend('KlerosLiquid', 'castVote')
+  const { send: sendCommit, status: sendCommitStatus } = useCacheSend(
+    'KlerosLiquid',
+    'castCommit'
+  )
+  const { send: sendVote, status: sendVoteStatus } = useCacheSend(
+    'KlerosLiquid',
+    'castVote'
+  )
   const onJustificationChange = useCallback(
     ({ currentTarget: { value } }) => setJustification(value),
     []
   )
+  const disabledDate = useCallback(
+    date =>
+      realitioLibQuestionFormatter
+        .maxNumber({
+          decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
+          type: metaEvidence.metaEvidenceJSON.rulingOptions.type
+        })
+        .lte(date.unix() + 1),
+    [
+      metaEvidence &&
+        metaEvidence.metaEvidenceJSON.rulingOptions &&
+        metaEvidence.metaEvidenceJSON.rulingOptions.precision,
+      metaEvidence &&
+        metaEvidence.metaEvidenceJSON.rulingOptions &&
+        metaEvidence.metaEvidenceJSON.rulingOptions.type
+    ]
+  )
   const onVoteClick = useCallback(
-    ({ currentTarget: { id } }) => send(ID, votesData.voteIDs, id, 0),
-    [ID, votesData.voteIDs]
+    async ({ currentTarget: { id } }) => {
+      let choice
+      const typeSwitch =
+        id !== '0' &&
+        metaEvidence.metaEvidenceJSON.rulingOptions &&
+        metaEvidence.metaEvidenceJSON.rulingOptions.type
+      switch (typeSwitch) {
+        case 'multiple-select':
+          choice = metaEvidence.metaEvidenceJSON.rulingOptions.titles
+            ? metaEvidence.metaEvidenceJSON.rulingOptions.titles.map(t =>
+                complexRuling.includes(t)
+              )
+            : []
+          break
+        case 'datetime':
+          choice = complexRuling.unix()
+          break
+        case 'uint':
+          choice = complexRuling
+          break
+        default:
+          choice = id
+          break
+      }
+      switch (typeSwitch) {
+        case 'multiple-select':
+        case 'datetime':
+        case 'uint':
+          choice = realitioLibQuestionFormatter.answerToBytes32(choice, {
+            decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
+            type: metaEvidence.metaEvidenceJSON.rulingOptions.type
+          })
+          choice = realitioLibQuestionFormatter.padToBytes32(
+            drizzle.web3.utils
+              .toBN(choice)
+              .add(drizzle.web3.utils.toBN('1'))
+              .toString(16)
+          )
+          break
+        default:
+          break
+      }
+      if (dispute.period === '1')
+        sendCommit(
+          ID,
+          votesData.voteIDs,
+          drizzle.web3.utils.soliditySha3(
+            choice,
+            await web3Salt(
+              drizzle.web3,
+              drizzleState.account,
+              'Kleros Court Commit',
+              ID,
+              dispute2.votesLengths.length - 1
+            )
+          )
+        )
+      else {
+        sendVote(
+          ID,
+          votesData.voteIDs,
+          choice,
+          subcourts[subcourts.length - 1].hiddenVotes
+            ? await web3Salt(
+                drizzle.web3,
+                drizzleState.account,
+                'Kleros Court Commit',
+                ID,
+                dispute2.votesLengths.length - 1
+              )
+            : 0
+        )
+        API.putJustifications(drizzle.web3, drizzleState.account, {
+          appeal: dispute2.votesLengths.length - 1,
+          disputeID: ID,
+          justification,
+          voteIDs: votesData.voteIDs
+        })
+      }
+    },
+    [
+      metaEvidence,
+      complexRuling,
+      dispute && dispute.period,
+      ID,
+      votesData.voteIDs,
+      drizzle.web3,
+      drizzleState.account,
+      dispute2 && dispute2.votesLengths.length,
+      subcourts && subcourts[subcourts.length - 1].hiddenVotes,
+      justification
+    ]
   )
   const metaEvidenceActions = useMemo(() => {
     if (metaEvidence) {
@@ -298,97 +465,206 @@ const CaseDetailsCard = ({ ID }) => {
   }, [metaEvidence])
   return (
     <StyledCard
-      actions={useMemo(
-        () => [
-          <Spin
-            spinning={
-              votesData.loading || !metaEvidence || status === 'pending'
-            }
-          >
-            {!votesData.loading && metaEvidence ? (
-              <>
-                <StyledDiv className="secondary-linear-background theme-linear-background">
-                  {votesData.drawnInCurrentRound
-                    ? votesData.canVote
-                      ? 'What is your verdict?'
-                      : votesData.voted
-                      ? `You chose: ${
-                          votesData.voted === '0'
-                            ? 'Refuse to Arbitrate'
-                            : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+      actions={useMemo(() => [
+        <Spin
+          spinning={
+            votesData.loading ||
+            !subcourts ||
+            !metaEvidence ||
+            sendCommitStatus === 'pending' ||
+            sendVoteStatus === 'pending'
+          }
+        >
+          {!votesData.loading && subcourts && metaEvidence ? (
+            <>
+              <StyledDiv className="secondary-linear-background theme-linear-background">
+                {votesData.drawnInCurrentRound
+                  ? votesData.canVote
+                    ? 'What is your verdict?'
+                    : votesData.voted
+                    ? `You chose: ${
+                        votesData.voted === '0'
+                          ? 'Refuse to Arbitrate'
+                          : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                              realitioLibQuestionFormatter.getAnswerString(
+                                {
+                                  decimals:
+                                    metaEvidence.metaEvidenceJSON.rulingOptions
+                                      .precision,
+                                  outcomes:
+                                    metaEvidence.metaEvidenceJSON.rulingOptions
+                                      .titles,
+                                  type:
+                                    metaEvidence.metaEvidenceJSON.rulingOptions
+                                      .type
+                                },
+                                realitioLibQuestionFormatter.padToBytes32(
+                                  drizzle.web3.utils
+                                    .toBN(votesData.voted)
+                                    .sub(drizzle.web3.utils.toBN('1'))
+                                    .toString(16)
+                                )
+                              )) ||
+                            'Unknown Choice'
+                      }.`
+                    : dispute.period === '0'
+                    ? 'Waiting for evidence.'
+                    : dispute.period === '1'
+                    ? 'Waiting to reveal your vote.'
+                    : subcourts[subcourts.length - 1].hiddenVotes
+                    ? votesData.committed
+                      ? 'You did not reveal your vote.'
+                      : 'You did not commit a vote.'
+                    : 'You did not cast a vote.'
+                  : 'You were not drawn in the current round.'}
+                {dispute.period === '4' &&
+                  ` The winning choice was "${
+                    votesData.currentRuling === '0'
+                      ? 'Refuse to Arbitrate'
+                      : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                          realitioLibQuestionFormatter.getAnswerString(
+                            {
+                              decimals:
                                 metaEvidence.metaEvidenceJSON.rulingOptions
-                                  .titles &&
+                                  .precision,
+                              outcomes:
                                 metaEvidence.metaEvidenceJSON.rulingOptions
-                                  .titles[votesData.voted - 1]) ||
-                              'Unknown Choice'
-                        }.`
-                      : dispute.period === '0'
-                      ? 'Waiting for evidence.'
-                      : 'You did not cast a vote.'
-                    : 'You were not drawn in the current round.'}
-                  {dispute.period === '4' &&
-                    ` The winning choice was "${
-                      votesData.currentRuling === '0'
-                        ? 'Refuse to Arbitrate'
-                        : (metaEvidence.metaEvidenceJSON.rulingOptions &&
-                            metaEvidence.metaEvidenceJSON.rulingOptions
-                              .titles &&
-                            metaEvidence.metaEvidenceJSON.rulingOptions.titles[
-                              votesData.currentRuling - 1
-                            ]) ||
-                          'Unknown Choice'
-                    }".`}
-                  {votesData.canVote && (
-                    <StyledInputTextArea
-                      onChange={onJustificationChange}
-                      placeholder="Justify your vote here..."
-                      value={justification}
-                    />
-                  )}
-                  <StyledButtonsDiv>
-                    {metaEvidence.metaEvidenceJSON.rulingOptions &&
-                      metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
-                      metaEvidence.metaEvidenceJSON.rulingOptions.titles.map(
-                        (t, i) => (
-                          <StyledButton
+                                  .titles,
+                              type:
+                                metaEvidence.metaEvidenceJSON.rulingOptions.type
+                            },
+                            realitioLibQuestionFormatter.padToBytes32(
+                              drizzle.web3.utils
+                                .toBN(votesData.currentRuling)
+                                .sub(drizzle.web3.utils.toBN('1'))
+                                .toString(16)
+                            )
+                          )) ||
+                        'Unknown Choice'
+                  }".`}
+                {votesData.canVote && dispute.period === '2' && (
+                  <StyledInputTextArea
+                    onChange={onJustificationChange}
+                    placeholder="Justify your vote here..."
+                    value={justification}
+                  />
+                )}
+                {metaEvidence.metaEvidenceJSON.rulingOptions && (
+                  <>
+                    {metaEvidence.metaEvidenceJSON.rulingOptions.type !==
+                      'single-select' && (
+                      <StyledButtonsDiv>
+                        {metaEvidence.metaEvidenceJSON.rulingOptions.type ===
+                        'multiple-select' ? (
+                          <Checkbox.Group
                             disabled={!votesData.canVote}
-                            id={i + 1}
-                            key={t}
-                            onClick={onVoteClick}
+                            name="ruling"
+                            onChange={setComplexRuling}
+                            options={
+                              metaEvidence.metaEvidenceJSON.rulingOptions
+                                .titles &&
+                              metaEvidence.metaEvidenceJSON.rulingOptions.titles.slice(
+                                0,
+                                255
+                              )
+                            }
+                            value={complexRuling}
+                          />
+                        ) : metaEvidence.metaEvidenceJSON.rulingOptions.type ===
+                          'datetime' ? (
+                          <DatePicker
+                            disabled={!votesData.canVote}
+                            disabledDate={disabledDate}
+                            onChange={setComplexRuling}
+                            showTime
                             size="large"
-                            type="primary"
-                          >
-                            {t}
-                          </StyledButton>
-                        )
+                            value={complexRuling}
+                          />
+                        ) : (
+                          <InputNumber
+                            disabled={!votesData.canVote}
+                            max={Number(
+                              realitioLibQuestionFormatter
+                                .maxNumber({
+                                  decimals:
+                                    metaEvidence.metaEvidenceJSON.rulingOptions
+                                      .precision,
+                                  type:
+                                    metaEvidence.metaEvidenceJSON.rulingOptions
+                                      .type
+                                })
+                                .minus(1)
+                            )}
+                            min={Number(
+                              realitioLibQuestionFormatter.minNumber({
+                                decimals:
+                                  metaEvidence.metaEvidenceJSON.rulingOptions
+                                    .precision,
+                                type:
+                                  metaEvidence.metaEvidenceJSON.rulingOptions
+                                    .type
+                              })
+                            )}
+                            onChange={setComplexRuling}
+                            precision={
+                              metaEvidence.metaEvidenceJSON.rulingOptions
+                                .precision
+                            }
+                            size="large"
+                            value={complexRuling}
+                          />
+                        )}
+                      </StyledButtonsDiv>
+                    )}
+                    <StyledButtonsDiv>
+                      {metaEvidence.metaEvidenceJSON.rulingOptions.type ===
+                      'single-select' ? (
+                        metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
+                        metaEvidence.metaEvidenceJSON.rulingOptions.titles
+                          .slice(0, 2 ** 256 - 1)
+                          .map((t, i) => (
+                            <StyledButton
+                              disabled={!votesData.canVote}
+                              id={i + 1}
+                              key={t}
+                              onClick={onVoteClick}
+                              size="large"
+                              type="primary"
+                            >
+                              {t}
+                            </StyledButton>
+                          ))
+                      ) : (
+                        <StyledButton
+                          disabled={!votesData.canVote || !complexRuling}
+                          onClick={onVoteClick}
+                          size="large"
+                          type="primary"
+                        >
+                          Submit
+                        </StyledButton>
                       )}
-                  </StyledButtonsDiv>
-                </StyledDiv>
-                <StyledDiv className="secondary-background theme-background">
-                  <Button
-                    disabled={!votesData.canVote}
-                    ghost={votesData.canVote}
-                    id={0}
-                    onClick={onVoteClick}
-                    size="large"
-                  >
-                    Refuse to Arbitrate
-                  </Button>
-                </StyledDiv>
-              </>
-            ) : (
-              <StyledDiv className="secondary-linear-background theme-linear-background" />
-            )}
-          </Spin>
-        ],
-        [
-          votesData.canVote,
-          votesData.loading,
-          votesData.voted,
-          metaEvidence,
-          justification
-        ]
-      )}
+                    </StyledButtonsDiv>
+                  </>
+                )}
+              </StyledDiv>
+              <StyledDiv className="secondary-background theme-background">
+                <Button
+                  disabled={!votesData.canVote}
+                  ghost={votesData.canVote}
+                  id={0}
+                  onClick={onVoteClick}
+                  size="large"
+                >
+                  Refuse to Arbitrate
+                </Button>
+              </StyledDiv>
+            </>
+          ) : (
+            <StyledDiv className="secondary-linear-background theme-linear-background" />
+          )}
+        </Spin>
+      ])}
       extra={
         <StyledPoliciesButton
           onClick={useCallback(
@@ -418,12 +694,13 @@ const CaseDetailsCard = ({ ID }) => {
                 <ReactMarkdown
                   source={metaEvidence.metaEvidenceJSON.description}
                 />
-                {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL && (
+                {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
                   <StyledIFrame
                     frameBorder="0"
-                    src={`${
-                      metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURL
-                    }?${encodeURIComponent(
+                    src={`${metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI.replace(
+                      /^\/ipfs\//,
+                      'https://ipfs.kleros.io/ipfs/'
+                    )}?${encodeURIComponent(
                       JSON.stringify({
                         arbitrableContractAddress: dispute.arbitrated,
                         arbitratorContractAddress:
@@ -431,7 +708,7 @@ const CaseDetailsCard = ({ ID }) => {
                         disputeID: ID
                       })
                     )}`}
-                    title="Metaevidence Display"
+                    title="MetaEvidence Display"
                   />
                 )}
               </StyledInnerCard>
@@ -473,6 +750,27 @@ const CaseDetailsCard = ({ ID }) => {
               </Row>
             )}
           </Skeleton>
+          {dispute2 &&
+            metaEvidence &&
+            metaEvidence.metaEvidenceJSON.rulingOptions &&
+            metaEvidence.metaEvidenceJSON.rulingOptions.type ===
+              'single-select' && <Divider>History</Divider>}
+          {dispute2 &&
+            metaEvidence &&
+            metaEvidence.metaEvidenceJSON.rulingOptions &&
+            metaEvidence.metaEvidenceJSON.rulingOptions.type ===
+              'single-select' &&
+            dispute2.votesLengths.map((_, i) => (
+              <CaseRoundHistory
+                ID={ID}
+                disabled={
+                  dispute.period !== '4' &&
+                  i === dispute2.votesLengths.length - 1
+                }
+                key={i}
+                round={i}
+              />
+            ))}
         </>
       )}
       {activeSubcourtID !== undefined && (

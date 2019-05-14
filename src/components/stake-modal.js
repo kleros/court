@@ -96,10 +96,14 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
     drizzleState.account
   )
   const balance = _balance && drizzle.web3.utils.toBN(_balance)
-  const juror = useCacheCall('KlerosLiquid', 'jurors', drizzleState.account)
+  const juror = useCacheCall(
+    'KlerosLiquidExtraViews',
+    'getJuror',
+    drizzleState.account
+  )
   const stakedTokens = juror && drizzle.web3.utils.toBN(juror.stakedTokens)
   const _stake = useCacheCall(
-    'KlerosLiquid',
+    'KlerosLiquidExtraViews',
     'stakeOf',
     drizzleState.account,
     ID
@@ -118,6 +122,7 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
       centered
       closable={false}
       confirmLoading={loading || status === 'pending'}
+      maskClosable={false}
       okButtonProps={useMemo(
         () => ({
           disabled: hasError,
@@ -294,6 +299,7 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                       ? s
                       : `${s.slice(0, index)}${s.slice(index, index + 19)}`
                   }, [])}
+                  precision={0}
                 />
               )}
             </Form.Item>

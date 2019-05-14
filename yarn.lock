@@ -1055,23 +1055,24 @@
     log-update "^2.3.0"
     strip-ansi "^3.0.1"
 
-"@kleros/archon@^0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@kleros/archon/-/archon-0.6.0.tgz#3fce182a72a0edf93662e0b92cf9332789b8e1de"
-  integrity sha512-vhrWMNkDbQ+90KmTjv/JdVJarJTXm6A13PB9ZwQghZee0d2iQZ0MdBLn3O0QRx/cYoFNYU5kahAeHdJBXTp3cw==
+"@kleros/archon@^0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@kleros/archon/-/archon-0.10.0.tgz#09c4d7ca316400f1c3c9f7506d040897480c4431"
+  integrity sha512-6es1qT6nRbls0No3QU//OnUkyEweCYL0daizBEMCptYK1oeDenUSfQzO8VME7FDZTvhJXHsDwwDZZdanDn81+Q==
   dependencies:
     "@kleros/kleros-interaction" "^0.7.0"
     axios "^0.18.0"
     babel-runtime "^6.26.0"
+    iframe "^1.0.0"
     js-sha3 "^0.8.0"
     lodash "^4.17.4"
     multihashes "^0.4.14"
     web3 "1.0.0-beta.36"
 
-"@kleros/kathari@^0.21.0":
-  version "0.21.0"
-  resolved "https://registry.yarnpkg.com/@kleros/kathari/-/kathari-0.21.0.tgz#71841b3ebb965357e0dd4e617fccee111bfdadd6"
-  integrity sha512-jWzmpNQAa82r204qz+PP6RawMuvTUMGUTrXGKfe6dlQ+ZfwfdYYYoy4J8n6Z0nGhfzO5k5xOM76blPaEQoGgFA==
+"@kleros/kathari@^0.22.0":
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/@kleros/kathari/-/kathari-0.22.0.tgz#9027d550378f103f56f5f548693694f2f09df7c0"
+  integrity sha512-YJ1JpYrzKJvWgSGWyXxSwAqrzsV9Y5vBSOw+LrdoJYTE06kleJVZN1ILNBc3M1U4H4KRmNJBf6kXqW/a4WWiWA==
   dependencies:
     "@commitlint/cli" "^7.2.1"
     "@commitlint/config-conventional" "^7.1.2"
@@ -1150,6 +1151,21 @@
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/@realitio/realitio-contracts/-/realitio-contracts-2.0.5.tgz#785db5f1af064add917e91cd56f037243ff392a3"
   integrity sha512-bt2dQxqd0VDqJwdOJn6t+dySGRe8YqaqmFwzWnB+R9ozREQPQ0kSfOnhFV7nFFZRdI2eEXP0M3p18l1WyGtrZg==
+
+"@realitio/realitio-contracts@git+https://github.com/realitio/realitio-contracts.git":
+  version "2.0.7"
+  resolved "git+https://github.com/realitio/realitio-contracts.git#f80e6cad275c5dd9b85bc8531aabb6dd063d7a36"
+
+"@realitio/realitio-lib@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@realitio/realitio-lib/-/realitio-lib-1.0.2.tgz#fa3672a2d8669eac654be3ee66e03dfa2da68a2b"
+  integrity sha512-uY9cyTufafsnHOhMCvU9b64CrOmnRPlZITPk5FQeAGaIziBrTLzJuuP7Phtct2WlhU25dmpR3PIAxePuW8JcRg==
+  dependencies:
+    "@realitio/realitio-contracts" "git+https://github.com/realitio/realitio-contracts.git"
+    bignumber.js "^7.2.1"
+    bn.js "^4.11.8"
+    ethereumjs-abi "^0.6.5"
+    sprintf-js "^1.1.1"
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
@@ -2674,6 +2690,11 @@ big.js@^3.1.3:
   resolved "https://registry.yarnpkg.com/big.js/-/big.js-3.2.0.tgz#a5fc298b81b9e0dca2e458824784b65c52ba588e"
   integrity sha512-+hN/Zh2D08Mx65pZ/4g5bsmNiZUuChDiQfTUQ7qJr4/kuopCr88xZsAXv6mBoZEsUI4OuGHlX59qE94K2mMW8Q==
 
+bignumber.js@^7.2.1:
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-7.2.1.tgz#80c048759d826800807c4bfd521e50edbba57a5f"
+  integrity sha512-S4XzBk5sMB+Rcb/LNcpzXr57VRTxgAvaAEDAl1AwRx27j00hT84O6OkteE7u8UB3NuaaygCRrEpqox4uDOrbdQ==
+
 "bignumber.js@git+https://github.com/debris/bignumber.js#master":
   version "2.0.7"
   resolved "git+https://github.com/debris/bignumber.js#c7a38de919ed75e6fb6ba38051986e294b328df9"
@@ -2745,7 +2766,7 @@ bn.js@4.11.6:
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.11.6.tgz#53344adb14617a13f6e8dd2ce28905d1c0ba3215"
   integrity sha1-UzRK2xRhehP26N0s4okF0cC6MhU=
 
-bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.11.0, bn.js@^4.11.3, bn.js@^4.11.6, bn.js@^4.4.0:
+bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.11.0, bn.js@^4.11.3, bn.js@^4.11.6, bn.js@^4.11.8, bn.js@^4.4.0:
   version "4.11.8"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.11.8.tgz#2cde09eb5ee341f484746bb0309b3253b1b1442f"
   integrity sha512-ItfYfPLkWHUjckQCk8xC+LwxgK8NYcXywGigJgSwOP8Y2iyWT4f2vsZnoOXTTbo+o5yXmIUJ4gn5538SO5S3gA==
@@ -5428,6 +5449,14 @@ ethereum-common@^0.0.18:
   resolved "https://registry.yarnpkg.com/ethereum-common/-/ethereum-common-0.0.18.tgz#2fdc3576f232903358976eb39da783213ff9523f"
   integrity sha1-L9w1dvIykDNYl26znaeDIT/5Uj8=
 
+ethereumjs-abi@^0.6.5:
+  version "0.6.7"
+  resolved "https://registry.yarnpkg.com/ethereumjs-abi/-/ethereumjs-abi-0.6.7.tgz#d1d1c5cdb8d910a7d97645ba9e93be5d153bba2e"
+  integrity sha512-EMLOA8ICO5yAaXDhjVEfYjsJIXYutY8ufTE93eEKwsVtp2usQreKwsDTJ9zvam3omYqNuffr8IONIqb2uUslGQ==
+  dependencies:
+    bn.js "^4.11.8"
+    ethereumjs-util "^6.0.0"
+
 ethereumjs-account@^2.0.3:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/ethereumjs-account/-/ethereumjs-account-2.0.5.tgz#eeafc62de544cb07b0ee44b10f572c9c49e00a84"
@@ -7168,6 +7197,11 @@ iferr@^0.1.5:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/iferr/-/iferr-0.1.5.tgz#c60eed69e6d8fdb6b3104a1fcbca1c192dc5b501"
   integrity sha1-xg7taebY/bazEEofy8ocGS3FtQE=
+
+iframe@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/iframe/-/iframe-1.0.0.tgz#58e74822b178a0579d09cd169640fb9537470ef5"
+  integrity sha1-WOdIIrF4oFedCc0WlkD7lTdHDvU=
 
 ignore-walk@^3.0.1:
   version "3.0.1"
@@ -13703,6 +13737,11 @@ split@^1.0.0:
   integrity sha512-mTyOoPbrivtXnwnIxZRFYRrPNtEFKlpB2fvjSnCQUiAA6qAZzqwna5envK4uk6OIeP17CsdF3rSBGYVBsU0Tkg==
   dependencies:
     through "2"
+
+sprintf-js@^1.1.1:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.1.2.tgz#da1765262bf8c0f571749f2ad6c26300207ae673"
+  integrity sha512-VE0SOVEHCk7Qc8ulkWw3ntAzXuqf7S2lvwQaDLRnUeIEaKNQJzV6BwmLKhOqT61aGhfUMrXeaBk+oDGCzvhcug==
 
 sprintf-js@~1.0.2:
   version "1.0.3"
