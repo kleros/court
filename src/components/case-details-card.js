@@ -411,7 +411,8 @@ const CaseDetailsCard = ({ ID }) => {
         API.putJustifications(drizzle.web3, drizzleState.account, {
           appeal: dispute2.votesLengths.length - 1,
           disputeID: ID,
-          justification
+          justification,
+          voteIDs: votesData.voteIDs
         })
 
         sendVote(

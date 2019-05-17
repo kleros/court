@@ -26,10 +26,11 @@ const funcs = [
   },
   {
     URL: process.env.REACT_APP_JUSTIFICATIONS_URL,
+    createDerived: true,
     method: 'PUT',
     name: 'putJustifications',
     payload: 'justification',
-    signingMethod: null
+    signingMethod: 'derived'
   }
 ]
 
@@ -40,9 +41,13 @@ export const API = funcs.reduce((acc, f) => {
       derivedAccount = await web3DeriveAccount(
         web3,
         account,
-        'To keep your data safe and to use certain features of Kleros, we ask that you sign this message to create a secret key for your account. This key is unrelated from your main Ethereum account and will not be able to send any transactions.',
+        'To keep your data safe and to use certain features of Kleros, we ask that you sign these messages to create a secret key for your account. This key is unrelated from your main Ethereum account and will not be able to send any transactions.',
         f.createDerived
       )
+
+    const network = await web3.eth.net.getNetworkType()
+    if (!f.payload)
+      payload['network'] = network === 'main' ? 'mainnet' : network
 
     // Use different signing method depending on the situation
     let signature
@@ -51,9 +56,6 @@ export const API = funcs.reduce((acc, f) => {
     else if (f.signingMethod === 'personal')
       signature = await web3.eth.sign(JSON.stringify(payload), account)
 
-    const network = await web3.eth.net.getNetworkType()
-    if (!f.payload)
-      payload['network'] = network === 'main' ? 'mainnet' : network
     const func = () =>
       fetch(f.URL, {
         body: JSON.stringify({
