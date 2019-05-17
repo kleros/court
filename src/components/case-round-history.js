@@ -19,14 +19,19 @@ const CaseRoundHistory = ({ ID, disabled, round }) => {
       drizzle.contracts.KlerosLiquid.address,
       ID
     )
+
   const _justifications = useAPI.getJustifications(
     drizzle.web3,
     drizzleState.account,
     { appeal: round, disputeID: ID }
   )
+
   const justifications = useCacheCall(['KlerosLiquid'], call => {
     let justifications = { loading: true }
-    if (metaEvidence && _justifications && _justifications !== 'pending')
+    if (metaEvidence && _justifications && _justifications !== 'pending') {
+      // Disable round justifications if there are none to show
+      if (_justifications.payload.justifications.Items.length === 0)
+        disabled = true
       justifications = _justifications.payload.justifications.Items.reduce(
         (acc, j) => {
           const vote = call('KlerosLiquid', 'getVote', ID, round, j.voteID.N)
@@ -53,6 +58,8 @@ const CaseRoundHistory = ({ ID, disabled, round }) => {
           loading: false
         }
       )
+    }
+
     return justifications
   })
   return (

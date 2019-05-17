@@ -4,44 +4,63 @@ import web3DeriveAccount from '../temp/web3-derive-account'
 const funcs = [
   {
     URL: process.env.REACT_APP_USER_SETTINGS_URL,
+    createDerived: false,
     method: 'GET',
     name: 'getUserSettings',
-    payload: 'settings'
+    payload: 'settings',
+    signingMethod: 'derived'
   },
   {
     URL: process.env.REACT_APP_USER_SETTINGS_URL,
+    createDerived: true,
     method: 'PATCH',
     name: 'patchUserSettings',
-    payload: 'settings'
+    payload: 'settings',
+    signingMethod: 'derived'
   },
   {
     URL: process.env.REACT_APP_JUSTIFICATIONS_URL,
     method: 'GET',
-    name: 'getJustifications'
+    name: 'getJustifications',
+    signingMethod: null
   },
   {
     URL: process.env.REACT_APP_JUSTIFICATIONS_URL,
     method: 'PUT',
     name: 'putJustifications',
-    payload: 'justification'
+    payload: 'justification',
+    signingMethod: null
   }
 ]
 
 export const API = funcs.reduce((acc, f) => {
   acc[f.name] = async (web3, account, payload) => {
-    const derivedAccount = await web3DeriveAccount(
-      web3,
-      account,
-      'Kleros Court Secret'
-    )
+    let derivedAccount
+    if (f.signingMethod === 'derived')
+      derivedAccount = await web3DeriveAccount(
+        web3,
+        account,
+        'To keep your data safe and to use certain features of Kleros, we ask that you sign this message to create a secret key for your account. This key is unrelated from your main Ethereum account and will not be able to send any transactions.',
+        f.createDerived
+      )
+
+    // Use different signing method depending on the situation
+    let signature
+    if (f.signingMethod === 'derived' && derivedAccount)
+      signature = derivedAccount.sign(JSON.stringify(payload)).signature
+    else if (f.signingMethod === 'personal')
+      signature = await web3.eth.sign(JSON.stringify(payload), account)
+
+    const network = await web3.eth.net.getNetworkType()
+    if (!f.payload) payload['network'] = network
     const func = () =>
       fetch(f.URL, {
         body: JSON.stringify({
           payload: f.payload
             ? {
                 address: account,
-                signature: derivedAccount.sign(JSON.stringify(payload))
-                  .signature,
+                network: network === 'main' ? 'mainnet' : network,
+                signature,
                 [f.payload]: payload
               }
             : payload
@@ -50,7 +69,7 @@ export const API = funcs.reduce((acc, f) => {
         method: f.method === 'GET' ? 'POST' : f.method
       }).then(res => res.json())
     const res = await func()
-    if (res.error) {
+    if (res.error && derivedAccount) {
       const settings = {
         derivedAccountAddress: {
           S: derivedAccount.address
