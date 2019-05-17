@@ -52,7 +52,8 @@ export const API = funcs.reduce((acc, f) => {
       signature = await web3.eth.sign(JSON.stringify(payload), account)
 
     const network = await web3.eth.net.getNetworkType()
-    if (!f.payload) payload['network'] = network
+    if (!f.payload)
+      payload['network'] = network === 'main' ? 'mainnet' : network
     const func = () =>
       fetch(f.URL, {
         body: JSON.stringify({
