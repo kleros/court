@@ -401,13 +401,20 @@ const CaseDetailsCard = ({ ID }) => {
             await web3Salt(
               drizzle.web3,
               drizzleState.account,
-              'Kleros Court Commit',
+              'Please sign this message to secure your vote. This is unrelated from your main Ethereum account and will not be able to send any transactions.',
               ID,
               dispute2.votesLengths.length - 1
             )
           )
         )
       else {
+        API.putJustifications(drizzle.web3, drizzleState.account, {
+          appeal: dispute2.votesLengths.length - 1,
+          disputeID: ID,
+          justification,
+          voteIDs: votesData.voteIDs
+        })
+
         sendVote(
           ID,
           votesData.voteIDs,
@@ -416,18 +423,12 @@ const CaseDetailsCard = ({ ID }) => {
             ? await web3Salt(
                 drizzle.web3,
                 drizzleState.account,
-                'Kleros Court Commit',
+                'Please sign this message to secure your vote. This is unrelated from your main Ethereum account and will not be able to send any transactions.',
                 ID,
                 dispute2.votesLengths.length - 1
               )
             : 0
         )
-        API.putJustifications(drizzle.web3, drizzleState.account, {
-          appeal: dispute2.votesLengths.length - 1,
-          disputeID: ID,
-          justification,
-          voteIDs: votesData.voteIDs
-        })
       }
     },
     [
