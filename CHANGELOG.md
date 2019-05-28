@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.3.0"></a>
+
+# [0.3.0](https://github.com/kleros/court/compare/v0.2.0...v0.3.0) (2019-05-28)
+
+### Bug Fixes
+
+- **api:** network name main -> mainnet ([4395c7c](https://github.com/kleros/court/commit/4395c7c))
+- **breadcrumbs:** stop overflow ([3f86932](https://github.com/kleros/court/commit/3f86932))
+- **case-details-card:** date validation ([8ff0efc](https://github.com/kleros/court/commit/8ff0efc))
+- **case-details-card:** datetime ruling uses momentjs ([9bcb6d5](https://github.com/kleros/court/commit/9bcb6d5))
+- **case-details-card:** wrong voting choice calculation ([eb72f39](https://github.com/kleros/court/commit/eb72f39))
+- **notification-settings:** add defaults for new accounts ([935bf75](https://github.com/kleros/court/commit/935bf75))
+- **stake-modal:** decimal parsing ([8c264c8](https://github.com/kleros/court/commit/8c264c8)), closes [#22](https://github.com/kleros/court/issues/22)
+
+### Features
+
+- **case-details-card:** finish handling complex rulings ([482d926](https://github.com/kleros/court/commit/482d926))
+- **case-details-card:** handle datetime rulings ([d936bcd](https://github.com/kleros/court/commit/d936bcd))
+- **case-details-card:** save justifications ([55bb6aa](https://github.com/kleros/court/commit/55bb6aa))
+- **case-details-card:** start handling complex ruling types ([3d8a7eb](https://github.com/kleros/court/commit/3d8a7eb))
+- **case-details-card:** support IPFS evidence displays ([cbbc5ea](https://github.com/kleros/court/commit/cbbc5ea))
+- **case-details-card:** support number rulings ([619c001](https://github.com/kleros/court/commit/619c001))
+- **case-details-card:** update API usage ([25a747d](https://github.com/kleros/court/commit/25a747d))
+- **case-round-history:** implement ([1ca2c6d](https://github.com/kleros/court/commit/1ca2c6d))
+- **contracts:** add kleros liquid extra views ([0710ecc](https://github.com/kleros/court/commit/0710ecc))
+- **dataloader:** update error message ([ffeb610](https://github.com/kleros/court/commit/ffeb610))
+- **stake-modal:** don't close on mask click ([dafc1b6](https://github.com/kleros/court/commit/dafc1b6)), closes [#24](https://github.com/kleros/court/issues/24)
+- abstract away delayed set stakes ([062b387](https://github.com/kleros/court/commit/062b387))
+- add support for commit and reveal courts ([106c5dd](https://github.com/kleros/court/commit/106c5dd))
+- **temp:** implement account derivation ([93ea85b](https://github.com/kleros/court/commit/93ea85b))
+- new API ([233ca1f](https://github.com/kleros/court/commit/233ca1f))
+- nicer error screen ([5d10c85](https://github.com/kleros/court/commit/5d10c85))
+- use new meta evidence scripts ([30aa04e](https://github.com/kleros/court/commit/30aa04e))
+
 <a name="0.2.0"></a>
 
 # 0.2.0 (2019-03-14)
