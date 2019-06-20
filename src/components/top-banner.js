@@ -6,6 +6,7 @@ import styled from 'styled-components/macro'
 
 const StyledCard = styled(Card)`
   margin: 0 -9.375vw 28px;
+  padding: 0px 50px 0px 50px;
 `
 const StyledTitleCol = styled(Col)`
   font-weight: bold;
