@@ -122,7 +122,6 @@ const PNKBalanceCard = () => {
                 <>
                   <ETHAmount
                     amount={juror && juror.stakedTokens}
-                    decimals={10}
                   />{' '}
                   PNK
                 </>
