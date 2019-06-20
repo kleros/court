@@ -481,7 +481,7 @@ const CaseDetailsCard = ({ ID }) => {
               <StyledDiv className="secondary-linear-background theme-linear-background">
                 {votesData.drawnInCurrentRound
                   ? votesData.canVote
-                    ? 'What is your verdict?'
+                    ? 'What is your decision?'
                     : votesData.voted
                     ? `You chose: ${
                         votesData.voted === '0'
