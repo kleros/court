@@ -123,7 +123,7 @@ const StyledMenu = styled(Menu)`
   text-align: center;
 `
 const StyledLayoutContent = styled(Layout.Content)`
-  background: white;
+  background: #F2E3FF;
   padding: 0 9.375vw 62px;
 `
 export default () => (
