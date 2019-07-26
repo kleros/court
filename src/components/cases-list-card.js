@@ -1,24 +1,11 @@
 import React, { useMemo } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import { ReactComponent as Hourglass } from '../assets/images/hourglass.svg'
-import { List } from 'antd'
+import ListItem from './list-item'
 import TimeAgo from './time-ago'
 import TitledListCard from './titled-list-card'
 import styled from 'styled-components/macro'
 
-const StyledListItem = styled(List.Item)`
-  font-weight: bold;
-  padding-left: 19px;
-  position: relative;
-
-  .ant-list-item-extra {
-    font-size: 18px;
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-`
 const StyledDiv = styled.div`
   background: whitesmoke;
   padding: 30px 22px;
@@ -123,11 +110,11 @@ const CasesListCard = () => {
       prefix={disputes.total}
       title="Cases"
     >
-      <StyledListItem extra={String(disputes.votePending)}>
+      <ListItem extra={String(disputes.votePending)}>
         Vote Pending
-      </StyledListItem>
-      <StyledListItem extra={String(disputes.active)}>Active</StyledListItem>
-      <StyledListItem extra={String(disputes.executed)}>Closed</StyledListItem>
+      </ListItem>
+      <ListItem extra={String(disputes.active)}>Active</ListItem>
+      <ListItem extra={String(disputes.executed)}>Closed</ListItem>
       {disputes.deadline && (
         <StyledDiv className="primary-color theme-color">
           <StyledDeadlineDiv>Next voting deadline</StyledDeadlineDiv>

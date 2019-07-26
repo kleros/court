@@ -77,10 +77,13 @@ const MenuItems = [
     <NavLink to="/courts">Courts</NavLink>
   </Menu.Item>,
   <Menu.Item key="cases">
-    <NavLink to="/cases">Cases</NavLink>
+    <NavLink to="/cases">My Cases</NavLink>
   </Menu.Item>,
   <Menu.Item key="tokens">
-    <NavLink to="/tokens">Tokens</NavLink>
+    <NavLink to="/tokens">Buy PNK</NavLink>
+  </Menu.Item>,
+  <Menu.Item key="guide">
+    <NavLink to="/tokens">Guide</NavLink>
   </Menu.Item>
 ]
 const settings = {

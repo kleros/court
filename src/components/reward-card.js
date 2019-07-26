@@ -1,19 +1,15 @@
 import { Card, Col, Row } from 'antd'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
-import ETHAddress from './eth-address'
 import ETHAmount from './eth-amount'
-import Hint from './hint'
-import Identicon from './identicon'
 import React from 'react'
 import { ReactComponent as Reward } from '../assets/images/reward.svg'
 import { ReactComponent as PurpleArrowBackground } from '../assets/images/purple-arrow.svg'
 import { ReactComponent as LightPurpleArrowBackground } from '../assets/images/light-purple-arrow.svg'
-import { ReactComponent as SectionArrowBackground } from '../assets/images/section-arrow-background.svg'
 import styled from 'styled-components/macro'
 
 const StyledCard = styled(Card)`
   cursor: initial;
-  margin: 28px 0;
+  margin: 60px 0 25px 0;
   border-radius: 12px;
 
   .ant-card-body {
@@ -68,13 +64,6 @@ const StyledCenterDiv = styled.div`
   @media (max-width: 1200px) {
     font-size: 28px;
   }
-`
-const StyledBottomDiv = styled.div`
-  font-size: 18px;
-  font-weight: bold;
-`
-const StyledCol = styled(Col)`
-  z-index: 0;
 `
 const StyledRewardLogoCol = styled(Col)`
   min-width: 100px;
@@ -159,25 +148,14 @@ const RewardCard = () => {
               <Reward />
             </StyledRewardLogoCol>
             <Col lg={4} xs={12}>
-              <StyledDivWhiteSmall>
-              Coherence
-              <Hint
-                description="Voting the same as the winning ruling makes you elligible for rewards."
-                title={
-                  <>
-                    Coherence
-                  </>
-                }
-              />
+              <StyledDivWhiteSmall style={{marginTop: "15px"}}>
+                Coherence
               </StyledDivWhiteSmall>
               <StyledDivWhiteLarge>
                 Rewards
               </StyledDivWhiteLarge>
-              <StyledDivWhiteSmall>
-                By voting coherently
-              </StyledDivWhiteSmall>
             </Col>
-            <AmountCol lg={8} xs={12}>
+            <AmountCol lg={8} xs={24}>
               <ETHOffset>
                 <StyledTopDiv>Total</StyledTopDiv>
                 <StyledCenterDiv>
@@ -185,7 +163,7 @@ const RewardCard = () => {
                 </StyledCenterDiv>
               </ETHOffset>
             </AmountCol>
-            <AmountCol lg={8} xs={12}>
+            <AmountCol lg={8} xs={24}>
               <PNKOffset>
                 <StyledTopDiv>Total</StyledTopDiv>
                 <StyledCenterDiv>

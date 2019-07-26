@@ -1,4 +1,4 @@
-import { Card, Divider } from 'antd'
+import { Card } from 'antd'
 import React, { Fragment } from 'react'
 import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
 import PropTypes from 'prop-types'
@@ -8,18 +8,25 @@ import styled from 'styled-components/macro'
 const StyledCard = styled(Card)`
   cursor: initial;
   margin: 28px 0 0;
+  background: none;
 
   .ant-card {
+
     &-head {
       color: white;
       margin: 0 0 11px;
+      background: linear-gradient(111.6deg, #4D00B4 46.25%, #6500B4 96.25%);
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
     }
 
     &-body {
+      background: white;
       border: 1px solid silver;
       border-radius: 3px;
       box-shadow: 0 3px 6px rgba(201, 201, 201, 0.5);
       padding: 0;
+      border-radius: 12px;
     }
   }
 
@@ -58,14 +65,14 @@ const StyledUnderline = styled(Underline)`
   top: 103px;
   width: 100%;
 `
-const StyledDivider = styled(Divider)`
+const StyledDivider = styled.div`
+  border-bottom: 1px solid #D09CFF;
   margin: 0;
   width: 100%;
 `
 const TitledListCard = ({ children, loading, prefix, title }) => (
   <StyledCard
     bordered={false}
-    className="secondary-background ternary-color"
     hoverable
     loading={loading}
     title={
@@ -81,7 +88,7 @@ const TitledListCard = ({ children, loading, prefix, title }) => (
       (children.length === undefined
         ? children
         : children.map((c, i) =>
-            i < children.length - 1 ? (
+            i < children.length - 2 ? (
               <Fragment key={i}>
                 {c}
                 <StyledDivider />

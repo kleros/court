@@ -1,14 +1,10 @@
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
-import { List } from 'antd'
 import React from 'react'
+import ETHAmount from './eth-amount'
+import ListItem from './list-item'
 import TitledListCard from './titled-list-card'
-import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
 
-const StyledListItem = styled(List.Item)`
-  font-weight: bold;
-  padding-left: 19px;
-`
 const CourtsListCard = () => {
   const { useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
@@ -36,6 +32,23 @@ const CourtsListCard = () => {
           return undefined
         })
   )
+  const stakes = useCacheCall(
+    ['PolicyRegistry'],
+    call =>
+      juror &&
+      juror.subcourtIDs
+        .filter(ID => ID !== '0')
+        .map(ID => String(ID - 1))
+        .map(ID => {
+          return useCacheCall(
+            'KlerosLiquidExtraViews',
+            'stakeOf',
+            drizzleState.account,
+            ID
+          )
+        })
+  )
+
   const loading = !names || names.some(n => n === undefined)
   return (
     <TitledListCard
@@ -43,7 +56,16 @@ const CourtsListCard = () => {
       prefix={names && names.length}
       title="Courts"
     >
-      {!loading && names.map(n => <StyledListItem key={n}>{n}</StyledListItem>)}
+      {!loading && names.map((n, i) => (
+        <ListItem key={n}
+          extra={(
+            <>
+              <ETHAmount amount={stakes[i]} /> PNK
+            </>
+          )}
+        >{n}</ListItem>
+      )
+    )}
     </TitledListCard>
   )
 }
