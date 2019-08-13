@@ -24,9 +24,9 @@ const StyledCard = styled(Card)`
       background: white;
       border: 1px solid silver;
       border-radius: 3px;
-      box-shadow: 0 3px 6px rgba(201, 201, 201, 0.5);
       padding: 0;
       border-radius: 12px;
+      box-shadow: 0px 6px 36px #BC9CFF;
     }
   }
 

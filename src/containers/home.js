@@ -6,6 +6,8 @@ import CourtsListCard from '../components/courts-list-card'
 import { Link } from 'react-router-dom'
 import RewardCard from '../components/reward-card'
 import PerformanceCard from '../components/performance-card'
+import OngoingCasesCard from '../components/ongoing-cases-card'
+import NotificationsCard from '../components/notifications-card'
 import TopBanner from '../components/top-banner'
 
 export default () => (
@@ -22,7 +24,7 @@ export default () => (
           )
         }
       />
-    <RewardCard />
+      <RewardCard />
       <Row gutter={32}>
         <Col lg={8}>
           <CourtsListCard />
@@ -34,5 +36,7 @@ export default () => (
           <PerformanceCard />
         </Col>
       </Row>
+      <OngoingCasesCard />
+      <NotificationsCard />
     </>
   )

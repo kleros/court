@@ -8,6 +8,7 @@ import Identicon from '../components/identicon'
 import { ReactComponent as Logo } from '../assets/images/logo.svg'
 import NotificationSettings from '../components/notification-settings'
 import Notifications from '../components/notifications'
+import Footer from '../components/footer'
 import React from 'react'
 import drizzle from './drizzle'
 import loadable from '@loadable/component'
@@ -125,9 +126,12 @@ const StyledMenu = styled(Menu)`
   line-height: 64px !important;
   text-align: center;
 `
+const StyledLayout = styled(Layout)`
+`
 const StyledLayoutContent = styled(Layout.Content)`
   background: #F2E3FF;
-  padding: 0 9.375vw 62px;
+  padding: 0px 9.375vw 120px 9.375vw;
+  min-height: 100vh;
 `
 export default () => (
   <>
@@ -150,7 +154,7 @@ export default () => (
               <StyledLayoutSider breakpoint="md" collapsedWidth="0">
                 <Menu theme="dark">{MenuItems}</Menu>
               </StyledLayoutSider>
-              <Layout>
+              <StyledLayout>
                 <Layout.Header>
                   <Row>
                     <StyledCol md={3} sm={16} xs={0}>
@@ -178,7 +182,8 @@ export default () => (
                     <Route component={C404} />
                   </Switch>
                 </StyledLayoutContent>
-              </Layout>
+                <Footer />
+              </StyledLayout>
             </Layout>
           </BrowserRouter>
         </ArchonInitializer>

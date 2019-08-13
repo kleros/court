@@ -34,7 +34,7 @@ export default () => {
             size="large"
             type="primary"
           >
-            Browse
+            Join a Court
           </Button>
         }
         title="Courts"

@@ -56,16 +56,21 @@ const CourtsListCard = () => {
       prefix={names && names.length}
       title="Courts"
     >
-      {!loading && names.map((n, i) => (
-        <ListItem key={n}
-          extra={(
-            <>
-              <ETHAmount amount={stakes[i]} /> PNK
-            </>
-          )}
-        >{n}</ListItem>
-      )
-    )}
+      {!loading && (names.length > 0 ? (
+        names.map((n, i) => (
+          <ListItem key={n}
+            extra={(
+              <>
+                <ETHAmount amount={stakes[i]} /> PNK
+              </>
+            )}
+          >{n}</ListItem>
+        ))) : (
+          <>
+            <ListItem key='Court-List-None'>You are not staked in any courts.</ListItem>
+          </>
+        )
+      )}
     </TitledListCard>
   )
 }
