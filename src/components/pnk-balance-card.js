@@ -1,20 +1,24 @@
 import { Card, Col, Row } from 'antd'
+import React from 'react'
+
+import { ReactComponent as Reward } from '../assets/images/reward.svg'
+import { ReactComponent as PurpleArrowBackground } from '../assets/images/purple-arrow.svg'
+import { ReactComponent as LightPurpleArrowBackground } from '../assets/images/light-purple-arrow.svg'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+
 import ETHAddress from './eth-address'
 import ETHAmount from './eth-amount'
 import Hint from './hint'
-import Identicon from './identicon'
-import React from 'react'
-import { ReactComponent as SectionArrow } from '../assets/images/section-arrow.svg'
-import { ReactComponent as SectionArrowBackground } from '../assets/images/section-arrow-background.svg'
+
 import styled from 'styled-components/macro'
 
 const StyledCard = styled(Card)`
   cursor: initial;
-  margin: 28px 0;
+  margin: 60px 0 25px 0;
+  border-radius: 12px;
 
   .ant-card-body {
-    padding: 18px 36px;
+    padding: 7px 36px;
 
     @media (max-width: 991px) {
       padding: 18px;
@@ -23,20 +27,29 @@ const StyledCard = styled(Card)`
 `
 const StyledDiv = styled.div`
   font-weight: bold;
-  margin: 8px 0;
+  color: #4004A3;
+  margin-top: 8px;
 
   @media (max-width: 991px) {
     text-align: right;
   }
 `
-const StyledSectionArrow = styled(SectionArrow)`
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
+const StyledDivWhiteSmall = styled(StyledDiv)`
+  color: white;
+  font-size: 14px;
+  margin-top: 8px;
 
   @media (max-width: 991px) {
-    display: none;
+    color: #4004a3;
+  }
+`
+const StyledDivWhiteLarge = styled(StyledDiv)`
+  color: white;
+  font-size: 36px;
+  margin: 0px;
+
+  @media (max-width: 991px) {
+    color: #4004a3;
   }
 `
 const StyledTopDiv = styled.div`
@@ -49,26 +62,69 @@ const StyledTopDiv = styled.div`
 const StyledCenterDiv = styled.div`
   font-size: 36px;
   font-weight: bold;
-`
-const StyledBottomDiv = styled.div`
-  font-size: 18px;
-  font-weight: bold;
-`
-const StyledCol = styled(Col)`
-  z-index: 0;
-`
-const StyledSectionArrowBackground = styled(SectionArrowBackground)`
-  height: 138px;
-  position: absolute;
-  right: -37px;
-  top: -18px;
-  width: 100%;
-  z-index: -1;
+  color: #4004A3;
 
-  @media (max-width: 991px) {
-    right: -19px;
+  @media (max-width: 1200px) {
+    font-size: 28px;
   }
 `
+const StyledBottomDiv = styled.div`
+  font-size: 14px;
+  font-weight: bold;
+  color: #4004A3;
+`
+const StyledRewardLogoCol = styled(Col)`
+  min-width: 100px;
+  max-width: 100px;
+
+  @media (max-width: 991px) {
+    max-width: none;
+  }
+`
+const AmountCol = styled(Col)`
+  color: #4004A3;
+  margin-top: 15px;
+`
+const StyledPurpleArrowBackground = styled(PurpleArrowBackground)`
+  height: 138px;
+  position: absolute;
+  left: -36px;
+  top: -16px;
+  z-index: 0;
+
+  @media (max-width: 991px) {
+    display: none;
+  }
+`
+const StyledLightPurpleArrowBackground = styled(LightPurpleArrowBackground)`
+  height: 138px;
+  position: absolute;
+  right: -36px;
+  top: -16px;
+  z-index: 0;
+
+  @media (max-width: 991px) {
+    display: none;
+  }
+`
+const ETHOffset = styled.div`
+  margin-left: 50%;
+
+  @media (max-width: 991px) {
+    margin-left: 0;
+  }
+`
+const PNKOffset = styled.div`
+  margin-left: 30%;
+
+  @media (max-width: 991px) {
+    margin-left: 0;
+  }
+`
+const PNKCol = styled(Col)`
+  padding-left: 58px;
+`
+
 const PNKBalanceCard = () => {
   const { useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
@@ -83,16 +139,14 @@ const PNKBalanceCard = () => {
   return (
     <StyledCard hoverable>
       <Row>
-        <Col lg={8}>
+        <StyledPurpleArrowBackground />
+        <Col lg={24} style={{zIndex: "1"}}>
           <Row>
-            <Col lg={11} xs={12}>
-              <Identicon large />
-            </Col>
-            <Col lg={13} xs={12}>
-              <StyledDiv>
-                <ETHAddress address={drizzleState.account} />
-              </StyledDiv>
-              <StyledDiv>
+            <PNKCol lg={8} xs={12}>
+              <StyledDivWhiteSmall>
+                Your wallet balance
+              </StyledDivWhiteSmall>
+              <StyledCenterDiv style={{color: "white"}}>
                 <ETHAmount
                   amount={useCacheCall(
                     'MiniMeTokenERC20',
@@ -101,56 +155,59 @@ const PNKBalanceCard = () => {
                   )}
                 />{' '}
                 PNK
-              </StyledDiv>
-              <StyledDiv>
+              </StyledCenterDiv>
+              <StyledBottomDiv style={{color: "white"}}>
                 <ETHAmount amount={drizzleState.balance} decimals={4} /> ETH
+              </StyledBottomDiv>
+            </PNKCol>
+            <PNKCol lg={8} xs={12}>
+              <StyledDiv>
+                You Have
               </StyledDiv>
-            </Col>
+              <StyledCenterDiv>
+                <ETHAmount amount={juror && juror.stakedTokens} /> PNK
+              </StyledCenterDiv>
+              <StyledBottomDiv>
+                Staked{' '}
+                <Hint
+                  description="The more you stake, the higher your chances of being drawn as a juror."
+                  title={
+                    <>
+                      <ETHAmount
+                        amount={juror && juror.stakedTokens}
+                      />{' '}
+                      PNK
+                    </>
+                  }
+                />
+              </StyledBottomDiv>
+            </PNKCol>
+            <PNKCol lg={8} xs={12}>
+              <StyledDiv>
+                You Have
+              </StyledDiv>
+              <StyledCenterDiv>
+                <ETHAmount amount={juror && juror.lockedTokens} /> PNK
+              </StyledCenterDiv>
+              <StyledBottomDiv>
+                Locked{' '}
+                <Hint
+                  description="These PNK are locked in active disputes for potential redistribution."
+                  title={
+                    <>
+                      <ETHAmount
+                        amount={juror && juror.lockedTokens}
+                        decimals={10}
+                      />{' '}
+                      PNK
+                    </>
+                  }
+                />
+              </StyledBottomDiv>
+            </PNKCol>
           </Row>
-          <StyledSectionArrow className="ternary-stroke" />
         </Col>
-        <Col className="ternary-color theme-color" lg={8}>
-          <StyledTopDiv>You have</StyledTopDiv>
-          <StyledCenterDiv>
-            <ETHAmount amount={juror && juror.stakedTokens} /> PNK
-          </StyledCenterDiv>
-          <StyledBottomDiv>
-            Staked{' '}
-            <Hint
-              description="The more you stake, the higher your chances of being drawn as a juror."
-              title={
-                <>
-                  <ETHAmount
-                    amount={juror && juror.stakedTokens}
-                  />{' '}
-                  PNK
-                </>
-              }
-            />
-          </StyledBottomDiv>
-        </Col>
-        <StyledCol className="ternary-color theme-color" lg={8}>
-          <StyledTopDiv>You have</StyledTopDiv>
-          <StyledCenterDiv>
-            <ETHAmount amount={juror && juror.lockedTokens} /> PNK
-          </StyledCenterDiv>
-          <StyledBottomDiv>
-            Locked{' '}
-            <Hint
-              description="These PNK are locked in active disputes for potential redistribution."
-              title={
-                <>
-                  <ETHAmount
-                    amount={juror && juror.lockedTokens}
-                    decimals={10}
-                  />{' '}
-                  PNK
-                </>
-              }
-            />
-          </StyledBottomDiv>
-          <StyledSectionArrowBackground />
-        </StyledCol>
+        <StyledLightPurpleArrowBackground />
       </Row>
     </StyledCard>
   )

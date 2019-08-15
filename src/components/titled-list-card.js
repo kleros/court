@@ -22,7 +22,6 @@ const StyledCard = styled(Card)`
 
     &-body {
       background: white;
-      border: 1px solid silver;
       border-radius: 3px;
       padding: 0;
       border-radius: 12px;

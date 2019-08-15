@@ -1,11 +1,16 @@
 import { Button, Cascader, Col, Modal, Row, Skeleton } from 'antd'
 import React, { useCallback, useState } from 'react'
-import Breadcrumbs from './breadcrumbs'
 import PropTypes from 'prop-types'
 import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components/macro'
+
+import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
+import skillsImg from '../assets/images/skills.png'
+import rewardImg from '../assets/images/reward.png'
 import { useDataloader } from '../bootstrap/dataloader'
 import { useDrizzle } from '../temp/drizzle-react-hooks'
+
+import Breadcrumbs from './breadcrumbs'
 
 const StyledModal = styled(Modal)`
   position: relative;
@@ -29,24 +34,42 @@ const StyledModal = styled(Modal)`
 
     &-footer {
       height: 284px;
+      color: #4D00B4;
       overflow-y: scroll;
       padding: 52px 42px 28px;
       text-align: left;
+      margin-top: 40px;
     }
   }
 `
-const StyledButton = styled(Button)`
-  border-radius: 0;
-  left: 0;
+
+const SelectButtonArea = styled.div`
   position: absolute;
-  top: 340px;
+  top: 390px;
+  background: #4004a3;
+  height: 60px;
+  margin: -52px -42px 0px -42px;
+  padding: 0;
   width: 100%;
-  z-index: 1;
+  z-index: 2;
+`
+
+const StyledButton = styled(Button)`
+  border-radius: 3px;
+  right: 44px;
+  position: absolute;
+  top: 15px;
+  width: 100px;
+  z-index: 3;
 `
 const StyledDiv = styled.div`
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 20px;
+`
+const StyledHeader = styled.div`
+  font-size: 18px;
+  font-weight: bold;
 `
 const StyledTitleDiv = styled.div`
   color: white;
@@ -65,14 +88,32 @@ const StyledCascader = styled(Cascader)`
     min-width: 100%;
     top: 0 !important;
 
+    ul:nth-child(1) {
+      background: #4004a3;
+
+      .ant-cascader-menu-item-active {
+        background: #1E075F;
+      }
+    }
+
+    ul:nth-child(2) {
+      .ant-cascader-menu-item-active {
+        background: #4004a3;
+      }
+    }
+
     .ant-cascader-menu {
       height: 286px;
       padding-top: 28px;
-      width: 135px;
+      width: 186px;
 
       &-item {
         height: 38px;
         padding: 5px 18px;
+
+        &-active {
+          color: white;
+        }
       }
     }
   }
@@ -84,8 +125,15 @@ const StyledBreadcrumbs = styled(Breadcrumbs)`
   top: ${props => props.columnIndex * 38 + 28}px;
   z-index: ${props => props.optionLength - props.colorIndex + 2000};
 `
+const StyledPrefixDiv = styled.div`
+  left: 29px;
+  position: absolute;
+  top: 29px;
+  transform: translate(-50%, -50%);
+`
+
 const CourtCascaderModal = ({ onClick }) => {
-  const { useCacheCall } = useDrizzle()
+  const { drizzle, useCacheCall } = useDrizzle()
   const loadPolicy = useDataloader.loadPolicy()
   const [subcourtIDs, setSubcourtIDs] = useState(['0'])
   const options = useCacheCall(['PolicyRegistry', 'KlerosLiquid'], call => {
@@ -110,6 +158,15 @@ const CourtCascaderModal = ({ onClick }) => {
           option.summary = policyJSON.summary
         }
       }
+      const _court = useCacheCall('KlerosLiquid', 'courts', i)
+      if (_court !== undefined) {
+        option.minStake = drizzle.web3.utils.fromWei(
+          drizzle.web3.utils.toBN(_court.minStake)
+        ).toString()
+        option.feeForJuror = drizzle.web3.utils.fromWei(
+          drizzle.web3.utils.toBN(_court.feeForJuror)
+        ).toString()
+      }
       const subcourt = call('KlerosLiquid', 'getSubcourt', subcourtIDs[i])
       if (subcourt)
         option.children = subcourt.children.map(c => {
@@ -119,6 +176,8 @@ const CourtCascaderModal = ({ onClick }) => {
             label: undefined,
             loading: false,
             summary: undefined,
+            minStake: undefined,
+            feeForJuror: undefined,
             value: c
           }
           const policy = call('PolicyRegistry', 'policies', c)
@@ -131,6 +190,15 @@ const CourtCascaderModal = ({ onClick }) => {
             }
           }
           if (child.label === undefined) child.loading = true
+          const _court = useCacheCall('KlerosLiquid', 'courts', i)
+          if (_court !== undefined) {
+            child.minStake = drizzle.web3.utils.fromWei(
+              drizzle.web3.utils.toBN(_court.minStake)
+            ).toString()
+            option.feeForJuror = drizzle.web3.utils.fromWei(
+              drizzle.web3.utils.toBN(_court.feeForJuror)
+            ).toString()
+          }
           return child
         })
       if (
@@ -149,35 +217,65 @@ const CourtCascaderModal = ({ onClick }) => {
     const index = acc.findIndex(option => option.value === ID)
     return i === subcourtIDs.length - 1
       ? {
+          label: acc[index].label,
           description: acc[index].description,
           loading: acc[index].loading,
-          summary: acc[index].summary
+          summary: acc[index].summary,
+          minStake: acc[index].minStake,
+          reward: acc[index].feeForJuror
         }
       : acc[index].children
   }, options)
+  console.log(option)
   return (
     <StyledModal
       centered
       footer={
         <>
-          <StyledButton
-            onClick={useCallback(
-              () => onClick(subcourtIDs[subcourtIDs.length - 1]),
-              [onClick, subcourtIDs[subcourtIDs.length - 1]]
-            )}
-            type="primary"
-          >
-            Stake
-          </StyledButton>
+          <SelectButtonArea>
+            <StyledButton
+              onClick={useCallback(
+                () => onClick(subcourtIDs[subcourtIDs.length - 1]),
+                [onClick, subcourtIDs[subcourtIDs.length - 1]]
+              )}
+              type="primary"
+            >
+              Stake
+            </StyledButton>
+          </SelectButtonArea>
           <Skeleton active loading={option.loading}>
             <Row gutter={16}>
               <Col md={12}>
-                <StyledDiv>Description</StyledDiv>
+                <StyledDiv>{`${option.label} | Min Stake = ${option.minStake} PNK`}</StyledDiv>
                 <ReactMarkdown source={option.description} />
               </Col>
               <Col md={12}>
-                <StyledDiv>Summary</StyledDiv>
-                <ReactMarkdown source={option.summary} />
+                <Row>
+                  <Col md={4}>
+                    <Hexagon className="ternary-fill" />
+                    <StyledPrefixDiv>
+                      <img src={skillsImg} />
+                    </StyledPrefixDiv>
+                  </Col>
+                  <Col md={20}>
+                    <StyledHeader>Required Skills</StyledHeader>
+                    <ReactMarkdown source={option.description} />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={4}>
+                    <Hexagon className="ternary-fill" />
+                    <StyledPrefixDiv style={{top: '33px'}}>
+                      <img src={rewardImg} />
+                    </StyledPrefixDiv>
+                  </Col>
+                  <Col md={20}>
+                    <StyledHeader>Reward</StyledHeader>
+                    <div>For each coherent vote you will receive
+                      <span style={{fontWeight: '600'}}> {option.reward} ETH +</span>
+                    </div>
+                  </Col>
+                </Row>
               </Col>
             </Row>
           </Skeleton>

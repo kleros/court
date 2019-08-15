@@ -15,7 +15,7 @@ const Footer = () => (
         <a href="https://kleros.io">Find out more about Kleros</a>
       </div>
       <div className='footer-center'>
-        Powered By Kleros
+        Kleros Court
       </div>
       <div className='footer-right'>
         <div className='footer-right-help'>

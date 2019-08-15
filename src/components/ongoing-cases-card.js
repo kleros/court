@@ -1,9 +1,11 @@
+import { Col, Row } from 'antd'
 import React, { useMemo } from 'react'
 import styled from 'styled-components/macro'
 
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import { useDataloader } from '../bootstrap/dataloader'
 
+import CaseSummaryCard from './case-summary-card'
 import TitledListCard from './titled-list-card'
 import ListItem from './list-item'
 
@@ -120,16 +122,28 @@ const OngoingCasesCard = ({}) => {
       <TitledListCard
         prefix={"IMG"}
         title={"Ongoing Cases"}
-      > {
+      />
+      <Row>
+      {
         (disputes.votePending.length === 0 && disputes.active.length === 0) ? (
-          <ListItem key='Ongoing-Cases-None'>You have no Ongoing Cases</ListItem>
+          disputes.executed.slice(0,3).map(_dispute => (
+            <Col lg={8}>
+              <CaseSummaryCard dispute={_dispute} />
+            </Col>
+          )
+
+          )
         ) : (
-          <div>Blah</div>
+          disputes.votePending.reverse().concat(disputes.active.reverse()).slice(0,3).map(_dispute =>
+            <CaseSummaryCard dispute={_dispute} />
+          )
         )
       }
-      </TitledListCard>
+    </Row>
+
     </ StyledDiv>
   )
 }
 
+// <ListItem key='Ongoing-Cases-None'>You have no Ongoing Cases</ListItem>
 export default OngoingCasesCard

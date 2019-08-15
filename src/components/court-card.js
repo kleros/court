@@ -1,14 +1,19 @@
-import { Button, Card, Popconfirm } from 'antd'
+import { Button, Card, Popconfirm, Row, Col } from 'antd'
 import React, { useCallback, useMemo } from 'react'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
-import { ReactComponent as Close } from '../assets/images/close.svg'
-import ETHAmount from './eth-amount'
-import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
 import PropTypes from 'prop-types'
 import styled from 'styled-components/macro'
+import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { ReactComponent as Close } from '../assets/images/close.svg'
+import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
+import { ReactComponent as Scales } from '../assets/images/scales.svg'
 import { useDataloader } from '../bootstrap/dataloader'
+import rewardImg from '../assets/images/reward.png'
+
+import ETHAmount from './eth-amount'
 
 const StyledCard = styled(Card)`
+  border-radius: 12px;
+  box-shadow: 0px 6px 36px #BC9CFF;
   margin: 20px 0 0;
   text-align: center;
 
@@ -19,22 +24,17 @@ const StyledCard = styled(Card)`
       border: none;
     }
   }
+
+  .ant-card-head {
+    height: 40px;
+    background: #4D00B4;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    text-align: left;
+    color: white;
+  }
 `
-const StyledCardGrid = styled(Card.Grid)`
-  box-shadow: none;
-  position: relative;
-  width: 50%;
-
-  @media (max-width: 767px) {
-    border-right: none !important;
-    padding: 8.5px;
-    width: 100%;
-  }
-
-  &:first-child {
-    border-right: 1px solid silver;
-    padding: 3px 0 0;
-  }
+const StyledBody = styled.div`
 `
 const StyledHexagon = styled(Hexagon)`
   height: 81px;
@@ -50,8 +50,26 @@ const StyledDiv = styled.div`
 const StyledAmountDiv = styled.div`
   font-weight: bold;
 `
+const StyledPrefixDiv = styled.div`
+  left: 29px;
+  position: absolute;
+  top: 29px;
+  transform: translate(-50%, -50%);
+`
+const InfoBox = styled.div`
+  border: 2px solid #D09CFF;
+  border-radius: 12px;
+  height: 88px;
+  margin-bottom: 8px;
+`
+const StakeBox = styled(InfoBox)`
+  background: #F5F1FD;
+`
+const RewardBox = styled(InfoBox)`
+  background: linear-gradient(111.05deg, #4D00B4 45.17%, #6500B4 88.53%);
+`
 const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
-  const { useCacheCall, useCacheSend } = useDrizzle()
+  const { drizzle, useCacheCall, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
   }))
@@ -87,59 +105,50 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
         ],
         []
       )}
-      extra={
-        <Popconfirm
-          cancelText="No"
-          okText="Yes"
-          onClick={useCallback(e => e.stopPropagation(), [])}
-          onConfirm={useCallback(
-            e => {
-              e.stopPropagation()
-              send(ID, 0)
-            },
-            [ID]
-          )}
-          title="Unstake all of your PNK from this court?"
-        >
-          <Close />
-        </Popconfirm>
-      }
       hoverable
       loading={name === undefined || (status && status !== 'error')}
       onClick={useCallback(() => onClick(ID), [onClick, ID])}
-      title={name}
+      title={(
+        <>
+          <Scales style={{marginRight: '5px'}}/>
+          {name}
+        </>
+      )}
     >
-      <StyledCardGrid>
-        <StyledHexagon className="ternary-fill" />
-        <StyledDiv>
-          <StyledAmountDiv>
-            <ETHAmount amount={stake} />
-          </StyledAmountDiv>
-          PNK
-        </StyledDiv>
-      </StyledCardGrid>
-      <StyledCardGrid>
-        Min Stake
-        <StyledAmountDiv>
-          <ETHAmount amount={subcourt && subcourt.minStake} /> PNK
-        </StyledAmountDiv>
-      </StyledCardGrid>
-      <StyledCardGrid>
-        Coherence Reward
-        <StyledAmountDiv>
-          <ETHAmount amount={subcourt && subcourt.feeForJuror} decimals={2} />{' '}
-          ETH +
-        </StyledAmountDiv>
-      </StyledCardGrid>
-      <StyledCardGrid>
-        Stake Locked/Vote
-        <StyledAmountDiv>
-          <ETHAmount
-            amount={subcourt && (subcourt.minStake * subcourt.alpha) / 10000}
-          />{' '}
-          PNK
-        </StyledAmountDiv>
-      </StyledCardGrid>
+      <StyledBody>
+        <StakeBox>
+          <Row>
+            <Col md={8}>
+              <Hexagon className="ternary-fill" />
+              <StyledPrefixDiv style={{top: '33px'}}>
+                <img src={rewardImg} />
+              </StyledPrefixDiv>
+            </Col>
+            <Col md={16}>
+              <div>Current Stake</div>
+              <div>
+                {subcourt && drizzle.web3.utils.fromWei(subcourt.feeForJuror).toString()} ETH +
+              </div>
+            </Col>
+          </Row>
+        </StakeBox>
+        <RewardBox>
+          <Row>
+            <Col md={8}>
+              <Hexagon className="ternary-fill" />
+              <StyledPrefixDiv style={{top: '33px'}}>
+                <img src={rewardImg} />
+              </StyledPrefixDiv>
+            </Col>
+            <Col md={16}>
+              <div>Coherence Reward</div>
+              <div>
+                {subcourt && drizzle.web3.utils.fromWei(subcourt.feeForJuror).toString()} ETH +
+              </div>
+            </Col>
+          </Row>
+        </RewardBox>
+      </StyledBody>
     </StyledCard>
   )
 }
