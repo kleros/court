@@ -20,7 +20,7 @@ const StyledBreadcrumbDiv = styled.div`
 `
 const StyledBreadcrumb = styled(Breadcrumb)`
   height: ${props => (props.large === 'true' ? 38 : 20)}px;
-  width: ${props => (props.large === 'true' ? 151 : 114)}px;
+  width: ${props => (props.large === 'true' ? 203 : 114)}px;
 `
 const StyledTitleDiv = styled.div`
   color: white;

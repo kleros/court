@@ -30,6 +30,7 @@ const StyledModal = styled(Modal)`
       height: 286px;
       overflow-x: scroll;
       position: relative;
+      margin-top: -1px;
     }
 
     &-footer {
@@ -72,6 +73,7 @@ const StyledHeader = styled.div`
   font-weight: bold;
 `
 const StyledTitleDiv = styled.div`
+  background: #4004a3;
   color: white;
   font-size: 20px;
   font-weight: bold;
@@ -90,6 +92,7 @@ const StyledCascader = styled(Cascader)`
 
     ul:nth-child(1) {
       background: #4004a3;
+      border-radius: 0px;
 
       .ant-cascader-menu-item-active {
         background: #1E075F;
@@ -119,7 +122,7 @@ const StyledCascader = styled(Cascader)`
   }
 `
 const StyledBreadcrumbs = styled(Breadcrumbs)`
-  left: ${props => props.colorIndex * 135}px;
+  left: ${props => props.colorIndex * 185}px;
   pointer-events: none;
   position: absolute;
   top: ${props => props.columnIndex * 38 + 28}px;
@@ -283,7 +286,7 @@ const CourtCascaderModal = ({ onClick }) => {
       }
       onCancel={useCallback(() => onClick(), [onClick])}
       title={
-        <StyledTitleDiv className="secondary-linear-background theme-linear-background">
+        <StyledTitleDiv>
           Select Court
         </StyledTitleDiv>
       }

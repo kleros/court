@@ -8,6 +8,7 @@ import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
 import { ReactComponent as Scales } from '../assets/images/scales.svg'
 import { useDataloader } from '../bootstrap/dataloader'
 import rewardImg from '../assets/images/reward.png'
+import stakeImg from '../assets/images/stake-kleros-logo.png'
 
 import ETHAmount from './eth-amount'
 
@@ -18,10 +19,24 @@ const StyledCard = styled(Card)`
   text-align: center;
 
   .ant-card-actions {
+    background: #F5F1FD;
     border: none;
 
     & > li {
       border: none;
+    }
+
+    button {
+      font-size: 14px;
+      min-width: 110px;
+      height: 40px;
+    }
+
+    .unstake-button {
+      background: none;
+      border: 1px solid #4D00B4;
+      border-radius: 3px;
+      color: #4D00B4;
     }
   }
 
@@ -51,10 +66,37 @@ const StyledAmountDiv = styled.div`
   font-weight: bold;
 `
 const StyledPrefixDiv = styled.div`
-  left: 29px;
+  left: 50%;
   position: absolute;
-  top: 29px;
+  top: 33px;
   transform: translate(-50%, -50%);
+`
+const IconCol = styled(Col)`
+  margin-top: 10px;
+`
+const StakeCol = styled(Col)`
+  margin-top: 16px;
+  color: #4D00B4;
+  font-size: 14px;
+  text-align: left;
+
+  h3 {
+    color: #4D00B4;
+    font-size: 24px;
+    font-weight: 600;
+  }
+`
+const RewardCol = styled(Col)`
+  margin-top: 16px;
+  color: white;
+  font-size: 14px;
+  text-align: left;
+
+  h3 {
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
+  }
 `
 const InfoBox = styled.div`
   border: 2px solid #D09CFF;
@@ -68,7 +110,7 @@ const StakeBox = styled(InfoBox)`
 const RewardBox = styled(InfoBox)`
   background: linear-gradient(111.05deg, #4D00B4 45.17%, #6500B4 88.53%);
 `
-const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
+const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick, onUnstakeAllClick: _onUnstakeAllClick }) => {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
@@ -95,13 +137,42 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
     },
     [_onStakeClick, ID]
   )
+  const onUnstakeAllClick = useCallback(
+    e => {
+      e.stopPropagation()
+      _onUnstakeAllClick(ID)
+    },
+    [_onUnstakeAllClick, ID]
+  )
+
   return (
     <StyledCard
       actions={useMemo(
         () => [
-          <Button onClick={onStakeClick} size="large" type="primary">
+          (
+            <Popconfirm
+              cancelText="No"
+              okText="Yes"
+              onClick={useCallback(e => e.stopPropagation(), [])}
+              onCancel={useCallback(e => e.stopPropagation(), [])}
+              onConfirm={useCallback(
+                e => {
+                  e.stopPropagation()
+                  send(ID, 0)
+                },
+                [ID]
+              )}
+              title="Unstake all of your PNK from this court?"
+            >
+              <Button className="unstake-button">
+                Unstake All
+              </Button>
+            </Popconfirm>
+          ),
+          <Button onClick={onStakeClick} type="primary" className="stake-button">
             Stake
           </Button>
+
         ],
         []
       )}
@@ -118,34 +189,34 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
       <StyledBody>
         <StakeBox>
           <Row>
-            <Col md={8}>
+            <IconCol md={8}>
               <Hexagon className="ternary-fill" />
-              <StyledPrefixDiv style={{top: '33px'}}>
-                <img src={rewardImg} />
+              <StyledPrefixDiv>
+                <img src={stakeImg} />
               </StyledPrefixDiv>
-            </Col>
-            <Col md={16}>
+            </IconCol>
+            <StakeCol md={16}>
               <div>Current Stake</div>
-              <div>
-                {subcourt && drizzle.web3.utils.fromWei(subcourt.feeForJuror).toString()} ETH +
-              </div>
-            </Col>
+              <h3>
+                {stake && Number(drizzle.web3.utils.fromWei(stake)).toFixed(0)} PNK
+              </h3>
+            </StakeCol>
           </Row>
         </StakeBox>
         <RewardBox>
           <Row>
-            <Col md={8}>
+            <IconCol md={8}>
               <Hexagon className="ternary-fill" />
-              <StyledPrefixDiv style={{top: '33px'}}>
+              <StyledPrefixDiv>
                 <img src={rewardImg} />
               </StyledPrefixDiv>
-            </Col>
-            <Col md={16}>
+            </IconCol>
+            <RewardCol md={16}>
               <div>Coherence Reward</div>
-              <div>
+              <h3>
                 {subcourt && drizzle.web3.utils.fromWei(subcourt.feeForJuror).toString()} ETH +
-              </div>
-            </Col>
+              </h3>
+            </RewardCol>
           </Row>
         </RewardBox>
       </StyledBody>
