@@ -25,10 +25,10 @@ const TopBanner = ({ description, extra, title }) => (
       <StyledTitleCol md={3} xs={12} offset={1}>
         {title}
       </StyledTitleCol>
-      <Col md={16} xs={0}>
+      <Col md={14} xs={0}>
         {description}
       </Col>
-      <StyledExtraCol md={4} xs={4}>
+      <StyledExtraCol md={6} xs={6}>
         {extra}
       </StyledExtraCol>
     </Row>

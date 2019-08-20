@@ -8,9 +8,28 @@ import styled from 'styled-components/macro'
 
 const StyledRadioGroup = styled(Radio.Group)`
   float: right;
+
+  .ant-radio-button-wrapper {
+    color: #4D00B4;
+    margin-left: 10px;
+    border: 1px solid #4D00B4 !important;
+    border-radius: 300px;
+
+    &:before {
+      background-color: transparent;
+    }
+
+    &-checked {
+      background: #4D00B4 !important;
+    }
+  }
 `
 const StyledCol = styled(Col)`
-  color: gainsboro;
+  color: #D09CFF;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 28px;
+  text-align: center;
 `
 export default () => {
   const { useCacheCall, useCacheEvents } = useDrizzle()
@@ -93,25 +112,26 @@ export default () => {
         //     </Button>
         //   </Link>
         // }
-        title="Cases"
+        title="My Cases"
+        extra={(
+          <StyledRadioGroup
+            buttonStyle="solid"
+            name="filter"
+            onChange={useCallback(e => setFilter(e.target.value), [])}
+            value={filter}
+          >
+            <Radio.Button value={0}>Vote Pending</Radio.Button>
+            <Radio.Button value={1}>In Progress</Radio.Button>
+            <Radio.Button value={2}>Closed</Radio.Button>
+          </StyledRadioGroup>
+        )}
       />
-      My Cases
-      <StyledRadioGroup
-        buttonStyle="solid"
-        name="filter"
-        onChange={useCallback(e => setFilter(e.target.value), [])}
-        value={filter}
-      >
-        <Radio.Button value={0}>Vote Pending</Radio.Button>
-        <Radio.Button value={1}>In Progress</Radio.Button>
-        <Radio.Button value={2}>Closed</Radio.Button>
-      </StyledRadioGroup>
       <Divider />
       <Spin spinning={disputes.loading}>
         <Row gutter={48}>
           {filteredDisputes.length === 0 ? (
             <StyledCol>
-              You don't have any {['vote pending', 'active', 'closed'][filter]}{' '}
+              You don't have any {['Pending', 'Active', 'Closed'][filter]}{' '}
               cases.
             </StyledCol>
           ) : (

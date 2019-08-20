@@ -17,7 +17,7 @@ export default () => (
         description={"This is the Kleros Juror Dashboard"}
         extra={(
             <Link to="/courts">
-              <Button size="large" type="primary">
+              <Button size="large" type="primary" style={{maxWidth: '120px'}}>
                 Join a Court
               </Button>
             </Link>

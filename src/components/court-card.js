@@ -21,6 +21,7 @@ const StyledCard = styled(Card)`
   .ant-card-actions {
     background: #F5F1FD;
     border: none;
+    padding: 12px 0px;
 
     & > li {
       border: none;

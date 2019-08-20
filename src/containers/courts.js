@@ -35,6 +35,7 @@ export default () => {
             onClick={useCallback(() => setStakingID(null), [])}
             size="large"
             type="primary"
+            style={{maxWidth: '120px'}}
           >
             Join a Court
           </Button>

@@ -1,85 +1,147 @@
-import { Button, Card } from 'antd'
-import React, { useMemo } from 'react'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
-import ETHAmount from './eth-amount'
-import { ReactComponent as Gavel } from '../assets/images/gavel.svg'
+import { Button, Card, Popconfirm, Row, Col } from 'antd'
+import React, { useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import TimeAgo from './time-ago'
 import styled from 'styled-components/macro'
+import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { ReactComponent as Close } from '../assets/images/close.svg'
+import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
+import { ReactComponent as Scales } from '../assets/images/scales.svg'
 import { useDataloader } from '../bootstrap/dataloader'
+import rewardImg from '../assets/images/reward.png'
+import stakeImg from '../assets/images/stake-kleros-logo.png'
+import Hint from '../components/hint'
+
+import ETHAmount from './eth-amount'
 
 const StyledCard = styled(Card)`
-  cursor: initial;
+  border-radius: 12px;
+  box-shadow: 0px 6px 36px #BC9CFF;
   margin: 20px 0 0;
+  text-align: center;
 
-  .ant-card {
-    &-head {
-      font-size: 14px;
-      height: 32px;
-      line-height: 32px;
-      min-height: 32px;
-      padding: 0 19px 0 44px;
-      position: relative;
+  .ant-card-actions {
+    background: #F5F1FD;
+    border: none;
+    padding: 12px 24px;
 
-      &-title {
-        padding: 0;
-      }
-    }
-
-    &-extra {
-      padding: 0;
-    }
-
-    &-body {
-      height: 203px;
-      padding: 17px 32px 0;
-    }
-
-    &-actions {
+    & > li {
       border: none;
+    }
 
-      & > li {
-        border: none;
-        height: 44px;
-        line-height: 44px;
+    & > li:first-child {
+      span {
+        float: left;
       }
+    }
+    & > li:nth-child(2) {
+      span {
+        float: right;
+      }
+    }
+
+    button {
+      font-size: 14px;
+      min-width: 110px;
+      height: 40px;
+    }
+
+    .unstake-button {
+      background: none;
+      border: 1px solid #4D00B4;
+      border-radius: 3px;
+      color: #4D00B4;
     }
   }
+
+  .ant-card-head {
+    height: 40px;
+    background: #4D00B4;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    text-align: left;
+    color: white;
+  }
+`
+const StyledBody = styled.div`
 `
 const StyledDiv = styled.div`
-  font-weight: bold;
+  color: white;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+`
+const StyledPrefixDiv = styled.div`
+  left: 50%;
+  position: absolute;
+  top: 33px;
+  transform: translate(-50%, -50%);
+`
+const IconCol = styled(Col)`
+  margin-top: 10px;
+`
+const RewardCol = styled(Col)`
+  margin-top: 16px;
+  color: white;
+  font-size: 14px;
+  text-align: left;
+
+  h3 {
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
+  }
+`
+const InfoBox = styled.div`
+  border: 2px solid #D09CFF;
+  border-radius: 12px;
+  height: 88px;
+  margin-bottom: 8px;
+`
+const CaseTitleBox = styled.div`
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 23px;
+  color: #000000;
+  height: 65px;
+`
+const RewardBox = styled(InfoBox)`
+  background: linear-gradient(111.05deg, #4D00B4 45.17%, #6500B4 88.53%);
 `
 const StyledBigTextDiv = styled(StyledDiv)`
   font-size: 16px;
 `
-const StyledGavel = styled(Gavel)`
-  left: 14px;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+const StyledHeaderText = styled.div`
+  display: inline-block;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  position: relative;
+  top: -2px;
+  color: #FFFFFF;
 `
-const StyledCardGrid = styled(Card.Grid)`
-  box-shadow: none;
-  display: flex;
-  flex-direction: column;
-  height: 73px;
-  justify-content: center;
-  margin-bottom: 20px;
-  padding: 0 5px;
+const TimeoutDiv = styled.div`
+  color: #F60C36;
+`
+const TimeoutText = styled.div`
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: right;
+`
+const TimeoutTime = styled.div`
+  font-weight: bold;
+  font-size: 20px;
+  line-height: 23px;
   text-align: center;
-  width: 50%;
-
-  &:first-child {
-    border-bottom: 1px solid silver;
-    padding-left: 8px;
-    text-align: left;
-    width: 100%;
-  }
-
-  &:nth-child(2) {
-    border-right: 1px solid silver;
-  }
+`
+const StakeLocked = styled.div`
+  font-size: 14px;
+  line-height: 16px;
+  text-align: right;
+  color: #4D00B4;
 `
 const CaseCard = ({ ID }) => {
   const { drizzle, useCacheCall, useCacheEvents } = useDrizzle()
@@ -95,7 +157,7 @@ const CaseCard = ({ ID }) => {
     useMemo(
       () => ({
         filter: { _address: drizzleState.account, _disputeID: ID },
-        fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER
+        fromBlock: process.env.REACT_APP_DRAW_EVENT_LISTENER_BLOCK_NUMBER
       }),
       [drizzleState.account, ID]
     )
@@ -160,19 +222,18 @@ const CaseCard = ({ ID }) => {
       actions={useMemo(
         () => [
           disputeData.deadline && (
-            <>
-              <StyledDiv className="primary-color theme-color">
+            <TimeoutDiv>
+              <TimeoutText>
                 {
-                  ['Evidence', 'Commit', 'Vote', 'Appeal', 'Execute'][
+                  ['Evidence Submission Over', 'Commit Deadline', 'Voting Deadline', 'Appeal Deadline', 'Execute Deadline'][
                     dispute.period
                   ]
-                }{' '}
-                Period Over
-              </StyledDiv>
-              <StyledBigTextDiv className="primary-color theme-color">
+                }
+              </TimeoutText>
+              <TimeoutTime>
                 <TimeAgo>{disputeData.deadline}</TimeAgo>
-              </StyledBigTextDiv>
-            </>
+              </TimeoutTime>
+            </TimeoutDiv>
           ),
           <Link to={`/cases/${ID}`}>
             <Button type="primary">See Details</Button>
@@ -180,33 +241,51 @@ const CaseCard = ({ ID }) => {
         ],
         [disputeData.deadline]
       )}
-      extra={`Case #${ID}`}
       hoverable
       loading={!metaEvidence}
-      title={
+      title={(
         <>
-          <StyledGavel className="ternary-fill" />
-          {metaEvidence && metaEvidence.metaEvidenceJSON.category}
+          <Scales style={{marginRight: '5px'}}/>
+          <StyledHeaderText>{metaEvidence && metaEvidence.metaEvidenceJSON.category}</StyledHeaderText>
         </>
-      }
+      )}
+      extra={(
+        <StyledHeaderText>
+          Case #{ID}
+        </StyledHeaderText>
+      )}
     >
-      <StyledCardGrid>
-        <StyledBigTextDiv>
+      <StyledBody>
+        <CaseTitleBox>
           {metaEvidence && metaEvidence.metaEvidenceJSON.title}
-        </StyledBigTextDiv>
-      </StyledCardGrid>
-      <StyledCardGrid>
-        Coherence Reward
-        <StyledBigTextDiv>
-          <ETHAmount amount={disputeData.coherenceReward} decimals={2} /> ETH +
-        </StyledBigTextDiv>
-      </StyledCardGrid>
-      <StyledCardGrid>
-        Stake Locked
-        <StyledBigTextDiv>
-          <ETHAmount amount={disputeData.atStake} /> PNK
-        </StyledBigTextDiv>
-      </StyledCardGrid>
+        </CaseTitleBox>
+        <RewardBox>
+          <Row>
+            <IconCol md={8}>
+              <Hexagon className="ternary-fill" />
+              <StyledPrefixDiv>
+                <img src={rewardImg} />
+              </StyledPrefixDiv>
+            </IconCol>
+            <RewardCol md={16}>
+              <div>Coherence Reward</div>
+              <h3>
+                {disputeData.coherenceReward &&
+                  Number(drizzle.web3.utils.fromWei(disputeData.coherenceReward).toString()).toFixed(2)
+                } ETH +
+              </h3>
+            </RewardCol>
+          </Row>
+        </RewardBox>
+        <StakeLocked>
+          Stake locked: {disputeData.atStake &&
+            Number(drizzle.web3.utils.fromWei(disputeData.atStake).toString()).toFixed(0)
+          } PNK {' '}
+          <Hint
+            description="These are the tokens you have locked for the duration of the dispute."
+          />
+        </StakeLocked>
+      </StyledBody>
     </StyledCard>
   )
 }
