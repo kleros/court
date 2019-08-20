@@ -110,7 +110,7 @@ const StakeBox = styled(InfoBox)`
 const RewardBox = styled(InfoBox)`
   background: linear-gradient(111.05deg, #4D00B4 45.17%, #6500B4 88.53%);
 `
-const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick, onUnstakeAllClick: _onUnstakeAllClick }) => {
+const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
@@ -136,13 +136,6 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick, onUnstakeAllClick
       _onStakeClick(ID)
     },
     [_onStakeClick, ID]
-  )
-  const onUnstakeAllClick = useCallback(
-    e => {
-      e.stopPropagation()
-      _onUnstakeAllClick(ID)
-    },
-    [_onUnstakeAllClick, ID]
   )
 
   return (
