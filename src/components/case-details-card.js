@@ -18,9 +18,13 @@ import { API } from '../bootstrap/api'
 import Attachment from './attachment'
 import Breadcrumbs from './breadcrumbs'
 import CaseRoundHistory from './case-round-history'
+import CollapsableCard from './collapsable-card'
 import CourtDrawer from './court-drawer'
 import { ReactComponent as Document } from '../assets/images/document.svg'
+import { ReactComponent as Folder } from '../assets/images/folder.svg'
+import { ReactComponent as Scales } from '../assets/images/scales.svg'
 import ETHAddress from './eth-address'
+import EvidenceTimeline from './evidence-timeline'
 import Identicon from './identicon'
 import PropTypes from 'prop-types'
 import ReactMarkdown from 'react-markdown'
@@ -39,6 +43,8 @@ realitioLibQuestionFormatter.minNumber = realitioLibQuestionFormatter.minNumber.
 )
 
 const StyledCard = styled(Card)`
+  border-radius: 12px;
+  box-shadow: 0px 6px 36px #BC9CFF;
   cursor: initial;
 
   .ant-card {
@@ -52,6 +58,7 @@ const StyledCard = styled(Card)`
       }
 
       &-title {
+        color: #4D00B4;
         font-size: 24px;
       }
     }
@@ -113,6 +120,10 @@ const StyledButton = styled(Button)`
   margin: 20px 5px 15px;
 `
 const StyledPoliciesButton = styled(Button)`
+  border: 1px solid #4D00B4;
+  box-sizing: border-box;
+  border-radius: 3px;
+  color: #4D00B4;
   padding-left: 40px;
   position: relative;
 `
@@ -123,6 +134,9 @@ const StyledDocument = styled(Document)`
   top: 50%;
   transform: translateY(-50%);
   width: auto;
+  path {
+    fill: #4D00B4;
+  }
 `
 const StyledBreadcrumbs = styled(Breadcrumbs)`
   bottom: -20px;
@@ -131,6 +145,9 @@ const StyledBreadcrumbs = styled(Breadcrumbs)`
   position: absolute;
 `
 const StyledInnerCard = styled(Card)`
+  border: 1px solid #D09CFF;
+  box-sizing: border-box;
+  border-radius: 3px;
   cursor: initial;
   margin-bottom: 38px;
 
@@ -151,18 +168,30 @@ const StyledInnerCard = styled(Card)`
     }
 
     &-actions {
-      background: linear-gradient(228.49deg, white -6.48%, whitesmoke 45.52%);
+      background: linear-gradient(204.14deg, #FFFFFF -6.48%, #F5F1FD 45.52%);
       border: none;
+      height: 70px;
       padding-left: 20px;
       position: relative;
+      text-align: center;
 
       & > li {
         border: none;
         margin: 12px 8px;
         width: auto !important;
 
+        path {
+          fill: #4D00B4;
+        }
+
+        &:first-child {
+          left: 48%;
+          position: absolute;
+          top: 4px;
+        }
+
         &:last-child {
-          left: 0;
+          left: 40%;
           position: absolute;
           top: 0;
         }
@@ -180,7 +209,7 @@ const StyledIFrame = styled.iframe`
   width: 100%;
 `
 const StyledInnerCardActionsTitleDiv = styled.div`
-  background: whitesmoke;
+  background: linear-gradient(204.14deg, #FFFFFF -6.48%, #F5F1FD 45.52%);
   border-radius: 6px 6px 0 0;
   height: 28px;
   left: 20px;
@@ -201,6 +230,8 @@ const CaseDetailsCard = ({ ID }) => {
   const loadPolicy = useDataloader.loadPolicy()
   const getMetaEvidence = useDataloader.getMetaEvidence()
   const getEvidence = useDataloader.getEvidence()
+  const getDisputeCreation = useDataloader.getDisputeCreation()
+  const getAppealDecision = useDataloader.getAppealDecision()
   const [activeSubcourtID, setActiveSubcourtID] = useState()
   const [justification, setJustification] = useState()
   const [complexRuling, setComplexRuling] = useState()
@@ -212,6 +243,17 @@ const CaseDetailsCard = ({ ID }) => {
     useMemo(
       () => ({
         filter: { _address: drizzleState.account, _disputeID: ID },
+        fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER
+      }),
+      [drizzleState.account, ID]
+    )
+  )
+  const disputeCreated = useCacheEvents(
+    'KlerosLiquid',
+    'DisputeCreation',
+    useMemo(
+      () => ({
+        filter: {_disputeID: ID },
         fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER
       }),
       [drizzleState.account, ID]
@@ -301,6 +343,8 @@ const CaseDetailsCard = ({ ID }) => {
   })
   let metaEvidence
   let evidence
+  let ruling
+  let appeals = []
   let evidenceBySubmitter
   if (dispute) {
     metaEvidence = getMetaEvidence(
@@ -319,7 +363,18 @@ const CaseDetailsCard = ({ ID }) => {
         else acc[e.submittedBy] = [e]
         return acc
       }, {})
+    if (dispute2 && dispute2.votesLengths.length > 1) {
+      appeals = new Array(dispute2.votesLengths.length - 1).map((_, i) =>
+        getAppealDecision(
+          drizzle.contracts.KlerosLiquid.address,
+          ID,
+          i + 1
+        )
+      )
+    }
   }
+  // if (disputeCreated) console.log(disputeCreated)
+  // if (appeals.length) console.log(appeals)
   const { send: sendCommit, status: sendCommitStatus } = useCacheSend(
     'KlerosLiquid',
     'castCommit'
@@ -715,63 +770,36 @@ const CaseDetailsCard = ({ ID }) => {
               </StyledInnerCard>
             </Col>
           </Row>
-          <Skeleton active loading={!evidence} title={false}>
-            {evidence && (
-              <Row gutter={40}>
-                {Object.keys(evidenceBySubmitter).map(a => (
-                  <Col key={a} md={12}>
-                    <StyledInnerCard
-                      actions={evidenceBySubmitter[a]
-                        .map(e => (
-                          <Attachment
-                            URI={e.evidenceJSON.fileURI}
-                            description={e.evidenceJSON.description}
-                            extension={e.evidenceJSON.fileTypeExtension}
-                            title={e.evidenceJSON.name}
-                          />
-                        ))
-                        .concat(
-                          <StyledInnerCardActionsTitleDiv className="ternary-color theme-color">
-                            Evidence
-                          </StyledInnerCardActionsTitleDiv>
-                        )}
-                      hoverable
-                      title={
-                        <>
-                          <StyledIdenticon account={a} />
-                          {(metaEvidence.metaEvidenceJSON.aliases &&
-                            metaEvidence.metaEvidenceJSON.aliases[a]) || (
-                            <ETHAddress address={a} />
-                          )}
-                        </>
-                      }
-                    />
-                  </Col>
-                ))}
-              </Row>
-            )}
-          </Skeleton>
-          {dispute2 &&
-            metaEvidence &&
-            metaEvidence.metaEvidenceJSON.rulingOptions &&
-            metaEvidence.metaEvidenceJSON.rulingOptions.type ===
-              'single-select' && <Divider>History</Divider>}
+          <CollapsableCard title={(
+              <>
+                <Folder /> Evidence
+              </>
+            )}>
+            <EvidenceTimeline evidence={evidence}/>
+          </CollapsableCard>
           {dispute2 &&
             metaEvidence &&
             metaEvidence.metaEvidenceJSON.rulingOptions &&
             metaEvidence.metaEvidenceJSON.rulingOptions.type ===
               'single-select' &&
-            dispute2.votesLengths.map((_, i) => (
-              <CaseRoundHistory
-                ID={ID}
-                disabled={
-                  dispute.period !== '4' &&
-                  i === dispute2.votesLengths.length - 1
-                }
-                key={i}
-                round={i}
-              />
-            ))}
+              <CollapsableCard title={(
+                  <>
+                    <Scales /> Dispute History
+                  </>
+                )}>
+                {dispute2.votesLengths.map((_, i) => (
+                  <CaseRoundHistory
+                    ID={ID}
+                    disabled={
+                      dispute.period !== '4' &&
+                      i === dispute2.votesLengths.length - 1
+                    }
+                    key={i}
+                    round={i}
+                  />
+              ))}
+              </CollapsableCard>
+          }
         </>
       )}
       {activeSubcourtID !== undefined && (

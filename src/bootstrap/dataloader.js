@@ -42,6 +42,19 @@ const funcs = {
           title: 'Invalid or tampered case data, refuse to arbitrate.'
         }
       })),
+  getDisputeCreation: (arbitratorAddress, disputeID, options) =>
+    archon.arbitrator
+      .getDisputeCreation(arbitratorAddress, disputeID, {
+        ...options
+      }),
+  getAppealDecision: (arbitratorAddress, disputeID, appeal, options) =>
+    archon.arbitrator
+      .getAppealDecision(arbitratorAddress, disputeID, appeal, {
+        ...options
+      })
+      .catch(() => ({
+        appealedAt: null
+      })),
   loadPolicy: (URI, options) =>
     archon.utils
       .validateFileFromURI(URI, {
