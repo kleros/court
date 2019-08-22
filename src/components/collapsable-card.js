@@ -34,9 +34,9 @@ const DetailsArea = ({ title, children, headerSpacing=false }) => {
           <Col lg={1} offset={15}>
             {
               showInputs ? (
-                <ArrowUp onClick={() => setShowInputs(!showInputs)} />
+                <ArrowUp onClick={() => setShowInputs(!showInputs)} style={{cursor: "pointer"}} />
               ) : (
-                <ArrowDown onClick={() => setShowInputs(!showInputs)} />
+                <ArrowDown onClick={() => setShowInputs(!showInputs)} style={{cursor: "pointer"}} />
               )
             }
           </Col>

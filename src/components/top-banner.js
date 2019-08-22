@@ -5,8 +5,8 @@ import styled from 'styled-components/macro'
 
 const StyledCard = styled(Card)`
   color: #4D00B4;
-  margin: 0 -9.375vw 28px;
-  padding: 0px 50px 0px 50px;
+  margin: 0 -9.375vw 28px -9.375vw;
+  padding: 0px 9.375vw 0px 9.375vw;
   background: linear-gradient(270deg, #F2E3FF 22.92%, #FFFFFF 76.25%);
   box-shadow: 0px 3px 24px #BC9CFF;
 `
@@ -25,10 +25,10 @@ const TopBanner = ({ description, extra, title }) => (
       <StyledTitleCol md={3} xs={12} offset={1}>
         {title}
       </StyledTitleCol>
-      <Col md={14} xs={0}>
+      <Col md={12} xs={0}>
         {description}
       </Col>
-      <StyledExtraCol md={6} xs={6}>
+      <StyledExtraCol md={8} xs={6}>
         {extra}
       </StyledExtraCol>
     </Row>

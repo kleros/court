@@ -772,10 +772,10 @@ const CaseDetailsCard = ({ ID }) => {
           </Row>
           <CollapsableCard title={(
               <>
-                <Folder /> Evidence
+                <Folder /> {`Evidence (${evidence ? evidence.length : 0})`}
               </>
             )}>
-            <EvidenceTimeline evidence={evidence}/>
+            <EvidenceTimeline evidence={evidence} metaEvidence={metaEvidence}/>
           </CollapsableCard>
           {dispute2 &&
             metaEvidence &&
