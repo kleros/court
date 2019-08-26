@@ -46,8 +46,7 @@ const EvidenceTimeline = ({evidence = {}, metaEvidence = {}, vents = [], ruling 
     return 0
   })
 
-  console.log(sortedEvidence[0])
-  console.log(metaEvidence)
+  if (sortedEvidence.length === 0) return null
 
   return (
     <>
@@ -56,7 +55,6 @@ const EvidenceTimeline = ({evidence = {}, metaEvidence = {}, vents = [], ruling 
         <Col lg={16}>
         {
           ruling && (
-
               <EventDiv>
                 {
                   ruling ?

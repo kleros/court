@@ -51,6 +51,15 @@ const StyledAppealed = styled.div`
     }
   }
 `
+const StyledGavelContainer = styled.div`
+  svg {
+    height: 30px;
+    width: 30px;
+    path {
+      fill: #fff;
+    }
+  }
+`
 
 const OngoingCasesCard = ({}) => {
   const { drizzle, useCacheCall, useCacheEvents } = useDrizzle()
@@ -180,7 +189,6 @@ const OngoingCasesCard = ({}) => {
 
   return (
     <StyledDiv>
-
       {
         (_allActive.length > 0) ? (
           <>
@@ -202,7 +210,11 @@ const OngoingCasesCard = ({}) => {
           </>
         ) : (
           <TitledListCard
-            prefix={"IMG"}
+            prefix={(
+              <StyledGavelContainer>
+                <Gavel />
+              </StyledGavelContainer>
+            )}
             title={"Ongoing Cases"}
           >
             <ListItem key='Ongoing-Cases-None'>You have no Ongoing Cases</ListItem>
