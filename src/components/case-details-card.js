@@ -10,7 +10,9 @@ import {
   InputNumber,
   Row,
   Skeleton,
-  Spin
+  Spin,
+  Icon,
+  Tooltip
 } from 'antd'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
@@ -704,7 +706,7 @@ const CaseDetailsCard = ({ ID }) => {
                   </>
                 )}
               </StyledDiv>
-              <StyledDiv className="secondary-background theme-background">
+              <StyledDiv className="secondary-background theme-background" style={{display: 'inherit'}}>
                 <Button
                   disabled={!votesData.canVote}
                   ghost={votesData.canVote}
@@ -775,7 +777,7 @@ const CaseDetailsCard = ({ ID }) => {
                 <Folder /> {`Evidence (${evidence ? evidence.length : 0})`}
               </>
             )}>
-            <EvidenceTimeline evidence={evidence} metaEvidence={metaEvidence}/>
+            <EvidenceTimeline evidence={evidence} metaEvidence={metaEvidence} ruling={dispute.period === '4' ? votesData.currentRuling : null} />
           </CollapsableCard>
           {dispute2 &&
             metaEvidence &&

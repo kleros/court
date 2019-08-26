@@ -125,6 +125,7 @@ export default () => {
             <Radio.Button value={2}>Closed</Radio.Button>
           </StyledRadioGroup>
         )}
+        extraLong={true}
       />
       <Divider />
       <Spin spinning={disputes.loading}>

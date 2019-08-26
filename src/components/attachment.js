@@ -54,6 +54,23 @@ const Attachment = ({
   else if (isVideo(extension)) Component = Video
   else Component = Link
   Component = <Component className="ternary-fill theme-fill" />
+  // No popover
+  if (!title && !description) {
+      if (URI)
+        return (
+          <a
+            href={URI.replace(/^\/ipfs\//, 'https://ipfs.kleros.io/ipfs/')}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            {Component}
+          </a>
+        )
+      return (
+        Component
+      )
+  }
+
   return (
     <StyledPopover
       arrowPointAtCenter

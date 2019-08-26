@@ -37,7 +37,7 @@ const ScrollText = styled.div`
   text-align: right;
 `
 
-const EvidenceTimeline = ({evidence = {}, metaEvidence = {}, vents = [], ruling = null}) => {
+const EvidenceTimeline = ({evidence = [], metaEvidence = {}, ruling = null}) => {
   // Sort so most recent is first
   const sortedEvidence = evidence.sort((a, b) => {
     if (a.submittedAt > b.submittedAt) return -1
@@ -55,10 +55,12 @@ const EvidenceTimeline = ({evidence = {}, metaEvidence = {}, vents = [], ruling 
         <Col lg={16}>
         {
           ruling && (
-              <EventDiv>
+              <EventDiv style={{width: '225px'}}>
                 {
                   ruling ?
-                    `Jurors ruled: ${ruling}` :
+                    `Jurors ruled: ${
+                      metaEvidence.metaEvidenceJSON.rulingOptions ? metaEvidence.metaEvidenceJSON.rulingOptions.titles[Number(ruling) - 1]
+                    : ruling}` :
                     "Jurors refused to make a ruling"
                 }
               </EventDiv>
@@ -77,7 +79,7 @@ const EvidenceTimeline = ({evidence = {}, metaEvidence = {}, vents = [], ruling 
           return (
             <div key={`evidence-${i}`}>
               <Row><StyledDividerCol lg={12} /></Row>
-              <EvidenceCard evidence={_evidence}  />
+              <EvidenceCard evidence={_evidence} metaEvidence={metaEvidence.metaEvidenceJSON} />
             </div>
           )
         })

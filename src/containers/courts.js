@@ -14,6 +14,9 @@ const StyledCol = styled(Col)`
   text-align: center;
   margin-top: 10px;
 `
+const StyledButton = styled(Button)`
+  float: right;
+`
 export default () => {
   const { useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
@@ -30,16 +33,18 @@ export default () => {
     <>
       <TopBanner
         description="Select courts and stake PNK."
-        extra={
-          <Button
-            onClick={useCallback(() => setStakingID(null), [])}
-            size="large"
-            type="primary"
-            style={{maxWidth: '120px'}}
-          >
-            Join a Court
-          </Button>
-        }
+        extra={(
+          <div className={{width: '100%'}}>
+            <StyledButton
+              onClick={useCallback(() => setStakingID(null), [])}
+              size="large"
+              type="primary"
+              style={{maxWidth: '120px'}}
+            >
+              Join a Court
+            </StyledButton>
+          </div>
+        )}
         title="Courts"
       />
       {juror &&

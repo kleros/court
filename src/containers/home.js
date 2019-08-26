@@ -14,7 +14,6 @@ import TopBanner from '../components/top-banner'
 const StyledButton = styled(Button)`
   float: right;
 `
-
 export default () => (
     <>
       <TopBanner

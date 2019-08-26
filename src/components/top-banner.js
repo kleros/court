@@ -19,21 +19,39 @@ const StyledExtraCol = styled(Col)`
   flex-direction: column;
   justify-content: flex-end;
 `
-const TopBanner = ({ description, extra, title }) => (
-  <StyledCard>
-    <Row align="middle" gutter={16} type="flex">
-      <StyledTitleCol md={3} xs={12} offset={1}>
-        {title}
-      </StyledTitleCol>
-      <Col md={12} xs={0}>
-        {description}
-      </Col>
-      <StyledExtraCol md={8} xs={6}>
-        {extra}
-      </StyledExtraCol>
-    </Row>
-  </StyledCard>
-)
+const TopBanner = ({ description, extra, title, extraLong }) => {
+  if (extraLong) return (
+    <StyledCard>
+      <Row align="middle" gutter={16} type="flex">
+        <StyledTitleCol md={3} xs={12} offset={1}>
+          {title}
+        </StyledTitleCol>
+        <Col md={11} xs={0}>
+          {description}
+        </Col>
+        <StyledExtraCol md={9} xs={6}>
+          {extra}
+        </StyledExtraCol>
+      </Row>
+    </StyledCard>
+  )
+
+  return (
+    <StyledCard>
+      <Row align="middle" gutter={16} type="flex">
+        <StyledTitleCol md={4} xs={12} offset={1}>
+          {title}
+        </StyledTitleCol>
+        <Col md={12} xs={0}>
+          {description}
+        </Col>
+        <StyledExtraCol md={7} xs={6}>
+          {extra}
+        </StyledExtraCol>
+      </Row>
+    </StyledCard>
+  )
+}
 
 TopBanner.propTypes = {
   description: PropTypes.node.isRequired,
