@@ -37,6 +37,7 @@ const NotificationsCard = ({ history }) => {
     notifications = _notifications.filter(
       n => n.account === drizzleState.account
     )
+  console.log(_notifications)
   return (
     <StyledDiv>
       <TitledListCard
