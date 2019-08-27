@@ -36,6 +36,9 @@ const ScrollText = styled.div`
   line-height: 16px;
   text-align: right;
 `
+const StyledEvidenceTimelineArea = styled.div`
+  padding: 35px 10%;
+`
 
 const EvidenceTimeline = ({evidence = [], metaEvidence = {}, ruling = null}) => {
   // Sort so most recent is first
@@ -49,7 +52,7 @@ const EvidenceTimeline = ({evidence = [], metaEvidence = {}, ruling = null}) => 
   if (sortedEvidence.length === 0) return null
 
   return (
-    <>
+    <StyledEvidenceTimelineArea>
       <Row id="scroll-top">
         <StyledHeaderCol lg={4}>Latest</StyledHeaderCol>
         <Col lg={16}>
@@ -99,7 +102,7 @@ const EvidenceTimeline = ({evidence = [], metaEvidence = {}, ruling = null}) => 
           Scroll to Top <Icon type="arrow-up" />
         </ScrollText>
       </Row>
-    </>
+    </StyledEvidenceTimelineArea>
   )
 }
 

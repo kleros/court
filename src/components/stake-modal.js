@@ -354,7 +354,7 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                 {form.getFieldDecorator('Agreement', {
                   rules: [
                     {
-                      message: ("Please acklowledge risks before you continue"),
+                      message: ("Please acknowledge risks before you continue"),
                       validator: (_, _value, callback) => {
                         callback(_value ? undefined : true)
                       }

@@ -789,17 +789,14 @@ const CaseDetailsCard = ({ ID }) => {
                     <Scales /> Dispute History
                   </>
                 )}>
-                {dispute2.votesLengths.map((_, i) => (
-                  <CaseRoundHistory
-                    ID={ID}
-                    disabled={
-                      dispute.period !== '4' &&
-                      i === dispute2.votesLengths.length - 1
-                    }
-                    key={i}
-                    round={i}
-                  />
-              ))}
+                <CaseRoundHistory
+                  ID={ID}
+                  dispute={{
+                    ...dispute2,
+                    ...dispute
+                  }}
+                  ruling={dispute.period === '4' ? votesData.currentRuling : null}
+                />
               </CollapsableCard>
           }
         </>

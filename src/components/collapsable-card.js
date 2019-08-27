@@ -20,7 +20,6 @@ const StyledHeader = styled.div`
   padding: 15px 30px;
 `
 const StyledBody = styled.div`
-  padding: 35px 10%;
 `
 
 const DetailsArea = ({ title, children, headerSpacing=false }) => {
