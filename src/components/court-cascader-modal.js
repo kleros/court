@@ -161,7 +161,7 @@ const CourtCascaderModal = ({ onClick }) => {
           option.summary = policyJSON.summary
         }
       }
-      const _court = useCacheCall('KlerosLiquid', 'courts', i)
+      const _court = call('KlerosLiquid', 'courts', i)
       if (_court !== undefined) {
         option.minStake = drizzle.web3.utils.fromWei(
           drizzle.web3.utils.toBN(_court.minStake)
@@ -193,7 +193,7 @@ const CourtCascaderModal = ({ onClick }) => {
             }
           }
           if (child.label === undefined) child.loading = true
-          const _court = useCacheCall('KlerosLiquid', 'courts', i)
+          const _court = call('KlerosLiquid', 'courts', i)
           if (_court !== undefined) {
             child.minStake = drizzle.web3.utils.fromWei(
               drizzle.web3.utils.toBN(_court.minStake)
@@ -229,7 +229,6 @@ const CourtCascaderModal = ({ onClick }) => {
         }
       : acc[index].children
   }, options)
-  console.log(option)
   return (
     <StyledModal
       centered

@@ -26,7 +26,7 @@ const ScrollBar = ({ currentOption, numberOfOptions, setOption }) => {
       <Col lg={1}>
         <Icon
           type="right"
-          style={{color: '#4D00B4', float: 'right'}}
+          style={{color: '#4D00B4'}}
           onClick={() => setOption((currentOption === numberOfOptions) ? 0 : currentOption + 1)}
         />
       </Col>

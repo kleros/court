@@ -9,7 +9,13 @@ import { useDataloader } from '../bootstrap/dataloader'
 
 import ScrollBar from './scroll-bar'
 
-const StyledCaseRoundHistory = styled.div``
+const StyledCaseRoundHistory = styled.div`
+  height: 550px;
+
+  .ant-row {
+    height: 100%;
+  }
+`
 const StyledRadioGroup = styled(Radio.Group)`
   width: 100%;
 
@@ -30,9 +36,6 @@ const StyledRadioGroup = styled(Radio.Group)`
       background: #4D00B4 !important;
     }
   }
-`
-const DivideCol = styled(Col)`
-  border-right: 1px solid #4D00B4;
 `
 const Box = styled.div`
   padding: 21px 43px;
@@ -60,6 +63,8 @@ const RulingOptionsBox = styled(Box)`
   }
 `
 const JustificationsBox = styled(Box)`
+  border-left: 1px solid #4D00B4;
+  height: 100%;
   text-align: center;
   h2 {
     font-weight: 500;
@@ -70,7 +75,14 @@ const JustificationsBox = styled(Box)`
   }
 `
 const ScrollBarContainer = styled.div`
+  bottom: 40px;
+  margin-left: -35px;
+  position: absolute;
+  width: 95%;
 
+  @media (min-width: 990px) {
+    
+  }
 `
 
 const CaseRoundHistory = ({ ID, dispute, ruling }) => {
@@ -148,7 +160,7 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
       {!justifications.loading && (
         <StyledCaseRoundHistory>
           <Row>
-            <DivideCol md={10}>
+            <Col md={10}>
               <RoundSelectBox>
                 <h3>Round</h3>
                 <StyledRadioGroup
@@ -189,8 +201,8 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
                     )}
                   </StyledRadioGroup>
               </RulingOptionsBox>
-            </DivideCol>
-            <Col md={14}>
+            </Col>
+            <Col md={14} style={{height: '100%'}}>
               <JustificationsBox>
                 <Skeleton active loading={justifications[round].loading}>
                   <h2>Justification</h2>
