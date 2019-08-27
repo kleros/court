@@ -25,6 +25,7 @@ const StyledBellContainer = styled.div`
 `
 const StyledListItem = styled(ListItem)`
   padding: 12px 30px;
+  border: 1px solid #D09CFF;
 
   .ant-list-item-extra {
     right: 30px;

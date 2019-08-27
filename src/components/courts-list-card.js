@@ -3,6 +3,7 @@ import React from 'react'
 import ETHAmount from './eth-amount'
 import ListItem from './list-item'
 import TitledListCard from './titled-list-card'
+import CourtListItem from './court-list-item'
 import { useDataloader } from '../bootstrap/dataloader'
 
 const CourtsListCard = () => {
@@ -27,25 +28,12 @@ const CourtsListCard = () => {
           const policy = call('PolicyRegistry', 'policies', ID)
           if (policy !== undefined) {
             const policyJSON = loadPolicy(policy)
-            if (policyJSON) return policyJSON.name
+            if (policyJSON) return {
+              name: policyJSON.name,
+              ID
+            }
           }
           return undefined
-        })
-  )
-  const stakes = useCacheCall(
-    ['PolicyRegistry'],
-    call =>
-      juror &&
-      juror.subcourtIDs
-        .filter(ID => ID !== '0')
-        .map(ID => String(ID - 1))
-        .map(ID => {
-          return useCacheCall(
-            'KlerosLiquidExtraViews',
-            'stakeOf',
-            drizzleState.account,
-            ID
-          )
         })
   )
 
@@ -58,13 +46,11 @@ const CourtsListCard = () => {
     >
       {!loading && (names.length > 0 ? (
         names.map((n, i) => (
-          <ListItem key={n}
-            extra={(
-              <>
-                <ETHAmount amount={stakes[i]} /> PNK
-              </>
-            )}
-          >{n}</ListItem>
+          <CourtListItem
+            key={n.name}
+            name={n.name}
+            ID={Number(n.ID)}
+          />
         ))) : (
           <>
             <ListItem key='Court-List-None'>You are not staked in any courts.</ListItem>

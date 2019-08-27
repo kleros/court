@@ -15,6 +15,10 @@ const StyledCaseRoundHistory = styled.div`
   .ant-row {
     height: 100%;
   }
+
+  @media (max-width: 768px) {
+    height: auto;
+  }
 `
 const StyledRadioGroup = styled(Radio.Group)`
   width: 100%;
@@ -35,6 +39,10 @@ const StyledRadioGroup = styled(Radio.Group)`
     &-checked {
       background: #4D00B4 !important;
     }
+  }
+
+  .ant-radio-button-wrapper-disabled.ant-radio-button-wrapper-checked {
+    background: #e6e6e6 !important;
   }
 `
 const Box = styled.div`
@@ -73,6 +81,10 @@ const JustificationsBox = styled(Box)`
     margin-bottom: 60px;
     color: #4D00B4;
   }
+  @media (max-width: 768px) {
+    border-left: none;
+    border-top: 1px solid #4D00B4;
+  }
 `
 const ScrollBarContainer = styled.div`
   bottom: 40px;
@@ -80,8 +92,10 @@ const ScrollBarContainer = styled.div`
   position: absolute;
   width: 95%;
 
-  @media (min-width: 990px) {
-    
+  @media (max-width: 768px) {
+    bottom: none;
+    position: unset;
+    margin-left: 0;
   }
 `
 
@@ -93,7 +107,7 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
   }))
   const getMetaEvidence = useDataloader.getMetaEvidence()
   // const dispute = useCacheCall('KlerosLiquid', 'disputes', ID)
-  const [ round, setRound ] = useState(ruling ? dispute.votesLengths.length - 1 : null)
+  const [ round, setRound ] = useState(dispute.votesLengths.length - 1)
   const [ rulingOption, setRulingOption ] = useState(Number(ruling) || 1)
   const [ justificationIndex, setjustificationIndex ] = useState(0)
   console.log(rulingOption)
@@ -153,10 +167,8 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
     })
   })
 
-  console.log(justifications)
-
   return (
-    <Skeleton active loading={justifications.loading}>
+    <Skeleton active loading={justifications && justifications.loading}>
       {!justifications.loading && (
         <StyledCaseRoundHistory>
           <Row>
@@ -173,6 +185,7 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
                     justifications.map((round, i) => (
                       <Radio.Button
                         value={i}
+                        key={i}
                         disabled={round.disabled}
                       >Round {i+1}</Radio.Button>
                     )
@@ -195,6 +208,7 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
                     {
                       metaEvidence && metaEvidence.metaEvidenceJSON.rulingOptions.titles.map((option, i) => (
                         <Radio.Button
+                          key={i}
                           value={i+1}
                         >{option}</Radio.Button>
                       )
@@ -207,7 +221,9 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
                 <Skeleton active loading={justifications[round].loading}>
                   <h2>Justification</h2>
                   {
-                    !justifications[round].loading && justifications[round].byChoice[rulingOption].length ? (
+                    !justifications[round].loading &&
+                    justifications[round].byChoice[rulingOption].length &&
+                    !(!ruling && round === justifications.length - 1) ? (
                       <div>
                         { justifications[round].byChoice[rulingOption][justificationIndex] }
                       </div>
