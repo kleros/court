@@ -74,7 +74,7 @@ export default () => {
         <Col lg={8} md={12}>
           <BuyPNKCard />
         </Col>
-        <Col lg={8} md={12}>
+        <Col lg={16} md={12}>
           <PNKExchangesCard />
         </Col>
       </Row>

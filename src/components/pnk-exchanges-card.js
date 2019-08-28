@@ -1,51 +1,69 @@
-import { Card, Divider } from 'antd'
+import { Card, Row, Col } from 'antd'
 import { ReactComponent as Bitfinex } from '../assets/images/bitfinex.svg'
 import { ReactComponent as Ethfinex } from '../assets/images/ethfinex.svg'
 import { ReactComponent as Idex } from '../assets/images/idex.svg'
+import { ReactComponent as UniswapNinja } from '../assets/images/uniswap-ninja.svg'
 import React from 'react'
 import styled from 'styled-components/macro'
 
-const StyledCard = styled(Card)`
-  cursor: initial;
+const StyledCol = styled(Col)`
+  margin-bottom: 25px;
+  max-height: 100px;
+  margin-bottom: 50px;
+
 `
-const StyledBitfinex = styled(Bitfinex)`
-  height: 55px;
-  padding: 0 20px;
-  width: 100%;
+
+const StyledExchangeCard = styled.a`
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0px 6px 36px #BC9CFF;
+  width: 90%;
+  height: 100px;
+
+  padding: 40px 26px;
+
+  svg {
+    width: 80%;
+    vertical-align: middle;
+  }
 `
-const StyledEthfinex = styled(Ethfinex)`
-  height: 55px;
-  width: 100%;
-`
-const StyledIdex = styled(Idex)`
-  height: 55px;
-  margin-left: -15px;
-  width: 100%;
-`
+
+const Exchanges = [
+  {
+    logo: (
+      <Bitfinex />
+    ),
+    link: "https://www.bitfinex.com"
+  },
+  {
+    logo: (
+      <Ethfinex />
+    ),
+    link: "https://www.ethfinex.com"
+  },
+  {
+    logo: (
+      <Idex />
+    ),
+    link: "https://idex.market/eth/pnk"
+  },
+  {
+    logo: (
+      <UniswapNinja />
+    ),
+    link: "https://uniswap.ninja"
+  },
+]
 export default () => (
-  <StyledCard hoverable title="Exchanges">
-    <a
-      href="https://www.bitfinex.com"
-      rel="noopener noreferrer"
-      target="_blank"
-    >
-      <StyledBitfinex />
-    </a>
-    <Divider />
-    <a
-      href="https://www.ethfinex.com"
-      rel="noopener noreferrer"
-      target="_blank"
-    >
-      <StyledEthfinex />
-    </a>
-    <Divider />
-    <a
-      href="https://idex.market/eth/pnk"
-      rel="noopener noreferrer"
-      target="_blank"
-    >
-      <StyledIdex />
-    </a>
-  </StyledCard>
+  <>
+    {
+      Exchanges.map((exchange, i) => (
+        <StyledCol lg={8}>
+          <StyledExchangeCard href={exchange.link}>
+              {exchange.logo}
+          </StyledExchangeCard>
+        </StyledCol>
+      ))
+    }
+  </>
 )
