@@ -27,7 +27,7 @@ const StyledRadioGroup = styled(Radio.Group)`
     color: #4D00B4;
     margin-left: 10px;
     border: 1px solid #4D00B4 !important;
-    border-radius: 300px;
+    border-radius: 300px !important;
     margin-bottom: 15px;
     text-align: center;
     width: 45%;
@@ -201,6 +201,7 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
                     value={rulingOption}
                   >
                     <Radio.Button
+                      size={'large'}
                       value={0}
                     >
                       Refuse to Arbitrate
@@ -210,6 +211,7 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
                         <Radio.Button
                           key={i}
                           value={i+1}
+                          size={'large'}
                         >{option}</Radio.Button>
                       )
                     )}
@@ -234,7 +236,7 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
                     )
                   }
                   {
-                    !justifications[round].loading &&
+                    !justifications[round].loading && justifications[round].byChoice[rulingOption].length > 0 &&
                     <ScrollBarContainer>
                       <ScrollBar
                         currentOption={justificationIndex}

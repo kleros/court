@@ -193,7 +193,11 @@ const OngoingCasesCard = ({}) => {
         (_allActive.length > 0) ? (
           <>
             <TitledListCard
-              prefix={"IMG"}
+              prefix={(
+                <StyledGavelContainer>
+                  <Gavel />
+                </StyledGavelContainer>
+              )}
               title={"Ongoing Cases"}
             />
             <Row>

@@ -17,21 +17,38 @@ const StyledBreadcrumbDiv = styled.div`
   position: absolute;
   top: 0;
   z-index: ${props => props.length - props.id};
+
+  .first-fill {
+    path {
+      fill: #1E075F;
+    }
+  }
+  .second-fill {
+    path {
+      fill: #4D00B4;
+    }
+  }
+  .third-fill {
+    path {
+      fill: #009AFF;
+    }
+  }
 `
 const StyledBreadcrumb = styled(Breadcrumb)`
   height: ${props => (props.large === 'true' ? 38 : 20)}px;
-  width: ${props => (props.large === 'true' ? 203 : 114)}px;
+  width: ${props => (props.large === 'true' ? 215 : 114)}px;
 `
 const StyledTitleDiv = styled.div`
   color: white;
   font-size: ${props => (props.large ? 14 : 10)}px;
-  left: ${props => (props.large ? 16 : 20)}px;
+  left: ${props => (props.large ? 28 : 20)}px;
   line-height: ${props => (props.large ? 38 : 20)}px;
   ${props => props.active && 'font-weight: bold;'}
   position: absolute;
   top: 0;
   user-select: none;
 `
+
 const Breadcrumbs = ({
   activeIndex,
   breadcrumbs,
@@ -54,7 +71,7 @@ const Breadcrumbs = ({
       >
         <StyledBreadcrumb
           className={`${
-            ['primary', 'secondary', 'ternary'][
+            ['first', 'second', 'third'][
               (colorIndex === null ? i : colorIndex) % 3
             ]
           }-fill`}

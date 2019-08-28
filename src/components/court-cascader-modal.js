@@ -93,15 +93,23 @@ const StyledCascader = styled(Cascader)`
     ul:nth-child(1) {
       background: #4004a3;
       border-radius: 0px;
+    }
 
+    ul:nth-child(3n+1) {
       .ant-cascader-menu-item-active {
         background: #1E075F;
       }
     }
 
-    ul:nth-child(2) {
+    ul:nth-child(3n+2) {
       .ant-cascader-menu-item-active {
         background: #4004a3;
+      }
+    }
+
+    ul:nth-child(3n) {
+      .ant-cascader-menu-item-active {
+        background: #009AFF;
       }
     }
 
@@ -109,10 +117,11 @@ const StyledCascader = styled(Cascader)`
       height: 286px;
       padding-top: 28px;
       width: 186px;
+      border: 0;
 
       &-item {
         height: 38px;
-        padding: 5px 18px;
+        padding: 5px 28px;
 
         &-active {
           color: white;
