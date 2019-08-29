@@ -57,7 +57,7 @@ const funcs = {
       })),
   loadPolicy: (URI, options) =>
     archon.utils
-      .validateFileFromURI(URI, {
+      .validateFileFromURI(URI.replace(/^\/ipfs\//, 'https://ipfs.kleros.io/ipfs/'), {
         strictHashes: true,
         ...options
       })
