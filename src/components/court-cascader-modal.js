@@ -172,12 +172,10 @@ const CourtCascaderModal = ({ onClick }) => {
       }
       const _court = call('KlerosLiquid', 'courts', i)
       if (_court !== undefined) {
-        option.minStake = drizzle.web3.utils.fromWei(
-          drizzle.web3.utils.toBN(_court.minStake)
-        ).toString()
-        option.feeForJuror = drizzle.web3.utils.fromWei(
-          drizzle.web3.utils.toBN(_court.feeForJuror)
-        ).toString()
+        const _minStakeBN = drizzle.web3.utils.toBN(_court.minStake)
+        option.minStake = _minStakeBN.toString()
+        const _feeForJurorBN = drizzle.web3.utils.toBN(_court.feeForJuror)
+        option.feeForJuror = _feeForJurorBN.toString()
       }
       const subcourt = call('KlerosLiquid', 'getSubcourt', subcourtIDs[i])
       if (subcourt)
@@ -204,12 +202,10 @@ const CourtCascaderModal = ({ onClick }) => {
           if (child.label === undefined) child.loading = true
           const _court = call('KlerosLiquid', 'courts', i)
           if (_court !== undefined) {
-            child.minStake = drizzle.web3.utils.fromWei(
-              drizzle.web3.utils.toBN(_court.minStake)
-            ).toString()
-            option.feeForJuror = drizzle.web3.utils.fromWei(
-              drizzle.web3.utils.toBN(_court.feeForJuror)
-            ).toString()
+            const _minStakeBN = drizzle.web3.utils.toBN(_court.minStake)
+            child.minStake = _minStakeBN.toString()
+            const _feeForJurorBN = drizzle.web3.utils.toBN(_court.feeForJuror)
+            option.feeForJuror = _feeForJurorBN.toString()
           }
           return child
         })
@@ -257,7 +253,9 @@ const CourtCascaderModal = ({ onClick }) => {
           <Skeleton active loading={option.loading}>
             <Row gutter={16}>
               <Col md={12}>
-                <StyledDiv>{`${option.label} | Min Stake = ${option.minStake} PNK`}</StyledDiv>
+                <StyledDiv>{`${option.label} | Min Stake = ${
+                    option.minStake ? drizzle.web3.utils.fromWei(option.minStake) : ''
+                  } PNK`}</StyledDiv>
                 <ReactMarkdown source={option.description} />
               </Col>
               <Col md={12}>
@@ -283,7 +281,9 @@ const CourtCascaderModal = ({ onClick }) => {
                   <Col md={20}>
                     <StyledHeader>Reward</StyledHeader>
                     <div>For each coherent vote you will receive
-                      <span style={{fontWeight: '600'}}> {option.reward} ETH +</span>
+                      <span style={{fontWeight: '600'}}> {
+                          option.reward ? drizzle.web3.utils.fromWei(option.reward) : ''
+                        } ETH +</span>
                     </div>
                   </Col>
                 </Row>

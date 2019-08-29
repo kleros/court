@@ -62,6 +62,9 @@ export default () => {
               'disputes',
               d.returnValues._disputeID
             )
+            const numberOfVotes = draws.filter(_draw =>
+              _draw.returnValues._disputeID === d.returnValues._disputeID
+            )
             if (dispute)
               if (dispute.period === '1' || dispute.period === '2') {
                 const dispute2 = call(
@@ -82,25 +85,30 @@ export default () => {
                       d.returnValues._voteID
                     )
                     if (vote)
-                      acc[vote.voted ? 'activeIDs' : 'votePendingIDs'].push(
-                        d.returnValues._disputeID
-                      )
+                      acc[vote.voted ? 'active' : 'votePending'].push({
+                        ID: d.returnValues._disputeID,
+                        draws: numberOfVotes
+                      })
                     else acc.loading = true
-                  } else acc.activeIDs.push(d.returnValues._disputeID)
+                  } else acc.active.push({
+                    ID: d.returnValues._disputeID,
+                    draws: numberOfVotes
+                  })
                 else acc.loading = true
               } else
-                acc[dispute.period === '4' ? 'executedIDs' : 'activeIDs'].push(
-                  d.returnValues._disputeID
-                )
+                acc[dispute.period === '4' ? 'executed' : 'active'].push({
+                  ID: d.returnValues._disputeID,
+                  draws: numberOfVotes
+                })
             else acc.loading = true
             return acc
           },
-          { activeIDs: [], executedIDs: [], loading: false, votePendingIDs: [] }
+          { active: [], executed: [], loading: false, votePending: [] }
         )
-      : { activeIDs: [], executedIDs: [], loading: true, votePendingIDs: [] }
+      : { active: [], executed: [], loading: true, votePending: [] }
   )
   const filteredDisputes =
-    disputes[['votePendingIDs', 'activeIDs', 'executedIDs'][filter]]
+    disputes[['votePending', 'active', 'executed'][filter]]
   return (
     <>
       <TopBanner
@@ -136,9 +144,9 @@ export default () => {
               cases.
             </StyledCol>
           ) : (
-            filteredDisputes.map(ID => (
-              <Col key={ID} md={12} xl={8}>
-                <CaseCard ID={ID} />
+            filteredDisputes.map(dispute => (
+              <Col key={dispute.ID} md={12} xl={8}>
+                <CaseCard ID={dispute.ID} draws={dispute.draws}/>
               </Col>
             ))
           )}

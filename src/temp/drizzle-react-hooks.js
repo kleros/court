@@ -33,6 +33,7 @@ export const useDrizzleState = (mapState, args) => {
   useEffect(() => {
     const debouncedHandler = debounce(() => {
       const newState = mapStateRef.current(drizzle.store.getState())
+
       if (!shallowequal(stateRef.current, newState)) {
         stateRef.current = newState
         setState(newState)

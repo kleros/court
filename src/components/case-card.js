@@ -143,7 +143,7 @@ const StakeLocked = styled.div`
   text-align: right;
   color: #4D00B4;
 `
-const CaseCard = ({ ID }) => {
+const CaseCard = ({ ID, draws }) => {
   const { drizzle, useCacheCall, useCacheEvents } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0]
@@ -151,17 +151,7 @@ const CaseCard = ({ ID }) => {
   const getMetaEvidence = useDataloader.getMetaEvidence()
   const dispute = useCacheCall('KlerosLiquid', 'disputes', ID)
   const dispute2 = useCacheCall('KlerosLiquid', 'getDispute', ID)
-  const draws = useCacheEvents(
-    'KlerosLiquid',
-    'Draw',
-    useMemo(
-      () => ({
-        filter: { _address: drizzleState.account, _disputeID: ID },
-        fromBlock: process.env.REACT_APP_DRAW_EVENT_LISTENER_BLOCK_NUMBER
-      }),
-      [drizzleState.account, ID]
-    )
-  )
+
   const disputeData = useCacheCall(['KlerosLiquid'], call => {
     let disputeData = {}
     if (dispute2 && draws) {
@@ -225,7 +215,7 @@ const CaseCard = ({ ID }) => {
             <TimeoutDiv>
               <TimeoutText>
                 {
-                  ['Evidence Submission Over', 'Commit Deadline', 'Voting Deadline', 'Appeal Deadline', 'Execute Deadline'][
+                  ['Evidence Submission', 'Commit Deadline', 'Voting Deadline', 'Appeal Deadline', 'Execute Deadline'][
                     dispute.period
                   ]
                 }
@@ -271,7 +261,7 @@ const CaseCard = ({ ID }) => {
               <div>Coherence Reward</div>
               <h3>
                 {disputeData.coherenceReward &&
-                  Number(drizzle.web3.utils.fromWei(disputeData.coherenceReward).toString()).toFixed(2)
+                  Number((disputeData.coherenceReward ? drizzle.web3.utils.fromWei(disputeData.coherenceReward.toString()) : 0).toString()).toFixed(2)
                 } ETH +
               </h3>
             </RewardCol>
@@ -279,7 +269,7 @@ const CaseCard = ({ ID }) => {
         </RewardBox>
         <StakeLocked>
           Stake locked: {disputeData.atStake &&
-            Number(drizzle.web3.utils.fromWei(disputeData.atStake).toString()).toFixed(0)
+            Number((disputeData.atStake ? drizzle.web3.utils.fromWei(disputeData.atStake.toString()) : 0).toString()).toFixed(0)
           } PNK {' '}
           <Hint
             description="These are the tokens you have locked for the duration of the dispute."
