@@ -102,7 +102,7 @@ const OngoingCasesCard = ({}) => {
                 )
                 if (dispute2) {
                   const metaEvidence = getMetaEvidence(
-                    dispute2.arbitrated,
+                    dispute.arbitrated,
                     drizzle.contracts.KlerosLiquid.address,
                     d.returnValues._disputeID
                   )
