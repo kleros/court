@@ -84,7 +84,7 @@ const MenuItems = [
     <NavLink to="/tokens">Buy PNK</NavLink>
   </Menu.Item>,
   <Menu.Item key="guide">
-    <NavLink to="/tokens">Guide</NavLink>
+    <a href="https://blog.kleros.io/become-a-juror-blockchain-dispute-resolution-on-ethereum/">Guide</a>
   </Menu.Item>
 ]
 const settings = {
