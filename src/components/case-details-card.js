@@ -540,7 +540,7 @@ const CaseDetailsCard = ({ ID }) => {
                   ? votesData.canVote
                     ? 'What is your decision?'
                     : votesData.voted
-                    ? `You chose: ${
+                    ? `You vote for: ${
                         votesData.voted === '0'
                           ? 'Refuse to Arbitrate'
                           : (metaEvidence.metaEvidenceJSON.rulingOptions &&
@@ -576,7 +576,7 @@ const CaseDetailsCard = ({ ID }) => {
                     : 'You did not cast a vote.'
                   : 'You were not drawn in the current round.'}
                 {dispute.period === '4' &&
-                  ` The winning choice was "${
+                  ` The winner in this case was "${
                     votesData.currentRuling === '0'
                       ? 'Refuse to Arbitrate'
                       : (metaEvidence.metaEvidenceJSON.rulingOptions &&
