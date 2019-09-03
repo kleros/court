@@ -183,13 +183,13 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
       <StyledBody>
         <StakeBox>
           <Row>
-            <IconCol md={8}>
+            <IconCol md={8} xs={8}>
               <Hexagon className="ternary-fill" />
               <StyledPrefixDiv>
                 <img src={stakeImg} />
               </StyledPrefixDiv>
             </IconCol>
-            <StakeCol md={16}>
+            <StakeCol md={16} xs={16}>
               <div>Current Stake</div>
               <h3>
                 {stake && Number(drizzle.web3.utils.fromWei(stake)).toFixed(0)} PNK
@@ -199,13 +199,13 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
         </StakeBox>
         <RewardBox>
           <Row>
-            <IconCol md={8}>
+            <IconCol md={8} xs={8}>
               <Hexagon className="ternary-fill" />
               <StyledPrefixDiv>
                 <img src={rewardImg} />
               </StyledPrefixDiv>
             </IconCol>
-            <RewardCol md={16}>
+            <RewardCol md={16} xs={16}>
               <div>Coherence Reward</div>
               <h3>
                 {subcourt && drizzle.web3.utils.fromWei(subcourt.feeForJuror).toString()} ETH +

@@ -251,13 +251,13 @@ const CaseCard = ({ ID, draws }) => {
         </CaseTitleBox>
         <RewardBox>
           <Row>
-            <IconCol md={8}>
+            <IconCol md={8} xs={8}>
               <Hexagon className="ternary-fill" />
               <StyledPrefixDiv>
                 <img src={rewardImg} />
               </StyledPrefixDiv>
             </IconCol>
-            <RewardCol md={16}>
+            <RewardCol md={16} xs={16}>
               <div>Coherence Reward</div>
               <h3>
                 {disputeData.coherenceReward &&

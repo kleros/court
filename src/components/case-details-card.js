@@ -375,8 +375,6 @@ const CaseDetailsCard = ({ ID }) => {
       )
     }
   }
-  // if (disputeCreated) console.log(disputeCreated)
-  // if (appeals.length) console.log(appeals)
   const { send: sendCommit, status: sendCommitStatus } = useCacheSend(
     'KlerosLiquid',
     'castCommit'
@@ -521,6 +519,7 @@ const CaseDetailsCard = ({ ID }) => {
       return actions
     }
   }, [metaEvidence])
+  console.log(dispute)
   return (
     <StyledCard
       actions={useMemo(() => [
@@ -540,7 +539,7 @@ const CaseDetailsCard = ({ ID }) => {
                   ? votesData.canVote
                     ? 'What is your decision?'
                     : votesData.voted
-                    ? `You vote for: ${
+                    ? `You voted for: ${
                         votesData.voted === '0'
                           ? 'Refuse to Arbitrate'
                           : (metaEvidence.metaEvidenceJSON.rulingOptions &&
@@ -607,7 +606,7 @@ const CaseDetailsCard = ({ ID }) => {
                     value={justification}
                   />
                 )}
-                {metaEvidence.metaEvidenceJSON.rulingOptions && (
+                {Number(dispute.period) < 3 && metaEvidence.metaEvidenceJSON.rulingOptions && (
                   <>
                     {metaEvidence.metaEvidenceJSON.rulingOptions.type !==
                       'single-select' && (
@@ -707,15 +706,19 @@ const CaseDetailsCard = ({ ID }) => {
                 )}
               </StyledDiv>
               <StyledDiv className="secondary-background theme-background" style={{display: 'inherit'}}>
-                <Button
-                  disabled={!votesData.canVote}
-                  ghost={votesData.canVote}
-                  id={0}
-                  onClick={onVoteClick}
-                  size="large"
-                >
-                  Refuse to Arbitrate
-                </Button>
+                {
+                  Number(dispute.period) < '3' && (
+                    <Button
+                      disabled={!votesData.canVote}
+                      ghost={votesData.canVote}
+                      id={0}
+                      onClick={onVoteClick}
+                      size="large"
+                    >
+                      Refuse to Arbitrate
+                    </Button>
+                  )
+                }
               </StyledDiv>
             </>
           ) : (

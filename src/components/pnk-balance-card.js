@@ -31,7 +31,6 @@ const StyledDiv = styled.div`
   margin-top: 8px;
 
   @media (max-width: 991px) {
-    text-align: right;
   }
 `
 const StyledDivWhiteSmall = styled(StyledDiv)`
@@ -47,6 +46,10 @@ const StyledDivWhiteLarge = styled(StyledDiv)`
   color: white;
   font-size: 36px;
   margin: 0px;
+
+  @media (max-width: 1200px) {
+    font-size: 28px;
+  }
 
   @media (max-width: 991px) {
     color: #4004a3;
@@ -142,11 +145,11 @@ const PNKBalanceCard = () => {
         <StyledPurpleArrowBackground />
         <Col lg={24} style={{zIndex: "1"}}>
           <Row>
-            <PNKCol lg={8} xs={12}>
+            <PNKCol lg={8} xs={24}>
               <StyledDivWhiteSmall>
                 Your wallet balance
               </StyledDivWhiteSmall>
-              <StyledCenterDiv style={{color: "white"}}>
+              <StyledDivWhiteLarge>
                 <ETHAmount
                   amount={useCacheCall(
                     'MiniMeTokenERC20',
@@ -155,12 +158,12 @@ const PNKBalanceCard = () => {
                   )}
                 />{' '}
                 PNK
-              </StyledCenterDiv>
+              </StyledDivWhiteLarge>
               <StyledBottomDiv style={{color: "white"}}>
                 <ETHAmount amount={drizzleState.balance} decimals={4} /> ETH
               </StyledBottomDiv>
             </PNKCol>
-            <PNKCol lg={8} xs={12}>
+            <PNKCol lg={8} xs={24}>
               <StyledDiv>
                 You Have
               </StyledDiv>

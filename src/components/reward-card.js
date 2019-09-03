@@ -64,6 +64,10 @@ const StyledCenterDiv = styled.div`
   @media (max-width: 1200px) {
     font-size: 28px;
   }
+
+  @media (max-width: 991px) {
+    font-size: 42px;
+  }
 `
 const StyledRewardLogoCol = styled(Col)`
   min-width: 100px;
@@ -113,6 +117,17 @@ const PNKOffset = styled.div`
     margin-left: 0;
   }
 `
+const TopCol = styled.div`
+  @media (max-width: 991px) {
+    width: 100%;
+    height: 140px;
+    background: #4D00B4;
+    border-radius: 12px;
+    margin: -18px;
+    padding-right: 50px;
+    color: white;
+  }
+`
 
 const RewardCard = () => {
   const { drizzle, useCacheEvents } = useDrizzle()
@@ -144,7 +159,7 @@ const RewardCard = () => {
         <StyledPurpleArrowBackground />
         <Col lg={24} style={{zIndex: "1"}}>
           <Row>
-            <StyledRewardLogoCol xs={12}>
+            <StyledRewardLogoCol xs={3}>
               <Reward />
             </StyledRewardLogoCol>
             <Col lg={4} xs={12}>
