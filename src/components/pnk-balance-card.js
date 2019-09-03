@@ -95,6 +95,12 @@ const StyledPurpleArrowBackground = styled(PurpleArrowBackground)`
   top: -16px;
   z-index: 0;
 
+  @media (max-width: 1200px) {
+    height: 115%;
+    left: -60px;
+    top: -7px;
+  }
+
   @media (max-width: 991px) {
     display: none;
   }
@@ -105,6 +111,12 @@ const StyledLightPurpleArrowBackground = styled(LightPurpleArrowBackground)`
   right: -36px;
   top: -16px;
   z-index: 0;
+
+  @media (max-width: 1200px) {
+    height: 115%;
+    right: -60px;
+    top: -7px;
+  }
 
   @media (max-width: 991px) {
     display: none;
