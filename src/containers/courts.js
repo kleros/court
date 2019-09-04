@@ -54,12 +54,14 @@ export default () => {
       ) : (
         ''
       )}
-      <Divider />
       <Spin spinning={!juror}>
         <Row gutter={40}>
           {juror &&
             (juror.subcourtIDs.filter(ID => ID !== '0').length === 0 ? (
-              <StyledCol>You have not joined any courts yet.</StyledCol>
+              <>
+                <Divider />
+                <StyledCol>You have not joined any courts yet.</StyledCol>
+              </>
             ) : (
               juror.subcourtIDs
                 .filter(ID => ID !== '0')
