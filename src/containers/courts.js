@@ -1,4 +1,4 @@
-import { Button, Col, Row, Spin } from 'antd'
+import { Button, Col, Row, Spin, Divider } from 'antd'
 import React, { useCallback, useState } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import CourtCard from '../components/court-card'
@@ -12,7 +12,8 @@ import styled from 'styled-components/macro'
 const StyledCol = styled(Col)`
   color: #d09cff;
   font-size: 24px;
-  margin-top: 10px;
+  font-weight: 500;
+  line-height: 28px;
   text-align: center;
 `
 const StyledButton = styled(Button)`
@@ -53,7 +54,7 @@ export default () => {
       ) : (
         ''
       )}
-
+      <Divider />
       <Spin spinning={!juror}>
         <Row gutter={40}>
           {juror &&
