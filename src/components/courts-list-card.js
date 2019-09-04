@@ -28,10 +28,11 @@ const CourtsListCard = () => {
           const policy = call('PolicyRegistry', 'policies', ID)
           if (policy !== undefined) {
             const policyJSON = loadPolicy(policy)
-            if (policyJSON) return {
-              name: policyJSON.name,
-              ID
-            }
+            if (policyJSON)
+              return {
+                name: policyJSON.name,
+                ID
+              }
           }
           return undefined
         })
@@ -44,19 +45,18 @@ const CourtsListCard = () => {
       prefix={names && names.length}
       title="Courts"
     >
-      {!loading && (names.length > 0 ? (
-        names.map((n, i) => (
-          <CourtListItem
-            key={n.name}
-            name={n.name}
-            ID={Number(n.ID)}
-          />
-        ))) : (
+      {!loading &&
+        (names.length > 0 ? (
+          names.map((n, i) => (
+            <CourtListItem ID={Number(n.ID)} key={n.name} name={n.name} />
+          ))
+        ) : (
           <>
-            <ListItem key='Court-List-None'>You are not staked in any courts.</ListItem>
+            <ListItem key="Court-List-None">
+              You are not staked in any courts.
+            </ListItem>
           </>
-        )
-      )}
+        ))}
     </TitledListCard>
   )
 }

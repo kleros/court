@@ -3,13 +3,11 @@ import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components/macro'
-
 import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
 import skillsImg from '../assets/images/skills.png'
 import rewardImg from '../assets/images/reward.png'
 import { useDataloader } from '../bootstrap/dataloader'
 import { useDrizzle } from '../temp/drizzle-react-hooks'
-
 import Breadcrumbs from './breadcrumbs'
 
 const StyledModal = styled(Modal)`
@@ -28,37 +26,37 @@ const StyledModal = styled(Modal)`
     &-body {
       background: whitesmoke;
       height: 286px;
+      margin-top: -1px;
       overflow-x: scroll;
       position: relative;
-      margin-top: -1px;
     }
 
     &-footer {
+      color: #4d00b4;
       height: 284px;
-      color: #4D00B4;
+      margin-top: 40px;
       overflow-y: scroll;
       padding: 52px 42px 28px;
       text-align: left;
-      margin-top: 40px;
     }
   }
 `
 
 const SelectButtonArea = styled.div`
-  position: absolute;
-  top: 390px;
   background: #4004a3;
   height: 60px;
   margin: -52px -42px 0px -42px;
   padding: 0;
+  position: absolute;
+  top: 390px;
   width: 100%;
   z-index: 2;
 `
 
 const StyledButton = styled(Button)`
   border-radius: 3px;
-  right: 44px;
   position: absolute;
+  right: 44px;
   top: 15px;
   width: 100px;
   z-index: 3;
@@ -90,34 +88,11 @@ const StyledCascader = styled(Cascader)`
     min-width: 100%;
     top: 0 !important;
 
-    ul:nth-child(1) {
-      background: #4004a3;
-      border-radius: 0px;
-    }
-
-    ul:nth-child(3n+1) {
-      .ant-cascader-menu-item-active {
-        background: #1E075F;
-      }
-    }
-
-    ul:nth-child(3n+2) {
-      .ant-cascader-menu-item-active {
-        background: #4004a3;
-      }
-    }
-
-    ul:nth-child(3n) {
-      .ant-cascader-menu-item-active {
-        background: #009AFF;
-      }
-    }
-
     .ant-cascader-menu {
+      border: 0;
       height: 286px;
       padding-top: 28px;
       width: 186px;
-      border: 0;
 
       &-item {
         height: 38px;
@@ -126,6 +101,29 @@ const StyledCascader = styled(Cascader)`
         &-active {
           color: white;
         }
+      }
+    }
+
+    ul:nth-child(1) {
+      background: #4004a3;
+      border-radius: 0px;
+    }
+
+    ul:nth-child(3n + 1) {
+      .ant-cascader-menu-item-active {
+        background: #1e075f;
+      }
+    }
+
+    ul:nth-child(3n + 2) {
+      .ant-cascader-menu-item-active {
+        background: #4004a3;
+      }
+    }
+
+    ul:nth-child(3n) {
+      .ant-cascader-menu-item-active {
+        background: #009aff;
       }
     }
   }
@@ -254,8 +252,10 @@ const CourtCascaderModal = ({ onClick }) => {
             <Row gutter={16}>
               <Col md={12}>
                 <StyledDiv>{`${option.label} | Min Stake = ${
-                    option.minStake ? drizzle.web3.utils.fromWei(option.minStake) : ''
-                  } PNK`}</StyledDiv>
+                  option.minStake
+                    ? drizzle.web3.utils.fromWei(option.minStake)
+                    : ''
+                } PNK`}</StyledDiv>
                 <ReactMarkdown source={option.description} />
               </Col>
               <Col md={12}>
@@ -274,16 +274,21 @@ const CourtCascaderModal = ({ onClick }) => {
                 <Row>
                   <Col md={4}>
                     <Hexagon className="ternary-fill" />
-                    <StyledPrefixDiv style={{top: '33px'}}>
+                    <StyledPrefixDiv style={{ top: '33px' }}>
                       <img src={rewardImg} />
                     </StyledPrefixDiv>
                   </Col>
                   <Col md={20}>
                     <StyledHeader>Reward</StyledHeader>
-                    <div>For each coherent vote you will receive
-                      <span style={{fontWeight: '600'}}> {
-                          option.reward ? drizzle.web3.utils.fromWei(option.reward) : ''
-                        } ETH +</span>
+                    <div>
+                      For each coherent vote you will receive
+                      <span style={{ fontWeight: '600' }}>
+                        {' '}
+                        {option.reward
+                          ? drizzle.web3.utils.fromWei(option.reward)
+                          : ''}{' '}
+                        ETH +
+                      </span>
                     </div>
                   </Col>
                 </Row>
@@ -293,11 +298,7 @@ const CourtCascaderModal = ({ onClick }) => {
         </>
       }
       onCancel={useCallback(() => onClick(), [onClick])}
-      title={
-        <StyledTitleDiv>
-          Select Court
-        </StyledTitleDiv>
-      }
+      title={<StyledTitleDiv>Join Court</StyledTitleDiv>}
       visible
     >
       <StyledCascader

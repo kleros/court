@@ -30,9 +30,7 @@ const StyledIFrame = styled.iframe`
   width: 300px;
 `
 
-const isPDF = (extension) => {
-  return extension.toLowerCase() === '.pdf'
-}
+const isPDF = extension => extension.toLowerCase() === '.pdf'
 
 const Attachment = ({
   URI,
@@ -42,10 +40,8 @@ const Attachment = ({
   title
 }) => {
   let extension
-  if (!_extension && URI)
-    extension = `.${URI.split('.').pop()}`
-  else
-    extension = `.${_extension}`
+  if (!_extension && URI) extension = `.${URI.split('.').pop()}`
+  else extension = `.${_extension}`
   let Component
   if (!URI) Component = Document
   else if (isPDF(extension)) Component = PDF
@@ -56,19 +52,17 @@ const Attachment = ({
   Component = <Component className="ternary-fill theme-fill" />
   // No popover
   if (!title && !description) {
-      if (URI)
-        return (
-          <a
-            href={URI.replace(/^\/ipfs\//, 'https://ipfs.kleros.io/ipfs/')}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            {Component}
-          </a>
-        )
+    if (URI)
       return (
-        Component
+        <a
+          href={URI.replace(/^\/ipfs\//, 'https://ipfs.kleros.io/ipfs/')}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          {Component}
+        </a>
       )
+    return Component
   }
 
   return (

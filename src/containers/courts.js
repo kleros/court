@@ -10,9 +10,10 @@ import TopBanner from '../components/top-banner'
 import styled from 'styled-components/macro'
 
 const StyledCol = styled(Col)`
-  color: #D09CFF;
-  text-align: center;
+  color: #d09cff;
+  font-size: 24px;
   margin-top: 10px;
+  text-align: center;
 `
 const StyledButton = styled(Button)`
   float: right;
@@ -33,25 +34,25 @@ export default () => {
     <>
       <TopBanner
         description="Select courts and stake PNK."
-        extra={(
-          <div className={{width: '100%'}}>
+        extra={
+          <div className={{ width: '100%' }}>
             <StyledButton
               onClick={useCallback(() => setStakingID(null), [])}
               size="large"
+              style={{ maxWidth: '120px' }}
               type="primary"
-              style={{maxWidth: '120px'}}
             >
               Join a Court
             </StyledButton>
           </div>
-        )}
+        }
         title="Courts"
       />
-      {juror &&
-        juror.subcourtIDs.filter(ID => ID !== '0').length > 0 ? (
-          <PNKBalanceCard />
-        ) : ''
-      }
+      {juror && juror.subcourtIDs.filter(ID => ID !== '0').length > 0 ? (
+        <PNKBalanceCard />
+      ) : (
+        ''
+      )}
 
       <Spin spinning={!juror}>
         <Row gutter={40}>

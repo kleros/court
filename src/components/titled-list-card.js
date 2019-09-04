@@ -6,26 +6,23 @@ import { ReactComponent as Underline } from '../assets/images/underline.svg'
 import styled from 'styled-components/macro'
 
 const StyledCard = styled(Card)`
+  background: none;
   cursor: initial;
   margin: 28px 0 0;
-  background: none;
 
   .ant-card {
-
-    &-head {
-      color: white;
-      margin: 0 0 11px;
-      background: linear-gradient(111.6deg, #4D00B4 46.25%, #6500B4 96.25%);
-      border-top-left-radius: 12px;
-      border-top-right-radius: 12px;
-    }
-
     &-body {
       background: white;
-      border-radius: 3px;
-      padding: 0;
       border-radius: 12px;
-      box-shadow: 0px 6px 36px #BC9CFF;
+      box-shadow: 0px 6px 36px #bc9cff;
+      padding: 0;
+    }
+    &-head {
+      background: linear-gradient(111.6deg, #4d00b4 46.25%, #6500b4 96.25%);
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      color: white;
+      margin: 0 0 11px;
     }
   }
 
@@ -65,7 +62,7 @@ const StyledUnderline = styled(Underline)`
   width: 100%;
 `
 const StyledDivider = styled.div`
-  border-bottom: 1px solid #D09CFF;
+  border-bottom: 1px solid #d09cff;
   margin: 0;
   width: 100%;
 `

@@ -6,9 +6,9 @@ import { ArchonInitializer } from './archon'
 import { Helmet } from 'react-helmet'
 import Identicon from '../components/identicon'
 import { ReactComponent as Logo } from '../assets/images/logo.svg'
-import NotificationSettings from '../components/notification-settings'
-import Notifications from '../components/notifications'
 import Footer from '../components/footer'
+import Notifications from '../components/notifications'
+import NotificationSettings from '../components/notification-settings'
 import React from 'react'
 import drizzle from './drizzle'
 import loadable from '@loadable/component'
@@ -80,11 +80,10 @@ const MenuItems = [
   <Menu.Item key="cases">
     <NavLink to="/cases">My Cases</NavLink>
   </Menu.Item>,
-  <Menu.Item key="tokens">
-    <NavLink to="/tokens">Buy PNK</NavLink>
-  </Menu.Item>,
   <Menu.Item key="guide">
-    <a href="https://blog.kleros.io/become-a-juror-blockchain-dispute-resolution-on-ethereum/">Guide</a>
+    <a target="_blank" href="https://blog.kleros.io/become-a-juror-blockchain-dispute-resolution-on-ethereum/">
+      Guide
+    </a>
   </Menu.Item>
 ]
 const settings = {
@@ -122,16 +121,30 @@ const StyledCol = styled(Col)`
   }
 `
 const StyledMenu = styled(Menu)`
-  font-weight: bold;
+  font-weight: 500;
   line-height: 64px !important;
   text-align: center;
-`
-const StyledLayout = styled(Layout)`
+
+  .ant-menu-item-selected {
+    background-color: transparent !important;
+  }
 `
 const StyledLayoutContent = styled(Layout.Content)`
-  background: #F2E3FF;
-  padding: 0px 9.375vw 120px 9.375vw;
+  background: #f2e3ff;
   min-height: 100vh;
+  padding: 0px 9.375vw 120px 9.375vw;
+`
+const StyledBuyPNK = styled.a`
+  color: #fff;
+  border: 1px solid white;
+  border-radius: 3px;
+  line-height: 16px;
+  padding: 11px 34px;
+  text-decoration: none;
+
+  &:hover {
+    color: #fff;
+  }
 `
 export default () => (
   <>
@@ -154,7 +167,7 @@ export default () => (
               <StyledLayoutSider breakpoint="md" collapsedWidth="0">
                 <Menu theme="dark">{MenuItems}</Menu>
               </StyledLayoutSider>
-              <StyledLayout>
+              <Layout>
                 <Layout.Header>
                   <Row>
                     <StyledCol md={3} sm={16} xs={0}>
@@ -169,6 +182,7 @@ export default () => (
                       <Notifications useNotifications={useNotifications} />
                       <NotificationSettings settings={settings} />
                       <Identicon pinakion />
+                      <StyledBuyPNK href="/tokens">Buy PNK</StyledBuyPNK>
                     </StyledCol>
                   </Row>
                 </Layout.Header>
@@ -183,7 +197,7 @@ export default () => (
                   </Switch>
                 </StyledLayoutContent>
                 <Footer />
-              </StyledLayout>
+              </Layout>
             </Layout>
           </BrowserRouter>
         </ArchonInitializer>

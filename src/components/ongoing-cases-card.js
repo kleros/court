@@ -1,12 +1,10 @@
 import { Col, Row } from 'antd'
 import React, { useMemo } from 'react'
 import styled from 'styled-components/macro'
-
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import { useDataloader } from '../bootstrap/dataloader'
 import { ReactComponent as Gavel } from '../assets/images/gavel.svg'
 import { ReactComponent as HourGlass } from '../assets/images/hourglass.svg'
-
 import CaseSummaryCard from './case-summary-card'
 import TitledListCard from './titled-list-card'
 import ListItem from './list-item'
@@ -16,38 +14,38 @@ const StyledDiv = styled.div`
 `
 
 const StyledPending = styled.div`
-  color: #4A4A4A;
+  color: #4a4a4a;
   svg {
     height: 12px;
     path {
-      fill: #4A4A4A;
+      fill: #4a4a4a;
     }
   }
 `
 const StyledVoting = styled.div`
-  color: #009AFF;
+  color: #009aff;
   svg {
     height: 12px;
     path {
-      fill: #009AFF;
+      fill: #009aff;
     }
   }
 `
 const StyledExecuted = styled.div`
-  color: #F60C36;
+  color: #f60c36;
   svg {
     height: 12px;
     path {
-      fill: #F60C36;
+      fill: #f60c36;
     }
   }
 `
 const StyledAppealed = styled.div`
-  color: #F60C36;
+  color: #f60c36;
   svg {
     height: 12px;
     path {
-      fill: #F60C36;
+      fill: #f60c36;
     }
   }
 `
@@ -119,20 +117,18 @@ const OngoingCasesCard = ({}) => {
                       d.returnValues._voteID
                     )
                     if (vote)
-                      acc[vote.voted ? 'active' : 'votePending'].push(
-                        {
-                          ...metaEvidence,
-                          statusDiv: (
-                            <StyledVoting>
-                              Voting <Gavel />
-                            </StyledVoting>
-                          ),
-                          ID: d.returnValues._disputeID
-                        }
-                      )
+                      acc[vote.voted ? 'active' : 'votePending'].push({
+                        ...metaEvidence,
+                        statusDiv: (
+                          <StyledVoting>
+                            Voting <Gavel />
+                          </StyledVoting>
+                        ),
+                        ID: d.returnValues._disputeID
+                      })
                     else acc.loading = true
-                  } else acc.active.push(
-                    {
+                  } else
+                    acc.active.push({
                       ...metaEvidence,
                       statusDiv: (
                         <StyledAppealed>
@@ -140,11 +136,8 @@ const OngoingCasesCard = ({}) => {
                         </StyledAppealed>
                       ),
                       ID: d.returnValues._disputeID
-                    }
-                  )
-                }
-
-                else acc.loading = true
+                    })
+                } else acc.loading = true
               } else {
                 const metaEvidence = getMetaEvidence(
                   dispute.arbitrated,
@@ -153,29 +146,25 @@ const OngoingCasesCard = ({}) => {
                 )
 
                 if (dispute.period === '4')
-                  acc.executed.push(
-                    {
-                      ...metaEvidence,
-                      statusDiv: (
-                        <StyledExecuted>
-                          Executed <HourGlass />
-                        </StyledExecuted>
-                      ),
-                      ID: d.returnValues._disputeID
-                    }
-                  )
+                  acc.executed.push({
+                    ...metaEvidence,
+                    statusDiv: (
+                      <StyledExecuted>
+                        Executed <HourGlass />
+                      </StyledExecuted>
+                    ),
+                    ID: d.returnValues._disputeID
+                  })
                 else
-                  acc.active.push(
-                    {
-                      ...metaEvidence,
-                      statusDiv: (
-                        <StyledPending>
-                          Pending <HourGlass />
-                        </StyledPending>
-                      ),
-                      ID: d.returnValues._disputeID
-                    }
-                  )
+                  acc.active.push({
+                    ...metaEvidence,
+                    statusDiv: (
+                      <StyledPending>
+                        Pending <HourGlass />
+                      </StyledPending>
+                    ),
+                    ID: d.returnValues._disputeID
+                  })
               }
             else acc.loading = true
             return acc
@@ -185,48 +174,45 @@ const OngoingCasesCard = ({}) => {
       : { active: [], executed: [], loading: true, votePending: [] }
   )
 
-  const _allActive = (disputes.votePending.reverse().concat(disputes.active.reverse()))
+  const _allActive = disputes.votePending
+    .reverse()
+    .concat(disputes.active.reverse())
 
   return (
     <StyledDiv>
-      {
-        (_allActive.length > 0) ? (
-          <>
-            <TitledListCard
-              prefix={(
-                <StyledGavelContainer>
-                  <Gavel />
-                </StyledGavelContainer>
-              )}
-              title={"Ongoing Cases"}
-            />
-            <Row>
-              {
-                _allActive.slice(0,3).map((_dispute, i) => {
-                  return (
-                    <Col lg={8} key={`case-summary-${i}`}>
-                      <CaseSummaryCard dispute={_dispute} />
-                    </Col>
-                  )
-                })
-              }
-            </Row>
-          </>
-        ) : (
+      {_allActive.length > 0 ? (
+        <>
           <TitledListCard
-            prefix={(
+            prefix={
               <StyledGavelContainer>
                 <Gavel />
               </StyledGavelContainer>
-            )}
-            title={"Ongoing Cases"}
-          >
-            <ListItem key='Ongoing-Cases-None'>You have no Ongoing Cases</ListItem>
-          </TitledListCard>
-        )
-      }
-
-    </ StyledDiv>
+            }
+            title="Ongoing Cases"
+          />
+          <Row>
+            {_allActive.slice(0, 3).map((_dispute, i) => (
+              <Col key={`case-summary-${i}`} lg={8}>
+                <CaseSummaryCard dispute={_dispute} />
+              </Col>
+            ))}
+          </Row>
+        </>
+      ) : (
+        <TitledListCard
+          prefix={
+            <StyledGavelContainer>
+              <Gavel />
+            </StyledGavelContainer>
+          }
+          title="Ongoing Cases"
+        >
+          <ListItem key="Ongoing-Cases-None">
+            You have no Ongoing Cases
+          </ListItem>
+        </TitledListCard>
+      )}
+    </StyledDiv>
   )
 }
 

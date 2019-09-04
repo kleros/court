@@ -10,24 +10,24 @@ const StyledRadioGroup = styled(Radio.Group)`
   float: right;
 
   .ant-radio-button-wrapper {
-    color: #4D00B4;
-    margin-left: 10px;
-    border: 1px solid #4D00B4 !important;
+    border: 1px solid #4d00b4 !important;
     border-radius: 300px;
+    color: #4d00b4;
+    margin-left: 10px;
 
     &:before {
       background-color: transparent;
     }
 
     &-checked {
-      background: #4D00B4 !important;
+      background: #4d00b4 !important;
     }
   }
 `
 const StyledCol = styled(Col)`
-  color: #D09CFF;
-  font-weight: 500;
+  color: #d09cff;
   font-size: 24px;
+  font-weight: 500;
   line-height: 28px;
   text-align: center;
 `
@@ -62,8 +62,9 @@ export default () => {
               'disputes',
               d.returnValues._disputeID
             )
-            const numberOfVotes = draws.filter(_draw =>
-              _draw.returnValues._disputeID === d.returnValues._disputeID
+            const numberOfVotes = draws.filter(
+              _draw =>
+                _draw.returnValues._disputeID === d.returnValues._disputeID
             )
             if (dispute)
               if (dispute.period === '1' || dispute.period === '2') {
@@ -90,10 +91,11 @@ export default () => {
                         draws: numberOfVotes
                       })
                     else acc.loading = true
-                  } else acc.active.push({
-                    ID: d.returnValues._disputeID,
-                    draws: numberOfVotes
-                  })
+                  } else
+                    acc.active.push({
+                      ID: d.returnValues._disputeID,
+                      draws: numberOfVotes
+                    })
                 else acc.loading = true
               } else
                 acc[dispute.period === '4' ? 'executed' : 'active'].push({
@@ -120,8 +122,7 @@ export default () => {
         //     </Button>
         //   </Link>
         // }
-        title="My Cases"
-        extra={(
+        extra={
           <StyledRadioGroup
             buttonStyle="solid"
             name="filter"
@@ -132,8 +133,9 @@ export default () => {
             <Radio.Button value={1}>In Progress</Radio.Button>
             <Radio.Button value={2}>Closed</Radio.Button>
           </StyledRadioGroup>
-        )}
-        extraLong={true}
+        }
+        extraLong
+        title="My Cases"
       />
       <Divider />
       <Spin spinning={disputes.loading}>
@@ -146,7 +148,7 @@ export default () => {
           ) : (
             filteredDisputes.map(dispute => (
               <Col key={dispute.ID} md={12} xl={8}>
-                <CaseCard ID={dispute.ID} draws={dispute.draws}/>
+                <CaseCard ID={dispute.ID} draws={dispute.draws} />
               </Col>
             ))
           )}

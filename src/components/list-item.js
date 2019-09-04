@@ -1,10 +1,9 @@
 import { List } from 'antd'
 import React from 'react'
-
 import styled from 'styled-components/macro'
 
 const StyledListItem = styled(List.Item)`
-  color: #4004A3;
+  color: #4004a3;
   font-weight: bold;
   padding-left: 19px;
   position: relative;
@@ -19,7 +18,9 @@ const StyledListItem = styled(List.Item)`
 `
 
 const ListItem = ({ children, extra, ...rest }) => (
-  <StyledListItem extra={extra} {...rest} >{children}</StyledListItem>
+  <StyledListItem extra={extra} {...rest}>
+    {children}
+  </StyledListItem>
 )
 
 export default ListItem

@@ -20,17 +20,17 @@ const StyledBreadcrumbDiv = styled.div`
 
   .first-fill {
     path {
-      fill: #1E075F;
+      fill: #1e075f;
     }
   }
   .second-fill {
     path {
-      fill: #4D00B4;
+      fill: #4d00b4;
     }
   }
   .third-fill {
     path {
-      fill: #009AFF;
+      fill: #009aff;
     }
   }
 `

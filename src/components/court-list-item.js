@@ -1,7 +1,5 @@
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
-
 import React from 'react'
-
 import ETHAmount from './eth-amount'
 import ListItem from './list-item'
 
@@ -20,12 +18,14 @@ const CourtListItem = ({ ID, name }) => {
 
   return (
     <ListItem
-      extra={(
+      extra={
         <>
           <ETHAmount amount={stake} /> PNK
         </>
-      )}
-    >{name}</ListItem>
+      }
+    >
+      {name}
+    </ListItem>
   )
 }
 

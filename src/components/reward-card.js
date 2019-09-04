@@ -8,9 +8,10 @@ import { ReactComponent as LightPurpleArrowBackground } from '../assets/images/l
 import styled from 'styled-components/macro'
 
 const StyledCard = styled(Card)`
+  border-radius: 12px;
+  box-shadow: 0px 6px 36px #bc9cff;
   cursor: initial;
   margin: 60px 0 25px 0;
-  border-radius: 12px;
 
   .ant-card-body {
     padding: 7px 36px;
@@ -31,6 +32,7 @@ const StyledDiv = styled.div`
 const StyledDivWhiteSmall = styled(StyledDiv)`
   color: white;
   font-size: 14px;
+  font-weight: 500;
   margin: 0px;
   text-align: center;
 
@@ -51,7 +53,7 @@ const StyledDivWhiteLarge = styled(StyledDiv)`
   }
 `
 const StyledTopDiv = styled.div`
-  font-weight: medium;
+  font-weight: 500;
 
   @media (max-width: 991px) {
     margin-top: 30px;
@@ -70,21 +72,21 @@ const StyledCenterDiv = styled.div`
   }
 `
 const StyledRewardLogoCol = styled(Col)`
-  min-width: 100px;
   max-width: 100px;
+  min-width: 100px;
 
   @media (max-width: 991px) {
     max-width: none;
   }
 `
 const AmountCol = styled(Col)`
-  color: #4004A3;
+  color: #4004a3;
   margin-top: 15px;
 `
 const StyledPurpleArrowBackground = styled(PurpleArrowBackground)`
   height: 138px;
-  position: absolute;
   left: -36px;
+  position: absolute;
   top: -16px;
   z-index: 0;
 
@@ -119,13 +121,13 @@ const PNKOffset = styled.div`
 `
 const TopCol = styled.div`
   @media (max-width: 991px) {
-    width: 100%;
-    height: 140px;
-    background: #4D00B4;
+    background: #4d00b4;
     border-radius: 12px;
+    color: white;
+    height: 140px;
     margin: -18px;
     padding-right: 50px;
-    color: white;
+    width: 100%;
   }
 `
 
@@ -145,30 +147,32 @@ const RewardCard = () => {
     [drizzleState.account]
   )
 
-  let ethRewards = drizzle.web3.utils.toBN("0")
-  let pnkRewards = drizzle.web3.utils.toBN("0")
-  if (rewards) {
-    for (let reward of rewards) {
-      ethRewards = ethRewards.add(drizzle.web3.utils.toBN(reward.returnValues._ETHAmount))
-      pnkRewards = pnkRewards.add(drizzle.web3.utils.toBN(reward.returnValues._tokenAmount))
+  let ethRewards = drizzle.web3.utils.toBN('0')
+  let pnkRewards = drizzle.web3.utils.toBN('0')
+  if (rewards)
+    for (const reward of rewards) {
+      ethRewards = ethRewards.add(
+        drizzle.web3.utils.toBN(reward.returnValues._ETHAmount)
+      )
+      pnkRewards = pnkRewards.add(
+        drizzle.web3.utils.toBN(reward.returnValues._tokenAmount)
+      )
     }
-  }
+
   return (
-    <StyledCard hoverable>
+    <StyledCard>
       <Row>
         <StyledPurpleArrowBackground />
-        <Col lg={24} style={{zIndex: "1"}}>
+        <Col lg={24} style={{ zIndex: '1' }}>
           <Row>
             <StyledRewardLogoCol xs={3}>
               <Reward />
             </StyledRewardLogoCol>
             <Col lg={4} xs={12}>
-              <StyledDivWhiteSmall style={{marginTop: "15px"}}>
+              <StyledDivWhiteSmall style={{ marginTop: '15px' }}>
                 Coherence
               </StyledDivWhiteSmall>
-              <StyledDivWhiteLarge>
-                Rewards
-              </StyledDivWhiteLarge>
+              <StyledDivWhiteLarge>Rewards</StyledDivWhiteLarge>
             </Col>
             <AmountCol lg={8} xs={24}>
               <ETHOffset>

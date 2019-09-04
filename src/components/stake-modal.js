@@ -1,4 +1,13 @@
-import { Alert, Col, Form, InputNumber, Modal, Row, Skeleton, Checkbox } from 'antd'
+import {
+  Alert,
+  Checkbox,
+  Col,
+  Form,
+  InputNumber,
+  Modal,
+  Row,
+  Skeleton
+} from 'antd'
 import React, { useCallback, useMemo } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import ETHAmount from './eth-amount'
@@ -22,10 +31,10 @@ const StyledModal = styled(Modal)`
     }
 
     &-header {
-      height: 55px;
-      background: #4D00B4;
+      background: #4d00b4;
       border-top-left-radius: 12px;
       border-top-right-radius: 12px;
+      height: 55px;
       text-align: center;
     }
 
@@ -45,19 +54,19 @@ const StyledModal = styled(Modal)`
 
       button {
         font-size: 14px;
-        min-width: 110px;
         height: 40px;
+        min-width: 110px;
       }
 
       .ant-btn {
         background: none;
-        border: 1px solid #4D00B4;
+        border: 1px solid #4d00b4;
         border-radius: 3px;
-        color: #4D00B4;
+        color: #4d00b4;
 
         &-primary {
-          background: #009AFF;
-          border: 1px solid #009AFF;
+          background: #009aff;
+          border: 1px solid #009aff;
           color: white;
         }
 
@@ -74,9 +83,9 @@ const StyledForm = styled(Form)`
       line-height: 30px;
 
       label {
-        color: #4D00B4 !important;
-        font-weight: 500;
+        color: #4d00b4 !important;
         font-size: 14px;
+        font-weight: 500;
         line-height: 16px;
       }
     }
@@ -85,30 +94,28 @@ const StyledForm = styled(Form)`
       height: 40px;
 
       input {
-        border: 1px solid #D09CFF;
-        box-sizing: border-box;
+        border: 1px solid #d09cff;
         border-radius: 3px;
-        height: 40px;
-        font-family: Roboto;
-        font-style: normal;
-        font-weight: 500;
+        box-sizing: border-box;
+        color: #4d00b4;
         font-size: 18px;
+        font-weight: 500;
+        height: 40px;
         line-height: 21px;
-        color: #4D00B4;
       }
     }
 
     .ant-form-extra {
-      font-style: italic;
+      color: #4d00b4;
       font-size: 12px;
+      font-style: italic;
       line-height: 14px;
-      color: #4D00B4;
     }
 
     .agreement-text {
+      color: #4d00b4;
       font-size: 14px;
       line-height: 16px;
-      color: #4D00B4;
       padding-left: 12px;
     }
     .agreement-checkbox {
@@ -118,8 +125,8 @@ const StyledForm = styled(Form)`
 `
 const StyledAmountDiv = styled.div`
   color: inherit;
-  font-weight: bold;
   font-size: 18px;
+  font-weight: bold;
 `
 const StyledValidatorAmountSpan = styled.span`
   font-style: italic;
@@ -133,23 +140,23 @@ const StyledRow = styled(Row)`
 `
 
 const AvailableStake = styled.div`
-  background: linear-gradient(164.87deg, #4D00B4 23.35%, #6500B4 62.96%);
-  border: 4px solid #D09CFF;
-  box-sizing: border-box;
+  background: linear-gradient(164.87deg, #4d00b4 23.35%, #6500b4 62.96%);
+  border: 4px solid #d09cff;
   border-radius: 12px;
+  box-sizing: border-box;
   color: white;
-  padding 30px 0;
+  padding: 30px 0;
   text-align: center;
   width: 100%;
 `
 const AmountBox = styled.div`
   background: white;
-  border: 4px solid #D09CFF;
-  box-sizing: border-box;
+  border: 4px solid #d09cff;
   border-radius: 12px;
-  color: #4D00B4;
-  text-align: center;
+  box-sizing: border-box;
+  color: #4d00b4;
   padding: 23px 30px;
+  text-align: center;
   width: 100%;
 `
 
@@ -197,7 +204,7 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
       centered
       closable={false}
       confirmLoading={loading || status === 'pending'}
-      maskClosable={true}
+      maskClosable
       okButtonProps={useMemo(
         () => ({
           disabled: hasError,
@@ -235,7 +242,7 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
       <StyledRow>
         <AvailableStake>
           <div>Available to Stake</div>
-          <StyledAmountDiv style={{'marginBottom': '10px'}}>
+          <StyledAmountDiv style={{ marginBottom: '10px' }}>
             <ETHAmount amount={max} /> PNK
           </StyledAmountDiv>
           <div>(PNK in your wallet - PNK already staked)</div>
@@ -266,12 +273,10 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
               <Form.Item
                 colon={false}
                 extra={
-                  (
-                    <div style={{marginTop: '5px'}}>
-                      <img src={infoImg} style={{marginRight: '5px'}}/>
-                      Enter a negative value to unstake.
-                    </div>
-                  )
+                  <div style={{ marginTop: '5px' }}>
+                    <img src={infoImg} style={{ marginRight: '5px' }} />
+                    Enter a negative value to unstake.
+                  </div>
                 }
                 hasFeedback
                 label="PNK"
@@ -348,13 +353,11 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                   />
                 )}
               </Form.Item>
-              <Form.Item
-                colon={false}
-              >
+              <Form.Item colon={false}>
                 {form.getFieldDecorator('Agreement', {
                   rules: [
                     {
-                      message: ("Please acknowledge risks before you continue"),
+                      message: 'Please acknowledge risks before you continue',
                       validator: (_, _value, callback) => {
                         callback(_value ? undefined : true)
                       }
@@ -362,9 +365,13 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                   ]
                 })(
                   <Row>
-                    <Col lg={1} className="agreement-checkbox"><Checkbox /></Col>
-                    <Col lg={23} className="agreement-text">
-                      I understand how Kleros works and that I may suffer a financial loss by participating as a juror in the platform.
+                    <Col className="agreement-checkbox" lg={1}>
+                      <Checkbox />
+                    </Col>
+                    <Col className="agreement-text" lg={23}>
+                      I understand how Kleros works and that I may suffer a
+                      financial loss by participating as a juror in the
+                      platform.
                     </Col>
                   </Row>
                 )}

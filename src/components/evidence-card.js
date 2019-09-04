@@ -1,24 +1,22 @@
-import { Card, Row, Col } from 'antd'
+import { Card, Col, Row } from 'antd'
 import React from 'react'
 import styled from 'styled-components'
-
 import EtherscanLogo from '../assets/images/etherscan-logo.png'
-
 import Attachment from './attachment'
 
 const StyledCard = styled(Card)`
-  background: #FFFFFF;
-  box-shadow: 0px 6px 36px #BC9CFF;
+  background: #ffffff;
   border-radius: 12px;
+  box-shadow: 0px 6px 36px #bc9cff;
 
   > .ant-card-body {
     padding-top: 12px !important;
   }
 `
 const StyledTitle = styled.div`
-  color: #4D00B4;
-  font-weight: 500;
+  color: #4d00b4;
   font-size: 18px;
+  font-weight: 500;
   line-height: 21px;
 `
 const StyledDescription = styled.div`
@@ -29,31 +27,44 @@ const StyledDescription = styled.div`
   min-height: 80px;
 `
 const StyledFooter = styled.div`
-  background: #F5F1FD;
-  min-height: 60px;
+  background: #f5f1fd;
   margin: 0 -46px -23px -46px;
+  min-height: 60px;
 `
 const StyledFooterBody = styled.div`
   padding: 13px 46px 23px;
 `
 const StyledSubmitter = styled.div`
-  color: #4D00B4;
+  color: #4d00b4;
   font-size: 14px;
   font-weight: 500;
 `
 const StyledTime = styled.div`
   font-weight: 400;
 `
-const StyledFiles = styled.div`
-`
 
-const truncateAddress = (address) => (
-  `${address.substring(0, 6)}...${address.substring(address.length - 4, address.length)}`
-)
+const truncateAddress = address =>
+  `${address.substring(0, 6)}...${address.substring(
+    address.length - 4,
+    address.length
+  )}`
 
-const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
+const months = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'June',
+  'July',
+  'Aug',
+  'Sept',
+  'Oct',
+  'Nov',
+  'Dec'
+]
 
-export const displayDateUTC = (dateString) => {
+export const displayDateUTC = dateString => {
   const _date = new Date(dateString)
 
   const date = String(_date.getUTCDate()).replace(/\b(\d{1})\b/g, '0$1')
@@ -70,33 +81,24 @@ const EvidenceCard = ({ evidence, metaEvidence }) => {
 
   return (
     <StyledCard
-      extra={(
+      extra={
         <a href={`https://etherscan.com/address/${evidence.submittedBy}`}>
           <img src={EtherscanLogo} />
         </a>
-      )}
-      title={(
-        <StyledTitle>
-          {evidence.evidenceJSON.title}
-        </StyledTitle>)
       }
+      title={<StyledTitle>{evidence.evidenceJSON.title}</StyledTitle>}
     >
-      <StyledDescription>
-        {evidence.evidenceJSON.description}
-      </StyledDescription>
+      <StyledDescription>{evidence.evidenceJSON.description}</StyledDescription>
       <StyledFooter>
         <StyledFooterBody>
           <Row>
             <Col lg={23}>
               <StyledSubmitter>
-                Submitted By: {
-                  metaEvidence.aliases[evidence.submittedBy] ?
-                  metaEvidence.aliases[evidence.submittedBy] :
-                  truncateAddress(evidence.submittedBy)
-                }
-                <StyledTime>
-                  {displayDateUTC(submittedAtDate)}
-                </StyledTime>
+                Submitted By:{' '}
+                {metaEvidence.aliases[evidence.submittedBy]
+                  ? metaEvidence.aliases[evidence.submittedBy]
+                  : truncateAddress(evidence.submittedBy)}
+                <StyledTime>{displayDateUTC(submittedAtDate)}</StyledTime>
               </StyledSubmitter>
             </Col>
             <Col lg={1}>
@@ -111,6 +113,5 @@ const EvidenceCard = ({ evidence, metaEvidence }) => {
     </StyledCard>
   )
 }
-
 
 export default EvidenceCard

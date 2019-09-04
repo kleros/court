@@ -16,8 +16,8 @@ const handlers = {
         date: new Date(block.timestamp * 1000),
         message: `Case #${event.returnValues._disputeID} has been appealed.`,
         to: `/cases/${event.returnValues._disputeID}`,
-        type: 'info',
-        icon: 'alert'
+        icon: 'alert',
+        type: 'info'
       }
       return (await klerosLiquid.getPastEvents('Draw', {
         filter: { _disputeID: event.returnValues._disputeID },
@@ -54,8 +54,8 @@ const handlers = {
               event.returnValues._disputeID
             }.`,
             to: `/cases/${event.returnValues._disputeID}`,
-            type: 'info',
-            icon: 'alert'
+            icon: 'alert',
+            type: 'info'
           }
         ]
     }
@@ -78,8 +78,8 @@ const handlers = {
             web3.utils.fromWei(event.returnValues._tokenAmount)
           ).toFixed(0)}.`,
           to: `/cases/${event.returnValues._disputeID}`,
-          type: 'info',
-          icon: 'reward'
+          icon: 'reward',
+          type: 'info'
         }
       ]
   }

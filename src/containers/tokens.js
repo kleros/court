@@ -42,7 +42,7 @@ export default () => {
                 }.`
               : hasOldKlerosAtStake
               ? 'Looks like you have some PNK locked in the old Kleros. Come back later when the periods have passed to withdraw.'
-              : 'Buy Pinakion (PNK). The more PNK you stake, the higher your chances of being drawn as a juror.'}
+              : 'The more PNK you stake, the higher your chances of being drawn as a juror.'}
           </Skeleton>
         }
         extra={
@@ -67,7 +67,7 @@ export default () => {
             </>
           )
         }
-        title="Tokens"
+        title="Buy PNK"
       />
       <PNKBalanceCard />
       <Row gutter={40}>

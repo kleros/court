@@ -1,34 +1,32 @@
-import { Skeleton, Tabs, Row, Col, Radio } from 'antd'
-import React, { Fragment, useState, useCallback } from 'react'
+import { Col, Radio, Row, Skeleton, Tabs } from 'antd'
+import React, { Fragment, useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import { useAPI } from '../bootstrap/api'
 import { useDataloader } from '../bootstrap/dataloader'
-
 import ScrollBar from './scroll-bar'
 
 const StyledCaseRoundHistory = styled.div`
   height: 550px;
 
-  .ant-row {
-    height: 100%;
-  }
-
   @media (max-width: 768px) {
     height: auto;
+  }
+
+  .ant-row {
+    height: 100%;
   }
 `
 const StyledRadioGroup = styled(Radio.Group)`
   width: 100%;
 
   .ant-radio-button-wrapper {
-    color: #4D00B4;
-    margin-left: 10px;
-    border: 1px solid #4D00B4 !important;
+    border: 1px solid #4d00b4 !important;
     border-radius: 300px !important;
+    color: #4d00b4;
     margin-bottom: 15px;
+    margin-left: 10px;
     text-align: center;
     width: 45%;
 
@@ -37,7 +35,7 @@ const StyledRadioGroup = styled(Radio.Group)`
     }
 
     &-checked {
-      background: #4D00B4 !important;
+      background: #4d00b4 !important;
     }
   }
 
@@ -49,41 +47,41 @@ const Box = styled.div`
   padding: 21px 43px;
 `
 const RoundSelectBox = styled(Box)`
-  border-bottom: 1px solid #4D00B4;
+  border-bottom: 1px solid #4d00b4;
 
   h3 {
-    color: #4D00B4;
-    font-weight: 500;
+    color: #4d00b4;
     font-size: 14px;
+    font-weight: 500;
     line-height: 16px;
-    text-align: center;
     margin-bottom: 14px;
+    text-align: center;
   }
 `
 const RulingOptionsBox = styled(Box)`
   h3 {
-    color: #4D00B4;
-    font-weight: 500;
+    color: #4d00b4;
     font-size: 14px;
+    font-weight: 500;
     line-height: 16px;
-    text-align: center;
     margin-bottom: 14px;
+    text-align: center;
   }
 `
 const JustificationsBox = styled(Box)`
-  border-left: 1px solid #4D00B4;
+  border-left: 1px solid #4d00b4;
   height: 100%;
   text-align: center;
-  h2 {
-    font-weight: 500;
-    font-size: 24px;
-    line-height: 28px;
-    margin-bottom: 60px;
-    color: #4D00B4;
-  }
   @media (max-width: 768px) {
     border-left: none;
-    border-top: 1px solid #4D00B4;
+    border-top: 1px solid #4d00b4;
+  }
+  h2 {
+    color: #4d00b4;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 28px;
+    margin-bottom: 60px;
   }
 `
 const ScrollBarContainer = styled.div`
@@ -94,8 +92,8 @@ const ScrollBarContainer = styled.div`
 
   @media (max-width: 768px) {
     bottom: none;
-    position: unset;
     margin-left: 0;
+    position: unset;
   }
 `
 
@@ -107,9 +105,9 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
   }))
   const getMetaEvidence = useDataloader.getMetaEvidence()
   // const dispute = useCacheCall('KlerosLiquid', 'disputes', ID)
-  const [ round, setRound ] = useState(dispute.votesLengths.length - 1)
-  const [ rulingOption, setRulingOption ] = useState(Number(ruling) || 1)
-  const [ justificationIndex, setjustificationIndex ] = useState(0)
+  const [round, setRound] = useState(dispute.votesLengths.length - 1)
+  const [rulingOption, setRulingOption] = useState(Number(ruling) || 1)
+  const [justificationIndex, setjustificationIndex] = useState(0)
   console.log(rulingOption)
 
   let metaEvidence
@@ -154,7 +152,8 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
                 2 +
                   ((metaEvidence.metaEvidenceJSON.rulingOptions &&
                     metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
-                    metaEvidence.metaEvidenceJSON.rulingOptions.titles.length) ||
+                    metaEvidence.metaEvidenceJSON.rulingOptions.titles
+                      .length) ||
                     0)
               )
             ].map(() => []),
@@ -181,71 +180,68 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
                   onChange={useCallback(e => setRound(e.target.value), [])}
                   value={round}
                 >
-                  {
-                    justifications.map((round, i) => (
-                      <Radio.Button
-                        value={i}
-                        key={i}
-                        disabled={round.disabled}
-                      >Round {i+1}</Radio.Button>
-                    )
-                  )}
+                  {justifications.map((round, i) => (
+                    <Radio.Button disabled={round.disabled} key={i} value={i}>
+                      Round {i + 1}
+                    </Radio.Button>
+                  ))}
                 </StyledRadioGroup>
               </RoundSelectBox>
               <RulingOptionsBox>
                 <h3>Votes</h3>
-                  <StyledRadioGroup
-                    buttonStyle="solid"
-                    name="votes"
-                    onChange={useCallback(e => setRulingOption(e.target.value), [])}
-                    value={rulingOption}
-                  >
-                    <Radio.Button
-                      size={'large'}
-                      value={0}
-                    >
-                      Refuse to Arbitrate
-                    </Radio.Button>
-                    {
-                      metaEvidence && metaEvidence.metaEvidenceJSON.rulingOptions.titles.map((option, i) => (
-                        <Radio.Button
-                          key={i}
-                          value={i+1}
-                          size={'large'}
-                        >{option}</Radio.Button>
+                <StyledRadioGroup
+                  buttonStyle="solid"
+                  name="votes"
+                  onChange={useCallback(
+                    e => setRulingOption(e.target.value),
+                    []
+                  )}
+                  value={rulingOption}
+                >
+                  <Radio.Button size="large" value={0}>
+                    Refuse to Arbitrate
+                  </Radio.Button>
+                  {metaEvidence &&
+                    metaEvidence.metaEvidenceJSON.rulingOptions.titles.map(
+                      (option, i) => (
+                        <Radio.Button key={i} size="large" value={i + 1}>
+                          {option}
+                        </Radio.Button>
                       )
                     )}
-                  </StyledRadioGroup>
+                </StyledRadioGroup>
               </RulingOptionsBox>
             </Col>
-            <Col md={14} style={{height: '100%'}}>
+            <Col md={14} style={{ height: '100%' }}>
               <JustificationsBox>
                 <Skeleton active loading={justifications[round].loading}>
                   <h2>Justification</h2>
-                  {
-                    !justifications[round].loading &&
-                    justifications[round].byChoice[rulingOption].length &&
-                    !(!ruling && round === justifications.length - 1) ? (
-                      <div>
-                        { justifications[round].byChoice[rulingOption][justificationIndex] }
-                      </div>
-                    ) : (
-                      <div>
-                        No Justifications for this selection
-                      </div>
-                    )
-                  }
-                  {
-                    !justifications[round].loading && justifications[round].byChoice[rulingOption].length > 0 &&
-                    <ScrollBarContainer>
-                      <ScrollBar
-                        currentOption={justificationIndex}
-                        numberOfOptions={justifications[round].byChoice[rulingOption].length - 1}
-                        setOption={setjustificationIndex}
-                      />
-                    </ScrollBarContainer>
-                  }
-
+                  {!justifications[round].loading &&
+                  justifications[round].byChoice[rulingOption].length &&
+                  !(!ruling && round === justifications.length - 1) ? (
+                    <div>
+                      {
+                        justifications[round].byChoice[rulingOption][
+                          justificationIndex
+                        ]
+                      }
+                    </div>
+                  ) : (
+                    <div>No Justifications for this selection</div>
+                  )}
+                  {!justifications[round].loading &&
+                    justifications[round].byChoice[rulingOption].length > 0 && (
+                      <ScrollBarContainer>
+                        <ScrollBar
+                          currentOption={justificationIndex}
+                          numberOfOptions={
+                            justifications[round].byChoice[rulingOption]
+                              .length - 1
+                          }
+                          setOption={setjustificationIndex}
+                        />
+                      </ScrollBarContainer>
+                    )}
                 </Skeleton>
               </JustificationsBox>
             </Col>

@@ -1,12 +1,10 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { Link, withRouter } from 'react-router-dom'
 import styled from 'styled-components/macro'
-
 import useNotifications from '../bootstrap/use-notifications'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import { ReactComponent as Bell } from '../assets/images/bell.svg'
 import { ReactComponent as Reward } from '../assets/images/reward.svg'
-
 import TitledListCard from './titled-list-card'
 import ListItem from './list-item'
 import TimeAgo from './time-ago'
@@ -24,8 +22,8 @@ const StyledBellContainer = styled.div`
   }
 `
 const StyledListItem = styled(ListItem)`
+  border: 1px solid #d09cff;
   padding: 12px 30px;
-  border: 1px solid #D09CFF;
 
   .ant-list-item-extra {
     right: 30px;
@@ -36,24 +34,24 @@ const StyledListItem = styled(ListItem)`
   }
 `
 const StyledNotificationText = styled.div`
-  font-weight: 400;
   font-size: 14px;
+  font-weight: 400;
   line-height: 16px;
   margin-left: 5%;
   position: relative;
   top: 6px;
 `
 const StyledAlertContainer = styled.div`
+  background: #009aff;
+  border-radius: 50%;
   height: 25px;
   width: 25px;
-  background: #009AFF;
-  border-radius: 50%;
 
   svg {
-    position: relative;
-    left: 5px;
-    top: 4px;
     height: 15px;
+    left: 5px;
+    position: relative;
+    top: 4px;
     width: 15px;
     path {
       fill: #fff;
@@ -95,41 +93,41 @@ const NotificationsCard = ({ history }) => {
   return (
     <StyledDiv>
       <TitledListCard
-        prefix={(
+        prefix={
           <StyledBellContainer>
             <Bell />
           </StyledBellContainer>
-        )}
-        title={"Notifications"}
-      > {(notifications.length > 0 ? (
-        notifications.map((_notification, i) => (
-          <StyledListItem extra={(
-              <TimeAgo>{_notification.date}</TimeAgo>
-            )
-          }> {
-            _notification.icon === 'alert' ? (
-              <StyledAlertContainer>
-                <Bell />
-              </StyledAlertContainer>
-            ) : (
-              <StyledRewardContainer>
-                <Reward />
-              </StyledRewardContainer>
-            )
-          }
-
-            <StyledNotificationText>
-              { _notification.message }
-            </StyledNotificationText>
-          </StyledListItem>
-        ))) : (
+        }
+        title="Notifications"
+      >
+        {' '}
+        {notifications.length > 0 ? (
+          notifications.map((_notification, i) => (
+            <StyledListItem extra={<TimeAgo>{_notification.date}</TimeAgo>}>
+              {' '}
+              {_notification.icon === 'alert' ? (
+                <StyledAlertContainer>
+                  <Bell />
+                </StyledAlertContainer>
+              ) : (
+                <StyledRewardContainer>
+                  <Reward />
+                </StyledRewardContainer>
+              )}
+              <StyledNotificationText>
+                {_notification.message}
+              </StyledNotificationText>
+            </StyledListItem>
+          ))
+        ) : (
           <>
-            <ListItem key='Notifications-None'>You have no Notifications</ListItem>
+            <ListItem key="Notifications-None">
+              You have no Notifications
+            </ListItem>
           </>
-        )
-      )}
+        )}
       </TitledListCard>
-    </ StyledDiv>
+    </StyledDiv>
   )
 }
 

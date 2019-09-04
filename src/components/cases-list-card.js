@@ -110,9 +110,7 @@ const CasesListCard = () => {
       prefix={disputes.total}
       title="Cases"
     >
-      <ListItem extra={String(disputes.votePending)}>
-        Vote Pending
-      </ListItem>
+      <ListItem extra={String(disputes.votePending)}>Vote Pending</ListItem>
       <ListItem extra={String(disputes.active)}>Active</ListItem>
       <ListItem extra={String(disputes.executed)}>Closed</ListItem>
       {disputes.deadline && (

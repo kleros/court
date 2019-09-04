@@ -4,11 +4,12 @@ import React from 'react'
 import styled from 'styled-components/macro'
 
 const StyledCard = styled(Card)`
-  color: #4D00B4;
+  background: linear-gradient(270deg, #f2e3ff 22.92%, #ffffff 76.25%);
+  box-shadow: 0px 3px 24px #bc9cff;
+  color: #4d00b4;
   margin: 0 -9.375vw 28px -9.375vw;
-  padding: 0px 9.375vw 0px 9.375vw;
-  background: linear-gradient(270deg, #F2E3FF 22.92%, #FFFFFF 76.25%);
-  box-shadow: 0px 3px 24px #BC9CFF;
+  min-height: 88px;
+  padding: 0px 77px 0px 77px;
 `
 const StyledTitleCol = styled(Col)`
   font-size: 24px;
@@ -20,26 +21,27 @@ const StyledExtraCol = styled(Col)`
   justify-content: flex-end;
 `
 const TopBanner = ({ description, extra, title, extraLong }) => {
-  if (extraLong) return (
-    <StyledCard>
-      <Row align="middle" gutter={16} type="flex">
-        <StyledTitleCol md={3} xs={12} offset={1}>
-          {title}
-        </StyledTitleCol>
-        <Col md={11} xs={0}>
-          {description}
-        </Col>
-        <StyledExtraCol md={9} xs={6}>
-          {extra}
-        </StyledExtraCol>
-      </Row>
-    </StyledCard>
-  )
+  if (extraLong)
+    return (
+      <StyledCard>
+        <Row align="middle" gutter={16} type="flex">
+          <StyledTitleCol md={3} offset={1} xs={12}>
+            {title}
+          </StyledTitleCol>
+          <Col md={11} xs={0}>
+            {description}
+          </Col>
+          <StyledExtraCol md={9} xs={6}>
+            {extra}
+          </StyledExtraCol>
+        </Row>
+      </StyledCard>
+    )
 
   return (
     <StyledCard>
       <Row align="middle" gutter={16} type="flex">
-        <StyledTitleCol md={4} xs={12} offset={1}>
+        <StyledTitleCol md={4} offset={1} xs={12}>
           {title}
         </StyledTitleCol>
         <Col md={12} xs={0}>

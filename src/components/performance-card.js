@@ -16,16 +16,15 @@ const StyledDiv = styled.div`
   }
 `
 const StyledText = styled.div`
-  color: #4004A3;
+  color: #4004a3;
   font-size: 18px;
   margin-top: 15px;
   text-align: center;
 `
 const StyledGraphContainer = styled.div`
-  margin-bottom: 15px;
   margin: auto;
+  margin-bottom: 15px;
   width: 40%;
-
 `
 
 const PNKStatsListCard = () => {
@@ -45,32 +44,27 @@ const PNKStatsListCard = () => {
     [drizzleState.account]
   )
 
-  if (rewards && rewards.length) loadingData = false
+  if (rewards) loadingData = false
 
   let totalCases = 0
   let coherentVote = 0
   let lastSeenDispute = -1
-  if (!loadingData) {
-    for (let reward of rewards) {
+  if (!loadingData)
+    for (const reward of rewards)
       if (Number(reward.returnValues._disputeID) !== lastSeenDispute) {
         totalCases++
         lastSeenDispute = Number(reward.returnValues._disputeID)
         if (Number(reward.returnValues._ETHAmount) > 0) coherentVote++
       }
 
-    }
-  }
-
-  const percent = loadingData ? 0 : (coherentVote / totalCases).toFixed(2) * 100
+  const percent = (!loadingData && rewards.length) ? (coherentVote / totalCases).toFixed(2) * 100 : 0
 
   return (
     <TitledListCard prefix="%" title="Voting Performance">
       <StyledDiv>
         <Spin spinning={loadingData}>
           <StyledGraphContainer>
-            <PercentageCircle
-              percent={percent}
-            />
+            <PercentageCircle percent={percent} />
           </StyledGraphContainer>
           <StyledText>Cases Coherent</StyledText>
         </Spin>

@@ -1,4 +1,4 @@
-import { Button, Card, Popconfirm, Row, Col } from 'antd'
+import { Button, Card, Col, Popconfirm, Row } from 'antd'
 import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components/macro'
@@ -9,17 +9,16 @@ import { ReactComponent as Scales } from '../assets/images/scales.svg'
 import { useDataloader } from '../bootstrap/dataloader'
 import rewardImg from '../assets/images/reward.png'
 import stakeImg from '../assets/images/stake-kleros-logo.png'
-
 import ETHAmount from './eth-amount'
 
 const StyledCard = styled(Card)`
   border-radius: 12px;
-  box-shadow: 0px 6px 36px #BC9CFF;
+  box-shadow: 0px 6px 36px #bc9cff;
   margin: 20px 0 0;
   text-align: center;
 
   .ant-card-actions {
-    background: #F5F1FD;
+    background: #f5f1fd;
     border: none;
     padding: 12px 0px;
 
@@ -29,28 +28,26 @@ const StyledCard = styled(Card)`
 
     button {
       font-size: 14px;
-      min-width: 110px;
       height: 40px;
+      min-width: 110px;
     }
 
     .unstake-button {
       background: none;
-      border: 1px solid #4D00B4;
+      border: 1px solid #4d00b4;
       border-radius: 3px;
-      color: #4D00B4;
+      color: #4d00b4;
     }
   }
 
   .ant-card-head {
-    height: 40px;
-    background: #4D00B4;
+    background: #4d00b4;
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
-    text-align: left;
     color: white;
+    height: 40px;
+    text-align: left;
   }
-`
-const StyledBody = styled.div`
 `
 const StyledHexagon = styled(Hexagon)`
   height: 81px;
@@ -76,21 +73,21 @@ const IconCol = styled(Col)`
   margin-top: 10px;
 `
 const StakeCol = styled(Col)`
-  margin-top: 16px;
-  color: #4D00B4;
+  color: #4d00b4;
   font-size: 14px;
+  margin-top: 16px;
   text-align: left;
 
   h3 {
-    color: #4D00B4;
+    color: #4d00b4;
     font-size: 24px;
     font-weight: 600;
   }
 `
 const RewardCol = styled(Col)`
-  margin-top: 16px;
   color: white;
   font-size: 14px;
+  margin-top: 16px;
   text-align: left;
 
   h3 {
@@ -100,16 +97,16 @@ const RewardCol = styled(Col)`
   }
 `
 const InfoBox = styled.div`
-  border: 2px solid #D09CFF;
+  border: 2px solid #d09cff;
   border-radius: 12px;
   height: 88px;
   margin-bottom: 8px;
 `
 const StakeBox = styled(InfoBox)`
-  background: #F5F1FD;
+  background: #f5f1fd;
 `
 const RewardBox = styled(InfoBox)`
-  background: linear-gradient(111.05deg, #4D00B4 45.17%, #6500B4 88.53%);
+  background: linear-gradient(111.05deg, #4d00b4 45.17%, #6500b4 88.53%);
 `
 const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle()
@@ -143,44 +140,43 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
     <StyledCard
       actions={useMemo(
         () => [
-          (
-            <Popconfirm
-              cancelText="No"
-              okText="Yes"
-              onClick={useCallback(e => e.stopPropagation(), [])}
-              onCancel={useCallback(e => e.stopPropagation(), [])}
-              onConfirm={useCallback(
-                e => {
-                  e.stopPropagation()
-                  send(ID, 0)
-                },
-                [ID]
-              )}
-              title="Unstake all of your PNK from this court?"
-            >
-              <Button className="unstake-button">
-                Unstake All
-              </Button>
-            </Popconfirm>
-          ),
-          <Button onClick={onStakeClick} type="primary" className="stake-button">
+          <Popconfirm
+            cancelText="No"
+            okText="Yes"
+            onCancel={useCallback(e => e.stopPropagation(), [])}
+            onClick={useCallback(e => e.stopPropagation(), [])}
+            onConfirm={useCallback(
+              e => {
+                e.stopPropagation()
+                send(ID, 0)
+              },
+              [ID]
+            )}
+            title="Unstake all of your PNK from this court?"
+          >
+            <Button className="unstake-button">Unstake All</Button>
+          </Popconfirm>,
+          <Button
+            className="stake-button"
+            onClick={onStakeClick}
+            type="primary"
+          >
             Stake
           </Button>
-
         ],
         []
       )}
       hoverable
       loading={name === undefined || (status && status !== 'error')}
       onClick={useCallback(() => onClick(ID), [onClick, ID])}
-      title={(
+      title={
         <>
-          <Scales style={{marginRight: '5px'}}/>
+          <Scales style={{ marginRight: '5px' }} />
           {name}
         </>
-      )}
+      }
     >
-      <StyledBody>
+      <div>
         <StakeBox>
           <Row>
             <IconCol md={8} xs={8}>
@@ -192,7 +188,8 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
             <StakeCol md={16} xs={16}>
               <div>Current Stake</div>
               <h3>
-                {stake && Number(drizzle.web3.utils.fromWei(stake)).toFixed(0)} PNK
+                {stake && Number(drizzle.web3.utils.fromWei(stake)).toFixed(0)}{' '}
+                PNK
               </h3>
             </StakeCol>
           </Row>
@@ -208,12 +205,16 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
             <RewardCol md={16} xs={16}>
               <div>Coherence Reward</div>
               <h3>
-                {subcourt && drizzle.web3.utils.fromWei(subcourt.feeForJuror).toString()} ETH +
+                {subcourt &&
+                  drizzle.web3.utils
+                    .fromWei(subcourt.feeForJuror)
+                    .toString()}{' '}
+                ETH +
               </h3>
             </RewardCol>
           </Row>
         </RewardBox>
-      </StyledBody>
+      </div>
     </StyledCard>
   )
 }

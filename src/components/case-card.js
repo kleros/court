@@ -1,28 +1,24 @@
-import { Button, Card, Popconfirm, Row, Col } from 'antd'
-import React, { useCallback, useMemo } from 'react'
+import { Button, Card, Col, Row } from 'antd'
+import React, { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import TimeAgo from './time-ago'
 import styled from 'styled-components/macro'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
-import { ReactComponent as Close } from '../assets/images/close.svg'
+import rewardImg from '../assets/images/reward.png'
+import Hint from './hint'
 import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
 import { ReactComponent as Scales } from '../assets/images/scales.svg'
 import { useDataloader } from '../bootstrap/dataloader'
-import rewardImg from '../assets/images/reward.png'
-import stakeImg from '../assets/images/stake-kleros-logo.png'
-import Hint from '../components/hint'
-
-import ETHAmount from './eth-amount'
+import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 
 const StyledCard = styled(Card)`
   border-radius: 12px;
-  box-shadow: 0px 6px 36px #BC9CFF;
+  box-shadow: 0px 6px 36px #bc9cff;
   margin: 20px 0 0;
   text-align: center;
 
   .ant-card-actions {
-    background: #F5F1FD;
+    background: #f5f1fd;
     border: none;
     padding: 12px 24px;
 
@@ -43,28 +39,26 @@ const StyledCard = styled(Card)`
 
     button {
       font-size: 14px;
-      min-width: 110px;
       height: 40px;
+      min-width: 110px;
     }
 
     .unstake-button {
       background: none;
-      border: 1px solid #4D00B4;
+      border: 1px solid #4d00b4;
       border-radius: 3px;
-      color: #4D00B4;
+      color: #4d00b4;
     }
   }
 
   .ant-card-head {
-    height: 40px;
-    background: #4D00B4;
+    background: #4d00b4;
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
-    text-align: left;
     color: white;
+    height: 40px;
+    text-align: left;
   }
-`
-const StyledBody = styled.div`
 `
 const StyledDiv = styled.div`
   color: white;
@@ -83,9 +77,9 @@ const IconCol = styled(Col)`
   margin-top: 10px;
 `
 const RewardCol = styled(Col)`
-  margin-top: 16px;
   color: white;
   font-size: 14px;
+  margin-top: 16px;
   text-align: left;
 
   h3 {
@@ -95,59 +89,53 @@ const RewardCol = styled(Col)`
   }
 `
 const InfoBox = styled.div`
-  border: 2px solid #D09CFF;
+  border: 2px solid #d09cff;
   border-radius: 12px;
   height: 88px;
   margin-bottom: 8px;
 `
 const CaseTitleBox = styled.div`
-  font-weight: 500;
-  font-size: 20px;
-  line-height: 23px;
   color: #000000;
+  font-size: 20px;
+  font-weight: 500;
   height: 65px;
+  line-height: 23px;
 `
 const RewardBox = styled(InfoBox)`
-  background: linear-gradient(111.05deg, #4D00B4 45.17%, #6500B4 88.53%);
-`
-const StyledBigTextDiv = styled(StyledDiv)`
-  font-size: 16px;
+  background: linear-gradient(111.05deg, #4d00b4 45.17%, #6500b4 88.53%);
 `
 const StyledHeaderText = styled.div`
+  color: #ffffff;
   display: inline-block;
-  font-weight: 500;
   font-size: 14px;
+  font-weight: 500;
   line-height: 16px;
   position: relative;
   top: -2px;
-  color: #FFFFFF;
 `
 const TimeoutDiv = styled.div`
-  color: #F60C36;
+  color: #f60c36;
 `
 const TimeoutText = styled.div`
-  font-weight: 500;
   font-size: 14px;
+  font-weight: 500;
   line-height: 16px;
   text-align: right;
 `
 const TimeoutTime = styled.div`
-  font-weight: bold;
   font-size: 20px;
+  font-weight: bold;
   line-height: 23px;
   text-align: center;
 `
 const StakeLocked = styled.div`
+  color: #4d00b4;
   font-size: 14px;
   line-height: 16px;
   text-align: right;
-  color: #4D00B4;
 `
 const CaseCard = ({ ID, draws }) => {
-  const { drizzle, useCacheCall, useCacheEvents } = useDrizzle()
-  const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
-  }))
+  const { drizzle, useCacheCall } = useDrizzle()
   const getMetaEvidence = useDataloader.getMetaEvidence()
   const dispute = useCacheCall('KlerosLiquid', 'disputes', ID)
   const dispute2 = useCacheCall('KlerosLiquid', 'getDispute', ID)
@@ -215,9 +203,13 @@ const CaseCard = ({ ID, draws }) => {
             <TimeoutDiv>
               <TimeoutText>
                 {
-                  ['Evidence Submission', 'Commit Deadline', 'Voting Deadline', 'Appeal Deadline', 'Execute Deadline'][
-                    dispute.period
-                  ]
+                  [
+                    'Evidence Submission',
+                    'Commit Deadline',
+                    'Voting Deadline',
+                    'Appeal Deadline',
+                    'Execute Deadline'
+                  ][dispute.period]
                 }
               </TimeoutText>
               <TimeoutTime>
@@ -231,21 +223,19 @@ const CaseCard = ({ ID, draws }) => {
         ],
         [disputeData.deadline]
       )}
+      extra={<StyledHeaderText>Case #{ID}</StyledHeaderText>}
       hoverable
       loading={!metaEvidence}
-      title={(
+      title={
         <>
-          <Scales style={{marginRight: '5px'}}/>
-          <StyledHeaderText>{metaEvidence && metaEvidence.metaEvidenceJSON.category}</StyledHeaderText>
+          <Scales style={{ marginRight: '5px' }} />
+          <StyledHeaderText>
+            {metaEvidence && metaEvidence.metaEvidenceJSON.category}
+          </StyledHeaderText>
         </>
-      )}
-      extra={(
-        <StyledHeaderText>
-          Case #{ID}
-        </StyledHeaderText>
-      )}
+      }
     >
-      <StyledBody>
+      <div>
         <CaseTitleBox>
           {metaEvidence && metaEvidence.metaEvidenceJSON.title}
         </CaseTitleBox>
@@ -261,21 +251,32 @@ const CaseCard = ({ ID, draws }) => {
               <div>Coherence Reward</div>
               <h3>
                 {disputeData.coherenceReward &&
-                  Number((disputeData.coherenceReward ? drizzle.web3.utils.fromWei(disputeData.coherenceReward.toString()) : 0).toString()).toFixed(2)
-                } ETH +
+                  Number(
+                    (disputeData.coherenceReward
+                      ? drizzle.web3.utils.fromWei(
+                          disputeData.coherenceReward.toString()
+                        )
+                      : 0
+                    ).toString()
+                  ).toFixed(2)}{' '}
+                ETH +
               </h3>
             </RewardCol>
           </Row>
         </RewardBox>
         <StakeLocked>
-          Stake locked: {disputeData.atStake &&
-            Number((disputeData.atStake ? drizzle.web3.utils.fromWei(disputeData.atStake.toString()) : 0).toString()).toFixed(0)
-          } PNK {' '}
-          <Hint
-            description="These are the tokens you have locked for the duration of the dispute."
-          />
+          Stake locked:{' '}
+          {disputeData.atStake &&
+            Number(
+              (disputeData.atStake
+                ? drizzle.web3.utils.fromWei(disputeData.atStake.toString())
+                : 0
+              ).toString()
+            ).toFixed(0)}{' '}
+          PNK{' '}
+          <Hint description="These are the tokens you have locked for the duration of the dispute." />
         </StakeLocked>
-      </StyledBody>
+      </div>
     </StyledCard>
   )
 }

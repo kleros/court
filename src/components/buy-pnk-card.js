@@ -5,9 +5,9 @@ import ETHAmount from './eth-amount'
 import styled from 'styled-components/macro'
 
 const StyledCard = styled(Card)`
-  background: linear-gradient(180deg, #4D00B4 0%, #6500B4 100%);
-  box-shadow: 0px 6px 36px #BC9CFF;
+  background: linear-gradient(180deg, #4d00b4 0%, #6500b4 100%);
   border-radius: 12px;
+  box-shadow: 0px 6px 36px #bc9cff;
   cursor: initial;
   position: relative;
 
@@ -53,14 +53,11 @@ const StyledPoweredByDiv = styled.div`
   width: 100%;
 
   a {
-    font-size: 12px;
-    float: right;
     color: white;
+    float: right;
+    font-size: 12px;
     text-decoration: none;
   }
-`
-const StyledSpan = styled.span`
-  font-size: 24px;
 `
 const StyledButton = styled(Button)`
   border-radius: 3px;
@@ -111,10 +108,7 @@ export default Form.create()(({ form }) => {
     'ethToTokenSwapOutput'
   )
   return (
-    <StyledCard
-      hoverable
-      title="Buy PNK with ETH"
-    >
+    <StyledCard hoverable bordered={false} title="Buy PNK with ETH">
       {status && status !== 'pending' && (
         <Alert
           closable
@@ -219,17 +213,14 @@ export default Form.create()(({ form }) => {
         <Spin spinning={loading}>
           <StyledDiv>
             1 PNK ~={' '}
-            {
-              hideETHSold ? ' ... ' : (
-                <ETHAmount
-                  amount={
-                    drizzle.web3.utils.toWei((ETHSold / PNK).toFixed(18))
-                  }
-                  decimals={10}
-                />
-              )
-            }
-            {' '}
+            {hideETHSold ? (
+              ' ... '
+            ) : (
+              <ETHAmount
+                amount={drizzle.web3.utils.toWei((ETHSold / PNK).toFixed(18))}
+                decimals={10}
+              />
+            )}{' '}
             ETH
           </StyledDiv>
           <StyledFormItem colon={false} label="ETH">
