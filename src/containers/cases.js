@@ -142,7 +142,7 @@ export default () => {
         <Row gutter={48}>
           {filteredDisputes.length === 0 ? (
             <StyledCol>
-              You don't have any {['Pending', 'Active', 'Closed'][filter]}{' '}
+              You don't have any {['pending', 'active', 'closed'][filter]}{' '}
               cases.
             </StyledCol>
           ) : (

@@ -122,7 +122,7 @@ const NotificationsCard = ({ history }) => {
         ) : (
           <>
             <ListItem key="Notifications-None">
-              You have no Notifications
+              You have no notifications
             </ListItem>
           </>
         )}

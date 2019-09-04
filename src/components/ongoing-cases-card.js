@@ -208,7 +208,7 @@ const OngoingCasesCard = ({}) => {
           title="Ongoing Cases"
         >
           <ListItem key="Ongoing-Cases-None">
-            You have no Ongoing Cases
+            You have no ongoing cases
           </ListItem>
         </TitledListCard>
       )}
@@ -216,5 +216,4 @@ const OngoingCasesCard = ({}) => {
   )
 }
 
-// <ListItem key='Ongoing-Cases-None'>You have no Ongoing Cases</ListItem>
 export default OngoingCasesCard
