@@ -1,9 +1,10 @@
-import { Alert, Button, Col, Row, Skeleton } from 'antd'
+import { Alert, Button, Col, Row, Skeleton, Divider } from 'antd'
 import React, { useCallback } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import BuyPNKCard from '../components/buy-pnk-card'
 import PNKBalanceCard from '../components/pnk-balance-card'
 import PNKExchangesCard from '../components/pnk-exchanges-card'
+import OTCCard from '../components/otc-card'
 import TopBanner from '../components/top-banner'
 
 export default () => {
@@ -77,6 +78,10 @@ export default () => {
         <Col lg={16} md={12}>
           <PNKExchangesCard />
         </Col>
+      </Row>
+      <Divider />
+      <Row>
+        <OTCCard />
       </Row>
     </>
   )
