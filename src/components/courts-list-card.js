@@ -1,14 +1,10 @@
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
-import { List } from 'antd'
 import React from 'react'
+import ListItem from './list-item'
 import TitledListCard from './titled-list-card'
-import styled from 'styled-components/macro'
+import CourtListItem from './court-list-item'
 import { useDataloader } from '../bootstrap/dataloader'
 
-const StyledListItem = styled(List.Item)`
-  font-weight: bold;
-  padding-left: 19px;
-`
 const CourtsListCard = () => {
   const { useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
@@ -31,11 +27,16 @@ const CourtsListCard = () => {
           const policy = call('PolicyRegistry', 'policies', ID)
           if (policy !== undefined) {
             const policyJSON = loadPolicy(policy)
-            if (policyJSON) return policyJSON.name
+            if (policyJSON)
+              return {
+                name: policyJSON.name,
+                ID
+              }
           }
           return undefined
         })
   )
+
   const loading = !names || names.some(n => n === undefined)
   return (
     <TitledListCard
@@ -43,7 +44,18 @@ const CourtsListCard = () => {
       prefix={names && names.length}
       title="Courts"
     >
-      {!loading && names.map(n => <StyledListItem key={n}>{n}</StyledListItem>)}
+      {!loading &&
+        (names.length > 0 ? (
+          names.map((n, i) => (
+            <CourtListItem ID={Number(n.ID)} key={n.name} name={n.name} />
+          ))
+        ) : (
+          <>
+            <ListItem key="Court-List-None">
+              You are not staked in any courts.
+            </ListItem>
+          </>
+        ))}
     </TitledListCard>
   )
 }

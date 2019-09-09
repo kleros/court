@@ -5,6 +5,9 @@ import ETHAmount from './eth-amount'
 import styled from 'styled-components/macro'
 
 const StyledCard = styled(Card)`
+  background: linear-gradient(180deg, #4d00b4 0%, #6500b4 100%);
+  border-radius: 12px;
+  box-shadow: 0px 6px 36px #bc9cff;
   cursor: initial;
   position: relative;
 
@@ -31,26 +34,36 @@ const StyledInputNumber = styled(InputNumber)`
   color: white;
   width: 100%;
 `
+const StyledInputNumberRight = styled(StyledInputNumber)`
+  input {
+    text-align: right;
+  }
+`
 const StyledDiv = styled.div`
   border: 3px solid white;
   border-radius: 3px;
   color: white;
-  font-size: 10px;
+  font-size: 14px;
   margin: 10px 0;
   padding: 10px;
   text-align: center;
 `
 const StyledPoweredByDiv = styled.div`
-  bottom: 8px;
-  color: white;
-  font-size: 10px;
-  opacity: 0.5;
-  position: absolute;
-  right: 12px;
+  margin-top: 25px;
+  width: 100%;
+
+  a {
+    color: white;
+    float: right;
+    font-size: 12px;
+    text-decoration: none;
+  }
 `
-const StyledSpan = styled.span`
-  font-size: 24px;
+const StyledButton = styled(Button)`
+  border-radius: 3px;
+  width: 100%;
 `
+
 export default Form.create()(({ form }) => {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
@@ -95,11 +108,7 @@ export default Form.create()(({ form }) => {
     'ethToTokenSwapOutput'
   )
   return (
-    <StyledCard
-      className="secondary-linear-background theme-linear-background"
-      hoverable
-      title="Buy PNK with ETH"
-    >
+    <StyledCard bordered={false} hoverable title="Buy PNK with ETH">
       {status && status !== 'pending' && (
         <Alert
           closable
@@ -132,12 +141,11 @@ export default Form.create()(({ form }) => {
         <StyledFormItem colon={false} hasFeedback label="PNK">
           {form.getFieldDecorator('PNK', {
             rules: [
-              { message: 'Please enter an amount of PNK.', required: true },
               {
                 message: "You can't buy 0 or less PNK.",
                 validator: (_, _value, callback) => {
                   if (_value === undefined || _value === '' || _value === '-')
-                    return callback()
+                    return callback(true)
                   const value = drizzle.web3.utils.toBN(
                     drizzle.web3.utils.toWei(
                       typeof _value === 'number'
@@ -205,18 +213,18 @@ export default Form.create()(({ form }) => {
         <Spin spinning={loading}>
           <StyledDiv>
             1 PNK ~={' '}
-            <ETHAmount
-              amount={
-                hideETHSold
-                  ? undefined
-                  : drizzle.web3.utils.toWei((ETHSold / PNK).toFixed(18))
-              }
-              decimals={10}
-            />{' '}
+            {hideETHSold ? (
+              ' ... '
+            ) : (
+              <ETHAmount
+                amount={drizzle.web3.utils.toWei((ETHSold / PNK).toFixed(18))}
+                decimals={10}
+              />
+            )}{' '}
             ETH
           </StyledDiv>
           <StyledFormItem colon={false} label="ETH">
-            <StyledInputNumber
+            <StyledInputNumberRight
               disabled
               precision={18}
               value={
@@ -227,22 +235,18 @@ export default Form.create()(({ form }) => {
             />
           </StyledFormItem>
         </Spin>
-        <Button
+        <StyledButton
           disabled={Object.values(errors).some(v => v) || loading}
           htmlType="submit"
           loading={status === 'pending'}
           type="primary"
         >
-          Buy Now
-        </Button>
+          Buy
+        </StyledButton>
       </Form>
       <StyledPoweredByDiv>
-        powered by{' '}
         <a href="https://uniswap.io" rel="noopener noreferrer" target="_blank">
-          {/* eslint-disable-next-line jsx-a11y/accessible-emoji */}
-          <StyledSpan aria-label="Uniswap Logo" role="img">
-            🦄
-          </StyledSpan>
+          Powered by Uniswap
         </a>
       </StyledPoweredByDiv>
     </StyledCard>

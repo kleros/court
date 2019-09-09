@@ -3,6 +3,18 @@ import Dataloader from 'dataloader'
 import archon from './archon'
 
 const funcs = {
+  getAppealDecision: (arbitratorAddress, disputeID, appeal, options) =>
+    archon.arbitrator
+      .getAppealDecision(arbitratorAddress, disputeID, appeal, {
+        ...options
+      })
+      .catch(() => ({
+        appealedAt: null
+      })),
+  getDisputeCreation: (arbitratorAddress, disputeID, options) =>
+    archon.arbitrator.getDisputeCreation(arbitratorAddress, disputeID, {
+      ...options
+    }),
   getEvidence: (contractAddress, arbitratorAddress, disputeID, options) =>
     archon.arbitrable
       .getDispute(contractAddress, arbitratorAddress, disputeID, {
@@ -35,19 +47,25 @@ const funcs = {
           ...options
         })
       )
-      .catch(() => ({
-        metaEvidenceJSON: {
-          description:
-            'The data for this case is not formatted correctly or has been tampered since the time of its submission. Please refresh the page and refuse to arbitrate if the problem persists.',
-          title: 'Invalid or tampered case data, refuse to arbitrate.'
+      .catch(e => {
+        console.log(e)
+        return {
+          metaEvidenceJSON: {
+            description:
+              'The data for this case is not formatted correctly or has been tampered since the time of its submission. Please refresh the page and refuse to arbitrate if the problem persists.',
+            title: 'Invalid or tampered case data, refuse to arbitrate.'
+          }
         }
-      })),
+      }),
   loadPolicy: (URI, options) =>
     archon.utils
-      .validateFileFromURI(URI, {
-        strictHashes: true,
-        ...options
-      })
+      .validateFileFromURI(
+        URI.replace(/^\/ipfs\//, 'https://ipfs.kleros.io/ipfs/'),
+        {
+          strictHashes: true,
+          ...options
+        }
+      )
       .then(res => res.file)
       .catch(() => ({
         description: 'Please contact the governance team.',

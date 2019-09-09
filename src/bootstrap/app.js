@@ -6,8 +6,9 @@ import { ArchonInitializer } from './archon'
 import { Helmet } from 'react-helmet'
 import Identicon from '../components/identicon'
 import { ReactComponent as Logo } from '../assets/images/logo.svg'
-import NotificationSettings from '../components/notification-settings'
+import Footer from '../components/footer'
 import Notifications from '../components/notifications'
+import NotificationSettings from '../components/notification-settings'
 import React from 'react'
 import drizzle from './drizzle'
 import loadable from '@loadable/component'
@@ -77,10 +78,16 @@ const MenuItems = [
     <NavLink to="/courts">Courts</NavLink>
   </Menu.Item>,
   <Menu.Item key="cases">
-    <NavLink to="/cases">Cases</NavLink>
+    <NavLink to="/cases">My Cases</NavLink>
   </Menu.Item>,
-  <Menu.Item key="tokens">
-    <NavLink to="/tokens">Tokens</NavLink>
+  <Menu.Item key="guide">
+    <a
+      href="https://blog.kleros.io/become-a-juror-blockchain-dispute-resolution-on-ethereum/"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      Guide
+    </a>
   </Menu.Item>
 ]
 const settings = {
@@ -118,13 +125,30 @@ const StyledCol = styled(Col)`
   }
 `
 const StyledMenu = styled(Menu)`
-  font-weight: bold;
+  font-weight: 500;
   line-height: 64px !important;
   text-align: center;
+
+  .ant-menu-item-selected {
+    background-color: transparent !important;
+  }
 `
 const StyledLayoutContent = styled(Layout.Content)`
-  background: white;
-  padding: 0 9.375vw 62px;
+  background: #f2e3ff;
+  min-height: 100vh;
+  padding: 0px 9.375vw 120px 9.375vw;
+`
+const StyledBuyPNK = styled.a`
+  border: 1px solid white;
+  border-radius: 3px;
+  color: #fff;
+  line-height: 16px;
+  padding: 11px 34px;
+  text-decoration: none;
+
+  &:hover {
+    color: #fff;
+  }
 `
 export default () => (
   <>
@@ -162,6 +186,7 @@ export default () => (
                       <Notifications useNotifications={useNotifications} />
                       <NotificationSettings settings={settings} />
                       <Identicon pinakion />
+                      <StyledBuyPNK href="/tokens">Buy PNK</StyledBuyPNK>
                     </StyledCol>
                   </Row>
                 </Layout.Header>
@@ -175,6 +200,7 @@ export default () => (
                     <Route component={C404} />
                   </Switch>
                 </StyledLayoutContent>
+                <Footer />
               </Layout>
             </Layout>
           </BrowserRouter>

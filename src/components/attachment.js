@@ -2,6 +2,7 @@ import { Divider, Popover } from 'antd'
 import { ReactComponent as Document } from '../assets/images/document.svg'
 import { ReactComponent as Image } from '../assets/images/image.svg'
 import { ReactComponent as Link } from '../assets/images/link.svg'
+import { ReactComponent as PDF } from '../assets/images/pdf.svg'
 import PropTypes from 'prop-types'
 import React from 'react'
 import { ReactComponent as Video } from '../assets/images/video.svg'
@@ -28,6 +29,9 @@ const StyledIFrame = styled.iframe`
   margin-top: -8px;
   width: 300px;
 `
+
+const isPDF = extension => extension.toLowerCase() === '.pdf'
+
 const Attachment = ({
   URI,
   description,
@@ -35,13 +39,32 @@ const Attachment = ({
   previewURI,
   title
 }) => {
-  const extension = `.${_extension}`
+  let extension
+  if (!_extension && URI) extension = `.${URI.split('.').pop()}`
+  else extension = `.${_extension}`
   let Component
-  if (!URI || isTextPath(extension)) Component = Document
+  if (!URI) Component = Document
+  else if (isPDF(extension)) Component = PDF
+  else if (isTextPath(extension)) Component = Document
   else if (isImage(extension)) Component = Image
   else if (isVideo(extension)) Component = Video
   else Component = Link
   Component = <Component className="ternary-fill theme-fill" />
+  // No popover
+  if (!title && !description) {
+    if (URI)
+      return (
+        <a
+          href={URI.replace(/^\/ipfs\//, 'https://ipfs.kleros.io/ipfs/')}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          {Component}
+        </a>
+      )
+    return Component
+  }
+
   return (
     <StyledPopover
       arrowPointAtCenter

@@ -1,105 +1,138 @@
-import { Button, Card } from 'antd'
+import { Button, Card, Col, Row } from 'antd'
 import React, { useMemo } from 'react'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
-import ETHAmount from './eth-amount'
-import { ReactComponent as Gavel } from '../assets/images/gavel.svg'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import TimeAgo from './time-ago'
 import styled from 'styled-components/macro'
+import rewardImg from '../assets/images/reward.png'
+import Hint from './hint'
+import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
+import { ReactComponent as Scales } from '../assets/images/scales.svg'
 import { useDataloader } from '../bootstrap/dataloader'
+import { useDrizzle } from '../temp/drizzle-react-hooks'
 
 const StyledCard = styled(Card)`
-  cursor: initial;
+  border-radius: 12px;
+  box-shadow: 0px 6px 36px #bc9cff;
   margin: 20px 0 0;
-
-  .ant-card {
-    &-head {
-      font-size: 14px;
-      height: 32px;
-      line-height: 32px;
-      min-height: 32px;
-      padding: 0 19px 0 44px;
-      position: relative;
-
-      &-title {
-        padding: 0;
-      }
-    }
-
-    &-extra {
-      padding: 0;
-    }
-
-    &-body {
-      height: 203px;
-      padding: 17px 32px 0;
-    }
-
-    &-actions {
-      border: none;
-
-      & > li {
-        border: none;
-        height: 44px;
-        line-height: 44px;
-      }
-    }
-  }
-`
-const StyledDiv = styled.div`
-  font-weight: bold;
-`
-const StyledBigTextDiv = styled(StyledDiv)`
-  font-size: 16px;
-`
-const StyledGavel = styled(Gavel)`
-  left: 14px;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-`
-const StyledCardGrid = styled(Card.Grid)`
-  box-shadow: none;
-  display: flex;
-  flex-direction: column;
-  height: 73px;
-  justify-content: center;
-  margin-bottom: 20px;
-  padding: 0 5px;
   text-align: center;
-  width: 50%;
 
-  &:first-child {
-    border-bottom: 1px solid silver;
-    padding-left: 8px;
-    text-align: left;
-    width: 100%;
+  .ant-card-actions {
+    background: #f5f1fd;
+    border: none;
+    padding: 12px 24px;
+
+    & > li {
+      border: none;
+    }
+
+    & > li:first-child {
+      span {
+        float: left;
+      }
+    }
+    & > li:nth-child(2) {
+      span {
+        float: right;
+      }
+    }
+
+    button {
+      font-size: 14px;
+      height: 40px;
+      min-width: 110px;
+    }
+
+    .unstake-button {
+      background: none;
+      border: 1px solid #4d00b4;
+      border-radius: 3px;
+      color: #4d00b4;
+    }
   }
 
-  &:nth-child(2) {
-    border-right: 1px solid silver;
+  .ant-card-head {
+    background: #4d00b4;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    color: white;
+    height: 40px;
+    text-align: left;
   }
 `
-const CaseCard = ({ ID }) => {
-  const { drizzle, useCacheCall, useCacheEvents } = useDrizzle()
-  const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
-  }))
+const StyledPrefixDiv = styled.div`
+  left: 50%;
+  position: absolute;
+  top: 33px;
+  transform: translate(-50%, -50%);
+`
+const IconCol = styled(Col)`
+  margin-top: 10px;
+`
+const RewardCol = styled(Col)`
+  color: white;
+  font-size: 14px;
+  margin-top: 16px;
+  text-align: left;
+
+  h3 {
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
+  }
+`
+const InfoBox = styled.div`
+  border: 2px solid #d09cff;
+  border-radius: 12px;
+  height: 88px;
+  margin-bottom: 8px;
+`
+const CaseTitleBox = styled.div`
+  color: #000000;
+  font-size: 20px;
+  font-weight: 500;
+  height: 65px;
+  line-height: 23px;
+`
+const RewardBox = styled(InfoBox)`
+  background: linear-gradient(111.05deg, #4d00b4 45.17%, #6500b4 88.53%);
+`
+const StyledHeaderText = styled.div`
+  color: #ffffff;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 16px;
+  position: relative;
+  top: -2px;
+`
+const TimeoutDiv = styled.div`
+  color: #f60c36;
+`
+const TimeoutText = styled.div`
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 16px;
+  text-align: right;
+`
+const TimeoutTime = styled.div`
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 23px;
+  text-align: center;
+`
+const StakeLocked = styled.div`
+  color: #4d00b4;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: right;
+`
+const CaseCard = ({ ID, draws }) => {
+  const { drizzle, useCacheCall } = useDrizzle()
   const getMetaEvidence = useDataloader.getMetaEvidence()
   const dispute = useCacheCall('KlerosLiquid', 'disputes', ID)
   const dispute2 = useCacheCall('KlerosLiquid', 'getDispute', ID)
-  const draws = useCacheEvents(
-    'KlerosLiquid',
-    'Draw',
-    useMemo(
-      () => ({
-        filter: { _address: drizzleState.account, _disputeID: ID },
-        fromBlock: process.env.REACT_APP_DRAW_EVENT_LISTENER_BLOCK_NUMBER
-      }),
-      [drizzleState.account, ID]
-    )
-  )
+
   const disputeData = useCacheCall(['KlerosLiquid'], call => {
     let disputeData = {}
     if (dispute2 && draws) {
@@ -160,19 +193,22 @@ const CaseCard = ({ ID }) => {
       actions={useMemo(
         () => [
           disputeData.deadline && (
-            <>
-              <StyledDiv className="primary-color theme-color">
+            <TimeoutDiv>
+              <TimeoutText>
                 {
-                  ['Evidence', 'Commit', 'Vote', 'Appeal', 'Execute'][
-                    dispute.period
-                  ]
-                }{' '}
-                Period Over
-              </StyledDiv>
-              <StyledBigTextDiv className="primary-color theme-color">
+                  [
+                    'Evidence Submission',
+                    'Commit Deadline',
+                    'Voting Deadline',
+                    'Appeal Deadline',
+                    'Execute Deadline'
+                  ][dispute.period]
+                }
+              </TimeoutText>
+              <TimeoutTime>
                 <TimeAgo>{disputeData.deadline}</TimeAgo>
-              </StyledBigTextDiv>
-            </>
+              </TimeoutTime>
+            </TimeoutDiv>
           ),
           <Link to={`/cases/${ID}`}>
             <Button type="primary">See Details</Button>
@@ -180,33 +216,60 @@ const CaseCard = ({ ID }) => {
         ],
         [disputeData.deadline]
       )}
-      extra={`Case #${ID}`}
+      extra={<StyledHeaderText>Case #{ID}</StyledHeaderText>}
       hoverable
       loading={!metaEvidence}
       title={
         <>
-          <StyledGavel className="ternary-fill" />
-          {metaEvidence && metaEvidence.metaEvidenceJSON.category}
+          <Scales style={{ marginRight: '5px' }} />
+          <StyledHeaderText>
+            {metaEvidence && metaEvidence.metaEvidenceJSON.category}
+          </StyledHeaderText>
         </>
       }
     >
-      <StyledCardGrid>
-        <StyledBigTextDiv>
+      <div>
+        <CaseTitleBox>
           {metaEvidence && metaEvidence.metaEvidenceJSON.title}
-        </StyledBigTextDiv>
-      </StyledCardGrid>
-      <StyledCardGrid>
-        Coherence Reward
-        <StyledBigTextDiv>
-          <ETHAmount amount={disputeData.coherenceReward} decimals={2} /> ETH +
-        </StyledBigTextDiv>
-      </StyledCardGrid>
-      <StyledCardGrid>
-        Stake Locked
-        <StyledBigTextDiv>
-          <ETHAmount amount={disputeData.atStake} /> PNK
-        </StyledBigTextDiv>
-      </StyledCardGrid>
+        </CaseTitleBox>
+        <RewardBox>
+          <Row>
+            <IconCol md={8} xs={8}>
+              <Hexagon className="ternary-fill" />
+              <StyledPrefixDiv>
+                <img src={rewardImg} />
+              </StyledPrefixDiv>
+            </IconCol>
+            <RewardCol md={16} xs={16}>
+              <div>Coherence Reward</div>
+              <h3>
+                {disputeData.coherenceReward &&
+                  Number(
+                    (disputeData.coherenceReward
+                      ? drizzle.web3.utils.fromWei(
+                          disputeData.coherenceReward.toString()
+                        )
+                      : 0
+                    ).toString()
+                  ).toFixed(2)}{' '}
+                ETH +
+              </h3>
+            </RewardCol>
+          </Row>
+        </RewardBox>
+        <StakeLocked>
+          Stake locked:{' '}
+          {disputeData.atStake &&
+            Number(
+              (disputeData.atStake
+                ? drizzle.web3.utils.fromWei(disputeData.atStake.toString())
+                : 0
+              ).toString()
+            ).toFixed(0)}{' '}
+          PNK{' '}
+          <Hint description="These are the tokens you have locked for the duration of the dispute." />
+        </StakeLocked>
+      </div>
     </StyledCard>
   )
 }

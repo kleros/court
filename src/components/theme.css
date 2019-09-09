@@ -53,7 +53,7 @@ body {
   font-variant: tabular-nums;
   line-height: 1.5;
   color: rgba(0, 0, 0, 0.65);
-  background-color: #fff;
+  background-color: #F2E3FF;
 }
 [tabindex="-1"]:focus {
   outline: none !important;
@@ -10798,7 +10798,7 @@ textarea.ant-input-number {
   flex: 0 0 auto;
 }
 .ant-layout-header {
-  background: #1e075f;
+  background: #1E075F;
   padding: 0 50px;
   height: 64px;
   line-height: 64px;
@@ -18801,7 +18801,7 @@ li.ant-select-tree-treenode-disabled > .ant-select-tree-node-content-wrapper:hov
 }
 .ternary-fill.theme-fill,
 .ternary-fill .theme-fill {
-  fill: #4004a3;
+  fill: #1E075F;
 }
 .ternary-stroke.theme-stroke,
 .ternary-stroke .theme-stroke {

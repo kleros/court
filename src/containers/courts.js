@@ -1,16 +1,23 @@
-import { Button, Col, Row, Spin } from 'antd'
+import { Button, Col, Divider, Row, Spin } from 'antd'
 import React, { useCallback, useState } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import CourtCard from '../components/court-card'
 import CourtCascaderModal from '../components/court-cascader-modal'
+import PNKBalanceCard from '../components/pnk-balance-card'
 import CourtDrawer from '../components/court-drawer'
 import StakeModal from '../components/stake-modal'
 import TopBanner from '../components/top-banner'
 import styled from 'styled-components/macro'
 
 const StyledCol = styled(Col)`
-  color: gainsboro;
-  margin-top: 10px;
+  color: #d09cff;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 28px;
+  text-align: center;
+`
+const StyledButton = styled(Button)`
+  float: right;
 `
 export default () => {
   const { useCacheCall } = useDrizzle()
@@ -29,22 +36,32 @@ export default () => {
       <TopBanner
         description="Select courts and stake PNK."
         extra={
-          <Button
-            onClick={useCallback(() => setStakingID(null), [])}
-            size="large"
-            type="primary"
-          >
-            Browse
-          </Button>
+          <div className={{ width: '100%' }}>
+            <StyledButton
+              onClick={useCallback(() => setStakingID(null), [])}
+              size="large"
+              style={{ maxWidth: '120px' }}
+              type="primary"
+            >
+              Join a Court
+            </StyledButton>
+          </div>
         }
         title="Courts"
       />
-      My Courts
+      {juror && juror.subcourtIDs.filter(ID => ID !== '0').length > 0 ? (
+        <PNKBalanceCard />
+      ) : (
+        ''
+      )}
       <Spin spinning={!juror}>
         <Row gutter={40}>
           {juror &&
             (juror.subcourtIDs.filter(ID => ID !== '0').length === 0 ? (
-              <StyledCol>You don't have stake in any courts.</StyledCol>
+              <>
+                <Divider />
+                <StyledCol>You have not joined any courts yet.</StyledCol>
+              </>
             ) : (
               juror.subcourtIDs
                 .filter(ID => ID !== '0')

@@ -39,7 +39,7 @@ const _404 = ({ Web3 }) => (
     <StyledAcropolis />
     <StyledInfoDiv className="quaternary-background theme-background">
       <Styled404Div className="primary-color theme-color">
-        {Web3 && 'Web3 '}404
+        {Web3 ? 'Web3 not found' : '404'}
       </Styled404Div>
       <StyledMessageLine1 className="ternary-color theme-color">
         Oops,

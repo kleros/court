@@ -1,7 +1,8 @@
-import { Alert, Button, Col, Row, Skeleton } from 'antd'
+import { Alert, Button, Col, Divider, Row, Skeleton } from 'antd'
 import React, { useCallback } from 'react'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import BuyPNKCard from '../components/buy-pnk-card'
+import OTCCard from '../components/otc-card'
 import PNKBalanceCard from '../components/pnk-balance-card'
 import PNKExchangesCard from '../components/pnk-exchanges-card'
 import TopBanner from '../components/top-banner'
@@ -42,7 +43,7 @@ export default () => {
                 }.`
               : hasOldKlerosAtStake
               ? 'Looks like you have some PNK locked in the old Kleros. Come back later when the periods have passed to withdraw.'
-              : 'Buy Pinakion (PNK). The more PNK you stake, the higher your chances of being drawn as a juror.'}
+              : 'The more PNK you stake, the higher your chances of being drawn as a juror.'}
           </Skeleton>
         }
         extra={
@@ -67,16 +68,20 @@ export default () => {
             </>
           )
         }
-        title="Tokens"
+        title="Buy PNK"
       />
       <PNKBalanceCard />
       <Row gutter={40}>
         <Col lg={8} md={12}>
           <BuyPNKCard />
         </Col>
-        <Col lg={8} md={12}>
+        <Col lg={16} md={12}>
           <PNKExchangesCard />
         </Col>
+      </Row>
+      <Divider />
+      <Row>
+        <OTCCard />
       </Row>
     </>
   )

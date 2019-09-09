@@ -5,11 +5,9 @@ import {
   Checkbox,
   Col,
   DatePicker,
-  Divider,
   Input,
   InputNumber,
   Row,
-  Skeleton,
   Spin
 } from 'antd'
 import React, { useCallback, useMemo, useState } from 'react'
@@ -18,10 +16,13 @@ import { API } from '../bootstrap/api'
 import Attachment from './attachment'
 import Breadcrumbs from './breadcrumbs'
 import CaseRoundHistory from './case-round-history'
+import CollapsableCard from './collapsable-card'
 import CourtDrawer from './court-drawer'
 import { ReactComponent as Document } from '../assets/images/document.svg'
-import ETHAddress from './eth-address'
-import Identicon from './identicon'
+import { ReactComponent as Folder } from '../assets/images/folder.svg'
+import { ReactComponent as Gavel } from '../assets/images/gavel.svg'
+import { ReactComponent as Scales } from '../assets/images/scales.svg'
+import EvidenceTimeline from './evidence-timeline'
 import PropTypes from 'prop-types'
 import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components/macro'
@@ -39,6 +40,8 @@ realitioLibQuestionFormatter.minNumber = realitioLibQuestionFormatter.minNumber.
 )
 
 const StyledCard = styled(Card)`
+  border-radius: 12px;
+  box-shadow: 0px 6px 36px #bc9cff;
   cursor: initial;
 
   .ant-card {
@@ -52,6 +55,7 @@ const StyledCard = styled(Card)`
       }
 
       &-title {
+        color: #4d00b4;
         font-size: 24px;
       }
     }
@@ -84,7 +88,14 @@ const StyledDiv = styled.div`
   display: flex;
   flex-direction: column;
   font-size: 24px;
-  padding: 30px 10px;
+  padding: 34px 10px;
+`
+const StyledActionsDiv = styled(StyledDiv)`
+  min-height: 250px;
+  overflow: hidden;
+`
+const SecondaryActionText = styled.div`
+  margin-top: 30px;
 `
 const StyledInputTextArea = styled(Input.TextArea)`
   background: rgba(255, 255, 255, 0.3);
@@ -113,8 +124,19 @@ const StyledButton = styled(Button)`
   margin: 20px 5px 15px;
 `
 const StyledPoliciesButton = styled(Button)`
+  border: 1px solid #4d00b4;
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: #4d00b4;
   padding-left: 40px;
   position: relative;
+`
+const GavalLarge = styled(Gavel)`
+  height: 150px;
+  opacity: 0.15;
+  position: absolute;
+  top: 50px;
+  width: 150px;
 `
 const StyledDocument = styled(Document)`
   height: 18px;
@@ -123,6 +145,9 @@ const StyledDocument = styled(Document)`
   top: 50%;
   transform: translateY(-50%);
   width: auto;
+  path {
+    fill: #4d00b4;
+  }
 `
 const StyledBreadcrumbs = styled(Breadcrumbs)`
   bottom: -20px;
@@ -131,6 +156,9 @@ const StyledBreadcrumbs = styled(Breadcrumbs)`
   position: absolute;
 `
 const StyledInnerCard = styled(Card)`
+  border: 1px solid #d09cff;
+  border-radius: 3px;
+  box-sizing: border-box;
   cursor: initial;
   margin-bottom: 38px;
 
@@ -151,18 +179,30 @@ const StyledInnerCard = styled(Card)`
     }
 
     &-actions {
-      background: linear-gradient(228.49deg, white -6.48%, whitesmoke 45.52%);
+      background: linear-gradient(204.14deg, #ffffff -6.48%, #f5f1fd 45.52%);
       border: none;
+      height: 70px;
       padding-left: 20px;
       position: relative;
+      text-align: center;
 
       & > li {
         border: none;
         margin: 12px 8px;
         width: auto !important;
 
+        path {
+          fill: #4d00b4;
+        }
+
+        &:first-child {
+          left: 48%;
+          position: absolute;
+          top: 4px;
+        }
+
         &:last-child {
-          left: 0;
+          left: 40%;
           position: absolute;
           top: 0;
         }
@@ -180,7 +220,7 @@ const StyledIFrame = styled.iframe`
   width: 100%;
 `
 const StyledInnerCardActionsTitleDiv = styled.div`
-  background: whitesmoke;
+  background: linear-gradient(204.14deg, #ffffff -6.48%, #f5f1fd 45.52%);
   border-radius: 6px 6px 0 0;
   height: 28px;
   left: 20px;
@@ -190,9 +230,7 @@ const StyledInnerCardActionsTitleDiv = styled.div`
   top: -55px;
   width: 167px;
 `
-const StyledIdenticon = styled(Identicon)`
-  margin-right: 10px;
-`
+
 const CaseDetailsCard = ({ ID }) => {
   const { drizzle, useCacheCall, useCacheEvents, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
@@ -201,6 +239,7 @@ const CaseDetailsCard = ({ ID }) => {
   const loadPolicy = useDataloader.loadPolicy()
   const getMetaEvidence = useDataloader.getMetaEvidence()
   const getEvidence = useDataloader.getEvidence()
+  const getAppealDecision = useDataloader.getAppealDecision()
   const [activeSubcourtID, setActiveSubcourtID] = useState()
   const [justification, setJustification] = useState()
   const [complexRuling, setComplexRuling] = useState()
@@ -212,7 +251,7 @@ const CaseDetailsCard = ({ ID }) => {
     useMemo(
       () => ({
         filter: { _address: drizzleState.account, _disputeID: ID },
-        fromBlock: process.env.REACT_APP_DRAW_EVENT_LISTENER_BLOCK_NUMBER
+        fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER
       }),
       [drizzleState.account, ID]
     )
@@ -301,7 +340,7 @@ const CaseDetailsCard = ({ ID }) => {
   })
   let metaEvidence
   let evidence
-  let evidenceBySubmitter
+  let appeals
   if (dispute) {
     metaEvidence = getMetaEvidence(
       dispute.arbitrated,
@@ -313,12 +352,10 @@ const CaseDetailsCard = ({ ID }) => {
       drizzle.contracts.KlerosLiquid.address,
       ID
     )
-    if (evidence)
-      evidenceBySubmitter = evidence.reduce((acc, e) => {
-        if (acc[e.submittedBy]) acc[e.submittedBy].push(e)
-        else acc[e.submittedBy] = [e]
-        return acc
-      }, {})
+    if (dispute2 && dispute2.votesLengths.length > 1)
+      appeals = new Array(dispute2.votesLengths.length - 1).map((_, i) =>
+        getAppealDecision(drizzle.contracts.KlerosLiquid.address, ID, i + 1)
+      )
   }
   const { send: sendCommit, status: sendCommitStatus } = useCacheSend(
     'KlerosLiquid',
@@ -478,12 +515,13 @@ const CaseDetailsCard = ({ ID }) => {
         >
           {!votesData.loading && subcourts && metaEvidence ? (
             <>
-              <StyledDiv className="secondary-linear-background theme-linear-background">
+              <StyledActionsDiv className="secondary-linear-background theme-linear-background">
+                {dispute.period !== '2' ? <GavalLarge /> : ''}
                 {votesData.drawnInCurrentRound
                   ? votesData.canVote
                     ? 'What is your decision?'
                     : votesData.voted
-                    ? `You chose: ${
+                    ? `You voted for: ${
                         votesData.voted === '0'
                           ? 'Refuse to Arbitrate'
                           : (metaEvidence.metaEvidenceJSON.rulingOptions &&
@@ -518,31 +556,35 @@ const CaseDetailsCard = ({ ID }) => {
                       : 'You did not commit a vote.'
                     : 'You did not cast a vote.'
                   : 'You were not drawn in the current round.'}
-                {dispute.period === '4' &&
-                  ` The winning choice was "${
-                    votesData.currentRuling === '0'
-                      ? 'Refuse to Arbitrate'
-                      : (metaEvidence.metaEvidenceJSON.rulingOptions &&
-                          realitioLibQuestionFormatter.getAnswerString(
-                            {
-                              decimals:
-                                metaEvidence.metaEvidenceJSON.rulingOptions
-                                  .precision,
-                              outcomes:
-                                metaEvidence.metaEvidenceJSON.rulingOptions
-                                  .titles,
-                              type:
-                                metaEvidence.metaEvidenceJSON.rulingOptions.type
-                            },
-                            realitioLibQuestionFormatter.padToBytes32(
-                              drizzle.web3.utils
-                                .toBN(votesData.currentRuling)
-                                .sub(drizzle.web3.utils.toBN('1'))
-                                .toString(16)
-                            )
-                          )) ||
-                        'Unknown Choice'
-                  }".`}
+                {dispute.period === '4' && (
+                  <SecondaryActionText>
+                    {` The winner in this case was "${
+                      votesData.currentRuling === '0'
+                        ? 'Refuse to Arbitrate'
+                        : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                            realitioLibQuestionFormatter.getAnswerString(
+                              {
+                                decimals:
+                                  metaEvidence.metaEvidenceJSON.rulingOptions
+                                    .precision,
+                                outcomes:
+                                  metaEvidence.metaEvidenceJSON.rulingOptions
+                                    .titles,
+                                type:
+                                  metaEvidence.metaEvidenceJSON.rulingOptions
+                                    .type
+                              },
+                              realitioLibQuestionFormatter.padToBytes32(
+                                drizzle.web3.utils
+                                  .toBN(votesData.currentRuling)
+                                  .sub(drizzle.web3.utils.toBN('1'))
+                                  .toString(16)
+                              )
+                            )) ||
+                          'Unknown Choice'
+                    }".`}
+                  </SecondaryActionText>
+                )}
                 {votesData.canVote && dispute.period === '2' && (
                   <StyledInputTextArea
                     onChange={onJustificationChange}
@@ -550,43 +592,55 @@ const CaseDetailsCard = ({ ID }) => {
                     value={justification}
                   />
                 )}
-                {metaEvidence.metaEvidenceJSON.rulingOptions && (
-                  <>
-                    {metaEvidence.metaEvidenceJSON.rulingOptions.type !==
-                      'single-select' && (
-                      <StyledButtonsDiv>
-                        {metaEvidence.metaEvidenceJSON.rulingOptions.type ===
-                        'multiple-select' ? (
-                          <Checkbox.Group
-                            disabled={!votesData.canVote}
-                            name="ruling"
-                            onChange={setComplexRuling}
-                            options={
-                              metaEvidence.metaEvidenceJSON.rulingOptions
-                                .titles &&
-                              metaEvidence.metaEvidenceJSON.rulingOptions.titles.slice(
-                                0,
-                                255
-                              )
-                            }
-                            value={complexRuling}
-                          />
-                        ) : metaEvidence.metaEvidenceJSON.rulingOptions.type ===
-                          'datetime' ? (
-                          <DatePicker
-                            disabled={!votesData.canVote}
-                            disabledDate={disabledDate}
-                            onChange={setComplexRuling}
-                            showTime
-                            size="large"
-                            value={complexRuling}
-                          />
-                        ) : (
-                          <InputNumber
-                            disabled={!votesData.canVote}
-                            max={Number(
-                              realitioLibQuestionFormatter
-                                .maxNumber({
+                {Number(dispute.period) < 3 &&
+                  metaEvidence.metaEvidenceJSON.rulingOptions && (
+                    <>
+                      {metaEvidence.metaEvidenceJSON.rulingOptions.type !==
+                        'single-select' && (
+                        <StyledButtonsDiv>
+                          {metaEvidence.metaEvidenceJSON.rulingOptions.type ===
+                          'multiple-select' ? (
+                            <Checkbox.Group
+                              disabled={!votesData.canVote}
+                              name="ruling"
+                              onChange={setComplexRuling}
+                              options={
+                                metaEvidence.metaEvidenceJSON.rulingOptions
+                                  .titles &&
+                                metaEvidence.metaEvidenceJSON.rulingOptions.titles.slice(
+                                  0,
+                                  255
+                                )
+                              }
+                              value={complexRuling}
+                            />
+                          ) : metaEvidence.metaEvidenceJSON.rulingOptions
+                              .type === 'datetime' ? (
+                            <DatePicker
+                              disabled={!votesData.canVote}
+                              disabledDate={disabledDate}
+                              onChange={setComplexRuling}
+                              showTime
+                              size="large"
+                              value={complexRuling}
+                            />
+                          ) : (
+                            <InputNumber
+                              disabled={!votesData.canVote}
+                              max={Number(
+                                realitioLibQuestionFormatter
+                                  .maxNumber({
+                                    decimals:
+                                      metaEvidence.metaEvidenceJSON
+                                        .rulingOptions.precision,
+                                    type:
+                                      metaEvidence.metaEvidenceJSON
+                                        .rulingOptions.type
+                                  })
+                                  .minus(1)
+                              )}
+                              min={Number(
+                                realitioLibQuestionFormatter.minNumber({
                                   decimals:
                                     metaEvidence.metaEvidenceJSON.rulingOptions
                                       .precision,
@@ -594,71 +648,65 @@ const CaseDetailsCard = ({ ID }) => {
                                     metaEvidence.metaEvidenceJSON.rulingOptions
                                       .type
                                 })
-                                .minus(1)
-                            )}
-                            min={Number(
-                              realitioLibQuestionFormatter.minNumber({
-                                decimals:
-                                  metaEvidence.metaEvidenceJSON.rulingOptions
-                                    .precision,
-                                type:
-                                  metaEvidence.metaEvidenceJSON.rulingOptions
-                                    .type
-                              })
-                            )}
-                            onChange={setComplexRuling}
-                            precision={
-                              metaEvidence.metaEvidenceJSON.rulingOptions
-                                .precision
-                            }
+                              )}
+                              onChange={setComplexRuling}
+                              precision={
+                                metaEvidence.metaEvidenceJSON.rulingOptions
+                                  .precision
+                              }
+                              size="large"
+                              value={complexRuling}
+                            />
+                          )}
+                        </StyledButtonsDiv>
+                      )}
+                      <StyledButtonsDiv>
+                        {metaEvidence.metaEvidenceJSON.rulingOptions.type ===
+                        'single-select' ? (
+                          metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
+                          metaEvidence.metaEvidenceJSON.rulingOptions.titles
+                            .slice(0, 2 ** 256 - 1)
+                            .map((t, i) => (
+                              <StyledButton
+                                disabled={!votesData.canVote}
+                                id={i + 1}
+                                key={t}
+                                onClick={onVoteClick}
+                                size="large"
+                                type="primary"
+                              >
+                                {t}
+                              </StyledButton>
+                            ))
+                        ) : (
+                          <StyledButton
+                            disabled={!votesData.canVote || !complexRuling}
+                            onClick={onVoteClick}
                             size="large"
-                            value={complexRuling}
-                          />
+                            type="primary"
+                          >
+                            Submit
+                          </StyledButton>
                         )}
                       </StyledButtonsDiv>
-                    )}
-                    <StyledButtonsDiv>
-                      {metaEvidence.metaEvidenceJSON.rulingOptions.type ===
-                      'single-select' ? (
-                        metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
-                        metaEvidence.metaEvidenceJSON.rulingOptions.titles
-                          .slice(0, 2 ** 256 - 1)
-                          .map((t, i) => (
-                            <StyledButton
-                              disabled={!votesData.canVote}
-                              id={i + 1}
-                              key={t}
-                              onClick={onVoteClick}
-                              size="large"
-                              type="primary"
-                            >
-                              {t}
-                            </StyledButton>
-                          ))
-                      ) : (
-                        <StyledButton
-                          disabled={!votesData.canVote || !complexRuling}
-                          onClick={onVoteClick}
-                          size="large"
-                          type="primary"
-                        >
-                          Submit
-                        </StyledButton>
-                      )}
-                    </StyledButtonsDiv>
-                  </>
+                    </>
+                  )}
+              </StyledActionsDiv>
+              <StyledDiv
+                className="secondary-background theme-background"
+                style={{ display: 'inherit' }}
+              >
+                {Number(dispute.period) < '3' && (
+                  <Button
+                    disabled={!votesData.canVote}
+                    ghost={votesData.canVote}
+                    id={0}
+                    onClick={onVoteClick}
+                    size="large"
+                  >
+                    Refuse to Arbitrate
+                  </Button>
                 )}
-              </StyledDiv>
-              <StyledDiv className="secondary-background theme-background">
-                <Button
-                  disabled={!votesData.canVote}
-                  ghost={votesData.canVote}
-                  id={0}
-                  onClick={onVoteClick}
-                  size="large"
-                >
-                  Refuse to Arbitrate
-                </Button>
               </StyledDiv>
             </>
           ) : (
@@ -676,7 +724,6 @@ const CaseDetailsCard = ({ ID }) => {
           <StyledDocument /> Policies
         </StyledPoliciesButton>
       }
-      hoverable
       loading={!metaEvidence}
       title={
         <>
@@ -691,7 +738,7 @@ const CaseDetailsCard = ({ ID }) => {
         <>
           <Row>
             <Col span={24}>
-              <StyledInnerCard actions={metaEvidenceActions} hoverable>
+              <StyledInnerCard actions={metaEvidenceActions}>
                 <ReactMarkdown
                   source={metaEvidence.metaEvidenceJSON.description}
                 />
@@ -715,63 +762,43 @@ const CaseDetailsCard = ({ ID }) => {
               </StyledInnerCard>
             </Col>
           </Row>
-          <Skeleton active loading={!evidence} title={false}>
-            {evidence && (
-              <Row gutter={40}>
-                {Object.keys(evidenceBySubmitter).map(a => (
-                  <Col key={a} md={12}>
-                    <StyledInnerCard
-                      actions={evidenceBySubmitter[a]
-                        .map(e => (
-                          <Attachment
-                            URI={e.evidenceJSON.fileURI}
-                            description={e.evidenceJSON.description}
-                            extension={e.evidenceJSON.fileTypeExtension}
-                            title={e.evidenceJSON.name}
-                          />
-                        ))
-                        .concat(
-                          <StyledInnerCardActionsTitleDiv className="ternary-color theme-color">
-                            Evidence
-                          </StyledInnerCardActionsTitleDiv>
-                        )}
-                      hoverable
-                      title={
-                        <>
-                          <StyledIdenticon account={a} />
-                          {(metaEvidence.metaEvidenceJSON.aliases &&
-                            metaEvidence.metaEvidenceJSON.aliases[a]) || (
-                            <ETHAddress address={a} />
-                          )}
-                        </>
-                      }
-                    />
-                  </Col>
-                ))}
-              </Row>
-            )}
-          </Skeleton>
+          <CollapsableCard
+            title={
+              <>
+                <Folder /> {`Evidence (${evidence ? evidence.length : 0})`}
+              </>
+            }
+          >
+            <EvidenceTimeline
+              evidence={evidence}
+              metaEvidence={metaEvidence}
+              ruling={dispute.period === '4' ? votesData.currentRuling : null}
+            />
+          </CollapsableCard>
           {dispute2 &&
             metaEvidence &&
             metaEvidence.metaEvidenceJSON.rulingOptions &&
             metaEvidence.metaEvidenceJSON.rulingOptions.type ===
-              'single-select' && <Divider>History</Divider>}
-          {dispute2 &&
-            metaEvidence &&
-            metaEvidence.metaEvidenceJSON.rulingOptions &&
-            metaEvidence.metaEvidenceJSON.rulingOptions.type ===
-              'single-select' &&
-            dispute2.votesLengths.map((_, i) => (
-              <CaseRoundHistory
-                ID={ID}
-                disabled={
-                  dispute.period !== '4' &&
-                  i === dispute2.votesLengths.length - 1
+              'single-select' && (
+              <CollapsableCard
+                title={
+                  <>
+                    <Scales /> Dispute History
+                  </>
                 }
-                key={i}
-                round={i}
-              />
-            ))}
+              >
+                <CaseRoundHistory
+                  ID={ID}
+                  dispute={{
+                    ...dispute2,
+                    ...dispute
+                  }}
+                  ruling={
+                    dispute.period === '4' ? votesData.currentRuling : null
+                  }
+                />
+              </CollapsableCard>
+            )}
         </>
       )}
       {activeSubcourtID !== undefined && (

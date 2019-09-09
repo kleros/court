@@ -66,6 +66,7 @@
     "prop-types": "^15.6.2",
     "react": "16.7.0-alpha.2",
     "react-blockies": "^1.4.0",
+    "react-circular-progressbar": "^2.0.1",
     "react-dom": "16.7.0-alpha.2",
     "react-helmet": "^5.2.0",
     "react-markdown": "^4.0.4",

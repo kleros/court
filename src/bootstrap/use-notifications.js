@@ -14,13 +14,14 @@ const handlers = {
     if (dispute.period !== '4') {
       const notification = {
         date: new Date(block.timestamp * 1000),
+        icon: 'alert',
         message: `Case #${event.returnValues._disputeID} has been appealed.`,
         to: `/cases/${event.returnValues._disputeID}`,
         type: 'info'
       }
       return (await klerosLiquid.getPastEvents('Draw', {
         filter: { _disputeID: event.returnValues._disputeID },
-        fromBlock: process.env.REACT_APP_DRAW_EVENT_LISTENER_BLOCK_NUMBER
+        fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER
       })).map(d => ({
         ...notification,
         account: d.returnValues._address,
@@ -46,6 +47,7 @@ const handlers = {
           {
             account: event.returnValues._address,
             date: new Date(block.timestamp * 1000),
+            icon: 'alert',
             key: `${event.blockNumber}-${event.transactionIndex}-${
               event.logIndex
             }-${event.returnValues._address}`,
@@ -65,6 +67,7 @@ const handlers = {
         {
           account: event.returnValues._address,
           date: new Date(time),
+          icon: 'reward',
           key: `${event.blockNumber}-${event.transactionIndex}-${
             event.logIndex
           }-${event.returnValues._address}`,
