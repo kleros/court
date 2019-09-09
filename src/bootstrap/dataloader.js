@@ -48,7 +48,6 @@ const funcs = {
         })
       )
       .catch(e => {
-        console.log(e)
         return {
           metaEvidenceJSON: {
             description:
@@ -62,17 +61,18 @@ const funcs = {
       .validateFileFromURI(
         URI.replace(/^\/ipfs\//, 'https://ipfs.kleros.io/ipfs/'),
         {
-          strictHashes: true,
           ...options
         }
       )
       .then(res => res.file)
-      .catch(() => ({
-        description: 'Please contact the governance team.',
-        name: 'Invalid Court Data',
-        summary:
-          'The data for this court is not formatted correctly or has been tampered since the time of its submission.'
-      }))
+      .catch(() => {
+        return ({
+          description: 'Please contact the governance team.',
+          name: 'Invalid Court Data',
+          summary:
+            'The data for this court is not formatted correctly or has been tampered since the time of its submission.'
+        })
+      })
 }
 export const dataloaders = Object.keys(funcs).reduce((acc, f) => {
   acc[f] = new Dataloader(

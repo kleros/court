@@ -166,6 +166,7 @@ const CourtCascaderModal = ({ onClick }) => {
           option.description = policyJSON.description
           option.label = policyJSON.name
           option.summary = policyJSON.summary
+          option.requiredSkills = policyJSON.requiredSkills
         }
       }
       const _court = call('KlerosLiquid', 'courts', i)
@@ -228,7 +229,8 @@ const CourtCascaderModal = ({ onClick }) => {
           loading: acc[index].loading,
           summary: acc[index].summary,
           minStake: acc[index].minStake,
-          reward: acc[index].feeForJuror
+          reward: acc[index].feeForJuror,
+          requiredSkills: acc[index].requiredSkills
         }
       : acc[index].children
   }, options)
@@ -259,18 +261,22 @@ const CourtCascaderModal = ({ onClick }) => {
                 <ReactMarkdown source={option.description} />
               </Col>
               <Col md={12}>
-                <Row>
-                  <Col md={4}>
-                    <Hexagon className="ternary-fill" />
-                    <StyledPrefixDiv>
-                      <img src={skillsImg} />
-                    </StyledPrefixDiv>
-                  </Col>
-                  <Col md={20}>
-                    <StyledHeader>Required Skills</StyledHeader>
-                    <ReactMarkdown source={option.description} />
-                  </Col>
-                </Row>
+                {
+                  option.requiredSkills ? (
+                    <Row>
+                      <Col md={4}>
+                        <Hexagon className="ternary-fill" />
+                        <StyledPrefixDiv>
+                          <img src={skillsImg} />
+                        </StyledPrefixDiv>
+                      </Col>
+                      <Col md={20}>
+                        <StyledHeader>Required Skills</StyledHeader>
+                        <ReactMarkdown source={option.requiredSkills} />
+                      </Col>
+                    </Row>
+                  ) : ''
+                }
                 <Row>
                   <Col md={4}>
                     <Hexagon className="ternary-fill" />
