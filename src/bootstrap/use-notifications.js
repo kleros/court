@@ -14,9 +14,9 @@ const handlers = {
     if (dispute.period !== '4') {
       const notification = {
         date: new Date(block.timestamp * 1000),
+        icon: 'alert',
         message: `Case #${event.returnValues._disputeID} has been appealed.`,
         to: `/cases/${event.returnValues._disputeID}`,
-        icon: 'alert',
         type: 'info'
       }
       return (await klerosLiquid.getPastEvents('Draw', {
@@ -47,6 +47,7 @@ const handlers = {
           {
             account: event.returnValues._address,
             date: new Date(block.timestamp * 1000),
+            icon: 'alert',
             key: `${event.blockNumber}-${event.transactionIndex}-${
               event.logIndex
             }-${event.returnValues._address}`,
@@ -54,7 +55,6 @@ const handlers = {
               event.returnValues._disputeID
             }.`,
             to: `/cases/${event.returnValues._disputeID}`,
-            icon: 'alert',
             type: 'info'
           }
         ]
@@ -67,6 +67,7 @@ const handlers = {
         {
           account: event.returnValues._address,
           date: new Date(time),
+          icon: 'reward',
           key: `${event.blockNumber}-${event.transactionIndex}-${
             event.logIndex
           }-${event.returnValues._address}`,
@@ -78,7 +79,6 @@ const handlers = {
             web3.utils.fromWei(event.returnValues._tokenAmount)
           ).toFixed(0)}.`,
           to: `/cases/${event.returnValues._disputeID}`,
-          icon: 'reward',
           type: 'info'
         }
       ]

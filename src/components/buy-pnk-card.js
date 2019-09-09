@@ -108,7 +108,7 @@ export default Form.create()(({ form }) => {
     'ethToTokenSwapOutput'
   )
   return (
-    <StyledCard hoverable bordered={false} title="Buy PNK with ETH">
+    <StyledCard bordered={false} hoverable title="Buy PNK with ETH">
       {status && status !== 'pending' && (
         <Alert
           closable

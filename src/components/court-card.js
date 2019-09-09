@@ -9,7 +9,6 @@ import { ReactComponent as Scales } from '../assets/images/scales.svg'
 import { useDataloader } from '../bootstrap/dataloader'
 import rewardImg from '../assets/images/reward.png'
 import stakeImg from '../assets/images/stake-kleros-logo.png'
-import ETHAmount from './eth-amount'
 
 const StyledCard = styled(Card)`
   border-radius: 12px;
@@ -48,20 +47,6 @@ const StyledCard = styled(Card)`
     height: 40px;
     text-align: left;
   }
-`
-const StyledHexagon = styled(Hexagon)`
-  height: 81px;
-  width: 71px;
-`
-const StyledDiv = styled.div`
-  color: white;
-  left: 50%;
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-`
-const StyledAmountDiv = styled.div`
-  font-weight: bold;
 `
 const StyledPrefixDiv = styled.div`
   left: 50%;

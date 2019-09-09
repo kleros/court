@@ -23,7 +23,6 @@ import { ReactComponent as Folder } from '../assets/images/folder.svg'
 import { ReactComponent as Gavel } from '../assets/images/gavel.svg'
 import { ReactComponent as Scales } from '../assets/images/scales.svg'
 import EvidenceTimeline from './evidence-timeline'
-import Identicon from './identicon'
 import PropTypes from 'prop-types'
 import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components/macro'
@@ -132,6 +131,13 @@ const StyledPoliciesButton = styled(Button)`
   padding-left: 40px;
   position: relative;
 `
+const GavalLarge = styled(Gavel)`
+  height: 150px;
+  opacity: 0.15;
+  position: absolute;
+  top: 50px;
+  width: 150px;
+`
 const StyledDocument = styled(Document)`
   height: 18px;
   left: 17px;
@@ -223,17 +229,6 @@ const StyledInnerCardActionsTitleDiv = styled.div`
   text-align: center;
   top: -55px;
   width: 167px;
-`
-const GavalLarge = styled(Gavel)`
-  height: 150px;
-  opacity: 0.15;
-  position: absolute;
-  top: 50px;
-  width: 150px;
-
-  path {
-    fill: #ffffff;
-  }
 `
 
 const CaseDetailsCard = ({ ID }) => {
@@ -519,19 +514,52 @@ const CaseDetailsCard = ({ ID }) => {
           }
         >
           {!votesData.loading && subcourts && metaEvidence ? (
-          <>
-            <StyledActionsDiv className="secondary-linear-background theme-linear-background">
-              {
-                dispute.period !== '2' ? (
-                  <GavalLarge />
-                ) : ''
-              }
-              {votesData.drawnInCurrentRound
-                ? votesData.canVote
-                  ? 'What is your decision?'
-                  : votesData.voted
-                  ? `You voted for: ${
-                      votesData.voted === '0'
+            <>
+              <StyledActionsDiv className="secondary-linear-background theme-linear-background">
+                {dispute.period !== '2' ? <GavalLarge /> : ''}
+                {votesData.drawnInCurrentRound
+                  ? votesData.canVote
+                    ? 'What is your decision?'
+                    : votesData.voted
+                    ? `You voted for: ${
+                        votesData.voted === '0'
+                          ? 'Refuse to Arbitrate'
+                          : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                              realitioLibQuestionFormatter.getAnswerString(
+                                {
+                                  decimals:
+                                    metaEvidence.metaEvidenceJSON.rulingOptions
+                                      .precision,
+                                  outcomes:
+                                    metaEvidence.metaEvidenceJSON.rulingOptions
+                                      .titles,
+                                  type:
+                                    metaEvidence.metaEvidenceJSON.rulingOptions
+                                      .type
+                                },
+                                realitioLibQuestionFormatter.padToBytes32(
+                                  drizzle.web3.utils
+                                    .toBN(votesData.voted)
+                                    .sub(drizzle.web3.utils.toBN('1'))
+                                    .toString(16)
+                                )
+                              )) ||
+                            'Unknown Choice'
+                      }.`
+                    : dispute.period === '0'
+                    ? 'Waiting for evidence.'
+                    : dispute.period === '1'
+                    ? 'Waiting to reveal your vote.'
+                    : subcourts[subcourts.length - 1].hiddenVotes
+                    ? votesData.committed
+                      ? 'You did not reveal your vote.'
+                      : 'You did not commit a vote.'
+                    : 'You did not cast a vote.'
+                  : 'You were not drawn in the current round.'}
+                {dispute.period === '4' && (
+                  <SecondaryActionText>
+                    {` The winner in this case was "${
+                      votesData.currentRuling === '0'
                         ? 'Refuse to Arbitrate'
                         : (metaEvidence.metaEvidenceJSON.rulingOptions &&
                             realitioLibQuestionFormatter.getAnswerString(
@@ -548,157 +576,121 @@ const CaseDetailsCard = ({ ID }) => {
                               },
                               realitioLibQuestionFormatter.padToBytes32(
                                 drizzle.web3.utils
-                                  .toBN(votesData.voted)
+                                  .toBN(votesData.currentRuling)
                                   .sub(drizzle.web3.utils.toBN('1'))
                                   .toString(16)
                               )
                             )) ||
                           'Unknown Choice'
-                    }.`
-                  : dispute.period === '0'
-                  ? 'Waiting for evidence.'
-                  : dispute.period === '1'
-                  ? 'Waiting to reveal your vote.'
-                  : subcourts[subcourts.length - 1].hiddenVotes
-                  ? votesData.committed
-                    ? 'You did not reveal your vote.'
-                    : 'You did not commit a vote.'
-                  : 'You did not cast a vote.'
-                : 'You were not drawn in the current round.'}
-              {dispute.period === '4' &&
-                <SecondaryActionText>
-                {` The winner in this case was "${
-                  votesData.currentRuling === '0'
-                    ? 'Refuse to Arbitrate'
-                    : (metaEvidence.metaEvidenceJSON.rulingOptions &&
-                        realitioLibQuestionFormatter.getAnswerString(
-                          {
-                            decimals:
-                              metaEvidence.metaEvidenceJSON.rulingOptions
-                                .precision,
-                            outcomes:
-                              metaEvidence.metaEvidenceJSON.rulingOptions
-                                .titles,
-                            type:
-                              metaEvidence.metaEvidenceJSON.rulingOptions.type
-                          },
-                          realitioLibQuestionFormatter.padToBytes32(
-                            drizzle.web3.utils
-                              .toBN(votesData.currentRuling)
-                              .sub(drizzle.web3.utils.toBN('1'))
-                              .toString(16)
-                          )
-                        )) ||
-                      'Unknown Choice'
-                }".`}
-                </SecondaryActionText>
-              }
-              {votesData.canVote && dispute.period === '2' && (
-                <StyledInputTextArea
-                  onChange={onJustificationChange}
-                  placeholder="Justify your vote here..."
-                  value={justification}
-                />
-              )}
-              {Number(dispute.period) < 3 &&
-                metaEvidence.metaEvidenceJSON.rulingOptions && (
-                  <>
-                    {metaEvidence.metaEvidenceJSON.rulingOptions.type !==
-                      'single-select' && (
+                    }".`}
+                  </SecondaryActionText>
+                )}
+                {votesData.canVote && dispute.period === '2' && (
+                  <StyledInputTextArea
+                    onChange={onJustificationChange}
+                    placeholder="Justify your vote here..."
+                    value={justification}
+                  />
+                )}
+                {Number(dispute.period) < 3 &&
+                  metaEvidence.metaEvidenceJSON.rulingOptions && (
+                    <>
+                      {metaEvidence.metaEvidenceJSON.rulingOptions.type !==
+                        'single-select' && (
+                        <StyledButtonsDiv>
+                          {metaEvidence.metaEvidenceJSON.rulingOptions.type ===
+                          'multiple-select' ? (
+                            <Checkbox.Group
+                              disabled={!votesData.canVote}
+                              name="ruling"
+                              onChange={setComplexRuling}
+                              options={
+                                metaEvidence.metaEvidenceJSON.rulingOptions
+                                  .titles &&
+                                metaEvidence.metaEvidenceJSON.rulingOptions.titles.slice(
+                                  0,
+                                  255
+                                )
+                              }
+                              value={complexRuling}
+                            />
+                          ) : metaEvidence.metaEvidenceJSON.rulingOptions
+                              .type === 'datetime' ? (
+                            <DatePicker
+                              disabled={!votesData.canVote}
+                              disabledDate={disabledDate}
+                              onChange={setComplexRuling}
+                              showTime
+                              size="large"
+                              value={complexRuling}
+                            />
+                          ) : (
+                            <InputNumber
+                              disabled={!votesData.canVote}
+                              max={Number(
+                                realitioLibQuestionFormatter
+                                  .maxNumber({
+                                    decimals:
+                                      metaEvidence.metaEvidenceJSON
+                                        .rulingOptions.precision,
+                                    type:
+                                      metaEvidence.metaEvidenceJSON
+                                        .rulingOptions.type
+                                  })
+                                  .minus(1)
+                              )}
+                              min={Number(
+                                realitioLibQuestionFormatter.minNumber({
+                                  decimals:
+                                    metaEvidence.metaEvidenceJSON.rulingOptions
+                                      .precision,
+                                  type:
+                                    metaEvidence.metaEvidenceJSON.rulingOptions
+                                      .type
+                                })
+                              )}
+                              onChange={setComplexRuling}
+                              precision={
+                                metaEvidence.metaEvidenceJSON.rulingOptions
+                                  .precision
+                              }
+                              size="large"
+                              value={complexRuling}
+                            />
+                          )}
+                        </StyledButtonsDiv>
+                      )}
                       <StyledButtonsDiv>
                         {metaEvidence.metaEvidenceJSON.rulingOptions.type ===
-                        'multiple-select' ? (
-                          <Checkbox.Group
-                            disabled={!votesData.canVote}
-                            name="ruling"
-                            onChange={setComplexRuling}
-                            options={
-                              metaEvidence.metaEvidenceJSON.rulingOptions
-                                .titles &&
-                              metaEvidence.metaEvidenceJSON.rulingOptions.titles.slice(
-                                0,
-                                255
-                              )
-                            }
-                            value={complexRuling}
-                          />
-                        ) : metaEvidence.metaEvidenceJSON.rulingOptions
-                            .type === 'datetime' ? (
-                          <DatePicker
-                            disabled={!votesData.canVote}
-                            disabledDate={disabledDate}
-                            onChange={setComplexRuling}
-                            showTime
-                            size="large"
-                            value={complexRuling}
-                          />
+                        'single-select' ? (
+                          metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
+                          metaEvidence.metaEvidenceJSON.rulingOptions.titles
+                            .slice(0, 2 ** 256 - 1)
+                            .map((t, i) => (
+                              <StyledButton
+                                disabled={!votesData.canVote}
+                                id={i + 1}
+                                key={t}
+                                onClick={onVoteClick}
+                                size="large"
+                                type="primary"
+                              >
+                                {t}
+                              </StyledButton>
+                            ))
                         ) : (
-                          <InputNumber
-                            disabled={!votesData.canVote}
-                            max={Number(
-                              realitioLibQuestionFormatter
-                                .maxNumber({
-                                  decimals:
-                                    metaEvidence.metaEvidenceJSON
-                                      .rulingOptions.precision,
-                                  type:
-                                    metaEvidence.metaEvidenceJSON
-                                      .rulingOptions.type
-                                })
-                                .minus(1)
-                            )}
-                            min={Number(
-                              realitioLibQuestionFormatter.minNumber({
-                                decimals:
-                                  metaEvidence.metaEvidenceJSON.rulingOptions
-                                    .precision,
-                                type:
-                                  metaEvidence.metaEvidenceJSON.rulingOptions
-                                    .type
-                              })
-                            )}
-                            onChange={setComplexRuling}
-                            precision={
-                              metaEvidence.metaEvidenceJSON.rulingOptions
-                                .precision
-                            }
+                          <StyledButton
+                            disabled={!votesData.canVote || !complexRuling}
+                            onClick={onVoteClick}
                             size="large"
-                            value={complexRuling}
-                          />
+                            type="primary"
+                          >
+                            Submit
+                          </StyledButton>
                         )}
                       </StyledButtonsDiv>
-                    )}
-                    <StyledButtonsDiv>
-                      {metaEvidence.metaEvidenceJSON.rulingOptions.type ===
-                      'single-select' ? (
-                        metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
-                        metaEvidence.metaEvidenceJSON.rulingOptions.titles
-                          .slice(0, 2 ** 256 - 1)
-                          .map((t, i) => (
-                            <StyledButton
-                              disabled={!votesData.canVote}
-                              id={i + 1}
-                              key={t}
-                              onClick={onVoteClick}
-                              size="large"
-                              type="primary"
-                            >
-                              {t}
-                            </StyledButton>
-                          ))
-                      ) : (
-                        <StyledButton
-                          disabled={!votesData.canVote || !complexRuling}
-                          onClick={onVoteClick}
-                          size="large"
-                          type="primary"
-                        >
-                          Submit
-                        </StyledButton>
-                      )}
-                    </StyledButtonsDiv>
-                  </>
-                )}
+                    </>
+                  )}
               </StyledActionsDiv>
               <StyledDiv
                 className="secondary-background theme-background"

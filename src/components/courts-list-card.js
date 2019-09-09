@@ -1,6 +1,5 @@
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
 import React from 'react'
-import ETHAmount from './eth-amount'
 import ListItem from './list-item'
 import TitledListCard from './titled-list-card'
 import CourtListItem from './court-list-item'

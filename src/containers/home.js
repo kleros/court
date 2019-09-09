@@ -1,18 +1,18 @@
 import { Button, Col, Row } from 'antd'
-import React from 'react'
-import styled from 'styled-components'
 import CasesListCard from '../components/cases-list-card'
+import React from 'react'
 import CourtsListCard from '../components/courts-list-card'
 import { Link } from 'react-router-dom'
-import RewardCard from '../components/reward-card'
-import PerformanceCard from '../components/performance-card'
-import OngoingCasesCard from '../components/ongoing-cases-card'
 import NotificationsCard from '../components/notifications-card'
+import OngoingCasesCard from '../components/ongoing-cases-card'
+import PerformanceCard from '../components/performance-card'
+import RewardCard from '../components/reward-card'
 import TopBanner from '../components/top-banner'
+import styled from 'styled-components'
 
 const StyledButton = styled(Button)`
-  float: right;
   box-shadow: none;
+  float: right;
   text-shadow: none;
 `
 export default () => (

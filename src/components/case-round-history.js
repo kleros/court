@@ -1,5 +1,5 @@
-import { Col, Radio, Row, Skeleton, Tabs } from 'antd'
-import React, { Fragment, useCallback, useState } from 'react'
+import { Col, Radio, Row, Skeleton } from 'antd'
+import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'

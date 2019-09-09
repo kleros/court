@@ -81,7 +81,11 @@ const MenuItems = [
     <NavLink to="/cases">My Cases</NavLink>
   </Menu.Item>,
   <Menu.Item key="guide">
-    <a target="_blank" href="https://blog.kleros.io/become-a-juror-blockchain-dispute-resolution-on-ethereum/">
+    <a
+      href="https://blog.kleros.io/become-a-juror-blockchain-dispute-resolution-on-ethereum/"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
       Guide
     </a>
   </Menu.Item>
@@ -135,9 +139,9 @@ const StyledLayoutContent = styled(Layout.Content)`
   padding: 0px 9.375vw 120px 9.375vw;
 `
 const StyledBuyPNK = styled.a`
-  color: #fff;
   border: 1px solid white;
   border-radius: 3px;
+  color: #fff;
   line-height: 16px;
   padding: 11px 34px;
   text-decoration: none;

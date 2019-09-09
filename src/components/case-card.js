@@ -9,7 +9,7 @@ import Hint from './hint'
 import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
 import { ReactComponent as Scales } from '../assets/images/scales.svg'
 import { useDataloader } from '../bootstrap/dataloader'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { useDrizzle } from '../temp/drizzle-react-hooks'
 
 const StyledCard = styled(Card)`
   border-radius: 12px;
@@ -59,13 +59,6 @@ const StyledCard = styled(Card)`
     height: 40px;
     text-align: left;
   }
-`
-const StyledDiv = styled.div`
-  color: white;
-  left: 50%;
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
 `
 const StyledPrefixDiv = styled.div`
   left: 50%;

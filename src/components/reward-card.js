@@ -119,17 +119,6 @@ const PNKOffset = styled.div`
     margin-left: 0;
   }
 `
-const TopCol = styled.div`
-  @media (max-width: 991px) {
-    background: #4d00b4;
-    border-radius: 12px;
-    color: white;
-    height: 140px;
-    margin: -18px;
-    padding-right: 50px;
-    width: 100%;
-  }
-`
 
 const RewardCard = () => {
   const { drizzle, useCacheEvents } = useDrizzle()

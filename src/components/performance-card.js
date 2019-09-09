@@ -57,7 +57,10 @@ const PNKStatsListCard = () => {
         if (Number(reward.returnValues._ETHAmount) > 0) coherentVote++
       }
 
-  const percent = (!loadingData && rewards.length) ? (coherentVote / totalCases).toFixed(2) * 100 : 0
+  const percent =
+    !loadingData && rewards.length
+      ? (coherentVote / totalCases).toFixed(2) * 100
+      : 0
 
   return (
     <TitledListCard prefix="%" title="Voting Performance">

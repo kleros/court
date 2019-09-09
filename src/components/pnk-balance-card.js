@@ -1,10 +1,8 @@
 import { Card, Col, Row } from 'antd'
 import React from 'react'
-import { ReactComponent as Reward } from '../assets/images/reward.svg'
 import { ReactComponent as PurpleArrowBackground } from '../assets/images/purple-arrow.svg'
 import { ReactComponent as LightPurpleArrowBackground } from '../assets/images/light-purple-arrow.svg'
 import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
-import ETHAddress from './eth-address'
 import ETHAmount from './eth-amount'
 import Hint from './hint'
 import styled from 'styled-components/macro'
@@ -50,13 +48,6 @@ const StyledDivWhiteLarge = styled(StyledDiv)`
     color: #4004a3;
   }
 `
-const StyledTopDiv = styled.div`
-  font-weight: medium;
-
-  @media (max-width: 991px) {
-    margin-top: 30px;
-  }
-`
 const StyledCenterDiv = styled.div`
   color: #4004a3;
   font-size: 36px;
@@ -70,18 +61,6 @@ const StyledBottomDiv = styled.div`
   color: #4004a3;
   font-size: 14px;
   font-weight: bold;
-`
-const StyledRewardLogoCol = styled(Col)`
-  max-width: 100px;
-  min-width: 100px;
-
-  @media (max-width: 991px) {
-    max-width: none;
-  }
-`
-const AmountCol = styled(Col)`
-  color: #4004a3;
-  margin-top: 15px;
 `
 const StyledPurpleArrowBackground = styled(PurpleArrowBackground)`
   height: 138px;
@@ -115,20 +94,6 @@ const StyledLightPurpleArrowBackground = styled(LightPurpleArrowBackground)`
 
   @media (max-width: 991px) {
     display: none;
-  }
-`
-const ETHOffset = styled.div`
-  margin-left: 50%;
-
-  @media (max-width: 991px) {
-    margin-left: 0;
-  }
-`
-const PNKOffset = styled.div`
-  margin-left: 30%;
-
-  @media (max-width: 991px) {
-    margin-left: 0;
   }
 `
 const PNKCol = styled(Col)`
