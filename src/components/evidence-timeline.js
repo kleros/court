@@ -93,7 +93,6 @@ const EvidenceTimeline = ({
           />
         </div>
       ))}
-      )}
       <Row>
         <StyledDividerCol lg={12} />
       </Row>

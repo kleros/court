@@ -352,29 +352,6 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                   />
                 )}
               </Form.Item>
-              <Form.Item colon={false}>
-                {form.getFieldDecorator('Agreement', {
-                  rules: [
-                    {
-                      message: 'Please acknowledge risks before you continue',
-                      validator: (_, _value, callback) => {
-                        callback(_value ? undefined : true)
-                      }
-                    }
-                  ]
-                })(
-                  <Row>
-                    <Col className="agreement-checkbox" lg={1}>
-                      <Checkbox />
-                    </Col>
-                    <Col className="agreement-text" lg={23}>
-                      I understand how Kleros works and that I may suffer a
-                      financial loss by participating as a juror in the
-                      platform.
-                    </Col>
-                  </Row>
-                )}
-              </Form.Item>
             </>
           )}
         </Skeleton>
