@@ -169,13 +169,6 @@ const CourtCascaderModal = ({ onClick }) => {
           option.requiredSkills = policyJSON.requiredSkills
         }
       }
-      const _court = call('KlerosLiquid', 'courts', i)
-      if (_court !== undefined) {
-        const _minStakeBN = drizzle.web3.utils.toBN(_court.minStake)
-        option.minStake = _minStakeBN.toString()
-        const _feeForJurorBN = drizzle.web3.utils.toBN(_court.feeForJuror)
-        option.feeForJuror = _feeForJurorBN.toString()
-      }
       const subcourt = call('KlerosLiquid', 'getSubcourt', subcourtIDs[i])
       if (subcourt)
         option.children = subcourt.children.map(c => {
@@ -185,8 +178,6 @@ const CourtCascaderModal = ({ onClick }) => {
             label: undefined,
             loading: false,
             summary: undefined,
-            minStake: undefined,
-            feeForJuror: undefined,
             value: c
           }
           const policy = call('PolicyRegistry', 'policies', c)
@@ -199,13 +190,6 @@ const CourtCascaderModal = ({ onClick }) => {
             }
           }
           if (child.label === undefined) child.loading = true
-          const _court = call('KlerosLiquid', 'courts', i)
-          if (_court !== undefined) {
-            const _minStakeBN = drizzle.web3.utils.toBN(_court.minStake)
-            child.minStake = _minStakeBN.toString()
-            const _feeForJurorBN = drizzle.web3.utils.toBN(_court.feeForJuror)
-            option.feeForJuror = _feeForJurorBN.toString()
-          }
           return child
         })
       if (
@@ -228,12 +212,21 @@ const CourtCascaderModal = ({ onClick }) => {
           description: acc[index].description,
           loading: acc[index].loading,
           summary: acc[index].summary,
-          minStake: acc[index].minStake,
-          reward: acc[index].feeForJuror,
-          requiredSkills: acc[index].requiredSkills
+          requiredSkills: acc[index].requiredSkills,
+          courtID: ID
         }
       : acc[index].children
   }, options)
+  const _court =
+    option && useCacheCall('KlerosLiquid', 'courts', option.courtID)
+  let minStake
+  let feeForJuror
+  if (_court !== undefined) {
+    const _minStakeBN = drizzle.web3.utils.toBN(_court.minStake)
+    minStake = _minStakeBN.toString()
+    const _feeForJurorBN = drizzle.web3.utils.toBN(_court.feeForJuror)
+    feeForJuror = _feeForJurorBN.toString()
+  }
   return (
     <StyledModal
       centered
@@ -254,29 +247,27 @@ const CourtCascaderModal = ({ onClick }) => {
             <Row gutter={16}>
               <Col md={12}>
                 <StyledDiv>{`${option.label} | Min Stake = ${
-                  option.minStake
-                    ? drizzle.web3.utils.fromWei(option.minStake)
-                    : ''
+                  minStake ? drizzle.web3.utils.fromWei(minStake) : ''
                 } PNK`}</StyledDiv>
                 <ReactMarkdown source={option.description} />
               </Col>
               <Col md={12}>
-                {
-                  option.requiredSkills ? (
-                    <Row>
-                      <Col md={4}>
-                        <Hexagon className="ternary-fill" />
-                        <StyledPrefixDiv>
-                          <img src={skillsImg} />
-                        </StyledPrefixDiv>
-                      </Col>
-                      <Col md={20}>
-                        <StyledHeader>Required Skills</StyledHeader>
-                        <ReactMarkdown source={option.requiredSkills} />
-                      </Col>
-                    </Row>
-                  ) : ''
-                }
+                {option.requiredSkills ? (
+                  <Row>
+                    <Col md={4}>
+                      <Hexagon className="ternary-fill" />
+                      <StyledPrefixDiv>
+                        <img src={skillsImg} />
+                      </StyledPrefixDiv>
+                    </Col>
+                    <Col md={20}>
+                      <StyledHeader>Required Skills</StyledHeader>
+                      <ReactMarkdown source={option.requiredSkills} />
+                    </Col>
+                  </Row>
+                ) : (
+                  ''
+                )}
                 <Row>
                   <Col md={4}>
                     <Hexagon className="ternary-fill" />
@@ -290,8 +281,8 @@ const CourtCascaderModal = ({ onClick }) => {
                       For each coherent vote you will receive
                       <span style={{ fontWeight: '600' }}>
                         {' '}
-                        {option.reward
-                          ? drizzle.web3.utils.fromWei(option.reward)
+                        {feeForJuror
+                          ? drizzle.web3.utils.fromWei(feeForJuror)
                           : ''}{' '}
                         ETH +
                       </span>

@@ -140,16 +140,17 @@ const NotificationSettings = Form.create()(
                           validator: (rule, value, callback) => {
                             if (!value) callback()
 
-                            const phone = value.replace(/-/g, "")
+                            const phone = value.replace(/-/g, '')
 
-                            if (phone.length < 5) return callback('Please enter a valid phone number')
+                            if (phone.length < 5)
+                              return callback(
+                                'Please enter a valid phone number'
+                              )
                             const reg = new RegExp('^\\d+$')
 
-                            if (!reg.test(phone)) {
+                            if (!reg.test(phone))
                               callback('Please enter a valid phone number')
-                            } else {
-                              callback()
-                            }
+                            else callback()
                           }
                         }
                       ]
