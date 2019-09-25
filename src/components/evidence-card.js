@@ -95,7 +95,8 @@ const EvidenceCard = ({ evidence, metaEvidence }) => {
             <Col lg={23}>
               <StyledSubmitter>
                 Submitted By:{' '}
-                {metaEvidence.aliases && metaEvidence.aliases[evidence.submittedBy]
+                {metaEvidence.aliases &&
+                metaEvidence.aliases[evidence.submittedBy]
                   ? metaEvidence.aliases[evidence.submittedBy]
                   : truncateAddress(evidence.submittedBy)}
                 <StyledTime>{displayDateUTC(submittedAtDate)}</StyledTime>

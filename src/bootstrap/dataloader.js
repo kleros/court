@@ -47,15 +47,13 @@ const funcs = {
           ...options
         })
       )
-      .catch(e => {
-        return {
-          metaEvidenceJSON: {
-            description:
-              'The data for this case is not formatted correctly or has been tampered since the time of its submission. Please refresh the page and refuse to arbitrate if the problem persists.',
-            title: 'Invalid or tampered case data, refuse to arbitrate.'
-          }
+      .catch(e => ({
+        metaEvidenceJSON: {
+          description:
+            'The data for this case is not formatted correctly or has been tampered since the time of its submission. Please refresh the page and refuse to arbitrate if the problem persists.',
+          title: 'Invalid or tampered case data, refuse to arbitrate.'
         }
-      }),
+      })),
   loadPolicy: (URI, options) =>
     archon.utils
       .validateFileFromURI(
@@ -65,14 +63,12 @@ const funcs = {
         }
       )
       .then(res => res.file)
-      .catch(() => {
-        return ({
-          description: 'Please contact the governance team.',
-          name: 'Invalid Court Data',
-          summary:
-            'The data for this court is not formatted correctly or has been tampered since the time of its submission.'
-        })
-      })
+      .catch(() => ({
+        description: 'Please contact the governance team.',
+        name: 'Invalid Court Data',
+        summary:
+          'The data for this court is not formatted correctly or has been tampered since the time of its submission.'
+      }))
 }
 export const dataloaders = Object.keys(funcs).reduce((acc, f) => {
   acc[f] = new Dataloader(
