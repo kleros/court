@@ -104,8 +104,8 @@ const EvidenceCard = ({ evidence, metaEvidence }) => {
             </Col>
             <Col lg={1}>
               <Attachment
-                URI={metaEvidence.fileURI}
-                extension={metaEvidence.fileTypeExtension}
+                URI={evidence.evidenceJSON.fileURI}
+                extension={evidence.evidenceJSON.fileTypeExtension}
               />
             </Col>
           </Row>
