@@ -86,7 +86,7 @@ const EvidenceCard = ({ evidence, metaEvidence }) => {
           <img src={EtherscanLogo} />
         </a>
       }
-      title={<StyledTitle>{evidence.evidenceJSON.title}</StyledTitle>}
+      title={<StyledTitle>{evidence.evidenceJSON.title || evidence.evidenceJSON.name}</StyledTitle>}
     >
       <StyledDescription>{evidence.evidenceJSON.description}</StyledDescription>
       <StyledFooter>
