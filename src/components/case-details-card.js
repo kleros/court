@@ -519,7 +519,9 @@ const CaseDetailsCard = ({ ID }) => {
                 {dispute.period !== '2' ? <GavalLarge /> : ''}
                 {votesData.drawnInCurrentRound
                   ? votesData.canVote
-                    ? 'What is your decision?'
+                    ? metaEvidence.metaEvidenceJSON.question
+                      ? metaEvidence.metaEvidenceJSON.question
+                      : 'What is your decision?'
                     : votesData.voted
                     ? `You voted for: ${
                         votesData.voted === '0'
