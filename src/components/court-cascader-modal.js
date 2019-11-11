@@ -250,6 +250,7 @@ const CourtCascaderModal = ({ onClick }) => {
                   minStake ? drizzle.web3.utils.fromWei(minStake) : ''
                 } PNK`}</StyledDiv>
                 <ReactMarkdown source={option.description} />
+                <ReactMarkdown source={option.summary} />
               </Col>
               <Col md={12}>
                 {option.requiredSkills ? (
