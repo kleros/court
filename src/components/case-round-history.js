@@ -26,9 +26,8 @@ const StyledRadioGroup = styled(Radio.Group)`
     border-radius: 300px !important;
     color: #4d00b4;
     margin-bottom: 15px;
-    margin-left: 10px;
     text-align: center;
-    width: 45%;
+    width: 95%;
 
     &:before {
       background-color: transparent;
@@ -72,6 +71,7 @@ const JustificationsBox = styled(Box)`
   border-left: 1px solid #4d00b4;
   height: 100%;
   text-align: center;
+  word-break: break-all;
   @media (max-width: 768px) {
     border-left: none;
     border-top: 1px solid #4d00b4;
@@ -177,14 +177,22 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
                 <StyledRadioGroup
                   buttonStyle="solid"
                   name="round"
-                  onChange={useCallback(e => setRound(e.target.value), [])}
+                  onChange={useCallback(e => {
+                    setRound(e.target.value);
+                    setjustificationIndex(0)
+                  }, [])}
                   value={round}
                 >
+                <Row>
                   {justifications.map((round, i) => (
-                    <Radio.Button disabled={round.disabled} key={i} value={i}>
-                      Round {i + 1}
-                    </Radio.Button>
+
+                      <Col lg={12} md={24}>
+                        <Radio.Button disabled={round.disabled} key={i} value={i}>
+                          Round {i + 1}
+                        </Radio.Button>
+                      </Col>
                   ))}
+                </Row>
                 </StyledRadioGroup>
               </RoundSelectBox>
               <RulingOptionsBox>
@@ -193,22 +201,31 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
                   buttonStyle="solid"
                   name="votes"
                   onChange={useCallback(
-                    e => setRulingOption(e.target.value),
+                    e => {
+                      setRulingOption(e.target.value);
+                      setjustificationIndex(0)
+                    },
                     []
                   )}
                   value={rulingOption}
                 >
-                  <Radio.Button size="large" value={0}>
-                    Refuse to Arbitrate
-                  </Radio.Button>
-                  {metaEvidence &&
-                    metaEvidence.metaEvidenceJSON.rulingOptions.titles.map(
-                      (option, i) => (
-                        <Radio.Button key={i} size="large" value={i + 1}>
-                          {option}
-                        </Radio.Button>
-                      )
-                    )}
+                  <Row>
+                    <Col lg={24}>
+                      <Radio.Button size="large" value={0}>
+                        Refuse to Arbitrate
+                      </Radio.Button>
+                    </Col>
+                    {metaEvidence &&
+                      metaEvidence.metaEvidenceJSON.rulingOptions.titles.map(
+                        (option, i) => (
+                          <Col lg={24}>
+                            <Radio.Button key={i} size="large" value={i + 1}>
+                              {option}
+                            </Radio.Button>
+                          </Col>
+                        )
+                      )}
+                    </Row>
                 </StyledRadioGroup>
               </RulingOptionsBox>
             </Col>
