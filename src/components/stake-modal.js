@@ -359,7 +359,7 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
           <Alert
             closable
             message={
-              status === 'success' ? 'Stake set.' : 'Failed to set stake.'
+              status === 'success' ? 'Stake set. Note this can take up to a few hours to be effective.' : 'Failed to set stake. Please try again.'
             }
             type={status}
           />

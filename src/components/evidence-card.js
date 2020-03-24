@@ -81,11 +81,6 @@ const EvidenceCard = ({ evidence, metaEvidence }) => {
 
   return (
     <StyledCard
-      extra={
-        <a href={`https://etherscan.com/address/${evidence.submittedBy}`}>
-          <img src={EtherscanLogo} />
-        </a>
-      }
       title={<StyledTitle>{evidence.evidenceJSON.title || evidence.evidenceJSON.name}</StyledTitle>}
     >
       <StyledDescription>{evidence.evidenceJSON.description}</StyledDescription>
