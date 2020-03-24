@@ -63,7 +63,7 @@ export default () => {
                 <StyledCol>You have not joined any courts yet.</StyledCol>
               </>
             ) : (
-              juror.subcourtIDs
+              [ ...new Set(juror.subcourtIDs) ]
                 .filter(ID => ID !== '0')
                 .map(ID => String(ID - 1))
                 .map(ID => (
