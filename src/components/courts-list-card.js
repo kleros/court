@@ -16,11 +16,11 @@ const CourtsListCard = () => {
     'getJuror',
     drizzleState.account
   )
-  const names = useCacheCall(
+  let names = useCacheCall(
     ['PolicyRegistry'],
     call =>
       juror &&
-      juror.subcourtIDs
+      [...new Set(juror.subcourtIDs)]
         .filter(ID => ID !== '0')
         .map(ID => String(ID - 1))
         .map(ID => {
