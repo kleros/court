@@ -140,7 +140,8 @@ const NotificationSettings = Form.create()(
                           validator: (rule, value, callback) => {
                             if (!value) callback()
 
-                            const phone = value.replace(/-/g, '')
+                            let phone = value.replace(/-/g, '')
+                            phone = phone.replace(/\+/g, '')
 
                             if (phone.length < 5)
                               return callback(
