@@ -5,6 +5,7 @@ import {
   Checkbox,
   Col,
   DatePicker,
+  Icon,
   Input,
   InputNumber,
   Row,
@@ -229,6 +230,15 @@ const StyledInnerCardActionsTitleDiv = styled.div`
   text-align: center;
   top: -55px;
   width: 167px;
+`
+const ArbitrableInterfaceDiv = styled.div`
+  border-top: 1px solid #d09cff;
+  font-size: 18px;
+  padding: 20px 0px 5px 0px;
+
+  a {
+    color: #4d00b4;
+  }
 `
 
 const CaseDetailsCard = ({ ID }) => {
@@ -760,6 +770,11 @@ const CaseDetailsCard = ({ ID }) => {
                     )}`}
                     title="MetaEvidence Display"
                   />
+                )}
+                { metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI && (
+                    <ArbitrableInterfaceDiv>
+                      <a href={metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI} target='_blank'><Icon type="double-right" style={{marginRight: '5px'}}/>Go to the Arbitrable Application</a>
+                    </ArbitrableInterfaceDiv>
                 )}
               </StyledInnerCard>
             </Col>
