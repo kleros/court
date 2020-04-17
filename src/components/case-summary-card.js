@@ -7,7 +7,8 @@ const StyledCaseSummary = styled.div`
   background: white;
   border-radius: 12px;
   display: inline-block;
-  width: 95%;
+  width: 96%;
+  margin: 0px 2%;
 `
 
 const CaseNumber = styled.div`
