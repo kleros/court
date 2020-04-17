@@ -31,6 +31,10 @@ const StyledModal = styled(Modal)`
       position: relative;
     }
 
+    &-body::-webkit-scrollbar {
+      display: none;
+    }
+
     &-footer {
       color: #4d00b4;
       height: 284px;
