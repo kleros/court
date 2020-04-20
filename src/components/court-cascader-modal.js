@@ -31,6 +31,10 @@ const StyledModal = styled(Modal)`
       position: relative;
     }
 
+    &-body::-webkit-scrollbar {
+      display: none;
+    }
+
     &-footer {
       color: #4d00b4;
       height: 284px;
@@ -141,6 +145,7 @@ const StyledPrefixDiv = styled.div`
   top: 29px;
   transform: translate(-50%, -50%);
 `
+const ALPHA_DIVISOR = 1e4
 
 const CourtCascaderModal = ({ onClick }) => {
   const { drizzle, useCacheCall } = useDrizzle()
@@ -221,11 +226,11 @@ const CourtCascaderModal = ({ onClick }) => {
     option && useCacheCall('KlerosLiquid', 'courts', option.courtID)
   let minStake
   let feeForJuror
+  let subcourtAlpha
   if (_court !== undefined) {
-    const _minStakeBN = drizzle.web3.utils.toBN(_court.minStake)
-    minStake = _minStakeBN.toString()
-    const _feeForJurorBN = drizzle.web3.utils.toBN(_court.feeForJuror)
-    feeForJuror = _feeForJurorBN.toString()
+    minStake = drizzle.web3.utils.toBN(_court.minStake)
+    feeForJuror = drizzle.web3.utils.toBN(_court.feeForJuror)
+    subcourtAlpha = drizzle.web3.utils.toBN(_court.alpha)
   }
   return (
     <StyledModal
@@ -246,9 +251,20 @@ const CourtCascaderModal = ({ onClick }) => {
           <Skeleton active loading={option.loading}>
             <Row gutter={16}>
               <Col md={12}>
-                <StyledDiv>{`${option.label} | Min Stake = ${
-                  minStake ? drizzle.web3.utils.fromWei(minStake) : ''
-                } PNK`}</StyledDiv>
+                <StyledDiv>
+                  {
+                    `${option.label} | Min Stake = ${
+                      minStake ? drizzle.web3.utils.fromWei(minStake.toString()) : ''
+                      } PNK`
+                  }
+                  <div style={{ fontWeight: '400', fontSize: '12px'}}>
+                    {'Each vote has a stake of '}
+                    {minStake && subcourtAlpha
+                      ? drizzle.web3.utils.fromWei(minStake.mul(subcourtAlpha).div(drizzle.web3.utils.toBN(ALPHA_DIVISOR)).toString())
+                      : ''}
+                      {' PNK.'}
+                  </div>
+                </StyledDiv>
                 <ReactMarkdown source={option.description} />
                 <ReactMarkdown source={option.summary} />
               </Col>
@@ -283,7 +299,7 @@ const CourtCascaderModal = ({ onClick }) => {
                       <span style={{ fontWeight: '600' }}>
                         {' '}
                         {feeForJuror
-                          ? drizzle.web3.utils.fromWei(feeForJuror)
+                          ? drizzle.web3.utils.fromWei(feeForJuror.toString())
                           : ''}{' '}
                         ETH +
                       </span>
