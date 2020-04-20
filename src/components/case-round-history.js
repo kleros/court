@@ -2,10 +2,12 @@ import { Col, Radio, Row, Skeleton } from 'antd'
 import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import { useAPI } from '../bootstrap/api'
 import { useDataloader } from '../bootstrap/dataloader'
 import ScrollBar from './scroll-bar'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const StyledCaseRoundHistory = styled.div`
   height: 550px;
@@ -178,21 +180,24 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
                   buttonStyle="solid"
                   name="round"
                   onChange={useCallback(e => {
-                    setRound(e.target.value);
+                    setRound(e.target.value)
                     setjustificationIndex(0)
                   }, [])}
                   value={round}
                 >
-                <Row>
-                  {justifications.map((round, i) => (
-
+                  <Row>
+                    {justifications.map((round, i) => (
                       <Col lg={12} md={24}>
-                        <Radio.Button disabled={round.disabled} key={i} value={i}>
+                        <Radio.Button
+                          disabled={round.disabled}
+                          key={i}
+                          value={i}
+                        >
                           Round {i + 1}
                         </Radio.Button>
                       </Col>
-                  ))}
-                </Row>
+                    ))}
+                  </Row>
                 </StyledRadioGroup>
               </RoundSelectBox>
               <RulingOptionsBox>
@@ -200,13 +205,10 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
                 <StyledRadioGroup
                   buttonStyle="solid"
                   name="votes"
-                  onChange={useCallback(
-                    e => {
-                      setRulingOption(e.target.value);
-                      setjustificationIndex(0)
-                    },
-                    []
-                  )}
+                  onChange={useCallback(e => {
+                    setRulingOption(e.target.value)
+                    setjustificationIndex(0)
+                  }, [])}
                   value={rulingOption}
                 >
                   <Row>
@@ -225,7 +227,7 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
                           </Col>
                         )
                       )}
-                    </Row>
+                  </Row>
                 </StyledRadioGroup>
               </RulingOptionsBox>
             </Col>

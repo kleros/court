@@ -6,7 +6,9 @@ import { ReactComponent as Bell } from '../assets/images/bell.svg'
 import PropTypes from 'prop-types'
 import TimeAgo from './time-ago'
 import styled from 'styled-components/macro'
-import { useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
+
+const { useDrizzleState } = drizzleReactHooks
 
 const StyledListItem = styled(List.Item)`
   max-width: 358px;

@@ -9,11 +9,13 @@ import {
   Skeleton
 } from 'antd'
 import React, { useCallback } from 'react'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import { ReactComponent as Mail } from '../assets/images/mail.svg'
 import PropTypes from 'prop-types'
 import styled from 'styled-components/macro'
 import { useAPI } from '../bootstrap/api'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const StyledForm = styled(Form)`
   max-width: 250px;

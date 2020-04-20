@@ -1,10 +1,12 @@
 import React, { useMemo } from 'react'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import { ReactComponent as Hourglass } from '../assets/images/hourglass.svg'
 import ListItem from './list-item'
 import TimeAgo from './time-ago'
 import TitledListCard from './titled-list-card'
 import styled from 'styled-components/macro'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const StyledDiv = styled.div`
   background: whitesmoke;

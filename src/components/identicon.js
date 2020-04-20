@@ -1,11 +1,13 @@
 import { List, Popover, Spin } from 'antd'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import ETHAddress from './eth-address'
 import ETHAmount from './eth-amount'
 import PropTypes from 'prop-types'
 import React from 'react'
 import ReactBlockies from 'react-blockies'
 import styled from 'styled-components/macro'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const StyledDiv = styled.div`
   height: 32px;

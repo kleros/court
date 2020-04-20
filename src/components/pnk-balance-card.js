@@ -2,10 +2,12 @@ import { Card, Col, Row } from 'antd'
 import React from 'react'
 import { ReactComponent as PurpleArrowBackground } from '../assets/images/purple-arrow.svg'
 import { ReactComponent as LightPurpleArrowBackground } from '../assets/images/light-purple-arrow.svg'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import ETHAmount from './eth-amount'
 import Hint from './hint'
 import styled from 'styled-components/macro'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const StyledCard = styled(Card)`
   border-radius: 12px;

@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 import ETHAmount from './eth-amount'
 import PieChart from './pie-chart'
 import { Spin } from 'antd'

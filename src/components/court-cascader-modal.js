@@ -7,8 +7,10 @@ import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
 import skillsImg from '../assets/images/skills.png'
 import rewardImg from '../assets/images/reward.png'
 import { useDataloader } from '../bootstrap/dataloader'
-import { useDrizzle } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import Breadcrumbs from './breadcrumbs'
+
+const { useDrizzle } = drizzleReactHooks
 
 const StyledModal = styled(Modal)`
   position: relative;

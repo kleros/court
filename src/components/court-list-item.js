@@ -1,7 +1,9 @@
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import React from 'react'
 import ETHAmount from './eth-amount'
 import ListItem from './list-item'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const CourtListItem = ({ ID, name }) => {
   const { useCacheCall } = useDrizzle()

@@ -2,13 +2,14 @@ import { Button, Card, Col, Popconfirm, Row } from 'antd'
 import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components/macro'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
-import { ReactComponent as Close } from '../assets/images/close.svg'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
 import { ReactComponent as Scales } from '../assets/images/scales.svg'
 import { useDataloader } from '../bootstrap/dataloader'
 import rewardImg from '../assets/images/reward.png'
 import stakeImg from '../assets/images/stake-kleros-logo.png'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const StyledCard = styled(Card)`
   border-radius: 12px;

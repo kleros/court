@@ -1,4 +1,4 @@
-import { Drizzle, generateStore } from 'drizzle'
+import { Drizzle, generateStore } from '@drizzle/store'
 import Kleros from '../assets/contracts/kleros.json'
 import KlerosLiquid from '../assets/contracts/kleros-liquid.json'
 import KlerosLiquidExtraViews from '../assets/contracts/kleros-liquid-extra-views.json'

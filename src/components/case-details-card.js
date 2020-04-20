@@ -12,7 +12,7 @@ import {
   Spin
 } from 'antd'
 import React, { useCallback, useMemo, useState } from 'react'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import { API } from '../bootstrap/api'
 import Attachment from './attachment'
 import Breadcrumbs from './breadcrumbs'
@@ -29,6 +29,8 @@ import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components/macro'
 import { useDataloader } from '../bootstrap/dataloader'
 import web3Salt from '../temp/web3-salt'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 realitioLibQuestionFormatter.minNumber = realitioLibQuestionFormatter.minNumber.bind(
   {
@@ -771,10 +773,21 @@ const CaseDetailsCard = ({ ID }) => {
                     title="MetaEvidence Display"
                   />
                 )}
-                { metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI && (
-                    <ArbitrableInterfaceDiv>
-                      <a href={metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI} target='_blank'><Icon type="double-right" style={{marginRight: '5px'}}/>Go to the Arbitrable Application</a>
-                    </ArbitrableInterfaceDiv>
+                {metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI && (
+                  <ArbitrableInterfaceDiv>
+                    <a
+                      href={
+                        metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI
+                      }
+                      target="_blank"
+                    >
+                      <Icon
+                        type="double-right"
+                        style={{ marginRight: '5px' }}
+                      />
+                      Go to the Arbitrable Application
+                    </a>
+                  </ArbitrableInterfaceDiv>
                 )}
               </StyledInnerCard>
             </Col>

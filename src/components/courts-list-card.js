@@ -1,9 +1,11 @@
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import React from 'react'
 import ListItem from './list-item'
 import TitledListCard from './titled-list-card'
 import CourtListItem from './court-list-item'
 import { useDataloader } from '../bootstrap/dataloader'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const CourtsListCard = () => {
   const { useCacheCall } = useDrizzle()

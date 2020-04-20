@@ -1,8 +1,10 @@
 import { Alert, Button, Card, Form, InputNumber, Spin } from 'antd'
 import React, { useCallback } from 'react'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import ETHAmount from './eth-amount'
 import styled from 'styled-components/macro'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const StyledCard = styled(Card)`
   background: linear-gradient(180deg, #4d00b4 0%, #6500b4 100%);

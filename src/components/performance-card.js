@@ -1,9 +1,11 @@
 import React from 'react'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import PercentageCircle from './percentage-circle'
 import { Spin } from 'antd'
 import TitledListCard from './titled-list-card'
 import styled from 'styled-components/macro'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const StyledDiv = styled.div`
   align-items: center;
