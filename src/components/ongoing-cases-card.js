@@ -1,13 +1,15 @@
 import { Col, Row } from 'antd'
 import React, { useMemo } from 'react'
 import styled from 'styled-components/macro'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
-import { useDataloader } from '../bootstrap/dataloader'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
+import { useDataloader, VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
 import { ReactComponent as Gavel } from '../assets/images/gavel.svg'
 import { ReactComponent as HourGlass } from '../assets/images/hourglass.svg'
 import CaseSummaryCard from './case-summary-card'
 import TitledListCard from './titled-list-card'
 import ListItem from './list-item'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const StyledDiv = styled.div`
   margin-top: 50px;
@@ -59,11 +61,11 @@ const StyledGavelContainer = styled.div`
   }
 `
 
-const OngoingCasesCard = ({}) => {
+const OngoingCasesCard = () => {
   const { drizzle, useCacheCall, useCacheEvents } = useDrizzle()
   const getMetaEvidence = useDataloader.getMetaEvidence()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
 
   const draws = useCacheEvents(

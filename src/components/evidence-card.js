@@ -1,7 +1,6 @@
 import { Card, Col, Row } from 'antd'
 import React from 'react'
 import styled from 'styled-components'
-import EtherscanLogo from '../assets/images/etherscan-logo.png'
 import Attachment from './attachment'
 
 const StyledCard = styled(Card)`
@@ -81,7 +80,11 @@ const EvidenceCard = ({ evidence, metaEvidence }) => {
 
   return (
     <StyledCard
-      title={<StyledTitle>{evidence.evidenceJSON.title || evidence.evidenceJSON.name}</StyledTitle>}
+      title={
+        <StyledTitle>
+          {evidence.evidenceJSON.title || evidence.evidenceJSON.name}
+        </StyledTitle>
+      }
     >
       <StyledDescription>{evidence.evidenceJSON.description}</StyledDescription>
       <StyledFooter>

@@ -98,3 +98,5 @@ export const useDataloader = Object.keys(dataloaders).reduce((acc, f) => {
   }
   return acc
 }, {})
+
+export const VIEW_ONLY_ADDRESS = '0x0000000000000000000000000000000000000000'

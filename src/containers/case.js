@@ -1,11 +1,14 @@
 import { Button, Row, Col, Tooltip } from 'antd'
 import React, { useMemo } from 'react'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import CaseDetailsCard from '../components/case-details-card'
 import ETHAmount from '../components/eth-amount'
 import TimeAgo from '../components/time-ago'
 import TopBanner from '../components/top-banner'
 import styled from 'styled-components/macro'
+import { VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const StyledDiv = styled.div`
   font-weight: bold;
@@ -22,8 +25,8 @@ const ResolvedTag = styled.div`
   border-radius: 3px;
   float: right;
   margin-right: 50px;
-  text-align: center;
   padding: 5px;
+  text-align: center;
   width: 80px;
 `
 const MANUAL_PASS_DELAY = 3600
@@ -34,7 +37,7 @@ export default ({
 }) => {
   const { drizzle, useCacheCall, useCacheEvents, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
   const { send: sendPassPeriod, status: sendPassPeriodStatus } = useCacheSend(
     'KlerosLiquid',
@@ -81,23 +84,24 @@ export default ({
           deadline: undefined
         }
       )
-      if (
-        dispute &&
-        !dispute.ruled
-      ) {
+      if (dispute && !dispute.ruled) {
         const subcourt = call('KlerosLiquid', 'getSubcourt', dispute.subcourtID)
         if (subcourt) {
-          disputeData.deadline = dispute.period < 4 ? (
-            new Date(
-              (Number(dispute.lastPeriodChange) +
-              Number(subcourt.timesPerPeriod[dispute.period])) *
-              1000
-            )
-          ) : null
-          disputeData.showPassPeriod = dispute.period < 4 ? (
-            (parseInt(new Date().getTime() / 1000) - Number(dispute.lastPeriodChange)) >
-            Number(subcourt.timesPerPeriod[dispute.period]) + MANUAL_PASS_DELAY
-          ) : true
+          disputeData.deadline =
+            dispute.period < 4
+              ? new Date(
+                  (Number(dispute.lastPeriodChange) +
+                    Number(subcourt.timesPerPeriod[dispute.period])) *
+                    1000
+                )
+              : null
+          disputeData.showPassPeriod =
+            dispute.period < 4
+              ? parseInt(new Date().getTime() / 1000) -
+                  Number(dispute.lastPeriodChange) >
+                Number(subcourt.timesPerPeriod[dispute.period]) +
+                  MANUAL_PASS_DELAY
+              : true
         }
       }
     }
@@ -113,11 +117,11 @@ export default ({
         }
         extra={
           <Row>
-            { dispute && dispute.ruled ? (
+            {dispute && dispute.ruled ? (
               <ResolvedTag>Resolved</ResolvedTag>
-          ) : (
+            ) : (
               <>
-              { disputeData.deadline && (
+                {disputeData.deadline && (
                   <Col lg={12}>
                     <StyledDiv>
                       {
@@ -134,23 +138,35 @@ export default ({
                     </StyledBigTextDiv>
                   </Col>
                 )}
-                {
-                  disputeData.showPassPeriod ? (
-                    <Col lg={12}>
-                        {
-                          Number(dispute.period) === 4 ? (
-                            <Tooltip title={"Enforce the ruling of this case"}>
-                              <StyledButton type="primary" onClick={() => {sendExecuteRuling(ID)}}>Execute Ruling</StyledButton>
-                            </Tooltip>
-                          ) : (
-                            <Tooltip title={"Advance this case to the next phase"}>
-                              <StyledButton type="primary" onClick={() => {sendPassPeriod(ID)}}>Pass Period</StyledButton>
-                            </Tooltip>
-                          )
-                        }
-                    </Col>
-                  ) : ''
-                }
+                {disputeData.showPassPeriod ? (
+                  <Col lg={12}>
+                    {Number(dispute.period) === 4 ? (
+                      <Tooltip title={'Enforce the ruling of this case'}>
+                        <StyledButton
+                          type="primary"
+                          onClick={() => {
+                            sendExecuteRuling(ID)
+                          }}
+                        >
+                          Execute Ruling
+                        </StyledButton>
+                      </Tooltip>
+                    ) : (
+                      <Tooltip title={'Advance this case to the next phase'}>
+                        <StyledButton
+                          type="primary"
+                          onClick={() => {
+                            sendPassPeriod(ID)
+                          }}
+                        >
+                          Pass Period
+                        </StyledButton>
+                      </Tooltip>
+                    )}
+                  </Col>
+                ) : (
+                  ''
+                )}
               </>
             )}
           </Row>

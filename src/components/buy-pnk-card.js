@@ -1,8 +1,11 @@
-import { Alert, Button, Card, Form, InputNumber, Spin } from 'antd'
+import { Alert, Button, Card, Form, InputNumber, Spin, Tooltip } from 'antd'
 import React, { useCallback } from 'react'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import ETHAmount from './eth-amount'
 import styled from 'styled-components/macro'
+import { VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const StyledCard = styled(Card)`
   background: linear-gradient(180deg, #4d00b4 0%, #6500b4 100%);
@@ -68,8 +71,11 @@ export default Form.create()(({ form }) => {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     balance: drizzle.web3.utils.toBN(
-      drizzleState.accountBalances[drizzleState.accounts[0]]
-    )
+      drizzleState.accounts[0]
+        ? drizzleState.accountBalances[drizzleState.accounts[0]]
+        : 0
+    ),
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
   const _exchangeBalance = useCacheCall(
     'MiniMeTokenERC20',
@@ -150,11 +156,11 @@ export default Form.create()(({ form }) => {
                     drizzle.web3.utils.toWei(
                       typeof _value === 'number'
                         ? _value.toLocaleString('fullwide', {
-                            useGrouping: false
-                          })
+                          useGrouping: false
+                        })
                         : typeof _value === 'string'
-                        ? _value
-                        : String(_value)
+                          ? _value
+                          : String(_value)
                     )
                   )
                   callback(
@@ -183,11 +189,11 @@ export default Form.create()(({ form }) => {
                     drizzle.web3.utils.toWei(
                       typeof _value === 'number'
                         ? _value.toLocaleString('fullwide', {
-                            useGrouping: false
-                          })
+                          useGrouping: false
+                        })
                         : typeof _value === 'string'
-                        ? _value
-                        : String(_value)
+                          ? _value
+                          : String(_value)
                     )
                   )
                   callback(
@@ -216,11 +222,11 @@ export default Form.create()(({ form }) => {
             {hideETHSold ? (
               ' ... '
             ) : (
-              <ETHAmount
-                amount={drizzle.web3.utils.toWei((ETHSold / PNK).toFixed(18))}
-                decimals={10}
-              />
-            )}{' '}
+                <ETHAmount
+                  amount={drizzle.web3.utils.toWei((ETHSold / PNK).toFixed(18))}
+                  decimals={10}
+                />
+              )}{' '}
             ETH
           </StyledDiv>
           <StyledFormItem colon={false} label="ETH">
@@ -235,14 +241,18 @@ export default Form.create()(({ form }) => {
             />
           </StyledFormItem>
         </Spin>
-        <StyledButton
-          disabled={Object.values(errors).some(v => v) || loading}
-          htmlType="submit"
-          loading={status === 'pending'}
-          type="primary"
-        >
-          Buy
-        </StyledButton>
+        <Tooltip title={
+          drizzleState.account === VIEW_ONLY_ADDRESS && 'A Web3 wallet is required.'
+        }>
+          <StyledButton
+            disabled={Object.values(errors).some(v => v) || loading || drizzleState.account === VIEW_ONLY_ADDRESS}
+            htmlType="submit"
+            loading={status === 'pending'}
+            type="primary"
+          >
+            Buy
+          </StyledButton>
+        </Tooltip>
       </Form>
       <StyledPoweredByDiv>
         <a href="https://uniswap.io" rel="noopener noreferrer" target="_blank">

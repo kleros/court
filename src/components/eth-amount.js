@@ -2,7 +2,9 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { Skeleton } from 'antd'
 import styled from 'styled-components/macro'
-import { useDrizzle } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
+
+const { useDrizzle } = drizzleReactHooks
 
 const SkeletonTitleProps = { width: 30 }
 const StyledSkeleton = styled(Skeleton)`

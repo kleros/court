@@ -1,6 +1,6 @@
 import { Button, Col, Divider, Row, Spin } from 'antd'
 import React, { useCallback, useState } from 'react'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import CourtCard from '../components/court-card'
 import CourtCascaderModal from '../components/court-cascader-modal'
 import PNKBalanceCard from '../components/pnk-balance-card'
@@ -8,6 +8,9 @@ import CourtDrawer from '../components/court-drawer'
 import StakeModal from '../components/stake-modal'
 import TopBanner from '../components/top-banner'
 import styled from 'styled-components/macro'
+import { VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const StyledCol = styled(Col)`
   color: #d09cff;
@@ -22,7 +25,7 @@ const StyledButton = styled(Button)`
 export default () => {
   const { useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
   const [activeID, setActiveID] = useState()
   const [stakingID, setStakingID] = useState()
@@ -63,7 +66,7 @@ export default () => {
                 <StyledCol>You have not joined any courts yet.</StyledCol>
               </>
             ) : (
-              [ ...new Set(juror.subcourtIDs) ]
+              [...new Set(juror.subcourtIDs)]
                 .filter(ID => ID !== '0')
                 .map(ID => String(ID - 1))
                 .map(ID => (

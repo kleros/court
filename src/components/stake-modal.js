@@ -9,13 +9,14 @@ import {
   Skeleton
 } from 'antd'
 import React, { useCallback, useMemo } from 'react'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import ETHAmount from './eth-amount'
 import PropTypes from 'prop-types'
 import styled from 'styled-components/macro'
-import { useDataloader } from '../bootstrap/dataloader'
+import { useDataloader, VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
 import infoImg from '../assets/images/info.png'
 
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 const StyledModal = styled(Modal)`
   max-width: 90%;
 
@@ -162,7 +163,7 @@ const AmountBox = styled.div`
 const StakeModal = Form.create()(({ ID, form, onCancel }) => {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
   const loadPolicy = useDataloader.loadPolicy()
   let name
@@ -359,7 +360,9 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
           <Alert
             closable
             message={
-              status === 'success' ? 'Stake set. Note this can take up to a few hours to be effective.' : 'Failed to set stake. Please try again.'
+              status === 'success'
+                ? 'Stake set. Note this can take up to a few hours to be effective.'
+                : 'Failed to set stake. Please try again.'
             }
             type={status}
           />

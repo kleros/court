@@ -1,4 +1,4 @@
-import { Button, Cascader, Col, Modal, Row, Skeleton } from 'antd'
+import { Button, Cascader, Col, Modal, Row, Skeleton, Tooltip } from 'antd'
 import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import ReactMarkdown from 'react-markdown'
@@ -6,9 +6,11 @@ import styled from 'styled-components/macro'
 import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
 import skillsImg from '../assets/images/skills.png'
 import rewardImg from '../assets/images/reward.png'
-import { useDataloader } from '../bootstrap/dataloader'
-import { useDrizzle } from '../temp/drizzle-react-hooks'
+import { useDataloader, VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import Breadcrumbs from './breadcrumbs'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const StyledModal = styled(Modal)`
   position: relative;
@@ -151,6 +153,9 @@ const CourtCascaderModal = ({ onClick }) => {
   const { drizzle, useCacheCall } = useDrizzle()
   const loadPolicy = useDataloader.loadPolicy()
   const [subcourtIDs, setSubcourtIDs] = useState(['0'])
+  const drizzleState = useDrizzleState(drizzleState => ({
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
+  }))
   const options = useCacheCall(['PolicyRegistry', 'KlerosLiquid'], call => {
     const options = [
       {
@@ -213,13 +218,13 @@ const CourtCascaderModal = ({ onClick }) => {
     const index = acc.findIndex(option => option.value === ID)
     return i === subcourtIDs.length - 1
       ? {
-          label: acc[index].label,
-          description: acc[index].description,
-          loading: acc[index].loading,
-          summary: acc[index].summary,
-          requiredSkills: acc[index].requiredSkills,
-          courtID: ID
-        }
+        label: acc[index].label,
+        description: acc[index].description,
+        loading: acc[index].loading,
+        summary: acc[index].summary,
+        requiredSkills: acc[index].requiredSkills,
+        courtID: ID
+      }
       : acc[index].children
   }, options)
   const _court =
@@ -238,15 +243,19 @@ const CourtCascaderModal = ({ onClick }) => {
       footer={
         <>
           <SelectButtonArea>
-            <StyledButton
-              onClick={useCallback(
-                () => onClick(subcourtIDs[subcourtIDs.length - 1]),
-                [onClick, subcourtIDs[subcourtIDs.length - 1]]
-              )}
-              type="primary"
-            >
-              Stake
+            <Tooltip title={
+              drizzleState.account === VIEW_ONLY_ADDRESS && 'A Web3 wallet is required'
+            }>
+              <StyledButton
+                onClick={useCallback(
+                  () => drizzleState.account !== VIEW_ONLY_ADDRESS && onClick(subcourtIDs[subcourtIDs.length - 1]),
+                  [onClick, subcourtIDs[subcourtIDs.length - 1]]
+                )}
+                type="primary"
+              >
+                Stake
             </StyledButton>
+            </Tooltip>
           </SelectButtonArea>
           <Skeleton active loading={option.loading}>
             <Row gutter={16}>
@@ -254,15 +263,15 @@ const CourtCascaderModal = ({ onClick }) => {
                 <StyledDiv>
                   {
                     `${option.label} | Min Stake = ${
-                      minStake ? drizzle.web3.utils.fromWei(minStake.toString()) : ''
-                      } PNK`
+                    minStake ? drizzle.web3.utils.fromWei(minStake.toString()) : ''
+                    } PNK`
                   }
-                  <div style={{ fontWeight: '400', fontSize: '12px'}}>
+                  <div style={{ fontWeight: '400', fontSize: '12px' }}>
                     {'Each vote has a stake of '}
                     {minStake && subcourtAlpha
                       ? drizzle.web3.utils.fromWei(minStake.mul(subcourtAlpha).div(drizzle.web3.utils.toBN(ALPHA_DIVISOR)).toString())
                       : ''}
-                      {' PNK.'}
+                    {' PNK.'}
                   </div>
                 </StyledDiv>
                 <ReactMarkdown source={option.description} />
@@ -283,8 +292,8 @@ const CourtCascaderModal = ({ onClick }) => {
                     </Col>
                   </Row>
                 ) : (
-                  ''
-                )}
+                    ''
+                  )}
                 <Row>
                   <Col md={4}>
                     <Hexagon className="ternary-fill" />
