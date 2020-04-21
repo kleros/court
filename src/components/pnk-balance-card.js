@@ -107,7 +107,9 @@ const PNKBalanceCard = () => {
   const { useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
-    balance: drizzleState.accountBalances[drizzleState.accounts[0] || VIEW_ONLY_ADDRESS]
+    balance: drizzleState.accounts[0]
+        ? drizzleState.accountBalances[drizzleState.accounts[0]]
+        : 0
   }))
   const juror = useCacheCall(
     'KlerosLiquidExtraViews',
