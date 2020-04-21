@@ -13,7 +13,7 @@ import { drizzleReactHooks } from '@drizzle/react-plugin'
 import ETHAmount from './eth-amount'
 import PropTypes from 'prop-types'
 import styled from 'styled-components/macro'
-import { useDataloader } from '../bootstrap/dataloader'
+import { useDataloader, ZERO_ADDRESS } from '../bootstrap/dataloader'
 import infoImg from '../assets/images/info.png'
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks
@@ -163,7 +163,7 @@ const AmountBox = styled.div`
 const StakeModal = Form.create()(({ ID, form, onCancel }) => {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
+    account: drizzleState.accounts[0] || ZERO_ADDRESS
   }))
   const loadPolicy = useDataloader.loadPolicy()
   let name

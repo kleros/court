@@ -2,13 +2,14 @@ import { drizzleReactHooks } from '@drizzle/react-plugin'
 import React from 'react'
 import ETHAmount from './eth-amount'
 import ListItem from './list-item'
+import { ZERO_ADDRESS } from '../bootstrap/dataloader'
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const CourtListItem = ({ ID, name }) => {
   const { useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
+    account: drizzleState.accounts[0] || ZERO_ADDRESS
   }))
 
   const stake = useCacheCall(

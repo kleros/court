@@ -8,6 +8,7 @@ import { ReactComponent as Reward } from '../assets/images/reward.svg'
 import TitledListCard from './titled-list-card'
 import ListItem from './list-item'
 import TimeAgo from './time-ago'
+import { ZERO_ADDRESS } from '../bootstrap/dataloader'
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
@@ -69,7 +70,7 @@ const StyledRewardContainer = styled.div`
 
 const NotificationsCard = ({ history }) => {
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0],
+    account: drizzleState.accounts[0] || ZERO_ADDRESS,
     networkID: drizzleState.web3.networkId
   }))
   const {

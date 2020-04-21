@@ -6,6 +6,7 @@ import ETHAmount from '../components/eth-amount'
 import TimeAgo from '../components/time-ago'
 import TopBanner from '../components/top-banner'
 import styled from 'styled-components/macro'
+import { ZERO_ADDRESS } from '../bootstrap/dataloader'
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
@@ -36,7 +37,7 @@ export default ({
 }) => {
   const { drizzle, useCacheCall, useCacheEvents, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
+    account: drizzleState.accounts[0] || ZERO_ADDRESS
   }))
   const { send: sendPassPeriod, status: sendPassPeriodStatus } = useCacheSend(
     'KlerosLiquid',

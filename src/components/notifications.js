@@ -7,6 +7,7 @@ import PropTypes from 'prop-types'
 import TimeAgo from './time-ago'
 import styled from 'styled-components/macro'
 import { drizzleReactHooks } from '@drizzle/react-plugin'
+import { ZERO_ADDRESS } from '../bootstrap/dataloader'
 
 const { useDrizzleState } = drizzleReactHooks
 
@@ -79,7 +80,7 @@ const StyledBadge = styled(Badge)`
 `
 const Notifications = ({ history, useNotifications }) => {
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0],
+    account: drizzleState.accounts[0] || ZERO_ADDRESS,
     networkID: drizzleState.web3.networkId
   }))
   const {

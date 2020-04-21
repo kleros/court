@@ -4,6 +4,7 @@ import PercentageCircle from './percentage-circle'
 import { Spin } from 'antd'
 import TitledListCard from './titled-list-card'
 import styled from 'styled-components/macro'
+import { ZERO_ADDRESS } from '../bootstrap/dataloader'
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
@@ -32,7 +33,7 @@ const StyledGraphContainer = styled.div`
 const PNKStatsListCard = () => {
   const { useCacheEvents } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
+    account: drizzleState.accounts[0] || ZERO_ADDRESS
   }))
 
   let loadingData = true

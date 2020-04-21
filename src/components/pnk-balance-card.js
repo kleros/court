@@ -6,6 +6,7 @@ import { drizzleReactHooks } from '@drizzle/react-plugin'
 import ETHAmount from './eth-amount'
 import Hint from './hint'
 import styled from 'styled-components/macro'
+import { ZERO_ADDRESS } from '../bootstrap/dataloader'
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
@@ -105,8 +106,8 @@ const PNKCol = styled(Col)`
 const PNKBalanceCard = () => {
   const { useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0],
-    balance: drizzleState.accountBalances[drizzleState.accounts[0]]
+    account: drizzleState.accounts[0] || ZERO_ADDRESS,
+    balance: drizzleState.accountBalances[drizzleState.accounts[0] || ZERO_ADDRESS]
   }))
   const juror = useCacheCall(
     'KlerosLiquidExtraViews',

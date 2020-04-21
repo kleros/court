@@ -6,6 +6,7 @@ import { ReactComponent as Reward } from '../assets/images/reward.svg'
 import { ReactComponent as PurpleArrowBackground } from '../assets/images/purple-arrow.svg'
 import { ReactComponent as LightPurpleArrowBackground } from '../assets/images/light-purple-arrow.svg'
 import styled from 'styled-components/macro'
+import { ZERO_ADDRESS } from '../bootstrap/dataloader'
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
@@ -125,8 +126,8 @@ const PNKOffset = styled.div`
 const RewardCard = () => {
   const { drizzle, useCacheEvents } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0],
-    balance: drizzleState.accountBalances[drizzleState.accounts[0]]
+    account: drizzleState.accounts[0] || ZERO_ADDRESS,
+    balance: drizzleState.accountBalances[drizzleState.accounts[0] || ZERO_ADDRESS]
   }))
   const rewards = useCacheEvents(
     'KlerosLiquid',

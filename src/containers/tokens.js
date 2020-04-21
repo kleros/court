@@ -6,13 +6,14 @@ import OTCCard from '../components/otc-card'
 import PNKBalanceCard from '../components/pnk-balance-card'
 import PNKExchangesCard from '../components/pnk-exchanges-card'
 import TopBanner from '../components/top-banner'
+import { ZERO_ADDRESS } from '../bootstrap/dataloader'
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 export default () => {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
+    account: drizzleState.accounts[0] || ZERO_ADDRESS
   }))
   const juror = useCacheCall('Kleros', 'jurors', drizzleState.account)
   const oldKlerosBalance = juror && drizzle.web3.utils.toBN(juror.balance)

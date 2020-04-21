@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { drizzleReactHooks } from '@drizzle/react-plugin'
 import { useAPI } from '../bootstrap/api'
-import { useDataloader } from '../bootstrap/dataloader'
+import { useDataloader, ZERO_ADDRESS } from '../bootstrap/dataloader'
 import ScrollBar from './scroll-bar'
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks
@@ -103,7 +103,7 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
   console.log(ruling)
   const { drizzle, useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
+    account: drizzleState.accounts[0] || ZERO_ADDRESS
   }))
   const getMetaEvidence = useDataloader.getMetaEvidence()
   // const dispute = useCacheCall('KlerosLiquid', 'disputes', ID)

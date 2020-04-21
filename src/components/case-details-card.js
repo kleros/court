@@ -27,7 +27,7 @@ import EvidenceTimeline from './evidence-timeline'
 import PropTypes from 'prop-types'
 import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components/macro'
-import { useDataloader } from '../bootstrap/dataloader'
+import { useDataloader, ZERO_ADDRESS } from '../bootstrap/dataloader'
 import web3Salt from '../temp/web3-salt'
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks
@@ -246,7 +246,7 @@ const ArbitrableInterfaceDiv = styled.div`
 const CaseDetailsCard = ({ ID }) => {
   const { drizzle, useCacheCall, useCacheEvents, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
+    account: drizzleState.accounts[0] || ZERO_ADDRESS
   }))
   const loadPolicy = useDataloader.loadPolicy()
   const getMetaEvidence = useDataloader.getMetaEvidence()

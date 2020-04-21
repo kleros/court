@@ -3,14 +3,14 @@ import React from 'react'
 import ListItem from './list-item'
 import TitledListCard from './titled-list-card'
 import CourtListItem from './court-list-item'
-import { useDataloader } from '../bootstrap/dataloader'
+import { useDataloader, ZERO_ADDRESS } from '../bootstrap/dataloader'
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const CourtsListCard = () => {
   const { useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
+    account: drizzleState.accounts[0] || ZERO_ADDRESS
   }))
   const loadPolicy = useDataloader.loadPolicy()
   const juror = useCacheCall(

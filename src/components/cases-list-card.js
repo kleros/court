@@ -5,6 +5,7 @@ import ListItem from './list-item'
 import TimeAgo from './time-ago'
 import TitledListCard from './titled-list-card'
 import styled from 'styled-components/macro'
+import { ZERO_ADDRESS } from '../bootstrap/dataloader'
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
@@ -29,7 +30,7 @@ const StyledHourglass = styled(Hourglass)`
 const CasesListCard = () => {
   const { useCacheCall, useCacheEvents } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
+    account: drizzleState.accounts[0] || ZERO_ADDRESS
   }))
   const draws = useCacheEvents(
     'KlerosLiquid',
