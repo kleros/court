@@ -125,7 +125,7 @@ const Notifications = ({ history, useNotifications }) => {
       content={
         <StyledList
           dataSource={notifications}
-          loading={!notifications}
+          loading={!notifications && drizzleState.account !== VIEW_ONLY_ADDRESS}
           locale={locale}
           renderItem={useCallback(
             data => (
