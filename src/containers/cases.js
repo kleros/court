@@ -1,10 +1,12 @@
 import { Col, Divider, Radio, Row, Spin } from 'antd'
 import React, { useCallback, useMemo, useState } from 'react'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import CaseCard from '../components/case-card'
-// import { Link } from 'react-router-dom'
 import TopBanner from '../components/top-banner'
 import styled from 'styled-components/macro'
+import { VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const StyledRadioGroup = styled(Radio.Group)`
   float: right;
@@ -34,7 +36,7 @@ const StyledCol = styled(Col)`
 export default () => {
   const { useCacheCall, useCacheEvents } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
   const [filter, setFilter] = useState(0)
   const draws = useCacheEvents(

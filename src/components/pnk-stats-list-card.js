@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 import ETHAmount from './eth-amount'
 import PieChart from './pie-chart'
 import { Spin } from 'antd'
 import TitledListCard from './titled-list-card'
 import styled from 'styled-components/macro'
-import { useDataloader } from '../bootstrap/dataloader'
+import { useDataloader, VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
 
 const loadingPieChartData = [{ tooltip: 'Loading...', value: 1 }]
 const emptyPieChartData = [{ tooltip: '0 PNK', value: 1 }]
@@ -27,7 +28,7 @@ const StyledTitleSpan = styled.span`
 const PNKStatsListCard = () => {
   const { drizzle, useCacheCall, useCacheEvents } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
   const loadPolicy = useDataloader.loadPolicy()
   const juror = useCacheCall(

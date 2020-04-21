@@ -2,12 +2,15 @@ import React, { useCallback, useMemo } from 'react'
 import { Link, withRouter } from 'react-router-dom'
 import styled from 'styled-components/macro'
 import useNotifications from '../bootstrap/use-notifications'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import { ReactComponent as Bell } from '../assets/images/bell.svg'
 import { ReactComponent as Reward } from '../assets/images/reward.svg'
 import TitledListCard from './titled-list-card'
 import ListItem from './list-item'
 import TimeAgo from './time-ago'
+import { VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const StyledDiv = styled.div`
   margin-top: 50px;
@@ -67,7 +70,7 @@ const StyledRewardContainer = styled.div`
 
 const NotificationsCard = ({ history }) => {
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0],
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
     networkID: drizzleState.web3.networkId
   }))
   const {

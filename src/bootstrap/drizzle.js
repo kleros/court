@@ -1,4 +1,4 @@
-import { Drizzle, generateStore } from 'drizzle'
+import { Drizzle, generateStore } from '@drizzle/store'
 import Kleros from '../assets/contracts/kleros.json'
 import KlerosLiquid from '../assets/contracts/kleros-liquid.json'
 import KlerosLiquidExtraViews from '../assets/contracts/kleros-liquid-extra-views.json'
@@ -56,6 +56,11 @@ const options = {
   polls: {
     accounts: 3000,
     blocks: 3000
+  },
+  web3: process.env.REACT_APP_WEB3_FALLBACK_URL && {
+    fallback: {
+      url: process.env.REACT_APP_WEB3_FALLBACK_URL
+    }
   }
 }
 export default new Drizzle(options, generateStore(options))

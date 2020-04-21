@@ -1,16 +1,19 @@
 import { Alert, Button, Col, Divider, Row, Skeleton } from 'antd'
 import React, { useCallback } from 'react'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import BuyPNKCard from '../components/buy-pnk-card'
 import OTCCard from '../components/otc-card'
 import PNKBalanceCard from '../components/pnk-balance-card'
 import PNKExchangesCard from '../components/pnk-exchanges-card'
 import TopBanner from '../components/top-banner'
+import { VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 export default () => {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
   const juror = useCacheCall('Kleros', 'jurors', drizzleState.account)
   const oldKlerosBalance = juror && drizzle.web3.utils.toBN(juror.balance)

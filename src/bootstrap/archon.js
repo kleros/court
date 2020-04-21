@@ -1,7 +1,9 @@
 import Archon from '@kleros/archon'
 import PropTypes from 'prop-types'
-import { useDrizzle } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import { useEffect } from 'react'
+
+const { useDrizzle } = drizzleReactHooks
 
 const archon = new Archon(undefined, 'https://ipfs.kleros.io')
 export default archon

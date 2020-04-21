@@ -6,7 +6,10 @@ import { ReactComponent as Bell } from '../assets/images/bell.svg'
 import PropTypes from 'prop-types'
 import TimeAgo from './time-ago'
 import styled from 'styled-components/macro'
-import { useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
+import { VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
+
+const { useDrizzleState } = drizzleReactHooks
 
 const StyledListItem = styled(List.Item)`
   max-width: 358px;
@@ -77,7 +80,7 @@ const StyledBadge = styled(Badge)`
 `
 const Notifications = ({ history, useNotifications }) => {
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0],
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
     networkID: drizzleState.web3.networkId
   }))
   const {
@@ -122,7 +125,7 @@ const Notifications = ({ history, useNotifications }) => {
       content={
         <StyledList
           dataSource={notifications}
-          loading={!notifications}
+          loading={!notifications && drizzleState.account !== VIEW_ONLY_ADDRESS}
           locale={locale}
           renderItem={useCallback(
             data => (

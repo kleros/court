@@ -6,7 +6,9 @@ import ReactMarkdown from 'react-markdown'
 import styled from 'styled-components/macro'
 import { triangle } from 'polished'
 import { useDataloader } from '../bootstrap/dataloader'
-import { useDrizzle } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
+
+const { useDrizzle } = drizzleReactHooks
 
 const StyledDrawer = styled(Drawer)`
   .ant-drawer {

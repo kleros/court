@@ -1,9 +1,12 @@
 import React from 'react'
-import { useDrizzle, useDrizzleState } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import PercentageCircle from './percentage-circle'
 import { Spin } from 'antd'
 import TitledListCard from './titled-list-card'
 import styled from 'styled-components/macro'
+import { VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
+
+const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
 const StyledDiv = styled.div`
   align-items: center;
@@ -30,7 +33,7 @@ const StyledGraphContainer = styled.div`
 const PNKStatsListCard = () => {
   const { useCacheEvents } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0]
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
 
   let loadingData = true

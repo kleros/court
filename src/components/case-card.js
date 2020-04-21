@@ -9,7 +9,9 @@ import Hint from './hint'
 import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
 import { ReactComponent as Scales } from '../assets/images/scales.svg'
 import { useDataloader } from '../bootstrap/dataloader'
-import { useDrizzle } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
+
+const { useDrizzle } = drizzleReactHooks
 
 const StyledCard = styled(Card)`
   border-radius: 12px;

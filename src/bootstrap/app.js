@@ -1,7 +1,7 @@
 import '../components/theme.css'
 import { BrowserRouter, NavLink, Route, Switch } from 'react-router-dom'
 import { Col, Layout, Menu, Row, Spin, message } from 'antd'
-import { DrizzleProvider, Initializer } from '../temp/drizzle-react-hooks'
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import { ArchonInitializer } from './archon'
 import { Helmet } from 'react-helmet'
 import Identicon from '../components/identicon'
@@ -15,6 +15,8 @@ import loadable from '@loadable/component'
 import { unregister } from './service-worker'
 import styled from 'styled-components/macro'
 import useNotifications from './use-notifications'
+
+const { DrizzleProvider, Initializer } = drizzleReactHooks
 
 const StyledSpin = styled(Spin)`
   left: 50%;
