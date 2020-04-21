@@ -57,7 +57,7 @@ const options = {
     accounts: 3000,
     blocks: 3000
   },
-  web3: {
+  web3: process.env.REACT_APP_WEB3_WS_FALLBACK_URL && {
     fallback: {
       url: process.env.REACT_APP_WEB3_WS_FALLBACK_URL
     }
