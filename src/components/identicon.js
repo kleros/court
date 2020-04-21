@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import ReactBlockies from 'react-blockies'
 import styled from 'styled-components/macro'
-import { ZERO_ADDRESS } from '../bootstrap/dataloader'
+import { VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
@@ -23,8 +23,8 @@ const Identicon = ({ account, className, large, pinakion }) => {
   const drizzleState = account
     ? { account }
     : useDrizzleState(drizzleState => ({
-        account: drizzleState.accounts[0] || ZERO_ADDRESS,
-        balance: drizzleState.accountBalances[drizzleState.accounts[0] || ZERO_ADDRESS]
+        account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
+        balance: drizzleState.accountBalances[drizzleState.accounts[0] || VIEW_ONLY_ADDRESS]
       }))
   let PNK
   if (pinakion)

@@ -14,7 +14,7 @@ import { ReactComponent as Mail } from '../assets/images/mail.svg'
 import PropTypes from 'prop-types'
 import styled from 'styled-components/macro'
 import { useAPI } from '../bootstrap/api'
-import { ZERO_ADDRESS } from '../bootstrap/dataloader'
+import { VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
@@ -25,7 +25,7 @@ const NotificationSettings = Form.create()(
   ({ form, settings: { key, ...settings } }) => {
     const { drizzle } = useDrizzle()
     const drizzleState = useDrizzleState(drizzleState => ({
-      account: drizzleState.accounts[0] || ZERO_ADDRESS
+      account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
     }))
     const userSettings = useAPI.getUserSettings(
       drizzle.web3,

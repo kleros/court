@@ -8,7 +8,7 @@ import CourtDrawer from '../components/court-drawer'
 import StakeModal from '../components/stake-modal'
 import TopBanner from '../components/top-banner'
 import styled from 'styled-components/macro'
-import { ZERO_ADDRESS } from '../bootstrap/dataloader'
+import { VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
@@ -25,7 +25,7 @@ const StyledButton = styled(Button)`
 export default () => {
   const { useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0] || ZERO_ADDRESS
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
   const [activeID, setActiveID] = useState()
   const [stakingID, setStakingID] = useState()

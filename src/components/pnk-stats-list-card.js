@@ -6,7 +6,7 @@ import PieChart from './pie-chart'
 import { Spin } from 'antd'
 import TitledListCard from './titled-list-card'
 import styled from 'styled-components/macro'
-import { useDataloader, ZERO_ADDRESS } from '../bootstrap/dataloader'
+import { useDataloader, VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
 
 const loadingPieChartData = [{ tooltip: 'Loading...', value: 1 }]
 const emptyPieChartData = [{ tooltip: '0 PNK', value: 1 }]
@@ -28,7 +28,7 @@ const StyledTitleSpan = styled.span`
 const PNKStatsListCard = () => {
   const { drizzle, useCacheCall, useCacheEvents } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0] || ZERO_ADDRESS
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
   const loadPolicy = useDataloader.loadPolicy()
   const juror = useCacheCall(

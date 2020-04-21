@@ -4,7 +4,7 @@ import { drizzleReactHooks } from '@drizzle/react-plugin'
 import CaseCard from '../components/case-card'
 import TopBanner from '../components/top-banner'
 import styled from 'styled-components/macro'
-import { ZERO_ADDRESS } from '../bootstrap/dataloader'
+import { VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
@@ -36,7 +36,7 @@ const StyledCol = styled(Col)`
 export default () => {
   const { useCacheCall, useCacheEvents } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0] || ZERO_ADDRESS
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
   const [filter, setFilter] = useState(0)
   const draws = useCacheEvents(

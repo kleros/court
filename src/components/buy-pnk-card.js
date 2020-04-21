@@ -3,7 +3,7 @@ import React, { useCallback } from 'react'
 import { drizzleReactHooks } from '@drizzle/react-plugin'
 import ETHAmount from './eth-amount'
 import styled from 'styled-components/macro'
-import { ZERO_ADDRESS } from '../bootstrap/dataloader'
+import { VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
@@ -71,7 +71,7 @@ export default Form.create()(({ form }) => {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     balance: drizzle.web3.utils.toBN(
-      drizzleState.accountBalances[drizzleState.accounts[0] || ZERO_ADDRESS]
+      drizzleState.accountBalances[drizzleState.accounts[0] || VIEW_ONLY_ADDRESS]
     )
   }))
   const _exchangeBalance = useCacheCall(

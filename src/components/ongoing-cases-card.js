@@ -2,7 +2,7 @@ import { Col, Row } from 'antd'
 import React, { useMemo } from 'react'
 import styled from 'styled-components/macro'
 import { drizzleReactHooks } from '@drizzle/react-plugin'
-import { useDataloader, ZERO_ADDRESS } from '../bootstrap/dataloader'
+import { useDataloader, VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
 import { ReactComponent as Gavel } from '../assets/images/gavel.svg'
 import { ReactComponent as HourGlass } from '../assets/images/hourglass.svg'
 import CaseSummaryCard from './case-summary-card'
@@ -65,7 +65,7 @@ const OngoingCasesCard = () => {
   const { drizzle, useCacheCall, useCacheEvents } = useDrizzle()
   const getMetaEvidence = useDataloader.getMetaEvidence()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0] || ZERO_ADDRESS
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
 
   const draws = useCacheEvents(

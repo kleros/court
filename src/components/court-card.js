@@ -5,7 +5,7 @@ import styled from 'styled-components/macro'
 import { drizzleReactHooks } from '@drizzle/react-plugin'
 import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
 import { ReactComponent as Scales } from '../assets/images/scales.svg'
-import { useDataloader, ZERO_ADDRESS } from '../bootstrap/dataloader'
+import { useDataloader, VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
 import rewardImg from '../assets/images/reward.png'
 import stakeImg from '../assets/images/stake-kleros-logo.png'
 
@@ -97,7 +97,7 @@ const RewardBox = styled(InfoBox)`
 const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0] || ZERO_ADDRESS
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
   const loadPolicy = useDataloader.loadPolicy()
   let name
