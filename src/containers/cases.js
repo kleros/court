@@ -24,8 +24,20 @@ const StyledRadioGroup = styled(Radio.Group)`
     &-checked {
       background: #4d00b4 !important;
     }
+
+    @media (max-width: 400px) {
+      display: flex;
+      flex-direction: column;
+    }
   }
 `
+
+const StyledRadioButton = styled(Radio.Button)`
+  @media (max-width: 400px) {
+    text-align: center;
+  }
+`
+
 const StyledCol = styled(Col)`
   color: #d09cff;
   font-size: 24px;
@@ -117,13 +129,6 @@ export default () => {
     <>
       <TopBanner
         description="Select a case you have been drawn in, study the evidence, and vote."
-        // extra={
-        //   <Link to="/cases/history">
-        //     <Button size="large" type="primary">
-        //       History
-        //     </Button>
-        //   </Link>
-        // }
         extra={
           <StyledRadioGroup
             buttonStyle="solid"
@@ -131,9 +136,9 @@ export default () => {
             onChange={useCallback(e => setFilter(e.target.value), [])}
             value={filter}
           >
-            <Radio.Button value={0}>Vote Pending</Radio.Button>
-            <Radio.Button value={1}>In Progress</Radio.Button>
-            <Radio.Button value={2}>Closed</Radio.Button>
+            <StyledRadioButton value={0}>Vote Pending</StyledRadioButton>
+            <StyledRadioButton value={1}>In Progress</StyledRadioButton>
+            <StyledRadioButton value={2}>Closed</StyledRadioButton>
           </StyledRadioGroup>
         }
         extraLong

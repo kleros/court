@@ -18,6 +18,7 @@ const StyledButton = styled(Button)`
 export default () => (
   <>
     <TopBanner
+      title="Welcome!"
       description="This is the Kleros Juror Dashboard"
       extra={
         <Link to="/courts">
@@ -30,7 +31,6 @@ export default () => (
           </StyledButton>
         </Link>
       }
-      title="Welcome!"
     />
     <RewardCard />
     <Row gutter={32}>
