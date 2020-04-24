@@ -133,35 +133,6 @@ const NotificationSettings = Form.create()(
                           ]
                         })(<Input placeholder="Email" />)}
                       </Form.Item>
-                      <Form.Item hasFeedback>
-                        {form.getFieldDecorator('phone', {
-                          initialValue:
-                            userSettings.payload &&
-                              userSettings.payload.settings.Item.phone
-                              ? userSettings.payload.settings.Item.phone.S
-                              : '',
-                          rules: [
-                            {
-                              validator: (rule, value, callback) => {
-                                if (!value) callback()
-
-                                let phone = value.replace(/-/g, '')
-                                phone = phone.replace(/\+/g, '')
-
-                                if (phone.length < 5)
-                                  return callback(
-                                    'Please enter a valid phone number'
-                                  )
-                                const reg = new RegExp('^\\d+$')
-
-                                if (!reg.test(phone))
-                                  callback('Please enter a valid phone number')
-                                else callback()
-                              }
-                            }
-                          ]
-                        })(<Input placeholder="Phone (Optional)" />)}
-                      </Form.Item>
                       <Button
                         disabled={Object.values(form.getFieldsError()).some(v => v)}
                         htmlType="submit"

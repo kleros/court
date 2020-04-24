@@ -152,6 +152,9 @@ const StyledBuyPNK = styled.a`
     color: #fff;
   }
 `
+const LogoNavLink = styled(NavLink)`
+  margin-top: 25px;
+`
 export default () => (
   <>
     <Helmet>
@@ -177,7 +180,7 @@ export default () => (
                 <Layout.Header>
                   <Row>
                     <StyledCol md={3} sm={16} xs={0}>
-                      <Logo />
+                      <LogoNavLink to="/"><Logo /></LogoNavLink>
                     </StyledCol>
                     <Col md={16} xs={0}>
                       <StyledMenu mode="horizontal" theme="dark">
