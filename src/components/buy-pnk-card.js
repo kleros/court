@@ -25,6 +25,10 @@ const StyledCard = styled(Card)`
       padding: 10px 36px 21px;
     }
   }
+
+  @media (max-width: 500px) {
+    margin-bottom: 20px;
+  }
 `
 const StyledFormItem = styled(Form.Item)`
   .ant-form-item-label label {

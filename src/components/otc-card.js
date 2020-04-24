@@ -10,6 +10,7 @@ const StyledOTCCard = styled.div`
   color: #ffffff;
   min-height: 100px;
   width: 100%;
+  padding: 24px;
 `
 const StyledPrefixDiv = styled.div`
   left: 29px;
