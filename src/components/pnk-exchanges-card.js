@@ -1,4 +1,3 @@
-import { Col } from 'antd'
 import { ReactComponent as Bitfinex } from '../assets/images/bitfinex.svg'
 import { ReactComponent as Ethfinex } from '../assets/images/ethfinex.svg'
 import { ReactComponent as Idex } from '../assets/images/idex.svg'
