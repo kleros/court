@@ -25,7 +25,7 @@ const StyledRadioGroup = styled(Radio.Group)`
       background: #4d00b4 !important;
     }
 
-    @media (max-width: 400px) {
+    @media (max-width: 500px) {
       display: flex;
       flex-direction: column;
     }
@@ -33,7 +33,7 @@ const StyledRadioGroup = styled(Radio.Group)`
 `
 
 const StyledRadioButton = styled(Radio.Button)`
-  @media (max-width: 400px) {
+  @media (max-width: 500px) {
     text-align: center;
   }
 `
