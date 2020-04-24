@@ -11,7 +11,7 @@ const StyledCard = styled(Card)`
   min-height: 88px;
   padding: 0px 77px;
 
-  @media (max-width: 400px) {
+  @media (max-width: 500px) {
     padding: 0;
   }
 `
@@ -26,7 +26,7 @@ const StyledExtraCol = styled(Col)`
 `
 
 const StyledTitleRow = styled(Row)`
-  @media (max-width: 400px) {
+  @media (max-width: 500px) {
     display: flex;
     justify-content: space-between;
     margin: 0;

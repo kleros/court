@@ -232,6 +232,10 @@ const StyledInnerCardActionsTitleDiv = styled.div`
   text-align: center;
   top: -55px;
   width: 167px;
+
+  @media (max-width: 500px) {
+    left: -40px;
+  }
 `
 const ArbitrableInterfaceDiv = styled.div`
   border-top: 1px solid #d09cff;
