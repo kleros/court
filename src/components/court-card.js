@@ -168,7 +168,7 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
             <IconCol md={8} xs={8}>
               <Hexagon className="ternary-fill" />
               <StyledPrefixDiv>
-                <img src={stakeImg} />
+                <img src={stakeImg} alt="stake" />
               </StyledPrefixDiv>
             </IconCol>
             <StakeCol md={16} xs={16}>
@@ -185,7 +185,7 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
             <IconCol md={8} xs={8}>
               <Hexagon className="ternary-fill" />
               <StyledPrefixDiv>
-                <img src={rewardImg} />
+                <img src={rewardImg} alt="reward" />
               </StyledPrefixDiv>
             </IconCol>
             <RewardCol md={16} xs={16}>

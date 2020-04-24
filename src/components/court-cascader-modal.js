@@ -283,7 +283,7 @@ const CourtCascaderModal = ({ onClick }) => {
                     <Col md={4}>
                       <Hexagon className="ternary-fill" />
                       <StyledPrefixDiv>
-                        <img src={skillsImg} />
+                        <img src={skillsImg} alt="skills" />
                       </StyledPrefixDiv>
                     </Col>
                     <Col md={20}>
@@ -298,7 +298,7 @@ const CourtCascaderModal = ({ onClick }) => {
                   <Col md={4}>
                     <Hexagon className="ternary-fill" />
                     <StyledPrefixDiv style={{ top: '33px' }}>
-                      <img src={rewardImg} />
+                      <img src={rewardImg} alt="reward" />
                     </StyledPrefixDiv>
                   </Col>
                   <Col md={20}>

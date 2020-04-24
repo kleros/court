@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo } from 'react'
-import { Link, withRouter } from 'react-router-dom'
+import React, { useCallback } from 'react'
+import { withRouter } from 'react-router-dom'
 import styled from 'styled-components/macro'
 import useNotifications from '../bootstrap/use-notifications'
 import { drizzleReactHooks } from '@drizzle/react-plugin'
@@ -10,7 +10,7 @@ import ListItem from './list-item'
 import TimeAgo from './time-ago'
 import { VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
 
-const { useDrizzle, useDrizzleState } = drizzleReactHooks
+const { useDrizzleState } = drizzleReactHooks
 
 const StyledDiv = styled.div`
   margin-top: 50px;
@@ -74,17 +74,16 @@ const NotificationsCard = ({ history }) => {
     networkID: drizzleState.web3.networkId
   }))
   const {
-    notifications: _notifications,
-    onNotificationClick
+    notifications: _notifications
   } = useNotifications(
     drizzleState.networkID,
     useCallback(
-      async (notifications, onNotificationClick) => {
-        const onClick = _notification => () => {
+      async (_, onNotificationClick) =>
+        _notification => () => {
           onNotificationClick({ currentTarget: { id: _notification.key } })
           history.push(_notification.to)
         }
-      },
+      ,
       [history.push, drizzleState.account]
     )
   )

@@ -1,6 +1,5 @@
 import {
   Alert,
-  Checkbox,
   Col,
   Form,
   InputNumber,
@@ -274,7 +273,7 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                 colon={false}
                 extra={
                   <div style={{ marginTop: '5px' }}>
-                    <img src={infoImg} style={{ marginRight: '5px' }} />
+                    <img src={infoImg} style={{ marginRight: '5px' }} alt="info" />
                     Enter a negative value to unstake.
                   </div>
                 }

@@ -1,6 +1,6 @@
 import '../components/theme.css'
 import { BrowserRouter, NavLink, Route, Switch } from 'react-router-dom'
-import { Col, Layout, Menu, Row, Spin, message } from 'antd'
+import { Col, Layout, Menu, Row, Spin } from 'antd'
 import { drizzleReactHooks } from '@drizzle/react-plugin'
 import { ArchonInitializer } from './archon'
 import { Helmet } from 'react-helmet'

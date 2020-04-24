@@ -21,19 +21,19 @@ const Footer = () => (
         </a>
       </div>
       <div className="footer-right-icons">
-        <a href="https://twitter.com/kleros_io?" target="_blank">
+        <a href="https://twitter.com/kleros_io?" target="_blank" rel="noopener noreferrer">
           <Twitter />
         </a>
-        <a href="https://github.com/kleros" target="_blank">
+        <a href="https://github.com/kleros" target="_blank" rel="noopener noreferrer">
           <Github />
         </a>
-        <a href="https://blog.kleros.io/" target="_blank">
+        <a href="https://blog.kleros.io/" target="_blank" rel="noopener noreferrer">
           <Ghost />
         </a>
-        <a href="https://www.linkedin.com/company/kleros/" target="_blank">
+        <a href="https://www.linkedin.com/company/kleros/" target="_blank" rel="noopener noreferrer">
           <LinkedIn />
         </a>
-        <a href="https://t.me/kleros" target="_blank">
+        <a href="https://t.me/kleros" target="_blank" rel="noopener noreferrer">
           <Telegram />
         </a>
       </div>

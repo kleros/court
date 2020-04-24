@@ -1,4 +1,3 @@
-import { Col, Row } from 'antd'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { ReactComponent as ArrowUp } from '../assets/images/arrow-up.svg'

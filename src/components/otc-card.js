@@ -46,14 +46,14 @@ const StyledButton = styled(Button)`
   max-width: '150px';
 `
 
-const OTCCard = ({}) => (
+const OTCCard = () => (
   <StyledOTCCard>
     <Row>
       <Col lg={1} offset={1}>
         <IconDiv>
           <Hexagon className="ternary-fill" />
           <StyledPrefixDiv>
-            <img src={stakeImg} />
+            <img src={stakeImg} alt="stake" />
           </StyledPrefixDiv>
         </IconDiv>
       </Col>
