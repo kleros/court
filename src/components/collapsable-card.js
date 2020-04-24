@@ -17,6 +17,11 @@ const StyledHeader = styled.div`
   border-radius: 3px;
   color: white;
   padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+`
+
+const HeaderTitle = styled.div`
 `
 
 const DetailsArea = ({ title, children, headerSpacing = false }) => {
@@ -24,23 +29,9 @@ const DetailsArea = ({ title, children, headerSpacing = false }) => {
 
   return (
     <CollapsableCard>
-      <StyledHeader>
-        <Row>
-          <Col lg={8}>{title}</Col>
-          <Col lg={1} offset={15}>
-            {showInputs ? (
-              <ArrowUp
-                onClick={() => setShowInputs(!showInputs)}
-                style={{ cursor: 'pointer' }}
-              />
-            ) : (
-              <ArrowDown
-                onClick={() => setShowInputs(!showInputs)}
-                style={{ cursor: 'pointer' }}
-              />
-            )}
-          </Col>
-        </Row>
+      <StyledHeader onClick={() => setShowInputs(!showInputs)} style={{ cursor: 'pointer' }}>
+        <HeaderTitle>{title}</HeaderTitle>
+        {showInputs ? <ArrowUp /> : <ArrowDown />}
       </StyledHeader>
       {showInputs ? (
         <div style={headerSpacing ? { marginTop: '25px' } : {}}>{children}</div>
