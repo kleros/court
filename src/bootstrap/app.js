@@ -9,7 +9,7 @@ import { ReactComponent as Logo } from '../assets/images/logo.svg'
 import Footer from '../components/footer'
 import Notifications from '../components/notifications'
 import NotificationSettings from '../components/notification-settings'
-import React from 'react'
+import React, { useState } from 'react'
 import drizzle from './drizzle'
 import loadable from '@loadable/component'
 import { register } from './service-worker'
@@ -154,69 +154,90 @@ const StyledBuyPNK = styled.a`
     color: #fff;
   }
 `
+
+
+const StyledClickaway = styled.div`
+  background-color: black;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  opacity: ${properties => (properties.isMenuClosed ? 0 : 0.4)};
+  transition: opacity 0.3s;
+  pointer-events: ${properties => (properties.isMenuClosed ? 'none' : 'auto')};
+`
+
 const LogoNavLink = styled(NavLink)`
   margin-top: 25px;
 `
-export default () => (
-  <>
-    <Helmet>
-      <title>Kleros · Court</title>
-      <link
-        href="https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i,700,700i"
-        rel="stylesheet"
-      />
-    </Helmet>
-    <DrizzleProvider drizzle={drizzle}>
-      <Initializer
-        error={<C404 Web3 />}
-        loadingContractsAndAccounts={<C404 Web3 />}
-        loadingWeb3={<StyledSpin tip="Connecting to your Web3 provider." />}
-      >
-        <ArchonInitializer>
-          <BrowserRouter>
-            <Layout>
-              <StyledLayoutSider breakpoint="md" collapsedWidth="0">
-                <Menu theme="dark">{MenuItems}</Menu>
-              </StyledLayoutSider>
-              <Layout>
-                <Layout.Header>
-                  <Row>
-                    <StyledCol md={3} sm={16} xs={0}>
-                      <LogoNavLink to="/">
-                        <Logo />
-                      </LogoNavLink>
-                    </StyledCol>
-                    <Col md={16} xs={0}>
-                      <StyledMenu mode="horizontal" theme="dark">
-                        {MenuItems}
-                      </StyledMenu>
-                    </Col>
-                    <StyledCol md={5} sm={8} xs={24}>
-                      <Notifications useNotifications={useNotifications} />
-                      <NotificationSettings settings={settings} />
-                      <Identicon pinakion />
-                      <StyledBuyPNK href="/tokens">Buy PNK</StyledBuyPNK>
-                    </StyledCol>
-                  </Row>
-                </Layout.Header>
-                <StyledLayoutContent>
-                  <Switch>
-                    <Route component={Home} exact path="/" />
-                    <Route component={Courts} exact path="/courts" />
-                    <Route component={Cases} exact path="/cases" />
-                    <Route component={Case} exact path="/cases/:ID" />
-                    <Route component={Tokens} exact path="/tokens" />
-                    <Route component={C404} />
-                  </Switch>
-                </StyledLayoutContent>
-                <Footer />
-              </Layout>
-            </Layout>
-          </BrowserRouter>
-        </ArchonInitializer>
-      </Initializer>
-    </DrizzleProvider>
-  </>
-)
 
-// register({})
+export default () => {
+  const [isMenuClosed, setIsMenuClosed] = useState(true)
+  return (
+    <>
+      <Helmet>
+        <title>Kleros · Court</title>
+        <link
+          href="https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i,700,700i"
+          rel="stylesheet"
+        />
+      </Helmet>
+      <DrizzleProvider drizzle={drizzle}>
+        <Initializer
+          error={<C404 Web3 />}
+          loadingContractsAndAccounts={<C404 Web3 />}
+          loadingWeb3={<StyledSpin tip="Connecting to your Web3 provider." />}
+        >
+          <ArchonInitializer>
+            <BrowserRouter>
+              <Layout>
+                <StyledLayoutSider
+                  breakpoint="md"
+                  collapsedWidth="0"
+                  collapsed={isMenuClosed}
+                  onClick={() => setIsMenuClosed(previousState => !previousState)}
+                >
+                  <Menu theme="dark">{MenuItems}</Menu>
+                </StyledLayoutSider>
+                <Layout>
+                  <Layout.Header>
+                    <Row>
+                      <StyledCol md={3} sm={16} xs={0}>
+                        <LogoNavLink to="/"><Logo /></LogoNavLink>
+                      </StyledCol>
+                      <Col md={16} xs={0}>
+                        <StyledMenu mode="horizontal" theme="dark">
+                          {MenuItems}
+                        </StyledMenu>
+                      </Col>
+                      <StyledCol md={5} sm={8} xs={24}>
+                        <Notifications useNotifications={useNotifications} />
+                        <NotificationSettings settings={settings} />
+                        <Identicon pinakion />
+                        <StyledBuyPNK href="/tokens">Buy PNK</StyledBuyPNK>
+                      </StyledCol>
+                    </Row>
+                  </Layout.Header>
+                  <StyledLayoutContent>
+                    <Switch>
+                      <Route component={Home} exact path="/" />
+                      <Route component={Courts} exact path="/courts" />
+                      <Route component={Cases} exact path="/cases" />
+                      <Route component={Case} exact path="/cases/:ID" />
+                      <Route component={Tokens} exact path="/tokens" />
+                      <Route component={C404} />
+                    </Switch>
+                  </StyledLayoutContent>
+                  <Footer />
+                  <StyledClickaway
+                    isMenuClosed={isMenuClosed}
+                    onClick={isMenuClosed ? null : () => setIsMenuClosed(true)}
+                  />
+                </Layout>
+              </Layout>
+            </BrowserRouter>
+          </ArchonInitializer>
+        </Initializer>
+      </DrizzleProvider>
+    </>
+  )
+}
