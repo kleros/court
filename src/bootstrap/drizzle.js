@@ -56,11 +56,11 @@ const options = {
   polls: {
     accounts: 3000,
     blocks: 3000
-  },
-  web3: process.env.REACT_APP_WEB3_FALLBACK_URL && {
-    fallback: {
-      url: process.env.REACT_APP_WEB3_FALLBACK_URL
-    }
+  }
+}
+if (process.env.REACT_APP_WEB3_FALLBACK_URL) options.web3 = process.env.REACT_APP_WEB3_FALLBACK_URL && {
+  fallback: {
+    url: process.env.REACT_APP_WEB3_FALLBACK_URL
   }
 }
 export default new Drizzle(options, generateStore(options))
