@@ -50,9 +50,19 @@ const StyledTitleDiv = styled.div`
   font-size: 24px;
   font-weight: medium;
   left: 95px;
+  width: 100%;
   position: absolute;
   top: 53px;
   transform: translateY(-50%);
+  @media (max-width: 1290px) {
+    font-size: 20px;
+  }
+  @media (max-width: 1190px) {
+    font-size: 16px;
+  }
+  @media (max-width: 991px) {
+    font-size: 24px;
+  }
 `
 const StyledUnderline = styled(Underline)`
   height: 4px;
