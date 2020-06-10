@@ -21,7 +21,9 @@ const isLocalhost = Boolean(
 )
 
 export const register = config => {
-  if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
+  console.log('starting...')
+
+  if ('serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href)
     if (publicUrl.origin !== window.location.origin)
@@ -53,6 +55,7 @@ export const register = config => {
 }
 
 const registerValidSW = (swUrl, config) => {
+  console.log('registering...')
   navigator.serviceWorker
     .register(swUrl)
     .then(registration => {
@@ -91,6 +94,7 @@ const registerValidSW = (swUrl, config) => {
 }
 
 const checkValidServiceWorker = (swUrl, config) => {
+  console.log("checking service worker")
   // Check if the service worker can be found. If it can't reload the page.
   fetch(swUrl)
     .then(response => {
@@ -121,4 +125,50 @@ export const unregister = () => {
     navigator.serviceWorker.ready.then(registration => {
       registration.unregister()
     })
+}
+
+export const askPermission = () => {
+  return new Promise(function(resolve, reject) {
+    const permissionResult = Notification.requestPermission(function(result) {
+      resolve(result);
+    });
+
+    if (permissionResult) {
+      permissionResult.then(resolve, reject);
+    }
+  })
+  .then(function(permissionResult) {
+    if (permissionResult !== 'granted') {
+      throw new Error('We weren\'t granted permission.');
+    }
+  });
+}
+
+export const subscribeUserToPush = () => {
+  const subscribeOptions = {
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(
+      'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'
+    )
+  };
+
+  navigator.serviceWorker.pushManager.subscribe(subscribeOptions).then(function(pushSubscription) {
+    console.log('Received PushSubscription: ', JSON.stringify(pushSubscription));
+    return pushSubscription;
+  });
+}
+
+const urlBase64ToUint8Array = (base64String) => {
+    var padding = '='.repeat((4 - base64String.length % 4) % 4);
+    var base64 = (base64String + padding)
+        .replace(/\-/g, '+')
+        .replace(/_/g, '/');
+
+    var rawData = window.atob(base64);
+    var outputArray = new Uint8Array(rawData.length);
+
+    for (var i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
 }

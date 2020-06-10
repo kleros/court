@@ -5,6 +5,7 @@ import { ReactComponent as Acropolis } from './assets/images/acropolis.svg'
 import App from './bootstrap/app'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components/macro'
+import { register } from './bootstrap/service-worker'
 import { version } from '../package.json'
 
 Sentry.init({
@@ -33,6 +34,7 @@ const StyledAlert = styled(Alert)`
 const StyledButton = styled(Button)`
   width: 100%;
 `
+register()
 const onReportFeedbackClick = () => Sentry.showReportDialog()
 class SentryApp extends PureComponent {
   state = { error: null }

@@ -17,6 +17,7 @@
   REACT_APP_DRAW_EVENT_LISTENER_BLOCK_NUMBER='7303699'
   REACT_APP_USER_SETTINGS_URL='https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/user-settings'
   REACT_APP_JUSTIFICATIONS_URL='https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/justifications'
+  REACT_APP_APPLICATION_SERVER_KEY='BNqPp3phfZUqu4G1SCkqNuZ_FDL4YuSeAEV97U_G3UbrOuOsTeaI9jHE3QNRJ-O8EH3F2OUdnJJ4ZOhp80FthKU'
 
 [context.production.environment]
   REACT_APP_CONTEXT='production'
