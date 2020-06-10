@@ -54,8 +54,11 @@ const funcs = {
           title: 'Invalid or tampered case data, refuse to arbitrate.'
         }
       })),
-  loadPolicy: (URI, options) =>
-    archon.utils
+  loadPolicy: (URI, options) => {
+    if (!options) options = {}
+    if (URI.startsWith("/ipfs/")) options.preValidated = true
+
+    return archon.utils
       .validateFileFromURI(
         URI.replace(/^\/ipfs\//, 'https://ipfs.kleros.io/ipfs/'),
         {
@@ -69,6 +72,8 @@ const funcs = {
         summary:
           'The data for this court is not formatted correctly or has been tampered since the time of its submission.'
       }))
+  }
+
 }
 export const dataloaders = Object.keys(funcs).reduce((acc, f) => {
   acc[f] = new Dataloader(
