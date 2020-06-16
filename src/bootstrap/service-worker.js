@@ -33,7 +33,8 @@ export const register = config => {
       return
 
     window.addEventListener('load', () => {
-      const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`
+      const swUrl = `${process.env.PUBLIC_URL}/sw.js`
+      console.log(swUrl)
 
       if (isLocalhost) {
         // This is running on localhost. Let's check if a service worker still exists or not.
@@ -144,18 +145,25 @@ export const askPermission = () => {
   });
 }
 
-export const subscribeUserToPush = () => {
-  const subscribeOptions = {
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(
-      'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'
-    )
-  };
+export const subscribeUserToPush = async () => {
+  const swUrl = `${process.env.PUBLIC_URL}/sw.js`
+  return new Promise( (resolve, reject) => {
+    navigator.serviceWorker
+    .register(swUrl)
+    .then(registration => {
+      const subscribeOptions = {
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(
+          'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'
+        )
+      };
 
-  navigator.serviceWorker.pushManager.subscribe(subscribeOptions).then(function(pushSubscription) {
-    console.log('Received PushSubscription: ', JSON.stringify(pushSubscription));
-    return pushSubscription;
-  });
+      registration.pushManager.subscribe(subscribeOptions).then(function(pushSubscription) {
+        console.log('Received PushSubscription: ', JSON.stringify(pushSubscription));
+        resolve(pushSubscription);
+      });
+    })
+  })
 }
 
 const urlBase64ToUint8Array = (base64String) => {

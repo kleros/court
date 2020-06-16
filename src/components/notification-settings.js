@@ -4,9 +4,11 @@ import {
   Checkbox,
   Divider,
   Form,
+  Icon,
   Input,
   Popover,
-  Skeleton
+  Skeleton,
+  Tooltip
 } from 'antd'
 import React, { useCallback } from 'react'
 import { drizzleReactHooks } from '@drizzle/react-plugin'
@@ -15,7 +17,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components/macro'
 import { useAPI } from '../bootstrap/api'
 import { VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
-import { askPermission } from '../bootstrap/service-worker'
+import { askPermission, subscribeUserToPush } from '../bootstrap/service-worker'
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks
 
@@ -35,6 +37,7 @@ const NotificationSettings = Form.create()(
         email: true,
         fullName: true,
         phone: true,
+        pushNotifications: true,
         ...Object.keys(settings).reduce((acc, v) => {
           acc[
             `${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`
@@ -56,15 +59,22 @@ const NotificationSettings = Form.create()(
             ? (
               <StyledForm
                 onSubmit={useCallback(
-                  e => {
+                  async e => {
                     e.preventDefault()
                     form.validateFieldsAndScroll(async (err, values) => {
                       if (!err) {
-                        const { email, fullName, phone, ...rest } = values
+                        const { email, fullName, phone, pushNotifications, ...rest } = values
+                        let pushNotificationsData
+                        if (pushNotifications) {
+                          pushNotificationsData = await subscribeUserToPush()
+                        }
+
                         send({
                           email: { S: email },
                           fullName: { S: fullName },
                           phone: { S: phone || ' ' },
+                          pushNotifications: { BOOL: pushNotifications || false },
+                          pushNotificationsData: { S: JSON.stringify(pushNotificationsData) },
                           ...Object.keys(rest).reduce((acc, v) => {
                             acc[
                               `${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(
@@ -134,14 +144,19 @@ const NotificationSettings = Form.create()(
                           ]
                         })(<Input placeholder="Email" />)}
                       </Form.Item>
-                      <Form.Item hasFeedback>
+                      <Form.Item>
                         {form.getFieldDecorator('pushNotifications', {
                           initialValue:
                             userSettings.payload &&
                               userSettings.payload.settings.Item.pushNotifications
-                              ? userSettings.payload.settings.Item.pushNotifications.S
-                              : '',
-                        })(<Checkbox onChange={(e)=>{askPermission()}} placeholder="PushNotifications">Push Notifications</Checkbox>)}
+                              ? userSettings.payload.settings.Item.pushNotifications.BOOL
+                              : false,
+                          valuePropName: 'checked'
+                        })(<Checkbox onChange={(e)=>{if (e.target.checked) askPermission()}} placeholder="PushNotifications">
+                          <div style={{display: "inline-block"}}>
+                            Push Notifications <Tooltip title="Enables browser notifications. When prompted, please grant access."><Icon type="question-circle" /></Tooltip>
+                          </div>
+                        </Checkbox>)}
                       </Form.Item>
                       <Button
                         disabled={Object.values(form.getFieldsError()).some(v => v)}

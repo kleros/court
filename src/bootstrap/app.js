@@ -93,8 +93,8 @@ const MenuItems = [
   </Menu.Item>
 ]
 const settings = {
-  appeal: 'When a case I ruled is appealed.',
   draw: 'When I am drawn as a juror.',
+  appeal: 'When a case I ruled is appealed.',
   key: 'court',
   lose: 'When I lose tokens.',
   win: 'When I win arbitration fees.'
