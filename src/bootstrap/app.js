@@ -12,7 +12,7 @@ import NotificationSettings from '../components/notification-settings'
 import React from 'react'
 import drizzle from './drizzle'
 import loadable from '@loadable/component'
-import { unregister } from './service-worker'
+import { register } from './service-worker'
 import styled from 'styled-components/macro'
 import useNotifications from './use-notifications'
 
@@ -93,8 +93,8 @@ const MenuItems = [
   </Menu.Item>
 ]
 const settings = {
-  appeal: 'When a case I ruled is appealed.',
   draw: 'When I am drawn as a juror.',
+  appeal: 'When a case I ruled is appealed.',
   key: 'court',
   lose: 'When I lose tokens.',
   win: 'When I win arbitration fees.'
@@ -215,11 +215,4 @@ export default () => (
   </>
 )
 
-unregister()
-// register({
-//   onUpdate: () =>
-//     message.warning(
-//       'An update is ready to be installed. Please close and reopen all tabs.',
-//       0
-//     )
-// })
+// register({})
