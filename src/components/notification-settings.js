@@ -74,7 +74,7 @@ const NotificationSettings = Form.create()(
                           fullName: { S: fullName },
                           phone: { S: phone || ' ' },
                           pushNotifications: { BOOL: pushNotifications || false },
-                          pushNotificationsData: { S: JSON.stringify(pushNotificationsData) },
+                          pushNotificationsData: { S: pushNotificationsData ? JSON.stringify(pushNotificationsData) : ' ' },
                           ...Object.keys(rest).reduce((acc, v) => {
                             acc[
                               `${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(

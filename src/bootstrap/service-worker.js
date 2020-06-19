@@ -21,8 +21,6 @@ const isLocalhost = Boolean(
 )
 
 export const register = config => {
-  console.log('starting...')
-
   if ('serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href)
@@ -34,7 +32,6 @@ export const register = config => {
 
     window.addEventListener('load', () => {
       const swUrl = `${process.env.PUBLIC_URL}/sw.js`
-      console.log(swUrl)
 
       if (isLocalhost) {
         // This is running on localhost. Let's check if a service worker still exists or not.
@@ -56,7 +53,6 @@ export const register = config => {
 }
 
 const registerValidSW = (swUrl, config) => {
-  console.log('registering...')
   navigator.serviceWorker
     .register(swUrl)
     .then(registration => {
@@ -95,7 +91,6 @@ const registerValidSW = (swUrl, config) => {
 }
 
 const checkValidServiceWorker = (swUrl, config) => {
-  console.log("checking service worker")
   // Check if the service worker can be found. If it can't reload the page.
   fetch(swUrl)
     .then(response => {
@@ -154,12 +149,11 @@ export const subscribeUserToPush = async () => {
       const subscribeOptions = {
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(
-          'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'
+          'BPRV92GzWwsZcr3PX6pz_RZRCOStsM68JcqkCJJbfdZqKm1resLwElm7MgiU4_gNGXtzZv0gN4pkKVRnnF8KQPk'
         )
       };
 
       registration.pushManager.subscribe(subscribeOptions).then(function(pushSubscription) {
-        console.log('Received PushSubscription: ', JSON.stringify(pushSubscription));
         resolve(pushSubscription);
       });
     })
