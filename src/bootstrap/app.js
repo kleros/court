@@ -16,6 +16,8 @@ import { register } from './service-worker'
 import styled from 'styled-components/macro'
 import useNotifications from './use-notifications'
 
+import style from './app.css'
+
 const { DrizzleProvider, Initializer } = drizzleReactHooks
 
 const StyledSpin = styled(Spin)`
@@ -180,7 +182,9 @@ export default () => (
                 <Layout.Header>
                   <Row>
                     <StyledCol md={3} sm={16} xs={0}>
-                      <LogoNavLink to="/"><Logo /></LogoNavLink>
+                      <LogoNavLink to="/">
+                        <Logo />
+                      </LogoNavLink>
                     </StyledCol>
                     <Col md={16} xs={0}>
                       <StyledMenu mode="horizontal" theme="dark">
