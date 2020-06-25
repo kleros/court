@@ -12,9 +12,11 @@ import NotificationSettings from '../components/notification-settings'
 import React from 'react'
 import drizzle from './drizzle'
 import loadable from '@loadable/component'
-import { unregister } from './service-worker'
+import { register } from './service-worker'
 import styled from 'styled-components/macro'
 import useNotifications from './use-notifications'
+
+import style from './app.css'
 
 const { DrizzleProvider, Initializer } = drizzleReactHooks
 
@@ -93,8 +95,8 @@ const MenuItems = [
   </Menu.Item>
 ]
 const settings = {
-  appeal: 'When a case I ruled is appealed.',
   draw: 'When I am drawn as a juror.',
+  appeal: 'When a case I ruled is appealed.',
   key: 'court',
   lose: 'When I lose tokens.',
   win: 'When I win arbitration fees.'
@@ -180,7 +182,9 @@ export default () => (
                 <Layout.Header>
                   <Row>
                     <StyledCol md={3} sm={16} xs={0}>
-                      <LogoNavLink to="/"><Logo /></LogoNavLink>
+                      <LogoNavLink to="/">
+                        <Logo />
+                      </LogoNavLink>
                     </StyledCol>
                     <Col md={16} xs={0}>
                       <StyledMenu mode="horizontal" theme="dark">
@@ -215,11 +219,4 @@ export default () => (
   </>
 )
 
-unregister()
-// register({
-//   onUpdate: () =>
-//     message.warning(
-//       'An update is ready to be installed. Please close and reopen all tabs.',
-//       0
-//     )
-// })
+// register({})

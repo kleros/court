@@ -100,7 +100,6 @@ const ScrollBarContainer = styled.div`
 `
 
 const CaseRoundHistory = ({ ID, dispute, ruling }) => {
-  console.log(ruling)
   const { drizzle, useCacheCall } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
@@ -110,7 +109,6 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
   const [round, setRound] = useState(dispute.votesLengths.length - 1)
   const [rulingOption, setRulingOption] = useState(Number(ruling) || 1)
   const [justificationIndex, setjustificationIndex] = useState(0)
-  console.log(rulingOption)
 
   let metaEvidence
   if (dispute)
