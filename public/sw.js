@@ -1,5 +1,4 @@
 self.addEventListener('push', event => {
-  console.log('New notification', event.data.text())
   const options = {
     body: 'Go to court',
     icon: 'stake-kleros-logo.png'
