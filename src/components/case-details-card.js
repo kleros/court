@@ -354,11 +354,23 @@ const CaseDetailsCard = ({ ID }) => {
   let evidence
   let appeals
   if (dispute) {
-    metaEvidence = getMetaEvidence(
-      dispute.arbitrated,
-      drizzle.contracts.KlerosLiquid.address,
-      ID
-    )
+    if (dispute.ruled) {
+      metaEvidence = getMetaEvidence(
+        dispute.arbitrated,
+        drizzle.contracts.KlerosLiquid.address,
+        ID,
+        {
+          strictHashes: false
+        }
+      )
+    } else {
+      metaEvidence = getMetaEvidence(
+        dispute.arbitrated,
+        drizzle.contracts.KlerosLiquid.address,
+        ID
+      )
+    }
+
     evidence = getEvidence(
       dispute.arbitrated,
       drizzle.contracts.KlerosLiquid.address,
