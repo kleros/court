@@ -47,13 +47,15 @@ const funcs = {
           ...options
         })
       )
-      .catch(e => ({
-        metaEvidenceJSON: {
-          description:
-            'The data for this case is not formatted correctly or has been tampered since the time of its submission. Please refresh the page and refuse to arbitrate if the problem persists.',
-          title: 'Invalid or tampered case data, refuse to arbitrate.'
-        }
-      })),
+      .catch(e => {
+        return ({
+          metaEvidenceJSON: {
+            description:
+              'The data for this case is not formatted correctly or has been tampered since the time of its submission. Please refresh the page and refuse to arbitrate if the problem persists.',
+            title: 'Invalid or tampered case data, refuse to arbitrate.'
+          }
+        })
+      }),
   loadPolicy: (URI, options) => {
     if (!options) options = {}
     if (URI.startsWith("/ipfs/")) options.preValidated = true
