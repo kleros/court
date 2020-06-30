@@ -29,6 +29,10 @@ const StyledFooter = styled.div`
   background: #f5f1fd;
   margin: 0 -46px -23px -46px;
   min-height: 60px;
+
+  @media (max-width: 767px) {
+    margin: 0 -23px -23px -23px;
+  }
 `
 const StyledFooterBody = styled.div`
   padding: 13px 46px 23px;

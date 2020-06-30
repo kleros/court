@@ -12,6 +12,7 @@ const StyledHeaderCol = styled(Col)`
 const StyledDividerCol = styled(Col)`
   border-right: 1px solid #4d00b4;
   height: 30px;
+  width: 50%;
 `
 const EventDiv = styled.div`
   background: #4d00b4;
@@ -22,7 +23,7 @@ const EventDiv = styled.div`
   line-height: 14px;
   margin-left: auto;
   margin-right: auto;
-  padding: 8px 0;
+  padding: 10px 0;
   text-align: center;
   width: 135px;
 `
@@ -33,6 +34,10 @@ const ScrollText = styled.div`
   font-weight: 500;
   line-height: 16px;
   text-align: right;
+
+  @media (max-width: 500px) {
+    text-align: center;
+  }
 `
 const StyledEvidenceTimelineArea = styled.div`
   padding: 35px 10%;

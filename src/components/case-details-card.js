@@ -232,6 +232,10 @@ const StyledInnerCardActionsTitleDiv = styled.div`
   text-align: center;
   top: -55px;
   width: 167px;
+
+  @media (max-width: 500px) {
+    left: -40px;
+  }
 `
 const ArbitrableInterfaceDiv = styled.div`
   border-top: 1px solid #d09cff;
@@ -251,7 +255,6 @@ const CaseDetailsCard = ({ ID }) => {
   const loadPolicy = useDataloader.loadPolicy()
   const getMetaEvidence = useDataloader.getMetaEvidence()
   const getEvidence = useDataloader.getEvidence()
-  const getAppealDecision = useDataloader.getAppealDecision()
   const [activeSubcourtID, setActiveSubcourtID] = useState()
   const [justification, setJustification] = useState()
   const [complexRuling, setComplexRuling] = useState()
@@ -352,7 +355,6 @@ const CaseDetailsCard = ({ ID }) => {
   })
   let metaEvidence
   let evidence
-  let appeals
   if (dispute) {
     if (dispute.ruled) {
       metaEvidence = getMetaEvidence(
@@ -376,10 +378,6 @@ const CaseDetailsCard = ({ ID }) => {
       drizzle.contracts.KlerosLiquid.address,
       ID
     )
-    if (dispute2 && dispute2.votesLengths.length > 1)
-      appeals = new Array(dispute2.votesLengths.length - 1).map((_, i) =>
-        getAppealDecision(drizzle.contracts.KlerosLiquid.address, ID, i + 1)
-      )
   }
   const { send: sendCommit, status: sendCommitStatus } = useCacheSend(
     'KlerosLiquid',
@@ -792,6 +790,7 @@ const CaseDetailsCard = ({ ID }) => {
                         metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI
                       }
                       target="_blank"
+                      rel="noopener noreferrer"
                     >
                       <Icon
                         type="double-right"

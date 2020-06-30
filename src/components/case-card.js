@@ -184,12 +184,24 @@ const CaseCard = ({ ID, draws }) => {
     return disputeData
   })
   let metaEvidence
-  if (dispute)
-    metaEvidence = getMetaEvidence(
-      dispute.arbitrated,
-      drizzle.contracts.KlerosLiquid.address,
-      ID
-    )
+  if (dispute) {
+    if (dispute.ruled) {
+      metaEvidence = getMetaEvidence(
+        dispute.arbitrated,
+        drizzle.contracts.KlerosLiquid.address,
+        ID,
+        {
+          strictHashes: false
+        }
+      )
+    } else {
+      metaEvidence = getMetaEvidence(
+        dispute.arbitrated,
+        drizzle.contracts.KlerosLiquid.address,
+        ID
+      )
+    }
+  }
   return (
     <StyledCard
       actions={useMemo(
@@ -239,7 +251,7 @@ const CaseCard = ({ ID, draws }) => {
             <IconCol md={8} xs={8}>
               <Hexagon className="ternary-fill" />
               <StyledPrefixDiv>
-                <img src={rewardImg} />
+                <img src={rewardImg} alt="reward" />
               </StyledPrefixDiv>
             </IconCol>
             <RewardCol md={16} xs={16}>
