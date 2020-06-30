@@ -12,7 +12,6 @@ import NotificationSettings from '../components/notification-settings'
 import React, { useState } from 'react'
 import drizzle from './drizzle'
 import loadable from '@loadable/component'
-import { register } from './service-worker'
 import styled from 'styled-components/macro'
 import useNotifications from './use-notifications'
 
