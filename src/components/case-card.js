@@ -184,12 +184,24 @@ const CaseCard = ({ ID, draws }) => {
     return disputeData
   })
   let metaEvidence
-  if (dispute)
-    metaEvidence = getMetaEvidence(
-      dispute.arbitrated,
-      drizzle.contracts.KlerosLiquid.address,
-      ID
-    )
+  if (dispute) {
+    if (dispute.ruled) {
+      metaEvidence = getMetaEvidence(
+        dispute.arbitrated,
+        drizzle.contracts.KlerosLiquid.address,
+        ID,
+        {
+          strictHashes: false
+        }
+      )
+    } else {
+      metaEvidence = getMetaEvidence(
+        dispute.arbitrated,
+        drizzle.contracts.KlerosLiquid.address,
+        ID
+      )
+    }
+  }
   return (
     <StyledCard
       actions={useMemo(
