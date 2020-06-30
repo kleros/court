@@ -1,4 +1,3 @@
-import { Col } from 'antd'
 import { ReactComponent as Bitfinex } from '../assets/images/bitfinex.svg'
 import { ReactComponent as Ethfinex } from '../assets/images/ethfinex.svg'
 import { ReactComponent as Idex } from '../assets/images/idex.svg'
@@ -6,23 +5,25 @@ import { ReactComponent as UniswapNinja } from '../assets/images/uniswap-ninja.s
 import React from 'react'
 import styled from 'styled-components/macro'
 
-const StyledCol = styled(Col)`
-  margin-bottom: 50px;
-  max-height: 100px;
-`
-
 const StyledExchangeCard = styled.a`
   background: white;
   border-radius: 12px;
   box-shadow: 0px 6px 36px #bc9cff;
-  height: 100px;
   padding: 40px 26px;
-  width: 90%;
+  height:40px;
+  display: flex;
+  align-items: center;
 
   svg {
     vertical-align: middle;
-    width: 80%;
+    width: 80%
   }
+`
+
+const StyledExchangeSection = styled.div`
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
 `
 
 const Exchanges = [
@@ -44,13 +45,11 @@ const Exchanges = [
   }
 ]
 export default () => (
-  <>
+  <StyledExchangeSection>
     {Exchanges.map((exchange, i) => (
-      <StyledCol lg={8}>
-        <StyledExchangeCard href={exchange.link}>
-          {exchange.logo}
-        </StyledExchangeCard>
-      </StyledCol>
+      <StyledExchangeCard href={exchange.link}>
+        {exchange.logo}
+      </StyledExchangeCard>
     ))}
-  </>
+  </StyledExchangeSection>
 )

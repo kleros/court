@@ -156,6 +156,15 @@ const CourtCascaderModal = ({ onClick }) => {
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
+  const subcourtSelected = useCallback(subcourtIDs => {
+    setSubcourtIDs(subcourtIDs)
+    setTimeout(() => {
+      const lastSubcourtList = [...document
+        .getElementsByClassName('ant-cascader-menu')]
+        .filter(e => e.children.length > 0)
+      lastSubcourtList[lastSubcourtList.length - 1].scrollIntoView({ behavior: "smooth" })
+    }, 1500)
+  })
   const options = useCacheCall(['PolicyRegistry', 'KlerosLiquid'], call => {
     const options = [
       {
@@ -283,7 +292,7 @@ const CourtCascaderModal = ({ onClick }) => {
                     <Col md={4}>
                       <Hexagon className="ternary-fill" />
                       <StyledPrefixDiv>
-                        <img src={skillsImg} />
+                        <img src={skillsImg} alt="skills" />
                       </StyledPrefixDiv>
                     </Col>
                     <Col md={20}>
@@ -298,7 +307,7 @@ const CourtCascaderModal = ({ onClick }) => {
                   <Col md={4}>
                     <Hexagon className="ternary-fill" />
                     <StyledPrefixDiv style={{ top: '33px' }}>
-                      <img src={rewardImg} />
+                      <img src={rewardImg} alt="reward" />
                     </StyledPrefixDiv>
                   </Col>
                   <Col md={20}>
@@ -330,7 +339,7 @@ const CourtCascaderModal = ({ onClick }) => {
           () => document.getElementsByClassName('ant-modal-body')[0],
           []
         )}
-        onChange={setSubcourtIDs}
+        onChange={subcourtSelected}
         options={options}
         popupClassName="popupClassName"
         popupVisible

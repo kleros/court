@@ -63,6 +63,10 @@ const StyledTitleDiv = styled.div`
   @media (max-width: 991px) {
     font-size: 24px;
   }
+  max-width: 65%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 `
 const StyledUnderline = styled(Underline)`
   height: 4px;

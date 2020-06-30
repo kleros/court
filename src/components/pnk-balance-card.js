@@ -101,6 +101,10 @@ const StyledLightPurpleArrowBackground = styled(LightPurpleArrowBackground)`
 `
 const PNKCol = styled(Col)`
   padding-left: 58px;
+
+  @media (max-width: 500px) {
+    padding-left: 0;
+  }
 `
 
 const PNKBalanceCard = () => {

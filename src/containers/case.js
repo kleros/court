@@ -39,11 +39,11 @@ export default ({
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
-  const { send: sendPassPeriod, status: sendPassPeriodStatus } = useCacheSend(
+  const { send: sendPassPeriod } = useCacheSend(
     'KlerosLiquid',
     'passPeriod'
   )
-  const { send: sendExecuteRuling, status: sendExecuteStatus } = useCacheSend(
+  const { send: sendExecuteRuling } = useCacheSend(
     'KlerosLiquid',
     'executeRuling'
   )

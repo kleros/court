@@ -10,6 +10,7 @@ const StyledOTCCard = styled.div`
   color: #ffffff;
   min-height: 100px;
   width: 100%;
+  padding: 24px;
 `
 const StyledPrefixDiv = styled.div`
   left: 29px;
@@ -46,14 +47,14 @@ const StyledButton = styled(Button)`
   max-width: '150px';
 `
 
-const OTCCard = ({}) => (
+const OTCCard = () => (
   <StyledOTCCard>
     <Row>
       <Col lg={1} offset={1}>
         <IconDiv>
           <Hexagon className="ternary-fill" />
           <StyledPrefixDiv>
-            <img src={stakeImg} />
+            <img src={stakeImg} alt="stake" />
           </StyledPrefixDiv>
         </IconDiv>
       </Col>
