@@ -144,6 +144,20 @@ const NotificationSettings = Form.create()(
                           ]
                         })(<Input placeholder="Email" />)}
                       </Form.Item>
+                      <Form.Item>
+                        {form.getFieldDecorator('pushNotifications', {
+                          initialValue:
+                            userSettings.payload &&
+                              userSettings.payload.settings.Item.pushNotifications
+                              ? userSettings.payload.settings.Item.pushNotifications.BOOL
+                              : false,
+                          valuePropName: 'checked'
+                        })(<Checkbox onChange={(e)=>{if (e.target.checked) askPermission()}} placeholder="PushNotifications">
+                          <div style={{display: "inline-block"}}>
+                            Push Notifications <Tooltip title="Enables browser notifications. When prompted, please grant access."><Icon type="question-circle" /></Tooltip>
+                          </div>
+                        </Checkbox>)}
+                      </Form.Item>
                       <Button
                         disabled={Object.values(form.getFieldsError()).some(v => v)}
                         htmlType="submit"
