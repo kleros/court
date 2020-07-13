@@ -115,7 +115,7 @@ const TimeoutText = styled.div`
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
-  text-align: right;
+  text-align: center;
 `
 const TimeoutTime = styled.div`
   font-size: 20px;
