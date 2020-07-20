@@ -48,6 +48,7 @@ const funcs = {
         })
       )
       .catch(e => {
+        console.log(e)
         return ({
           metaEvidenceJSON: {
             description:
