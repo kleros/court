@@ -801,7 +801,7 @@ const CaseDetailsCard = ({ ID }) => {
                   </ArbitrableInterfaceDiv>
                 )}
                 {ID === '302' ? (
-                  <ArbitrableInterfaceDiv>This realitio dispute has been created by Omen, we advise you to read the <a href={'https://omen.eth.link/rules.pdf'}>Omen Rules</a> and consult the evidence provided in the <a href={'https://omen.eth.link/#/0xffbc624070cb014420a6f7547fd05dfe635e2db2'}>Market Comments.</a></ArbitrableInterfaceDiv>
+                  <ArbitrableInterfaceDiv>This realitio dispute has been created by Omen, we advise you to read the <a target="_blank" href={'https://omen.eth.link/rules.pdf'}>Omen Rules</a> and consult the evidence provided in the <a target="_blank" href={'https://omen.eth.link/#/0xffbc624070cb014420a6f7547fd05dfe635e2db2'}>Market Comments.</a></ArbitrableInterfaceDiv>
                 ) : ''}
               </StyledInnerCard>
             </Col>
