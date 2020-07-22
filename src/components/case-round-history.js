@@ -112,11 +112,22 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
 
   let metaEvidence
   if (dispute)
-    metaEvidence = getMetaEvidence(
-      dispute.arbitrated,
-      drizzle.contracts.KlerosLiquid.address,
-      ID
-    )
+    if (dispute.ruled) {
+      metaEvidence = getMetaEvidence(
+        dispute.arbitrated,
+        drizzle.contracts.KlerosLiquid.address,
+        ID,
+        {
+          strictHashes: false
+        }
+      )
+    } else {
+      metaEvidence = getMetaEvidence(
+        dispute.arbitrated,
+        drizzle.contracts.KlerosLiquid.address,
+        ID
+      )
+    }
 
   const justifications = dispute.votesLengths.map((_, i) => {
     const _justifications = useAPI.getJustifications(
