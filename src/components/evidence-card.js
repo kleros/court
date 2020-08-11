@@ -24,6 +24,11 @@ const StyledDescription = styled.div`
   line-height: 16px;
   margin-bottom: 12px;
   min-height: 80px;
+  white-space: pre-wrap; /* CSS3 */
+  white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+  white-space: -pre-wrap; /* Opera 4-6 */
+  white-space: -o-pre-wrap; /* Opera 7 */
+  word-wrap: break-word; /* Internet Explorer 5.5+ */
 `
 const StyledFooter = styled.div`
   background: #f5f1fd;
