@@ -209,7 +209,6 @@ export default () => {
                         </StyledMenu>
                       </Col>
                       <StyledCol md={5} sm={8} xs={24}>
-                        <Notifications useNotifications={useNotifications} />
                         <NotificationSettings settings={settings} />
                         <Identicon pinakion />
                         <StyledBuyPNK href="/tokens">Buy PNK</StyledBuyPNK>
