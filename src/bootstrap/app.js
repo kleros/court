@@ -98,7 +98,8 @@ const settings = {
   appeal: 'When a case I ruled is appealed.',
   key: 'court',
   lose: 'When I lose tokens.',
-  win: 'When I win arbitration fees.'
+  win: 'When I win arbitration fees.',
+  stake: 'When my stakes are changed.'
 }
 const StyledLayoutSider = styled(Layout.Sider)`
   height: 100%;
