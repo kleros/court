@@ -97,7 +97,7 @@ export default Form.create()(({ form }) => {
     PNK = drizzle.web3.utils.toBN(
       drizzle.web3.utils.toWei(typeof PNK === 'string' ? PNK : String(PNK))
     )
-  const { pair, _exchangeBalance, _ETHSold } = useCacheCall(
+  const { exchangeBalance, ETHSold, pair } = useCacheCall(
     ['UniswapV2Router02', 'UniswapV2Factory', 'MiniMeTokenERC20'],
     call => {
       let ret = {}
@@ -113,25 +113,33 @@ export default Form.create()(({ form }) => {
       )
       if (!pairContractAddress) return ret
 
-      ret._exchangeBalance = call(
+      const _exchangeBalance = call(
         'MiniMeTokenERC20',
         'balanceOf',
         pairContractAddress
       )
-      ;[ret._ETHSold] =
+      if (_exchangeBalance)
+        ret.exchangeBalance = drizzle.web3.utils.toBN(_exchangeBalance)
+      const [_ETHSold] =
         call(
           'UniswapV2Router02',
           'getAmountsIn',
           hideETHSold ? '1' : String(PNK),
           ret.pair
         ) || []
+      if (_ETHSold) {
+        ret.ETHSold = drizzle.web3.utils.toBN(_ETHSold)
+
+        if (!hideETHSold) {
+          ret.ETHSold = ret.ETHSold.mul(drizzle.web3.utils.toBN(1005))
+            .div(drizzle.web3.utils.toBN(1000))
+            .toString()
+        }
+      }
 
       return ret
     }
   )
-  const exchangeBalance =
-    _exchangeBalance && drizzle.web3.utils.toBN(_exchangeBalance)
-  const ETHSold = _ETHSold && drizzle.web3.utils.toBN(_ETHSold)
   const loading = !exchangeBalance || !ETHSold
   hideETHSold = hideETHSold || loading
   const { send, status } = useCacheSend(
@@ -251,7 +259,7 @@ export default Form.create()(({ form }) => {
         </StyledFormItem>
         <Spin spinning={loading}>
           <StyledDiv>
-            1 PNK ~={' '}
+            1 PNK &lt;={' '}
             {hideETHSold ? (
               ' ... '
             ) : (
