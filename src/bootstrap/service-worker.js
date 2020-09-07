@@ -126,51 +126,48 @@ export const unregister = () => {
 export const askPermission = () => {
   return new Promise(function(resolve, reject) {
     const permissionResult = Notification.requestPermission(function(result) {
-      resolve(result);
-    });
+      resolve(result)
+    })
 
     if (permissionResult) {
-      permissionResult.then(resolve, reject);
+      permissionResult.then(resolve, reject)
+    }
+  }).then(function(permissionResult) {
+    if (permissionResult !== 'granted') {
+      throw new Error("We weren't granted permission.")
     }
   })
-  .then(function(permissionResult) {
-    if (permissionResult !== 'granted') {
-      throw new Error('We weren\'t granted permission.');
-    }
-  });
 }
 
 export const subscribeUserToPush = async () => {
   const swUrl = `${process.env.PUBLIC_URL}/sw.js`
-  return new Promise( (resolve, reject) => {
-    navigator.serviceWorker
-    .register(swUrl)
-    .then(registration => {
+  return new Promise((resolve, reject) => {
+    navigator.serviceWorker.register(swUrl).then(registration => {
       const subscribeOptions = {
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(
           'BPRV92GzWwsZcr3PX6pz_RZRCOStsM68JcqkCJJbfdZqKm1resLwElm7MgiU4_gNGXtzZv0gN4pkKVRnnF8KQPk'
         )
-      };
+      }
 
-      registration.pushManager.subscribe(subscribeOptions).then(function(pushSubscription) {
-        resolve(pushSubscription);
-      });
+      registration.pushManager
+        .subscribe(subscribeOptions)
+        .then(function(pushSubscription) {
+          resolve(pushSubscription)
+        })
     })
   })
 }
 
-const urlBase64ToUint8Array = (base64String) => {
-    var padding = '='.repeat((4 - base64String.length % 4) % 4);
-    var base64 = (base64String + padding)
-        .replace(/\-/g, '+')
-        .replace(/_/g, '/');
+const urlBase64ToUint8Array = base64String => {
+  var padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+  var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
 
-    var rawData = window.atob(base64);
-    var outputArray = new Uint8Array(rawData.length);
+  var rawData = window.atob(base64)
+  var outputArray = new Uint8Array(rawData.length)
 
-    for (var i = 0; i < rawData.length; ++i) {
-        outputArray[i] = rawData.charCodeAt(i);
-    }
-    return outputArray;
+  for (var i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i)
+  }
+  return outputArray
 }
