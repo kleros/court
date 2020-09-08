@@ -131,9 +131,9 @@ export default Form.create()(({ form }) => {
         ret.ETHSold = drizzle.web3.utils.toBN(_ETHSold)
 
         if (!hideETHSold) {
-          ret.ETHSold = ret.ETHSold.mul(drizzle.web3.utils.toBN(1005))
-            .div(drizzle.web3.utils.toBN(1000))
-            .toString()
+          ret.ETHSold = ret.ETHSold.mul(drizzle.web3.utils.toBN(1005)).div(
+            drizzle.web3.utils.toBN(1000)
+          )
         }
       }
 
