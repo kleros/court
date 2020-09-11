@@ -7,15 +7,13 @@ import { Helmet } from 'react-helmet'
 import Identicon from '../components/identicon'
 import { ReactComponent as Logo } from '../assets/images/logo.svg'
 import Footer from '../components/footer'
-import Notifications from '../components/notifications'
 import NotificationSettings from '../components/notification-settings'
 import React, { useState } from 'react'
 import drizzle from './drizzle'
 import loadable from '@loadable/component'
 import styled from 'styled-components/macro'
-import useNotifications from './use-notifications'
 
-import style from './app.css'
+import './app.css'
 
 const { DrizzleProvider, Initializer } = drizzleReactHooks
 
@@ -155,7 +153,6 @@ const StyledBuyPNK = styled.a`
   }
 `
 
-
 const StyledClickaway = styled.div`
   background-color: black;
   position: fixed;
@@ -194,7 +191,9 @@ export default () => {
                   breakpoint="md"
                   collapsedWidth="0"
                   collapsed={isMenuClosed}
-                  onClick={() => setIsMenuClosed(previousState => !previousState)}
+                  onClick={() =>
+                    setIsMenuClosed(previousState => !previousState)
+                  }
                 >
                   <Menu theme="dark">{MenuItems}</Menu>
                 </StyledLayoutSider>
@@ -202,7 +201,9 @@ export default () => {
                   <Layout.Header>
                     <Row>
                       <StyledCol md={3} sm={16} xs={0}>
-                        <LogoNavLink to="/"><Logo /></LogoNavLink>
+                        <LogoNavLink to="/">
+                          <Logo />
+                        </LogoNavLink>
                       </StyledCol>
                       <Col md={16} xs={0}>
                         <StyledMenu mode="horizontal" theme="dark">
