@@ -81,13 +81,6 @@ export default Form.create()(({ form }) => {
     ),
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
-  const _exchangeBalance = useCacheCall(
-    'MiniMeTokenERC20',
-    'balanceOf',
-    drizzle.contracts.UniswapExchange.address
-  )
-  const exchangeBalance =
-    _exchangeBalance && drizzle.web3.utils.toBN(_exchangeBalance)
   const errors = form.getFieldsError()
   let PNK = form.getFieldValue('PNK')
   let hideETHSold = false
@@ -95,7 +88,6 @@ export default Form.create()(({ form }) => {
     PNK === undefined ||
     PNK === '' ||
     PNK === '-' ||
-    !exchangeBalance ||
     (errors.PNK &&
       (errors.PNK.includes("You can't buy 0 or less PNK.") ||
         errors.PNK.includes('Not enough liquidity.')))
@@ -105,17 +97,54 @@ export default Form.create()(({ form }) => {
     PNK = drizzle.web3.utils.toBN(
       drizzle.web3.utils.toWei(typeof PNK === 'string' ? PNK : String(PNK))
     )
-  const _ETHSold = useCacheCall(
-    'UniswapExchange',
-    'getEthToTokenOutputPrice',
-    hideETHSold ? '1' : String(PNK)
+  const { exchangeBalance, ETHSold, pair } = useCacheCall(
+    ['UniswapV2Router02', 'UniswapV2Factory', 'MiniMeTokenERC20'],
+    call => {
+      let ret = {}
+      const WETHTokenAddress = call('UniswapV2Router02', 'WETH')
+      if (!WETHTokenAddress) return ret
+
+      ret.pair = [WETHTokenAddress, drizzle.contracts.MiniMeTokenERC20.address]
+      const pairContractAddress = call(
+        'UniswapV2Factory',
+        'getPair',
+        ret.pair[0],
+        ret.pair[1]
+      )
+      if (!pairContractAddress) return ret
+
+      const _exchangeBalance = call(
+        'MiniMeTokenERC20',
+        'balanceOf',
+        pairContractAddress
+      )
+      if (_exchangeBalance)
+        ret.exchangeBalance = drizzle.web3.utils.toBN(_exchangeBalance)
+      const [_ETHSold] =
+        call(
+          'UniswapV2Router02',
+          'getAmountsIn',
+          hideETHSold ? '1' : String(PNK),
+          ret.pair
+        ) || []
+      if (_ETHSold) {
+        ret.ETHSold = drizzle.web3.utils.toBN(_ETHSold)
+
+        if (!hideETHSold) {
+          ret.ETHSold = ret.ETHSold.mul(drizzle.web3.utils.toBN(1005)).div(
+            drizzle.web3.utils.toBN(1000)
+          )
+        }
+      }
+
+      return ret
+    }
   )
-  const ETHSold = _ETHSold && drizzle.web3.utils.toBN(_ETHSold)
   const loading = !exchangeBalance || !ETHSold
   hideETHSold = hideETHSold || loading
   const { send, status } = useCacheSend(
-    'UniswapExchange',
-    'ethToTokenSwapOutput'
+    'UniswapV2Router02',
+    'swapETHForExactTokens'
   )
   return (
     <StyledCard bordered={false} hoverable title="Buy PNK with ETH">
@@ -140,12 +169,20 @@ export default Form.create()(({ form }) => {
                       ? values.PNK
                       : String(values.PNK)
                   ),
+                  pair,
+                  drizzleState.account,
                   Math.floor(Date.now() / 1000) + 3600,
                   { value: ETHSold }
                 )
             })
           },
-          [form.validateFieldsAndScroll, hideETHSold, ETHSold]
+          [
+            form.validateFieldsAndScroll,
+            hideETHSold,
+            pair,
+            drizzleState.account,
+            ETHSold
+          ]
         )}
       >
         <StyledFormItem colon={false} hasFeedback label="PNK">
@@ -160,11 +197,11 @@ export default Form.create()(({ form }) => {
                     drizzle.web3.utils.toWei(
                       typeof _value === 'number'
                         ? _value.toLocaleString('fullwide', {
-                          useGrouping: false
-                        })
+                            useGrouping: false
+                          })
                         : typeof _value === 'string'
-                          ? _value
-                          : String(_value)
+                        ? _value
+                        : String(_value)
                     )
                   )
                   callback(
@@ -178,7 +215,7 @@ export default Form.create()(({ form }) => {
                   if (_value === undefined || _value === '' || _value === '-')
                     return callback()
                   callback(
-                    !ETHSold || ETHSold.lte(drizzleState.balance)
+                    !ETHSold || ETHSold.lt(drizzleState.balance)
                       ? undefined
                       : true
                   )
@@ -193,15 +230,15 @@ export default Form.create()(({ form }) => {
                     drizzle.web3.utils.toWei(
                       typeof _value === 'number'
                         ? _value.toLocaleString('fullwide', {
-                          useGrouping: false
-                        })
+                            useGrouping: false
+                          })
                         : typeof _value === 'string'
-                          ? _value
-                          : String(_value)
+                        ? _value
+                        : String(_value)
                     )
                   )
                   callback(
-                    !exchangeBalance || value.lte(exchangeBalance)
+                    !exchangeBalance || value.lt(exchangeBalance)
                       ? undefined
                       : true
                   )
@@ -222,15 +259,15 @@ export default Form.create()(({ form }) => {
         </StyledFormItem>
         <Spin spinning={loading}>
           <StyledDiv>
-            1 PNK ~={' '}
+            1 PNK &lt;={' '}
             {hideETHSold ? (
               ' ... '
             ) : (
-                <ETHAmount
-                  amount={drizzle.web3.utils.toWei((ETHSold / PNK).toFixed(18))}
-                  decimals={10}
-                />
-              )}{' '}
+              <ETHAmount
+                amount={drizzle.web3.utils.toWei((ETHSold / PNK).toFixed(18))}
+                decimals={10}
+              />
+            )}{' '}
             ETH
           </StyledDiv>
           <StyledFormItem colon={false} label="ETH">
@@ -245,11 +282,18 @@ export default Form.create()(({ form }) => {
             />
           </StyledFormItem>
         </Spin>
-        <Tooltip title={
-          drizzleState.account === VIEW_ONLY_ADDRESS && 'A Web3 wallet is required.'
-        }>
+        <Tooltip
+          title={
+            drizzleState.account === VIEW_ONLY_ADDRESS &&
+            'A Web3 wallet is required.'
+          }
+        >
           <StyledButton
-            disabled={Object.values(errors).some(v => v) || loading || drizzleState.account === VIEW_ONLY_ADDRESS}
+            disabled={
+              Object.values(errors).some(v => v) ||
+              loading ||
+              drizzleState.account === VIEW_ONLY_ADDRESS
+            }
             htmlType="submit"
             loading={status === 'pending'}
             type="primary"

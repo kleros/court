@@ -1024,20 +1024,21 @@
   resolved "https://registry.yarnpkg.com/@csstools/convert-colors/-/convert-colors-1.4.0.tgz#ad495dc41b12e75d588c6db8b9834f08fa131eb7"
   integrity sha512-5a6wqoJV/xEdbRNKVo6I4hO3VjyDq//8q2f9I6PBAvMesJHFauXDorcNCsr9RzvsZnaWi5NYCcfyqP1QeFHFbw==
 
-"@drizzle/react-plugin@^1.5.1":
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/@drizzle/react-plugin/-/react-plugin-1.5.1.tgz#c0a9396a00bad4b4b3fe1f731dd4f3ccea25cef9"
-  integrity sha512-+CSFr9JnPrfaq4yGVu7HYZVGb+s5mETULzhM12XrqA/3KUtnmBx3v3CItBrxW5eoRq/MkYvfqKSdE1AVsT5c5Q==
+"@drizzle/react-plugin@^1.5.3":
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/@drizzle/react-plugin/-/react-plugin-1.5.3.tgz#cb3bb0fc3a8d74076c196db16d4084ad340cf240"
+  integrity sha512-UT58IMGcSRk0Opcs7U29sEX1jWXaTNhE5RwHrHD6wTYv2zuS3bXfK3q+ojwLfWRnrcBn0MsulRm/FnJ3bD4TyQ==
   dependencies:
     debounce "^1.2.0"
     deep-equal "^1.0.1"
 
-"@drizzle/store@^1.5.1":
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/@drizzle/store/-/store-1.5.1.tgz#8fa47cfca60c5d741e751eeaf7deb19fa0624b7a"
-  integrity sha512-+esqXlRzVMHISYdxMInJgcCEQTa/fzbsZ0cxjFNwaTQTbgB316W8te2DYYiC5AVc+Gy34a7hpRo1V0DgWIUgSQ==
+"@drizzle/store@^1.5.3":
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/@drizzle/store/-/store-1.5.3.tgz#97a95627fc2e4751f20c84c2d06d8623c1e34343"
+  integrity sha512-/ESDSGz90sTOPNup87LCqvX9JGI7XfHgZpByPMean7rxVmIYr1P6/AoZQ8COKQjr3C9L0E7ZgXFtQeDMAS2TbA==
   dependencies:
     deepmerge "^3.2.0"
+    is-plain-object "^2.0.4"
     redux "^4.0.1"
     redux-saga "^0.16.0"
     web3 "^1.2.1"

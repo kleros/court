@@ -4,7 +4,8 @@ import KlerosLiquid from '../assets/contracts/kleros-liquid.json'
 import KlerosLiquidExtraViews from '../assets/contracts/kleros-liquid-extra-views.json'
 import Pinakion from '../assets/contracts/pinakion.json'
 import PolicyRegistry from '../assets/contracts/policy-registry.json'
-import UniswapExchange from '../assets/contracts/uniswap-exchange.json'
+import UniswapV2Factory from '../assets/contracts/uniswap-v2-factory.json'
+import UniswapV2Router02 from '../assets/contracts/uniswap-v2-router-02.json'
 
 const options = {
   contracts: [
@@ -46,10 +47,21 @@ const options = {
       }
     },
     {
-      ...UniswapExchange,
+      ...UniswapV2Factory,
       networks: {
-        1: { address: process.env.REACT_APP_UNISWAP_EXCHANGE_ADDRESS },
-        42: { address: process.env.REACT_APP_UNISWAP_EXCHANGE_KOVAN_ADDRESS }
+        1: { address: process.env.REACT_APP_UNISWAP_V2_FACTORY_ADDRESS },
+        42: {
+          address: process.env.REACT_APP_UNISWAP_V2_FACTORY_KOVAN_ADDRESS
+        }
+      }
+    },
+    {
+      ...UniswapV2Router02,
+      networks: {
+        1: { address: process.env.REACT_APP_UNISWAP_V2_ROUTER_02_ADDRESS },
+        42: {
+          address: process.env.REACT_APP_UNISWAP_V2_ROUTER_02_KOVAN_ADDRESS
+        }
       }
     }
   ],
@@ -58,9 +70,10 @@ const options = {
     blocks: 3000
   }
 }
-if (process.env.REACT_APP_WEB3_FALLBACK_URL) options.web3 = process.env.REACT_APP_WEB3_FALLBACK_URL && {
-  fallback: {
-    url: process.env.REACT_APP_WEB3_FALLBACK_URL
+if (process.env.REACT_APP_WEB3_FALLBACK_URL)
+  options.web3 = process.env.REACT_APP_WEB3_FALLBACK_URL && {
+    fallback: {
+      url: process.env.REACT_APP_WEB3_FALLBACK_URL
+    }
   }
-}
 export default new Drizzle(options, generateStore(options))
