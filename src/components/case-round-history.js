@@ -98,6 +98,11 @@ const ScrollBarContainer = styled.div`
     position: unset;
   }
 `
+const JustificationText = styled.div`
+  white-space: pre-wrap;
+  overflow-y: scroll;
+  height: 300px;
+`
 
 const CaseRoundHistory = ({ ID, dispute, ruling }) => {
   const { drizzle, useCacheCall } = useDrizzle()
@@ -247,13 +252,13 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
                   {!justifications[round].loading &&
                   justifications[round].byChoice[rulingOption].length &&
                   !(!ruling && round === justifications.length - 1) ? (
-                    <div>
+                    <JustificationText>
                       {
                         justifications[round].byChoice[rulingOption][
                           justificationIndex
                         ]
                       }
-                    </div>
+                    </JustificationText>
                   ) : (
                     <div>No Justifications for this selection</div>
                   )}
