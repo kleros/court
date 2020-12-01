@@ -251,7 +251,7 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
                   <h2>Justification</h2>
                   {!justifications[round].loading &&
                   justifications[round].byChoice[rulingOption].length &&
-                  !(!ruling && round === justifications.length - 1) ? (
+                  !(!ruling && round === justifications.length - 1 && dispute.period < 3) ? (
                     <JustificationText>
                       {
                         justifications[round].byChoice[rulingOption][

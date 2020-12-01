@@ -47,6 +47,9 @@ const StyledTitleDiv = styled.div`
   position: absolute;
   top: 0;
   user-select: none;
+  width: ${props => (props.large === 'true' ? 215 : 90)}px;
+  text-overflow: ellipsis;
+  overflow: hidden;
 `
 
 const Breadcrumbs = ({
