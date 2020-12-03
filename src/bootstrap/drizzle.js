@@ -13,6 +13,7 @@ const options = {
       ...Kleros,
       networks: {
         1: { address: process.env.REACT_APP_KLEROS_ADDRESS },
+        3: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" },
         42: { address: process.env.REACT_APP_KLEROS_KOVAN_ADDRESS }
       }
     },
@@ -20,6 +21,7 @@ const options = {
       ...KlerosLiquid,
       networks: {
         1: { address: process.env.REACT_APP_KLEROS_LIQUID_ADDRESS },
+        3: { address: process.env.REACT_APP_KLEROS_LIQUID_ROPSTEN_ADDRESS },
         42: { address: process.env.REACT_APP_KLEROS_LIQUID_KOVAN_ADDRESS }
       }
     },
@@ -27,6 +29,7 @@ const options = {
       ...KlerosLiquidExtraViews,
       networks: {
         1: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_ADDRESS },
+        3: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_ROPSTEN_ADDRESS },
         42: {
           address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_KOVAN_ADDRESS
         }
@@ -36,6 +39,7 @@ const options = {
       ...Pinakion,
       networks: {
         1: { address: process.env.REACT_APP_PINAKION_ADDRESS },
+        3: { address: process.env.REACT_APP_PINAKION_ROPSTEN_ADDRESS },
         42: { address: process.env.REACT_APP_PINAKION_KOVAN_ADDRESS }
       }
     },
@@ -43,6 +47,7 @@ const options = {
       ...PolicyRegistry,
       networks: {
         1: { address: process.env.REACT_APP_POLICY_REGISTRY_ADDRESS },
+        3: { address: process.env.REACT_APP_POLICY_REGISTRY_ROPSTEN_ADDRESS },
         42: { address: process.env.REACT_APP_POLICY_REGISTRY_KOVAN_ADDRESS }
       }
     },
@@ -50,6 +55,7 @@ const options = {
       ...UniswapV2Factory,
       networks: {
         1: { address: process.env.REACT_APP_UNISWAP_V2_FACTORY_ADDRESS },
+        3: { address: '0x00000000219ab540356cbb839cbe05303d7705fa'},
         42: {
           address: process.env.REACT_APP_UNISWAP_V2_FACTORY_KOVAN_ADDRESS
         }
@@ -59,6 +65,7 @@ const options = {
       ...UniswapV2Router02,
       networks: {
         1: { address: process.env.REACT_APP_UNISWAP_V2_ROUTER_02_ADDRESS },
+        3: { address: '0x00000000219ab540356cbb839cbe05303d7705fa'},
         42: {
           address: process.env.REACT_APP_UNISWAP_V2_ROUTER_02_KOVAN_ADDRESS
         }
