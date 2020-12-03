@@ -4,6 +4,7 @@ import Web3 from 'web3'
 
 const networkIDData = {
   1: { name: '', provider: 'https://mainnet.infura.io' },
+  3: {name: '_ROPSTEN', provider: 'https://ropsten.infura.io'},
   42: { name: '_KOVAN', provider: 'https://kovan.infura.io' }
 }
 const handlers = {
