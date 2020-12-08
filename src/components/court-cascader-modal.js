@@ -98,7 +98,7 @@ const StyledCascader = styled(Cascader)`
       border: 0;
       height: 286px;
       padding-top: 28px;
-      width: 186px;
+      width: 226px;
 
       &-item {
         height: 38px;
