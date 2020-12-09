@@ -219,7 +219,6 @@ const StyledInnerCard = styled(Card)`
   }
 `
 const StyledIFrame = styled.iframe`
-  height: 215px;
   width: 100%;
 `
 const StyledInnerCardActionsTitleDiv = styled.div`
@@ -781,6 +780,7 @@ const CaseDetailsCard = ({ ID }) => {
                       })
                     )}`}
                     title="MetaEvidence Display"
+                    height={metaEvidence.metaEvidenceJSON.evidenceDisplayHeight || '215px'}
                   />
                 )}
                 {metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI && (
