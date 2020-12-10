@@ -135,7 +135,7 @@ const StyledCascader = styled(Cascader)`
   }
 `
 const StyledBreadcrumbs = styled(Breadcrumbs)`
-  left: ${props => props.colorIndex * 185}px;
+  left: ${props => props.colorIndex * 226}px;
   pointer-events: none;
   position: absolute;
   top: ${props => props.columnIndex * 38 + 28}px;
