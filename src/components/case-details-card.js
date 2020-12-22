@@ -825,6 +825,31 @@ const CaseDetailsCard = ({ ID }) => {
                 ) : (
                   ''
                 )}
+                {ID === '532' ? (
+                  <ArbitrableInterfaceDiv>
+                    This realitio dispute has been created by Omen, we advise
+                    you to read the{' '}
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={'https://omen.eth.link/rules.pdf'}
+                    >
+                      Omen Rules
+                    </a>{' '}
+                    and consult the evidence provided in the{' '}
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={
+                        'https://omen.eth.link/#/0x95b2271039b020aba31b933039e042b60b063800'
+                      }
+                    >
+                      Market Comments.
+                    </a>
+                  </ArbitrableInterfaceDiv>
+                ) : (
+                  ''
+                )}
               </StyledInnerCard>
             </Col>
           </Row>
