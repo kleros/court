@@ -43,7 +43,7 @@ const funcs = {
       .then(d =>
         archon.arbitrable.getMetaEvidence(contractAddress, d.metaEvidenceID, {
           scriptParameters: { disputeID, arbitrableContractAddress: contractAddress, arbitratorContractAddress: arbitratorAddress },
-          strictHashes: true,
+          strictHashes: disputeID !== '544', // TODO: Remove this bandaid once the dispute is resolved.
           ...options
         })
       )
