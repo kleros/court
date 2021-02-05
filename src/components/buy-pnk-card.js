@@ -14,6 +14,10 @@ const StyledCard = styled(Card)`
   cursor: initial;
   position: relative;
 
+  @media (max-width: 500px) {
+    margin-bottom: 20px;
+  }
+
   .ant-card {
     &-head {
       color: white;
@@ -24,10 +28,6 @@ const StyledCard = styled(Card)`
     &-body {
       padding: 10px 36px 21px;
     }
-  }
-
-  @media (max-width: 500px) {
-    margin-bottom: 20px;
   }
 `
 const StyledFormItem = styled(Form.Item)`

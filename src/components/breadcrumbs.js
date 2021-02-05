@@ -44,12 +44,12 @@ const StyledTitleDiv = styled.div`
   left: ${props => (props.large ? 28 : 20)}px;
   line-height: ${props => (props.large ? 38 : 20)}px;
   ${props => props.active && 'font-weight: bold;'}
+  overflow: hidden;
   position: absolute;
+  text-overflow: ellipsis;
   top: 0;
   user-select: none;
   width: ${props => (props.large === 'true' ? 215 : 90)}px;
-  text-overflow: ellipsis;
-  overflow: hidden;
 `
 
 const Breadcrumbs = ({

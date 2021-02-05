@@ -17,17 +17,17 @@ const StyledRadioGroup = styled(Radio.Group)`
     color: #4d00b4;
     margin-left: 10px;
 
+    @media (max-width: 500px) {
+      display: flex;
+      flex-direction: column;
+    }
+
     &:before {
       background-color: transparent;
     }
 
     &-checked {
       background: #4d00b4 !important;
-    }
-
-    @media (max-width: 500px) {
-      display: flex;
-      flex-direction: column;
     }
   }
 `

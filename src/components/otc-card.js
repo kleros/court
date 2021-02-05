@@ -9,8 +9,8 @@ const StyledOTCCard = styled.div`
   border-radius: 12px;
   color: #ffffff;
   min-height: 100px;
-  width: 100%;
   padding: 24px;
+  width: 100%;
 `
 const StyledPrefixDiv = styled.div`
   left: 29px;
