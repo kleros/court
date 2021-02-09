@@ -155,12 +155,12 @@ const StyledBuyPNK = styled.a`
 
 const StyledClickaway = styled.div`
   background-color: black;
-  position: fixed;
-  width: 100%;
   height: 100%;
   opacity: ${properties => (properties.isMenuClosed ? 0 : 0.4)};
-  transition: opacity 0.3s;
   pointer-events: ${properties => (properties.isMenuClosed ? 'none' : 'auto')};
+  position: fixed;
+  transition: opacity 0.3s;
+  width: 100%;
 `
 
 const LogoNavLink = styled(NavLink)`

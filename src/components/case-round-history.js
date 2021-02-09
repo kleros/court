@@ -99,9 +99,9 @@ const ScrollBarContainer = styled.div`
   }
 `
 const JustificationText = styled.div`
-  white-space: pre-wrap;
-  overflow-y: scroll;
   height: 300px;
+  overflow-y: scroll;
+  white-space: pre-wrap;
 `
 
 const CaseRoundHistory = ({ ID, dispute, ruling }) => {
@@ -251,7 +251,11 @@ const CaseRoundHistory = ({ ID, dispute, ruling }) => {
                   <h2>Justification</h2>
                   {!justifications[round].loading &&
                   justifications[round].byChoice[rulingOption].length &&
-                  !(!ruling && round === justifications.length - 1 && dispute.period < 3) ? (
+                  !(
+                    !ruling &&
+                    round === justifications.length - 1 &&
+                    dispute.period < 3
+                  ) ? (
                     <JustificationText>
                       {
                         justifications[round].byChoice[rulingOption][
