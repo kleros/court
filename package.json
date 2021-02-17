@@ -78,5 +78,9 @@
     "shallowequal": "^1.1.0",
     "styled-components": "^4.1.1",
     "web3": "^1.2.6"
+  },
+  "prettier": {
+    "tabWidth": 2,
+    "printWidth": 280
   }
 }

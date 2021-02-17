@@ -21,7 +21,7 @@ const StyledTitleCol = styled(Col)`
 `
 const StyledExtraCol = styled(Col)`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: flex-end;
 `
 
