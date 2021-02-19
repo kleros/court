@@ -10,13 +10,13 @@ const StyledExchangeCard = styled.a`
   border-radius: 12px;
   box-shadow: 0px 6px 36px #bc9cff;
   padding: 40px 26px;
-  height:40px;
+  height: 40px;
   display: flex;
   align-items: center;
 
   svg {
     vertical-align: middle;
-    width: 80%
+    width: 80%;
   }
 `
 
