@@ -26,8 +26,10 @@ const ClaimModal = ({ visible, onOk, onCancel }) => {
   const [txHash, setTxHash] = useState(null);
   const [claimStatus, setClaimStatus] = useState(0);
 
+  const CONTRACT_ADDRESS = "0x8FEeEe5954E9eC05B79724C6829F9f5be0cC4ff0";
+
   const claimObjects = claims => {
-    if (claims.length > 0) return claims.filter((claim, index) => claimStatus[index] == false && claim).map((claim, index) => ({ week: 1, balance: claim.value, merkleProof: claim.proof }));
+    if (claims.length > 0) return claims.filter((claim, index) => claimStatus[index] == false && claim).map((claim, index) => ({ week: 1, balance: claim.value.hex, merkleProof: claim.proof }));
   };
 
   const snapshots = ["https://pnk-airdrop-snapshots.s3.us-east-2.amazonaws.com/snapshot-1.json"];
@@ -35,10 +37,8 @@ const ClaimModal = ({ visible, onOk, onCancel }) => {
   useEffect(() => {
     var responses = [];
     for (var month = 0; month < 1; month++) {
-      responses[month] = fetch(`https://ipfs.kleros.io/ipfs/QmX5hRNTtyLGmeG8fdRZKCZsJvR8HyEsjxm7XShS4Ga9hh`);
+      responses[month] = fetch(`https://ipfs.kleros.io/ipfs/QmQvTRLhHCouUK5q3PFSey28YAQoZbHWwATEVuWiwZBtFx`);
     }
-
-    console.log(drizzleState);
 
     const results = Promise.all(responses.map(promise => promise.then(r => r.json()).catch(e => console.error(e))));
 
@@ -57,13 +57,12 @@ const ClaimModal = ({ visible, onOk, onCancel }) => {
       })
     );
 
-    const contract = new Web3.eth.Contract(MerkleRedeem.abi, "0x193353d006Ab015216D34419a845989e76612475");
+    const contract = new Web3.eth.Contract(MerkleRedeem.abi, CONTRACT_ADDRESS);
     const claimStatus = contract.methods.claimStatus(drizzleState.account, 1, 12).call();
 
     //
 
     claimStatus.then(r => setClaimStatus(r));
-    // claimStatus.then(console.log);
   }, [drizzleState.account]);
 
   const delay = delayInMilliseconds => new Promise(resolve => setTimeout(resolve, delayInMilliseconds));
@@ -93,23 +92,23 @@ const ClaimModal = ({ visible, onOk, onCancel }) => {
   };
 
   const getTotalClaimable = claims => {
-    const temp = claims.filter((claim, index) => claimStatus[index] == false).map(claim => new drizzle.web3.utils.BN(claim ? claim.value : 0));
-
-    if (temp.length > 0)
-      return temp.reduce(function(accumulator, currentValue, currentIndex, array) {
+    // return "0x07d0a4095f8b3ca7d854";
+    const unclaimedItems = claims.filter((claim, index) => claimStatus[index] == false).map(claim => drizzle.web3.utils.toBN(claim ? claim.value.hex : "0x0"));
+    if (unclaimedItems.length > 0)
+      return unclaimedItems.reduce(function(accumulator, currentValue, currentIndex, array) {
         return accumulator.add(currentValue);
       });
     else return "0";
   };
   const getTotalRewarded = claims =>
     claims
-      .map(claim => new drizzle.web3.utils.BN(claim ? claim.value : 0))
+      .map(claim => drizzle.web3.utils.toBN(claim ? claim.value.hex : "0x0"))
       .reduce(function(accumulator, currentValue, currentIndex, array) {
         return accumulator.add(currentValue);
       });
 
   const claimWeeks = claims => {
-    const contract = new Web3.eth.Contract(MerkleRedeem.abi, "0x193353d006Ab015216D34419a845989e76612475");
+    const contract = new Web3.eth.Contract(MerkleRedeem.abi, CONTRACT_ADDRESS);
     const args = claimObjects(claims);
     return contract.methods.claimWeeks(drizzleState.account, args).send({ from: drizzleState.account });
   };
@@ -132,6 +131,9 @@ const ClaimModal = ({ visible, onOk, onCancel }) => {
       width="800px"
       footer={null}
     >
+      {false && claims && console.log(parseInt(claims[0].value.hex, 16))}
+      {true && claims && console.log(getTotalClaimable(claims).toString())}
+      {false && claims && console.log(claimStatus)}
       {modalState == 1 && <Spin size="large" />}
       {(modalState == 0 || modalState == 2) && <Kleros style={{ maxWidth: "100px", maxHeight: "100px" }} />}
       {modalState >= 1 && <div style={{ fontSize: "24px", marginTop: "24px" }}>{modalState == 1 ? "Claiming" : "🎉 Claimed 🎉"}</div>}
