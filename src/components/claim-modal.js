@@ -25,6 +25,7 @@ const ClaimModal = ({ visible, onOk, onCancel }) => {
   const [claims, setClaims] = useState(0);
   const [txHash, setTxHash] = useState(null);
   const [claimStatus, setClaimStatus] = useState(0);
+  const [modalState, setModalState] = useState(0);
 
   const CONTRACT_ADDRESS = "0x8FEeEe5954E9eC05B79724C6829F9f5be0cC4ff0";
 
@@ -35,13 +36,14 @@ const ClaimModal = ({ visible, onOk, onCancel }) => {
   const snapshots = ["https://pnk-airdrop-snapshots.s3.us-east-2.amazonaws.com/snapshot-1.json"];
 
   useEffect(() => {
+    console.log("useEffect triggered");
     var responses = [];
     for (var month = 0; month < 1; month++) {
       responses[month] = fetch(`https://ipfs.kleros.io/ipfs/QmQvTRLhHCouUK5q3PFSey28YAQoZbHWwATEVuWiwZBtFx`);
     }
 
     const results = Promise.all(responses.map(promise => promise.then(r => r.json()).catch(e => console.error(e))));
-
+    setClaims(0);
     results.then(r =>
       r.forEach(function(item) {
         if (item)
@@ -63,11 +65,9 @@ const ClaimModal = ({ visible, onOk, onCancel }) => {
     //
 
     claimStatus.then(r => setClaimStatus(r));
-  }, [drizzleState.account]);
+  }, [drizzleState, modalState]);
 
   const delay = delayInMilliseconds => new Promise(resolve => setTimeout(resolve, delayInMilliseconds));
-
-  const [modalState, setModalState] = useState(0);
 
   const handleClaim = () => {
     setModalState(1);
@@ -87,12 +87,11 @@ const ClaimModal = ({ visible, onOk, onCancel }) => {
   };
 
   const handleCancel = () => {
-    onCancel();
     setModalState(0);
+    onCancel();
   };
 
   const getTotalClaimable = claims => {
-    // return "0x07d0a4095f8b3ca7d854";
     const unclaimedItems = claims.filter((claim, index) => claimStatus[index] == false).map(claim => drizzle.web3.utils.toBN(claim ? claim.value.hex : "0x0"));
     if (unclaimedItems.length > 0)
       return unclaimedItems.reduce(function(accumulator, currentValue, currentIndex, array) {
@@ -131,9 +130,10 @@ const ClaimModal = ({ visible, onOk, onCancel }) => {
       width="800px"
       footer={null}
     >
-      {false && claims && console.log(parseInt(claims[0].value.hex, 16))}
-      {true && claims && console.log(getTotalClaimable(claims).toString())}
+      {false && claims && console.log(getTotalClaimable(claims).toString())}
+      {false && claims && console.log(claims)}
       {false && claims && console.log(claimStatus)}
+
       {modalState == 1 && <Spin size="large" />}
       {(modalState == 0 || modalState == 2) && <Kleros style={{ maxWidth: "100px", maxHeight: "100px" }} />}
       {modalState >= 1 && <div style={{ fontSize: "24px", marginTop: "24px" }}>{modalState == 1 ? "Claiming" : "🎉 Claimed 🎉"}</div>}
@@ -193,7 +193,7 @@ const ClaimModal = ({ visible, onOk, onCancel }) => {
           size="large"
           type="primary"
           style={
-            Number(drizzle.web3.utils.fromWei(getTotalClaimable(claims))).toFixed(0) < 1
+            !claims || Number(drizzle.web3.utils.fromWei(getTotalClaimable(claims))).toFixed(0) < 1
               ? { marginTop: "40px", border: "none", color: "#CCC", backgroundColor: "#fafafa" }
               : {
                   marginTop: "40px",
@@ -202,7 +202,7 @@ const ClaimModal = ({ visible, onOk, onCancel }) => {
                   border: "none"
                 }
           }
-          disabled={Number(drizzle.web3.utils.fromWei(getTotalClaimable(claims))).toFixed(0) < 1}
+          disabled={!claims || Number(drizzle.web3.utils.fromWei(getTotalClaimable(claims))).toFixed(0) < 1}
         >
           Claim Your PNK Tokens
         </Button>
