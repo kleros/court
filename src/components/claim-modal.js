@@ -15,7 +15,7 @@ import { ReactComponent as RightArrow } from "../assets/images/right-arrow.svg";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
-const ClaimModal = ({ visible, onOk, onCancel }) => {
+const ClaimModal = ({ visible, onOk, onCancel, displayButton }) => {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle();
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
@@ -26,32 +26,37 @@ const ClaimModal = ({ visible, onOk, onCancel }) => {
   const [txHash, setTxHash] = useState(null);
   const [claimStatus, setClaimStatus] = useState(0);
   const [modalState, setModalState] = useState(0);
+  const [currentClaimValue, setCurrentClaimValue] = useState(12);
 
-  const CONTRACT_ADDRESS = "0x8FEeEe5954E9eC05B79724C6829F9f5be0cC4ff0";
+  const CONTRACT_ADDRESSES = { 1: "", 42: "0x345719F4FA3EE5BCD41a0AEa227B2E76F3800B98" };
+
+  const SNAPSHOTS = ["https://ipfs.kleros.io/ipfs/QmcpNeZMrxjjdyANbX5JGq87WEeUBy8yX9pvNawFsonzmo", "https://ipfs.kleros.io/ipfs/QmQvTRLhHCouUK5q3PFSey28YAQoZbHWwATEVuWiwZBtFx"]; // First entry for 1000 PNK per address, the rest are for monthly allocations. First two months are in the same file (index 1)
 
   const claimObjects = claims => {
-    if (claims.length > 0) return claims.filter((claim, index) => claimStatus[index] == false && claim).map((claim, index) => ({ week: 1, balance: claim.value.hex, merkleProof: claim.proof }));
+    if (claims.length > 0) return claims.map((claim, index) => claim && { week: index, balance: claim.value.hex, merkleProof: claim.proof }).filter(claimObject => claimObject != undefined);
   };
-
-  const snapshots = ["https://pnk-airdrop-snapshots.s3.us-east-2.amazonaws.com/snapshot-1.json"];
 
   useEffect(() => {
     console.log("useEffect triggered");
+
+    console.log(CONTRACT_ADDRESSES[drizzleState.web3.networkId]);
+
     var responses = [];
-    for (var month = 0; month < 1; month++) {
-      responses[month] = fetch(`https://ipfs.kleros.io/ipfs/QmQvTRLhHCouUK5q3PFSey28YAQoZbHWwATEVuWiwZBtFx`);
+    for (var month = 0; month < SNAPSHOTS.length; month++) {
+      responses[month] = fetch(SNAPSHOTS[month]);
     }
 
     const results = Promise.all(responses.map(promise => promise.then(r => r.json()).catch(e => console.error(e))));
     setClaims(0);
     results.then(r =>
       r.forEach(function(item) {
-        if (item)
+        if (item) {
+          if (item.merkleTree.claims[drizzleState.account]) displayButton();
           setClaims(prevState => {
             if (prevState) return [...prevState, item.merkleTree.claims[drizzleState.account]];
             else return [item.merkleTree.claims[drizzleState.account]];
           });
-        else
+        } else
           setClaims(prevState => {
             if (prevState) return [...prevState, 0];
             else return [0];
@@ -59,8 +64,8 @@ const ClaimModal = ({ visible, onOk, onCancel }) => {
       })
     );
 
-    const contract = new Web3.eth.Contract(MerkleRedeem.abi, CONTRACT_ADDRESS);
-    const claimStatus = contract.methods.claimStatus(drizzleState.account, 1, 12).call();
+    const contract = new Web3.eth.Contract(MerkleRedeem.abi, CONTRACT_ADDRESSES[drizzleState.web3.networkId]);
+    const claimStatus = contract.methods.claimStatus(drizzleState.account, 0, 12).call();
 
     //
 
@@ -93,11 +98,15 @@ const ClaimModal = ({ visible, onOk, onCancel }) => {
 
   const getTotalClaimable = claims => {
     const unclaimedItems = claims.filter((claim, index) => claimStatus[index] == false).map(claim => drizzle.web3.utils.toBN(claim ? claim.value.hex : "0x0"));
-    if (unclaimedItems.length > 0)
-      return unclaimedItems.reduce(function(accumulator, currentValue, currentIndex, array) {
+
+    let totalClaimable;
+
+    if (unclaimedItems.length > 0) {
+      totalClaimable = unclaimedItems.reduce(function(accumulator, currentValue, currentIndex, array) {
         return accumulator.add(currentValue);
       });
-    else return "0";
+    } else totalClaimable = "0";
+    return totalClaimable;
   };
   const getTotalRewarded = claims =>
     claims
@@ -107,8 +116,17 @@ const ClaimModal = ({ visible, onOk, onCancel }) => {
       });
 
   const claimWeeks = claims => {
-    const contract = new Web3.eth.Contract(MerkleRedeem.abi, CONTRACT_ADDRESS);
+    const contract = new Web3.eth.Contract(MerkleRedeem.abi, CONTRACT_ADDRESSES[drizzleState.web3.networkId]);
     const args = claimObjects(claims);
+
+    setCurrentClaimValue(
+      args
+        .map(claim => drizzle.web3.utils.toBN(claim ? claim.balance : "0x0"))
+        .reduce((a, b) => {
+          return a.add(b);
+        }, drizzle.web3.utils.toBN("0x0"))
+    );
+
     return contract.methods.claimWeeks(drizzleState.account, args).send({ from: drizzleState.account });
   };
 
@@ -131,13 +149,17 @@ const ClaimModal = ({ visible, onOk, onCancel }) => {
       footer={null}
     >
       {false && claims && console.log(getTotalClaimable(claims).toString())}
-      {false && claims && console.log(claims)}
-      {false && claims && console.log(claimStatus)}
-
+      {true && claims && console.log(claims)}
+      {true && claims && console.log(claimStatus)}
+      {console.log("claimObjects below")}
+      {true && claims && console.log(claimObjects(claims))}
       {modalState == 1 && <Spin size="large" />}
       {(modalState == 0 || modalState == 2) && <Kleros style={{ maxWidth: "100px", maxHeight: "100px" }} />}
       {modalState >= 1 && <div style={{ fontSize: "24px", marginTop: "24px" }}>{modalState == 1 ? "Claiming" : "🎉 Claimed 🎉"}</div>}
-      <div style={{ fontSize: "64px", fontWeight: "500", color: "#9013FE", marginBottom: "24px" }}> {claims.length > 0 && claimStatus.length > 0 && Number(drizzle.web3.utils.fromWei(getTotalClaimable(claims))).toFixed(0)} PNK </div>
+      <div style={{ fontSize: "64px", fontWeight: "500", color: "#9013FE", marginBottom: "24px" }}>
+        {" "}
+        {claims.length > 0 && claimStatus.length > 0 && (modalState == 2 ? Number(drizzle.web3.utils.fromWei(currentClaimValue)).toFixed(0) : Number(drizzle.web3.utils.fromWei(getTotalClaimable(claims))).toFixed(0))} PNK{" "}
+      </div>
       {modalState == 0 && (
         <>
           <div style={{ fontSize: "24px", fontWeight: "400" }}>🎉 Thanks for being part of the community! 🎉</div>
