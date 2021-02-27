@@ -85,7 +85,7 @@ const StyledDivider = styled.div`
 const StyledTooltipDiv = styled.span`
   position: absolute;
   right: 18px;
-  top: 25.7%;
+  top: 20%;
   font-size: 16px;
   font-weight: 500;
   .ant-tooltip-arrow {
