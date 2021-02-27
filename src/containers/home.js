@@ -32,6 +32,7 @@ export default () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalButtonVisible, setIsModalButtonVisible] = useState(false);
+  const [apy, setApy] = useState(0);
 
   useEffect(() => {
     setIsModalButtonVisible(false);
@@ -54,9 +55,12 @@ export default () => {
     setIsModalVisible(false);
   };
 
+  const apyCallback = apy => {
+    setApy(apy);
+  };
   return (
     <>
-      <ClaimModal visible={isModalVisible} onOk={handleOk} onCancel={handleCancel} displayButton={showModalButton} />
+      <ClaimModal visible={isModalVisible} onOk={handleOk} onCancel={handleCancel} displayButton={showModalButton} apyCallback={apyCallback} />
       <TopBanner
         title="Welcome!"
         description="This is the Kleros Juror Dashboard"
@@ -87,7 +91,7 @@ export default () => {
       <RewardCard />
       <Row gutter={32}>
         <Col lg={8}>
-          <CourtsListCard />
+          <CourtsListCard apy={apy} />
         </Col>
         <Col lg={8}>
           <CasesListCard />

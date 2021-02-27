@@ -15,7 +15,7 @@ import { ReactComponent as RightArrow } from "../assets/images/right-arrow.svg";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
-const ClaimModal = ({ visible, onOk, onCancel, displayButton }) => {
+const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle();
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
@@ -28,7 +28,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton }) => {
   const [modalState, setModalState] = useState(0);
   const [currentClaimValue, setCurrentClaimValue] = useState(12);
 
-  const CONTRACT_ADDRESSES = { 1: "", 42: "0x345719F4FA3EE5BCD41a0AEa227B2E76F3800B98" };
+  const CONTRACT_ADDRESSES = { 1: "0xdbc3088Dfebc3cc6A84B0271DaDe2696DB00Af38", 42: "0x345719F4FA3EE5BCD41a0AEa227B2E76F3800B98" };
 
   const SNAPSHOTS = ["https://ipfs.kleros.io/ipfs/QmcpNeZMrxjjdyANbX5JGq87WEeUBy8yX9pvNawFsonzmo", "https://ipfs.kleros.io/ipfs/QmQvTRLhHCouUK5q3PFSey28YAQoZbHWwATEVuWiwZBtFx"]; // First entry for 1000 PNK per address, the rest are for monthly allocations. First two months are in the same file (index 1)
 
@@ -37,10 +37,6 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton }) => {
   };
 
   useEffect(() => {
-    console.log("useEffect triggered");
-
-    console.log(CONTRACT_ADDRESSES[drizzleState.web3.networkId]);
-
     var responses = [];
     for (var month = 0; month < SNAPSHOTS.length; month++) {
       responses[month] = fetch(SNAPSHOTS[month]);
@@ -51,6 +47,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton }) => {
     results.then(r =>
       r.forEach(function(item) {
         if (item) {
+          apyCallback(item.apy);
           if (item.merkleTree.claims[drizzleState.account]) displayButton();
           setClaims(prevState => {
             if (prevState) return [...prevState, item.merkleTree.claims[drizzleState.account]];
