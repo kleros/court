@@ -39,7 +39,6 @@ export default () => {
   }, [drizzleState.account]);
 
   const showModalButton = () => {
-    console.log("display:");
     setIsModalButtonVisible(true);
   };
 

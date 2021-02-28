@@ -67,7 +67,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
     //
 
     claimStatus.then(r => setClaimStatus(r));
-  }, [drizzleState, modalState]);
+  }, [drizzleState.account, drizzleState.web3.networkId, modalState]);
 
   const delay = delayInMilliseconds => new Promise(resolve => setTimeout(resolve, delayInMilliseconds));
 
@@ -145,11 +145,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       width="800px"
       footer={null}
     >
-      {false && claims && console.log(getTotalClaimable(claims).toString())}
-      {true && claims && console.log(claims)}
-      {true && claims && console.log(claimStatus)}
-      {console.log("claimObjects below")}
-      {true && claims && console.log(claimObjects(claims))}
+
       {modalState == 1 && <Spin size="large" />}
       {(modalState == 0 || modalState == 2) && <Kleros style={{ maxWidth: "100px", maxHeight: "100px" }} />}
       {modalState >= 1 && <div style={{ fontSize: "24px", marginTop: "24px" }}>{modalState == 1 ? "Claiming" : "🎉 Claimed 🎉"}</div>}
