@@ -90,7 +90,7 @@ export default () => {
       <RewardCard />
       <Row gutter={32}>
         <Col lg={8}>
-          <CourtsListCard apy={null} />
+          <CourtsListCard apy={apy} />
         </Col>
         <Col lg={8}>
           <CasesListCard />

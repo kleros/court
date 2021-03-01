@@ -30,13 +30,34 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
 
   const CONTRACT_ADDRESSES = { 1: "0xdbc3088Dfebc3cc6A84B0271DaDe2696DB00Af38", 42: "0x193353d006Ab015216D34419a845989e76612475" };
 
-  const SNAPSHOTS = [ "https://ipfs.kleros.io/ipfs/QmYJGrQBh68kAvqk57FdynEixdu4VY87mHme821rtPS92u/snapshot-1.json"];
+  const SNAPSHOTS = ["https://ipfs.kleros.io/ipfs/QmYJGrQBh68kAvqk57FdynEixdu4VY87mHme821rtPS92u/snapshot-1.json"];
 
   const claimObjects = claims => {
     if (claims.length > 0) return claims.map((claim, index) => claim && { week: 2, balance: claim.value.hex, merkleProof: claim.proof }).filter(claimObject => claimObject != undefined);
   };
 
   useEffect(() => {
+    fetch("https://api.thegraph.com/subgraphs/name/napolean0/kleros", {
+      headers: {
+        Accept: "*/*",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        query: `
+    {
+      totalStakeds {
+        totalStakedAmount
+      }
+    }
+        `
+      }),
+      method: "POST",
+      mode: "cors"
+    })
+      .then(r => r.json())
+      .then(r => apyCallback(drizzle.web3.utils.fromWei(r.data.totalStakeds[0].totalStakedAmount)));
+    // .then(r => console.log(r.data));
+
     var responses = [];
     for (var month = 0; month < SNAPSHOTS.length; month++) {
       responses[month] = fetch(SNAPSHOTS[month]);
@@ -94,7 +115,6 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
   };
 
   const getTotalClaimable = claims => {
-    console.log(claims)
     const unclaimedItems = claims.filter((claim, index) => claimStatus[index] == false).map(claim => drizzle.web3.utils.toBN(claim ? claim.value.hex : "0x0"));
 
     let totalClaimable;
@@ -146,7 +166,6 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       width="800px"
       footer={null}
     >
-
       {modalState == 1 && <Spin size="large" />}
       {(modalState == 0 || modalState == 2) && <Kleros style={{ maxWidth: "100px", maxHeight: "100px" }} />}
       {modalState >= 1 && <div style={{ fontSize: "24px", marginTop: "24px" }}>{modalState == 1 ? "Claiming" : "🎉 Claimed 🎉"}</div>}

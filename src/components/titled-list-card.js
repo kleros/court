@@ -111,7 +111,7 @@ const TitledListCard = ({ children, loading, prefix, title, apy }) => (
         {apy && (
           <Tooltip title="The rate of the last month. Subject to change depending on total staked amount." getPopupContainer={triggerNode => triggerNode}>
             <StyledTooltipDiv>
-              {`${apy * 100}% APY`}
+              {`${((1000000 / apy) * 12 * 100).toFixed(2)}% APY`}
               <Question style={{ verticalAlign: "text-bottom", marginLeft: "8px", height: "19px", width: "auto" }} />
             </StyledTooltipDiv>
           </Tooltip>
