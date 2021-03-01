@@ -94,6 +94,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
   };
 
   const getTotalClaimable = claims => {
+    console.log(claims)
     const unclaimedItems = claims.filter((claim, index) => claimStatus[index] == false).map(claim => drizzle.web3.utils.toBN(claim ? claim.value.hex : "0x0"));
 
     let totalClaimable;
