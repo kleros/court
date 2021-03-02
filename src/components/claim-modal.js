@@ -205,7 +205,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       {modalState == 2 && <div style={{ fontSize: "18px", fontWeight: "400" }}> Thank you for being part of the community! </div>}
       <div style={{ fontSize: "18px", color: "#009AFF" }}>
         {modalState == 0 && (
-          <a href="kleros.io" target="_blank" rel="noopener noreferrer">
+          <a href="https://blog.kleros.io/the-launch-of-the-kleros-juror-incentive-program/" target="_blank" rel="noopener noreferrer">
             Read more about Justice Farming <RightArrow style={{ marginLeft: "4px", verticalAlign: "middle" }} />
           </a>
         )}
@@ -217,7 +217,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
         )}
 
         {modalState == 2 && (
-          <a href="kleros.io" target="_blank" rel="noopener noreferrer">
+          <a href="https://blog.kleros.io/the-launch-of-the-kleros-juror-incentive-program/" target="_blank" rel="noopener noreferrer">
             Read more about the Juror Incentive Program <RightArrow style={{ marginLeft: "4px", verticalAlign: "middle" }} />
           </a>
         )}
