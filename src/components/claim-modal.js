@@ -33,7 +33,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
   const SNAPSHOTS = ["https://ipfs.kleros.io/ipfs/QmYJGrQBh68kAvqk57FdynEixdu4VY87mHme821rtPS92u/snapshot-1.json"];
 
   const claimObjects = claims => {
-    if (claims.length > 0) return claims.map((claim, index) => claim && { week: 2, balance: claim.value.hex, merkleProof: claim.proof }).filter(claimObject => claimObject != undefined);
+    if (claims.length > 0) return claims.map((claim, index) => claim && { week: index, balance: claim.value.hex, merkleProof: claim.proof }).filter(claimObject => claimObject != undefined);
   };
 
   useEffect(() => {
