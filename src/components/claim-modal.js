@@ -211,7 +211,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
         )}
 
         {modalState == 1 && txHash && (
-          <a href={`https://${drizzleState.web3.networkId == 42 && "kovan."}etherscan.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer">
+          <a href={`https://${drizzleState.web3.networkId == 42 ? "kovan." : ""}etherscan.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer">
             View Transaction on Etherscan <RightArrow style={{ marginLeft: "4px", verticalAlign: "middle" }} />
           </a>
         )}
