@@ -50,9 +50,11 @@
     "standard-version": "^4.4.0"
   },
   "dependencies": {
+    "@ant-design/icons": "^4.5.0",
     "@drizzle/react-plugin": "^1.5.3",
     "@drizzle/store": "^1.5.3",
-    "@kleros/archon": "^1.2.2",
+    "@kleros/archon": "^1.2.0",
+    "@kleros/pnk-merkle-drop-contracts": "^0.1.0",
     "@loadable/component": "^5.5.0",
     "@realitio/realitio-lib": "^1.0.2",
     "@sentry/browser": "^4.6.4",
@@ -82,5 +84,9 @@
   "volta": {
     "node": "10.23.2",
     "yarn": "1.22.10"
+  },
+  "prettier": {
+    "tabWidth": 2,
+    "printWidth": 280
   }
 }
