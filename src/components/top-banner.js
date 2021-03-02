@@ -9,28 +9,41 @@ const StyledCard = styled(Card)`
   color: #4d00b4;
   margin: 0 -9.375vw 28px -9.375vw;
   min-height: 88px;
-  padding: 0px 77px;
+  padding: 0px 9.375vw;
 
-  @media (max-width: 500px) {
-    padding: 0;
+  .ant-card-body {
+    padding: 24px 0;
   }
 `
+
+const StyledDescriptionCol = styled(Col)`
+  margin-bottom: 8px;
+
+  @media (max-width: 640px) {
+    display: none;
+  }
+`
+
 const StyledTitleCol = styled(Col)`
   font-size: 24px;
   font-weight: bold;
 `
 const StyledExtraCol = styled(Col)`
+  align-items: center;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  flex-direction: row;
+  grid-gap: 8px 0;
+
+  @media (max-width: 500px) {
+    flex-direction: column;
+  }
 `
 
 const StyledTitleRow = styled(Row)`
-  @media (max-width: 500px) {
-    display: flex;
-    justify-content: space-between;
-    margin: 0;
-  }
+  display: flex;
+
+  justify-content: space-between;
+  margin: 0;
 `
 
 const TopBanner = ({ description, extra, title, extraLong }) => {
@@ -53,16 +66,12 @@ const TopBanner = ({ description, extra, title, extraLong }) => {
 
   return (
     <StyledCard>
-      <StyledTitleRow align="middle" gutter={16} type="flex">
-        <StyledTitleCol md={4} offset={1} xs={12}>
-          {title}
-        </StyledTitleCol>
-        <Col md={12} xs={0}>
-          {description}
-        </Col>
-        <StyledExtraCol md={7} xs={6}>
-          {extra}
-        </StyledExtraCol>
+      <StyledTitleRow type="flex">
+        <div style={{ marginRight: '8px' }}>
+          <StyledTitleCol>{title}</StyledTitleCol>
+          <StyledDescriptionCol>{description}</StyledDescriptionCol>
+        </div>
+        <StyledExtraCol>{extra}</StyledExtraCol>
       </StyledTitleRow>
     </StyledCard>
   )

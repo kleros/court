@@ -1,6 +1,8 @@
-import { Card } from 'antd'
+import { Card, Tooltip } from 'antd'
 import React, { Fragment } from 'react'
 import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
+import { ReactComponent as Question } from '../assets/images/question-circle.svg'
+
 import PropTypes from 'prop-types'
 import { ReactComponent as Underline } from '../assets/images/underline.svg'
 import styled from 'styled-components/macro'
@@ -50,7 +52,6 @@ const StyledTitleDiv = styled.div`
   font-size: 24px;
   font-weight: medium;
   left: 95px;
-  width: 100%;
   position: absolute;
   top: 53px;
   transform: translateY(-50%);
@@ -80,13 +81,52 @@ const StyledDivider = styled.div`
   margin: 0;
   width: 100%;
 `
-const TitledListCard = ({ children, loading, prefix, title }) => (
+
+const StyledTooltipDiv = styled.span`
+  position: absolute;
+  right: 18px;
+  top: 20%;
+  font-size: 16px;
+  font-weight: 500;
+  .ant-tooltip-arrow {
+    border-top-color: #009aff;
+  }
+
+  .ant-tooltip-inner {
+    background-color: #009aff;
+    color: white;
+    white-space: break-spaces;
+    min-width: 200px;
+    padding: 16px;
+  }
+`
+
+const TitledListCard = ({ children, loading, prefix, title, apy }) => (
   <StyledCard
     bordered={false}
     hoverable
     loading={loading}
     title={
       <>
+        {apy && (
+          <Tooltip
+            title="The current rate. Subject to change depending on total staked amount."
+            getPopupContainer={triggerNode => triggerNode}
+          >
+            <StyledTooltipDiv>
+              {`${((1000000 / apy) * 12 * 100).toFixed(2)}% APY`}
+              <Question
+                style={{
+                  verticalAlign: 'text-bottom',
+                  marginLeft: '8px',
+                  height: '19px',
+                  width: 'auto'
+                }}
+              />
+            </StyledTooltipDiv>
+          </Tooltip>
+        )}
+
         <Hexagon className="ternary-fill" />
         <StyledPrefixDiv>{prefix}</StyledPrefixDiv>
         <StyledTitleDiv>{title}</StyledTitleDiv>
