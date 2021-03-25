@@ -41,15 +41,19 @@ const funcs = {
         ...options
       })
       .then(d =>
-        archon.arbitrable.getMetaEvidence(contractAddress, d.metaEvidenceID, {
-          scriptParameters: {
-            disputeID,
-            arbitrableContractAddress: contractAddress,
-            arbitratorContractAddress: arbitratorAddress
-          },
-          strictHashes: true,
-          ...options
-        })
+        archon.arbitrable.getMetaEvidence(
+          contractAddress,
+          disputeID === '560' ? '2' : d.metaEvidenceID,
+          {
+            scriptParameters: {
+              disputeID,
+              arbitrableContractAddress: contractAddress,
+              arbitratorContractAddress: arbitratorAddress
+            },
+            strictHashes: true,
+            ...options
+          }
+        )
       )
       .catch(e => {
         console.log(e)
