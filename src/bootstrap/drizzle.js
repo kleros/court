@@ -6,7 +6,6 @@ import Pinakion from '../assets/contracts/pinakion.json'
 import PolicyRegistry from '../assets/contracts/policy-registry.json'
 import UniswapV2Factory from '../assets/contracts/uniswap-v2-factory.json'
 import UniswapV2Router02 from '../assets/contracts/uniswap-v2-router-02.json'
-import MerkleRedeem from '../../node_modules/@kleros/pnk-merkle-drop-contracts/deployments/mainnet/MerkleRedeem.json'
 
 const options = {
   contracts: [
@@ -72,18 +71,6 @@ const options = {
         3: { address: '0x00000000219ab540356cbb839cbe05303d7705fa' },
         42: {
           address: process.env.REACT_APP_UNISWAP_V2_ROUTER_02_KOVAN_ADDRESS
-        }
-      }
-    },
-    {
-      ...MerkleRedeem,
-      networks: {
-        1: { address: '0xdbc3088Dfebc3cc6A84B0271DaDe2696DB00Af38' },
-        3: {
-          address: '0x193353d006Ab015216D34419a845989e76612475'
-        },
-        42: {
-          address: '0x193353d006Ab015216D34419a845989e76612475'
         }
       }
     }
