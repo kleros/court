@@ -59,16 +59,16 @@ export default () => {
   }
   return (
     <>
-      {drizzleState.networkId === '1' ||
-        (drizzleState.networkId === '42' && (
-          <ClaimModal
-            visible={isModalVisible}
-            onOk={handleOk}
-            onCancel={handleCancel}
-            displayButton={showModalButton}
-            apyCallback={apyCallback}
-          />
-        ))}
+      {(drizzleState.web3.networkId === 1 ||
+        drizzleState.web3.networkId === 42) && (
+        <ClaimModal
+          visible={isModalVisible}
+          onOk={handleOk}
+          onCancel={handleCancel}
+          displayButton={showModalButton}
+          apyCallback={apyCallback}
+        />
+      )}
       <TopBanner
         title="Welcome!"
         description="This is the Kleros Juror Dashboard"
