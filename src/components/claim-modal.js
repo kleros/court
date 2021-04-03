@@ -185,7 +185,9 @@ const ClaimModal = ({
       MerkleRedeem.abi,
       CONTRACT_ADDRESSES[drizzleState.web3.networkId]
     )
-    const args = claimObjects(claims)
+    const args = claimObjects(claims).filter(
+      (claim, index) => claimStatus[index] == false
+    )
 
     setCurrentClaimValue(
       args
