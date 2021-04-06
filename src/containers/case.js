@@ -39,10 +39,7 @@ export default ({
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
-  const { send: sendPassPeriod } = useCacheSend(
-    'KlerosLiquid',
-    'passPeriod'
-  )
+  const { send: sendPassPeriod } = useCacheSend('KlerosLiquid', 'passPeriod')
   const { send: sendExecuteRuling } = useCacheSend(
     'KlerosLiquid',
     'executeRuling'
@@ -122,7 +119,7 @@ export default ({
             ) : (
               <>
                 {disputeData.deadline && (
-                  <Col lg={12}>
+                  <Col lg={disputeData.showPassPeriod ? 12 : 24}>
                     <StyledDiv>
                       {
                         ['Evidence', 'Commit', 'Vote', 'Appeal', 'Execute'][
