@@ -159,10 +159,14 @@ const CourtCascaderModal = ({ onClick }) => {
   const subcourtSelected = useCallback(subcourtIDs => {
     setSubcourtIDs(subcourtIDs)
     setTimeout(() => {
-      const lastSubcourtList = [...document
-        .getElementsByClassName('ant-cascader-menu')]
-        .filter(e => e.children.length > 0)
-      lastSubcourtList[lastSubcourtList.length - 1].scrollIntoView({ behavior: "smooth" })
+      const lastSubcourtList = [
+        ...document.getElementsByClassName('ant-cascader-menu')
+      ].filter(e => e.children.length > 0)
+      if (lastSubcourtList.length > 0) {
+        lastSubcourtList[lastSubcourtList.length - 1].scrollIntoView({
+          behavior: 'smooth'
+        })
+      }
     }, 1500)
   })
   const options = useCacheCall(['PolicyRegistry', 'KlerosLiquid'], call => {
@@ -227,13 +231,13 @@ const CourtCascaderModal = ({ onClick }) => {
     const index = acc.findIndex(option => option.value === ID)
     return i === subcourtIDs.length - 1
       ? {
-        label: acc[index].label,
-        description: acc[index].description,
-        loading: acc[index].loading,
-        summary: acc[index].summary,
-        requiredSkills: acc[index].requiredSkills,
-        courtID: ID
-      }
+          label: acc[index].label,
+          description: acc[index].description,
+          loading: acc[index].loading,
+          summary: acc[index].summary,
+          requiredSkills: acc[index].requiredSkills,
+          courtID: ID
+        }
       : acc[index].children
   }, options)
   const _court =
@@ -252,33 +256,43 @@ const CourtCascaderModal = ({ onClick }) => {
       footer={
         <>
           <SelectButtonArea>
-            <Tooltip title={
-              drizzleState.account === VIEW_ONLY_ADDRESS && 'A Web3 wallet is required'
-            }>
+            <Tooltip
+              title={
+                drizzleState.account === VIEW_ONLY_ADDRESS &&
+                'A Web3 wallet is required'
+              }
+            >
               <StyledButton
                 onClick={useCallback(
-                  () => drizzleState.account !== VIEW_ONLY_ADDRESS && onClick(subcourtIDs[subcourtIDs.length - 1]),
+                  () =>
+                    drizzleState.account !== VIEW_ONLY_ADDRESS &&
+                    onClick(subcourtIDs[subcourtIDs.length - 1]),
                   [onClick, subcourtIDs[subcourtIDs.length - 1]]
                 )}
                 type="primary"
               >
                 Stake
-            </StyledButton>
+              </StyledButton>
             </Tooltip>
           </SelectButtonArea>
           <Skeleton active loading={option.loading}>
             <Row gutter={16}>
               <Col md={12}>
                 <StyledDiv>
-                  {
-                    `${option.label} | Min Stake = ${
-                    minStake ? drizzle.web3.utils.fromWei(minStake.toString()) : ''
-                    } PNK`
-                  }
+                  {`${option.label} | Min Stake = ${
+                    minStake
+                      ? drizzle.web3.utils.fromWei(minStake.toString())
+                      : ''
+                  } PNK`}
                   <div style={{ fontWeight: '400', fontSize: '12px' }}>
                     {'Each vote has a stake of '}
                     {minStake && subcourtAlpha
-                      ? drizzle.web3.utils.fromWei(minStake.mul(subcourtAlpha).div(drizzle.web3.utils.toBN(ALPHA_DIVISOR)).toString())
+                      ? drizzle.web3.utils.fromWei(
+                          minStake
+                            .mul(subcourtAlpha)
+                            .div(drizzle.web3.utils.toBN(ALPHA_DIVISOR))
+                            .toString()
+                        )
                       : ''}
                     {' PNK.'}
                   </div>
@@ -301,8 +315,8 @@ const CourtCascaderModal = ({ onClick }) => {
                     </Col>
                   </Row>
                 ) : (
-                    ''
-                  )}
+                  ''
+                )}
                 <Row>
                   <Col md={4}>
                     <Hexagon className="ternary-fill" />
