@@ -378,22 +378,24 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
               {shouldShowMaxStakeWarning ? (
                 <Alert
                   closable
-                  type="warning"
-                  message="Warning"
+                  type="info"
+                  message="Tip"
                   description={
                     <>
                       <p>
-                        We recommend you to have at least{' '}
+                        In case you stake all PNK you have available, then
+                        voting incoherently, your PNK balance may become lower
+                        than the stake. This removes you from the courts
+                        automatically.
+                      </p>
+                      <p>
+                        In order to avoid this scenario, we recommend you to
+                        have at least{' '}
                         <strong>
                           {utils.fromWei(RECOMMENDED_BALANCE_BUFFER)} unstaked
                           PNK
-                        </strong>
-                        . Otherwise, if you are slashed because you lost a case,
-                        you will be automatically unstaked from all courts.
-                      </p>
-                      <p>
-                        You can dismiss this alert if you know what you are
-                        doing.
+                        </strong>{' '}
+                        in your wallet.
                       </p>
                     </>
                   }
