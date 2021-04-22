@@ -385,7 +385,7 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                       <p>
                         In case you stake all PNK you have available, then
                         voting incoherently, your PNK balance may become lower
-                        than the stake. This removes you from the courts
+                        than the stake. This unstakes you from the courts
                         automatically.
                       </p>
                       <p>
