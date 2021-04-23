@@ -1,12 +1,4 @@
-import {
-  Alert,
-  Col,
-  Form,
-  InputNumber,
-  Modal,
-  Row,
-  Skeleton
-} from 'antd'
+import { Alert, Col, Form, InputNumber, Modal, Row, Skeleton } from 'antd'
 import React, { useCallback, useMemo } from 'react'
 import { drizzleReactHooks } from '@drizzle/react-plugin'
 import ETHAmount from './eth-amount'
@@ -159,11 +151,17 @@ const AmountBox = styled.div`
   width: 100%;
 `
 
+/**
+ * Recommended to have 2000+ PNK unstaked to avoid being unstaked after losing a case.
+ */
+const RECOMMENDED_BALANCE_BUFFER = '2000000000000000000000'
+
 const StakeModal = Form.create()(({ ID, form, onCancel }) => {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
   }))
+  const utils = drizzle.web3.utils
   const loadPolicy = useDataloader.loadPolicy()
   let name
   const policy = useCacheCall('PolicyRegistry', 'policies', ID)
@@ -176,24 +174,39 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
     'balanceOf',
     drizzleState.account
   )
-  const balance = _balance && drizzle.web3.utils.toBN(_balance)
+  const balance = _balance && utils.toBN(_balance)
   const juror = useCacheCall(
     'KlerosLiquidExtraViews',
     'getJuror',
     drizzleState.account
   )
-  const stakedTokens = juror && drizzle.web3.utils.toBN(juror.stakedTokens)
+  const stakedTokens = juror && utils.toBN(juror.stakedTokens)
   const _stake = useCacheCall(
     'KlerosLiquidExtraViews',
     'stakeOf',
     drizzleState.account,
     ID
   )
-  const stake = _stake && drizzle.web3.utils.toBN(_stake)
+  const stake = _stake && utils.toBN(_stake)
   const subcourt = useCacheCall('KlerosLiquid', 'courts', ID)
-  const minStake = subcourt && drizzle.web3.utils.toBN(subcourt.minStake)
-  const min = stake && minStake && minStake.sub(stake)
-  const max = balance && stakedTokens && balance.sub(stakedTokens)
+  const minStake = subcourt ? utils.toBN(subcourt.minStake) : utils.toBN('0')
+  const min = stake && minStake ? minStake.sub(stake) : utils.toBN('0')
+  const max =
+    balance && stakedTokens ? balance.sub(stakedTokens) : utils.toBN('0')
+  const recommendedBalanceBuffer = utils.toBN(RECOMMENDED_BALANCE_BUFFER)
+  const maxRecommendedStake = utils.BN.max(
+    min,
+    max.sub(recommendedBalanceBuffer)
+  )
+  const selectedStakeValue = Number.parseInt(String(form.getFieldValue('PNK')))
+  const selectedStake = utils.toBN(
+    utils.toWei(
+      String(Number.isNaN(selectedStakeValue) ? 0 : selectedStakeValue)
+    )
+  )
+  const shouldShowMaxStakeWarning =
+    selectedStake.gt(maxRecommendedStake) && selectedStake.lte(max)
+
   const loading = !min || !max
   const { send, status } = useCacheSend('KlerosLiquid', 'setStake')
   const hasError = Object.values(form.getFieldsError()).some(v => v)
@@ -221,8 +234,8 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                 ID,
                 String(
                   stake.add(
-                    drizzle.web3.utils.toBN(
-                      drizzle.web3.utils.toWei(
+                    utils.toBN(
+                      utils.toWei(
                         typeof values.PNK === 'string'
                           ? values.PNK
                           : String(values.PNK)
@@ -273,7 +286,11 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                 colon={false}
                 extra={
                   <div style={{ marginTop: '5px' }}>
-                    <img src={infoImg} style={{ marginRight: '5px' }} alt="info" />
+                    <img
+                      src={infoImg}
+                      style={{ marginRight: '5px' }}
+                      alt="info"
+                    />
                     Enter a negative value to unstake.
                   </div>
                 }
@@ -281,7 +298,7 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                 label="PNK"
               >
                 {form.getFieldDecorator('PNK', {
-                  initialValue: drizzle.web3.utils.fromWei(String(max)),
+                  initialValue: utils.fromWei(String(maxRecommendedStake)),
                   rules: [
                     {
                       message:
@@ -293,8 +310,8 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                           _value === '-'
                         )
                           return callback()
-                        const value = drizzle.web3.utils.toBN(
-                          drizzle.web3.utils.toWei(
+                        const value = utils.toBN(
+                          utils.toWei(
                             typeof _value === 'number'
                               ? _value.toLocaleString('fullwide', {
                                   useGrouping: false
@@ -324,8 +341,8 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                           _value === '-'
                         )
                           return callback()
-                        const value = drizzle.web3.utils.toBN(
-                          drizzle.web3.utils.toWei(
+                        const value = utils.toBN(
+                          utils.toWei(
                             typeof _value === 'number'
                               ? _value.toLocaleString('fullwide', {
                                   useGrouping: false
@@ -341,17 +358,49 @@ const StakeModal = Form.create()(({ ID, form, onCancel }) => {
                   ]
                 })(
                   <StyledInputNumber
-                    parser={useCallback(s => {
-                      s = s.replace(/(?!^-|\.)\D|\.(?![^.]*$)/g, '')
-                      const index = s.indexOf('.')
+                    parser={useCallback(valueAsString => {
+                      valueAsString = valueAsString.replace(
+                        /(?!^-|\.)\D|\.(?![^.]*$)/g,
+                        ''
+                      )
+                      const index = valueAsString.indexOf('.')
                       return index === -1
-                        ? s
-                        : `${s.slice(0, index)}${s.slice(index, index + 19)}`
+                        ? valueAsString
+                        : `${valueAsString.slice(
+                            0,
+                            index
+                          )}${valueAsString.slice(index, index + 19)}`
                     }, [])}
                     precision={0}
                   />
                 )}
               </Form.Item>
+              {shouldShowMaxStakeWarning ? (
+                <Alert
+                  closable
+                  type="info"
+                  message="Tip"
+                  description={
+                    <>
+                      <p>
+                        In case you stake all PNK you have available, then
+                        voting incoherently, your PNK balance may become lower
+                        than the stake. This unstakes you from the courts
+                        automatically.
+                      </p>
+                      <p>
+                        In order to avoid this scenario, we recommend you to
+                        have at least{' '}
+                        <strong>
+                          {utils.fromWei(RECOMMENDED_BALANCE_BUFFER)} unstaked
+                          PNK
+                        </strong>{' '}
+                        in your wallet.
+                      </p>
+                    </>
+                  }
+                />
+              ) : null}
             </>
           )}
         </Skeleton>
