@@ -1,15 +1,11 @@
-import { Col, Modal, Row, Button, Spin } from 'antd'
-import { LoadingOutlined } from '@ant-design/icons'
+import { Modal, Button, Spin } from 'antd'
 import Web3 from '../bootstrap/web3'
 import MerkleRedeem from '../../node_modules/@kleros/pnk-merkle-drop-contracts/deployments/mainnet/MerkleRedeem.json'
 
-import React, { useCallback, useMemo, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { drizzleReactHooks } from '@drizzle/react-plugin'
-import PropTypes from 'prop-types'
-import styled from 'styled-components/macro'
-import { useDataloader, VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
+import { VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
 import { ReactComponent as Kleros } from '../assets/images/kleros.svg'
-import { ReactComponent as Spinner } from '../assets/images/spinner.svg'
 
 import { ReactComponent as RightArrow } from '../assets/images/right-arrow.svg'
 
@@ -22,7 +18,7 @@ const ClaimModal = ({
   displayButton,
   apyCallback
 }) => {
-  const { drizzle, useCacheCall, useCacheSend } = useDrizzle()
+  const { drizzle } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
     web3: drizzleState.web3
@@ -55,7 +51,7 @@ const ClaimModal = ({
               merkleProof: claim.proof
             }
         )
-        .filter(claimObject => claimObject != undefined)
+        .filter(claimObject => typeof claimObject !== 'undefined')
   }
 
   useEffect(() => {
@@ -82,7 +78,6 @@ const ClaimModal = ({
           drizzle.web3.utils.fromWei(r.data.totalStakeds[0].totalStakedAmount)
         )
       )
-    // .then(r => console.log(r.data));
 
     var responses = []
     for (var month = 0; month < SNAPSHOTS.length; month++) {
@@ -129,9 +124,6 @@ const ClaimModal = ({
     claimStatus.then(r => setClaimStatus(r))
   }, [drizzleState.account, drizzleState.web3.networkId, modalState])
 
-  const delay = delayInMilliseconds =>
-    new Promise(resolve => setTimeout(resolve, delayInMilliseconds))
-
   const handleClaim = () => {
     setModalState(1)
 
@@ -156,7 +148,7 @@ const ClaimModal = ({
 
   const getTotalClaimable = claims => {
     const unclaimedItems = claims
-      .filter((claim, index) => claimStatus[index] == false)
+      .filter((claim, index) => Boolean(claimStatus[index]) === false)
       .map(claim => drizzle.web3.utils.toBN(claim ? claim.value.hex : '0x0'))
 
     let totalClaimable
@@ -186,7 +178,7 @@ const ClaimModal = ({
       CONTRACT_ADDRESSES[drizzleState.web3.networkId]
     )
     const args = claimObjects(claims).filter(
-      (claim, index) => claimStatus[index] == false
+      (_claim, index) => Boolean(claimStatus[index]) === false
     )
 
     setCurrentClaimValue(
@@ -220,13 +212,13 @@ const ClaimModal = ({
       width="800px"
       footer={null}
     >
-      {modalState == 1 && <Spin size="large" />}
-      {(modalState == 0 || modalState == 2) && (
+      {modalState === 1 && <Spin size="large" />}
+      {(modalState === 0 || modalState === 2) && (
         <Kleros style={{ maxWidth: '100px', maxHeight: '100px' }} />
       )}
       {modalState >= 1 && (
         <div style={{ fontSize: '24px', marginTop: '24px' }}>
-          {modalState == 1 ? 'Claiming' : '🎉 Claimed 🎉'}
+          {modalState === 1 ? 'Claiming' : '🎉 Claimed 🎉'}
         </div>
       )}
       <div
@@ -240,17 +232,23 @@ const ClaimModal = ({
         {' '}
         {claims.length > 0 &&
           claimStatus.length > 0 &&
-          (modalState == 2
+          (modalState === 2
             ? Number(drizzle.web3.utils.fromWei(currentClaimValue)).toFixed(0)
             : Number(
                 drizzle.web3.utils.fromWei(getTotalClaimable(claims))
               ).toFixed(0))}{' '}
         PNK{' '}
       </div>
-      {modalState == 0 && (
+      {modalState === 0 && (
         <>
           <div style={{ fontSize: '24px', fontWeight: '400' }}>
-            🎉 Thanks for being part of the community! 🎉
+            <span role="img" aria-label="fireworks">
+              🎉
+            </span>{' '}
+            Thanks for being part of the community!{' '}
+            <span role="img" aria-label="fireworks">
+              🎉
+            </span>
           </div>
           <div
             style={{ fontSize: '24px', fontWeight: '500', marginTop: '8px' }}
@@ -308,14 +306,14 @@ const ClaimModal = ({
           }}
         />
       )}
-      {modalState == 2 && (
+      {modalState === 2 && (
         <div style={{ fontSize: '18px', fontWeight: '400' }}>
           {' '}
           Thank you for being part of the community!{' '}
         </div>
       )}
       <div style={{ fontSize: '18px', color: '#009AFF' }}>
-        {modalState == 0 && (
+        {modalState === 0 && (
           <a
             href="https://blog.kleros.io/the-launch-of-the-kleros-juror-incentive-program/"
             target="_blank"
@@ -328,10 +326,10 @@ const ClaimModal = ({
           </a>
         )}
 
-        {modalState == 1 && txHash && (
+        {modalState === 1 && txHash && (
           <a
             href={`https://${
-              drizzleState.web3.networkId == 42 ? 'kovan.' : ''
+              Number(drizzleState.web3.networkId) === 42 ? 'kovan.' : ''
             }etherscan.io/tx/${txHash}`}
             target="_blank"
             rel="noopener noreferrer"
@@ -343,7 +341,7 @@ const ClaimModal = ({
           </a>
         )}
 
-        {modalState == 2 && (
+        {modalState === 2 && (
           <a
             href="https://blog.kleros.io/the-launch-of-the-kleros-juror-incentive-program/"
             target="_blank"
@@ -356,7 +354,7 @@ const ClaimModal = ({
           </a>
         )}
       </div>
-      {modalState == 0 && claims && (
+      {modalState === 0 && claims && (
         <Button
           onClick={handleClaim}
           size="large"
