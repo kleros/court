@@ -38,7 +38,9 @@
     "prettier": "2.2.1",
     "prettier-config-standard": "^4.0.0",
     "source-map-explorer": "^1.6.0",
-    "standard-version": "^8.0.1"
+    "standard-version": "^8.0.1",
+    "stylelint": "^13.13.0",
+    "stylelint-config-standard": "^22.0.0"
   },
   "dependencies": {
     "@ant-design/icons": "^4.5.0",
