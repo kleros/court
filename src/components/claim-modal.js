@@ -56,6 +56,16 @@ const ClaimModal = ({
   }
 
   useEffect(() => {
+    var responses = []
+    for (var month = 0; month < SNAPSHOTS.length; month++) {
+      responses[month] = fetch(SNAPSHOTS[month])
+    }
+    const results = Promise.all(
+      responses.map(promise =>
+        promise.then(r => r.json()).catch(e => console.error(e))
+      )
+    )
+
     fetch('https://api.thegraph.com/subgraphs/name/napolean0/kleros', {
       headers: {
         Accept: '*/*',
@@ -79,17 +89,18 @@ const ClaimModal = ({
           drizzle.web3.utils.fromWei(r.data.totalStakeds[0].totalStakedAmount)
         )
       )
+      .catch(err => {
+        console.error(err)
+        console.log('Falling back to last merkle tree for calculating apy')
+        results.then(trees =>
+          apyCallback(
+            drizzle.web3.utils.fromWei(
+              trees.slice(-1)[0].averageTotalStaked.hex
+            )
+          )
+        )
+      })
 
-    var responses = []
-    for (var month = 0; month < SNAPSHOTS.length; month++) {
-      responses[month] = fetch(SNAPSHOTS[month])
-    }
-
-    const results = Promise.all(
-      responses.map(promise =>
-        promise.then(r => r.json()).catch(e => console.error(e))
-      )
-    )
     setClaims(0)
     results.then(r =>
       r.forEach(function(item) {
