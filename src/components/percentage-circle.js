@@ -2,6 +2,8 @@ import React from 'react'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
 import 'react-circular-progressbar/dist/styles.css'
 
+const nf = new Intl.NumberFormat('en-US', { style: 'percent' })
+
 const PercentageCircle = ({ percent }) => (
   <CircularProgressbar
     styles={buildStyles({
@@ -10,7 +12,7 @@ const PercentageCircle = ({ percent }) => (
       textColor: '#4D00B4',
       trailColor: '#F2E3FF'
     })}
-    text={`${percent}%`}
+    text={nf.format(percent / 100)}
     value={percent || 0}
   />
 )
