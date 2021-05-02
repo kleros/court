@@ -13,9 +13,9 @@ import TopBanner from '../components/top-banner'
 import styled from 'styled-components'
 import { ReactComponent as Present } from '../assets/images/present.svg'
 import { drizzleReactHooks } from '@drizzle/react-plugin'
-import { useDataloader, VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
+import { VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
 
-const { useDrizzle, useDrizzleState } = drizzleReactHooks
+const { useDrizzleState } = drizzleReactHooks
 
 const StyledButton = styled(Button)`
   box-shadow: none;
@@ -24,7 +24,6 @@ const StyledButton = styled(Button)`
 `
 
 export default () => {
-  const { drizzle, useCacheCall, useCacheSend } = useDrizzle()
   const drizzleState = useDrizzleState(drizzleState => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
     web3: drizzleState.web3
