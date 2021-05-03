@@ -14,40 +14,42 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "prettify": "kathari prettify",
-    "lint:styled": "kathari lint:styled",
-    "lint:js": "kathari lint:js --no-root",
-    "lint": "yarn run lint:styled && yarn run lint:js",
-    "test": "echo \"\"",
-    "cz": "kathari cz",
+    "prestart": "run-s build:theme",
     "start": "react-scripts start",
+    "prebuild": "run-s build:theme",
     "build": "react-scripts build",
     "build:analyze": "source-map-explorer build/static/js/main.*",
-    "build:theme": "lessc --js ./src/components/theme.less ./src/components/theme.css"
+    "build:theme": "lessc --js ./src/components/theme.less ./src/components/theme.css",
+    "fix": "run-p -c fix:*",
+    "fix:js": "eslint --fix '**/*.{js,jsx}'",
+    "fix:css": "stylelint --fix '**/*.{less,css}'",
+    "fix:others": "prettier --write '**/*.{json,html,svg,md}'",
+    "lint": "run-p -c lint:*",
+    "lint:js": "eslint '**/*.{js,jsx}'",
+    "lint:css": "stylelint '**/*.{less,css}'",
+    "lint:others": "prettier --check '**/*.{json,html,svg,md}'",
+    "prepare": "husky install"
   },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "kathari precommit",
-      "commit-msg": "kathari commitmsg"
-    }
-  },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
   "devDependencies": {
-    "@kleros/kathari": "^0.22.0",
-    "husky": "^1.1.4",
+    "@commitlint/cli": "^12.1.1",
+    "@commitlint/config-conventional": "^12.1.1",
+    "@prettier/plugin-xml": "^0.13.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.23.2",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "husky": "^6.0.0",
     "less": "^3.8.1",
+    "lint-staged": "^10.5.4",
+    "npm-run-all": "^4.1.5",
+    "prettier": "2.2.1",
+    "prettier-config-standard": "^4.0.0",
     "source-map-explorer": "^1.6.0",
-    "standard-version": "^8.0.1"
+    "standard-version": "^8.0.1",
+    "stylelint": "^13.13.0",
+    "stylelint-config-standard": "^22.0.0"
   },
   "dependencies": {
     "@ant-design/icons": "^4.5.0",
@@ -84,9 +86,5 @@
   "volta": {
     "node": "10.23.2",
     "yarn": "1.22.10"
-  },
-  "prettier": {
-    "tabWidth": 2,
-    "printWidth": 280
   }
 }
