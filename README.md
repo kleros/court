@@ -13,7 +13,7 @@
   <a href="https://github.com/prettier/prettier"><img src="https://img.shields.io/badge/styled_with-prettier-ff69b4.svg" alt="Styled with Prettier"></a>
 </p>
 
-The Kleros court user interface.
+The Kleros Court user interface.
 
 ## Get Started
 
@@ -26,11 +26,11 @@ The Kleros court user interface.
 
 ## Other Scripts
 
-- `yarn run prettify` - Apply prettier to the entire project.
-- `yarn run lint:styled` - Lint the entire project's .js files with styled components.
-- `yarn run lint:js` - Lint the entire project's .js files.
-- `yarn run lint:js --fix` - Fix fixable linting errors in .js files.
-- `yarn run lint` - Lint the entire project's .js files with styled components and .js files.
-- `yarn run cz` - Run commitizen.
+- `yarn run lint:js` - Lint the all .js/jsx files in the project.
+- `yarn run lint:css` - Lint the all .css/less files in the project.
+- `yarn run lint` - Lint the entire project.
+- `yarn run fix:js` - Fix fixable linting errors in .js/jsx files.
+- `yarn run fix:css` - Fix fixable linting errors in .css/less files.
+- `yarn run fix` - Fix fixable linting errors in all files in the project.
 - `yarn run build` - Create a production build.
 - `yarn run build:analyze` - Analyze the production build using source-map-explorer.
