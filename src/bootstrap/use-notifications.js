@@ -7,6 +7,7 @@ const networkIDData = {
     name: "",
     provider: "https://mainnet.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
     nativeToken: "ETH",
+    pnkToken: "PNK",
     fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER
       ? Number(process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER)
       : 0,
@@ -15,25 +16,29 @@ const networkIDData = {
     name: "_ROPSTEN",
     provider: "https://ropsten.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
     nativeToken: "ETH",
+    pnkToken: "PNK",
   },
   42: {
     name: "_KOVAN",
     provider: "https://kovan.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
     nativeToken: "ETH",
+    pnkToken: "PNK",
   },
   77: {
     name: "_SOKOL",
     provider: "https://sokol.poa.network",
     nativeToken: "SPOA",
+    pnkToken: "stPNK",
   },
   100: {
     name: "_XDAI",
     provider: "https://rpc.xdaichain.com",
     nativeToken: "xDAI",
+    pnkToken: "stPNK",
   },
 };
 
-const createHandlers = ({ nativeToken, fromBlock }) => ({
+const createHandlers = ({ nativeToken, pnkToken, fromBlock }) => ({
   AppealDecision: async (_, klerosLiquid, block, event) => {
     const dispute = await klerosLiquid.methods.disputes(event.returnValues._disputeID).call();
     if (dispute.period !== "4") {
@@ -85,7 +90,7 @@ const createHandlers = ({ nativeToken, fromBlock }) => ({
           key: `${event.blockNumber}-${event.transactionIndex}-${event.logIndex}-${event.returnValues._address}`,
           message: `Case #${event.returnValues._disputeID} was executed. ${nativeToken}: ${Number(
             web3.utils.fromWei(event.returnValues._ETHAmount)
-          ).toFixed(4)}, PNK: ${Number(web3.utils.fromWei(event.returnValues._tokenAmount)).toFixed(0)}.`,
+          ).toFixed(4)}, ${pnkToken}: ${Number(web3.utils.fromWei(event.returnValues._tokenAmount)).toFixed(0)}.`,
           to: `/cases/${event.returnValues._disputeID}`,
           type: "info",
         },
@@ -95,9 +100,14 @@ const createHandlers = ({ nativeToken, fromBlock }) => ({
 
 export default (networkID, onNewNotifications) => {
   const nativeToken = networkIDData[networkID].nativeToken || "ETH";
+  const pnkToken = networkIDData[networkID].pnkToken || "PNK";
   const fromBlock = networkIDData[networkID].fromBlock || 0;
 
-  const handlers = useMemo(() => createHandlers({ nativeToken, fromBlock }), [nativeToken, fromBlock]);
+  const handlers = useMemo(() => createHandlers({ nativeToken, pnkToken, fromBlock }), [
+    nativeToken,
+    pnkToken,
+    fromBlock,
+  ]);
 
   const [notifications, setNotifications] = useState();
   const onNotificationClick = useCallback(

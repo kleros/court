@@ -10,6 +10,18 @@ import { ReactComponent as Kleros } from "../assets/images/kleros.svg";
 
 import { ReactComponent as RightArrow } from "../assets/images/right-arrow.svg";
 
+const CONTRACT_ADDRESSES = {
+  1: "0xdbc3088Dfebc3cc6A84B0271DaDe2696DB00Af38",
+  42: "0x193353d006Ab015216D34419a845989e76612475",
+  77: "0x0000000000000000000000000000000000000000",
+};
+
+const SNAPSHOTS = [
+  "https://ipfs.kleros.io/ipfs/QmYJGrQBh68kAvqk57FdynEixdu4VY87mHme821rtPS92u/snapshot-1.json",
+  "https://ipfs.kleros.io/ipfs/QmUCTdvyAWU8eEV1nwgiF7CwKpL5FnXiDxGD9FedFdrHYU/snapshot-2021-03.json",
+  "https://ipfs.kleros.io/ipfs/QmXG2EKcd3tyMwoxhrqmBAu7gsrzgF3jCde75CjQzmg1Am/snapshot-2021-04.json",
+];
+
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
 const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => {
@@ -24,17 +36,6 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
   const [claimStatus, setClaimStatus] = useState(0);
   const [modalState, setModalState] = useState(0);
   const [currentClaimValue, setCurrentClaimValue] = useState(12);
-
-  const CONTRACT_ADDRESSES = {
-    1: "0xdbc3088Dfebc3cc6A84B0271DaDe2696DB00Af38",
-    42: "0x193353d006Ab015216D34419a845989e76612475",
-  };
-
-  const SNAPSHOTS = [
-    "https://ipfs.kleros.io/ipfs/QmYJGrQBh68kAvqk57FdynEixdu4VY87mHme821rtPS92u/snapshot-1.json",
-    "https://ipfs.kleros.io/ipfs/QmUCTdvyAWU8eEV1nwgiF7CwKpL5FnXiDxGD9FedFdrHYU/snapshot-2021-03.json",
-    "https://ipfs.kleros.io/ipfs/QmXG2EKcd3tyMwoxhrqmBAu7gsrzgF3jCde75CjQzmg1Am/snapshot-2021-04.json",
-  ];
 
   const claimObjects = (claims) => {
     if (claims.length > 0)
@@ -107,7 +108,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
     //
 
     claimStatus.then((r) => setClaimStatus(r));
-  }, [drizzleState.account, drizzleState.web3.networkId, modalState]);
+  }, [drizzleState.account, drizzleState.web3.networkId, drizzle.web3.utils, modalState, apyCallback, displayButton]);
 
   const handleClaim = () => {
     setModalState(1);

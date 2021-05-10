@@ -1,16 +1,17 @@
-import { Button, Cascader, Col, Modal, Row, Skeleton, Tooltip } from 'antd'
-import React, { useCallback, useState } from 'react'
-import PropTypes from 'prop-types'
-import ReactMarkdown from 'react-markdown'
-import styled from 'styled-components/macro'
-import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
-import skillsImg from '../assets/images/skills.png'
-import rewardImg from '../assets/images/reward.png'
-import { useDataloader, VIEW_ONLY_ADDRESS } from '../bootstrap/dataloader'
-import { drizzleReactHooks } from '@drizzle/react-plugin'
-import Breadcrumbs from './breadcrumbs'
+import { Button, Cascader, Col, Modal, Row, Skeleton, Tooltip } from "antd";
+import React, { useCallback, useState } from "react";
+import PropTypes from "prop-types";
+import ReactMarkdown from "react-markdown";
+import styled from "styled-components/macro";
+import { ReactComponent as Hexagon } from "../assets/images/hexagon.svg";
+import skillsImg from "../assets/images/skills.png";
+import rewardImg from "../assets/images/reward.png";
+import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import { drizzleReactHooks } from "@drizzle/react-plugin";
+import Breadcrumbs from "./breadcrumbs";
+import ETHAmount from "./eth-amount";
 
-const { useDrizzle, useDrizzleState } = drizzleReactHooks
+const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
 const StyledModal = styled(Modal)`
   position: relative;
@@ -46,7 +47,7 @@ const StyledModal = styled(Modal)`
       text-align: left;
     }
   }
-`
+`;
 
 const SelectButtonArea = styled.div`
   background: #4004a3;
@@ -57,7 +58,7 @@ const SelectButtonArea = styled.div`
   top: 390px;
   width: 100%;
   z-index: 2;
-`
+`;
 
 const StyledButton = styled(Button)`
   border-radius: 3px;
@@ -66,16 +67,16 @@ const StyledButton = styled(Button)`
   top: 15px;
   width: 100px;
   z-index: 3;
-`
+`;
 const StyledDiv = styled.div`
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 20px;
-`
+`;
 const StyledHeader = styled.div`
   font-size: 18px;
   font-weight: bold;
-`
+`;
 const StyledTitleDiv = styled.div`
   background: #4004a3;
   color: white;
@@ -84,7 +85,7 @@ const StyledTitleDiv = styled.div`
   height: 54px;
   line-height: 54px;
   text-align: center;
-`
+`;
 const StyledCascader = styled(Cascader)`
   display: none;
 
@@ -133,43 +134,43 @@ const StyledCascader = styled(Cascader)`
       }
     }
   }
-`
+`;
 const StyledBreadcrumbs = styled(Breadcrumbs)`
-  left: ${props => props.colorIndex * 226}px;
+  left: ${(props) => props.colorIndex * 226}px;
   pointer-events: none;
   position: absolute;
-  top: ${props => props.columnIndex * 38 + 28}px;
-  z-index: ${props => props.optionLength - props.colorIndex + 2000};
-`
+  top: ${(props) => props.columnIndex * 38 + 28}px;
+  z-index: ${(props) => props.optionLength - props.colorIndex + 2000};
+`;
 const StyledPrefixDiv = styled.div`
   left: 29px;
   position: absolute;
   top: 29px;
   transform: translate(-50%, -50%);
-`
-const ALPHA_DIVISOR = 1e4
+`;
+const ALPHA_DIVISOR = 1e4;
 
 const CourtCascaderModal = ({ onClick }) => {
-  const { drizzle, useCacheCall } = useDrizzle()
-  const loadPolicy = useDataloader.loadPolicy()
-  const [subcourtIDs, setSubcourtIDs] = useState(['0'])
-  const drizzleState = useDrizzleState(drizzleState => ({
-    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS
-  }))
-  const subcourtSelected = useCallback(subcourtIDs => {
-    setSubcourtIDs(subcourtIDs)
+  const { drizzle, useCacheCall } = useDrizzle();
+  const loadPolicy = useDataloader.loadPolicy();
+  const [subcourtIDs, setSubcourtIDs] = useState(["0"]);
+  const drizzleState = useDrizzleState((drizzleState) => ({
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
+  }));
+  const subcourtSelected = useCallback((subcourtIDs) => {
+    setSubcourtIDs(subcourtIDs);
     setTimeout(() => {
-      const lastSubcourtList = [
-        ...document.getElementsByClassName('ant-cascader-menu')
-      ].filter(e => e.children.length > 0)
+      const lastSubcourtList = [...document.getElementsByClassName("ant-cascader-menu")].filter(
+        (e) => e.children.length > 0
+      );
       if (lastSubcourtList.length > 0) {
         lastSubcourtList[lastSubcourtList.length - 1].scrollIntoView({
-          behavior: 'smooth'
-        })
+          behavior: "smooth",
+        });
       }
-    }, 1500)
-  })
-  const options = useCacheCall(['PolicyRegistry', 'KlerosLiquid'], call => {
+    }, 1500);
+  }, []);
+  const options = useCacheCall(["PolicyRegistry", "KlerosLiquid"], (call) => {
     const options = [
       {
         children: undefined,
@@ -177,58 +178,54 @@ const CourtCascaderModal = ({ onClick }) => {
         label: undefined,
         loading: false,
         summary: undefined,
-        value: subcourtIDs[0]
-      }
-    ]
-    let option = options[0]
+        value: subcourtIDs[0],
+      },
+    ];
+    let option = options[0];
     for (let i = 0; i < subcourtIDs.length; i++) {
-      const policy = call('PolicyRegistry', 'policies', subcourtIDs[i])
+      const policy = call("PolicyRegistry", "policies", subcourtIDs[i]);
       if (policy !== undefined) {
-        const policyJSON = loadPolicy(policy)
+        const policyJSON = loadPolicy(policy);
         if (policyJSON) {
-          option.description = policyJSON.description
-          option.label = policyJSON.name
-          option.summary = policyJSON.summary
-          option.requiredSkills = policyJSON.requiredSkills
+          option.description = policyJSON.description;
+          option.label = policyJSON.name;
+          option.summary = policyJSON.summary;
+          option.requiredSkills = policyJSON.requiredSkills;
         }
       }
-      const subcourt = call('KlerosLiquid', 'getSubcourt', subcourtIDs[i])
+      const subcourt = call("KlerosLiquid", "getSubcourt", subcourtIDs[i]);
       if (subcourt)
-        option.children = subcourt.children.map(c => {
+        option.children = subcourt.children.map((c) => {
           const child = {
             children: undefined,
             description: undefined,
             label: undefined,
             loading: false,
             summary: undefined,
-            value: c
-          }
-          const policy = call('PolicyRegistry', 'policies', c)
+            value: c,
+          };
+          const policy = call("PolicyRegistry", "policies", c);
           if (policy !== undefined) {
-            const policyJSON = loadPolicy(policy)
+            const policyJSON = loadPolicy(policy);
             if (policyJSON) {
-              child.description = policyJSON.description
-              child.label = policyJSON.name
-              child.summary = policyJSON.summary
+              child.description = policyJSON.description;
+              child.label = policyJSON.name;
+              child.summary = policyJSON.summary;
             }
           }
-          if (child.label === undefined) child.loading = true
-          return child
-        })
-      if (
-        option.label === undefined ||
-        !subcourt ||
-        option.children.some(c => c.loading)
-      ) {
-        option.loading = true
-        break
+          if (child.label === undefined) child.loading = true;
+          return child;
+        });
+      if (option.label === undefined || !subcourt || option.children.some((c) => c.loading)) {
+        option.loading = true;
+        break;
       }
-      option = option.children.find(c => c.value === subcourtIDs[i + 1])
+      option = option.children.find((c) => c.value === subcourtIDs[i + 1]);
     }
-    return options
-  })
+    return options;
+  });
   const option = subcourtIDs.reduce((acc, ID, i) => {
-    const index = acc.findIndex(option => option.value === ID)
+    const index = acc.findIndex((option) => option.value === ID);
     return i === subcourtIDs.length - 1
       ? {
           label: acc[index].label,
@@ -236,39 +233,35 @@ const CourtCascaderModal = ({ onClick }) => {
           loading: acc[index].loading,
           summary: acc[index].summary,
           requiredSkills: acc[index].requiredSkills,
-          courtID: ID
+          courtID: ID,
         }
-      : acc[index].children
-  }, options)
-  const _court =
-    option && useCacheCall('KlerosLiquid', 'courts', option.courtID)
-  let minStake
-  let feeForJuror
-  let subcourtAlpha
-  if (_court !== undefined) {
-    minStake = drizzle.web3.utils.toBN(_court.minStake)
-    feeForJuror = drizzle.web3.utils.toBN(_court.feeForJuror)
-    subcourtAlpha = drizzle.web3.utils.toBN(_court.alpha)
+      : acc[index].children;
+  }, options);
+  const _court = useCacheCall("KlerosLiquid", "courts", option.courtID) || null;
+  let minStake;
+  let feeForJuror;
+  let subcourtAlpha;
+  if (_court !== null) {
+    minStake = drizzle.web3.utils.toBN(_court.minStake);
+    feeForJuror = drizzle.web3.utils.toBN(_court.feeForJuror);
+    subcourtAlpha = drizzle.web3.utils.toBN(_court.alpha);
   }
+
+  const lastSubcourt = subcourtIDs[subcourtIDs.length - 1];
+
   return (
     <StyledModal
       centered
       footer={
         <>
           <SelectButtonArea>
-            <Tooltip
-              title={
-                drizzleState.account === VIEW_ONLY_ADDRESS &&
-                'A Web3 wallet is required'
-              }
-            >
+            <Tooltip title={drizzleState.account === VIEW_ONLY_ADDRESS && "A Web3 wallet is required"}>
               <StyledButton
-                onClick={useCallback(
-                  () =>
-                    drizzleState.account !== VIEW_ONLY_ADDRESS &&
-                    onClick(subcourtIDs[subcourtIDs.length - 1]),
-                  [onClick, subcourtIDs[subcourtIDs.length - 1]]
-                )}
+                onClick={useCallback(() => drizzleState.account !== VIEW_ONLY_ADDRESS && onClick(lastSubcourt), [
+                  drizzleState.account,
+                  onClick,
+                  lastSubcourt,
+                ])}
                 type="primary"
               >
                 Stake
@@ -279,22 +272,19 @@ const CourtCascaderModal = ({ onClick }) => {
             <Row gutter={16}>
               <Col md={12}>
                 <StyledDiv>
-                  {`${option.label} | Min Stake = ${
-                    minStake
-                      ? drizzle.web3.utils.fromWei(minStake.toString())
-                      : ''
-                  } PNK`}
-                  <div style={{ fontWeight: '400', fontSize: '12px' }}>
-                    {'Each vote has a stake of '}
-                    {minStake && subcourtAlpha
-                      ? drizzle.web3.utils.fromWei(
-                          minStake
-                            .mul(subcourtAlpha)
-                            .div(drizzle.web3.utils.toBN(ALPHA_DIVISOR))
-                            .toString()
-                        )
-                      : ''}
-                    {' PNK.'}
+                  {option.label} | Min Stake = <ETHAmount amount={minStake} decimals={0} tokenSymbol="PNK" />
+                  <div style={{ fontWeight: "400", fontSize: "12px" }}>
+                    Each vote has a stake of{" "}
+                    <ETHAmount
+                      amount={
+                        minStake &&
+                        subcourtAlpha &&
+                        minStake.mul(subcourtAlpha).div(drizzle.web3.utils.toBN(ALPHA_DIVISOR))
+                      }
+                      decimals={0}
+                      tokenSymbol="PNK"
+                    />
+                    .
                   </div>
                 </StyledDiv>
                 <ReactMarkdown source={option.description} />
@@ -315,26 +305,23 @@ const CourtCascaderModal = ({ onClick }) => {
                     </Col>
                   </Row>
                 ) : (
-                  ''
+                  ""
                 )}
                 <Row>
                   <Col md={4}>
                     <Hexagon className="ternary-fill" />
-                    <StyledPrefixDiv style={{ top: '33px' }}>
+                    <StyledPrefixDiv style={{ top: "33px" }}>
                       <img src={rewardImg} alt="reward" />
                     </StyledPrefixDiv>
                   </Col>
                   <Col md={20}>
                     <StyledHeader>Reward</StyledHeader>
                     <div>
-                      For each coherent vote you will receive
-                      <span style={{ fontWeight: '600' }}>
-                        {' '}
-                        {feeForJuror
-                          ? drizzle.web3.utils.fromWei(feeForJuror.toString())
-                          : ''}{' '}
-                        ETH +
-                      </span>
+                      For each coherent vote you will receive{" "}
+                      <strong>
+                        <ETHAmount amount={feeForJuror || null} decimals={2} tokenSymbol={true} /> +
+                      </strong>
+                      .
                     </div>
                   </Col>
                 </Row>
@@ -349,10 +336,7 @@ const CourtCascaderModal = ({ onClick }) => {
     >
       <StyledCascader
         changeOnSelect
-        getPopupContainer={useCallback(
-          () => document.getElementsByClassName('ant-modal-body')[0],
-          []
-        )}
+        getPopupContainer={useCallback(() => document.getElementsByClassName("ant-modal-body")[0], [])}
         onChange={subcourtSelected}
         options={options}
         popupClassName="popupClassName"
@@ -360,16 +344,11 @@ const CourtCascaderModal = ({ onClick }) => {
         value={subcourtIDs}
       />
       {subcourtIDs.slice(0, subcourtIDs.length - 1).map((ID, i) => {
-        const subcourtIDsSubset = subcourtIDs.slice(
-          0,
-          subcourtIDs.indexOf(ID) + 1
-        )
+        const subcourtIDsSubset = subcourtIDs.slice(0, subcourtIDs.indexOf(ID) + 1);
         const option = subcourtIDsSubset.reduce((acc, ID, i) => {
-          const index = acc.findIndex(option => option.value === ID)
-          return i === subcourtIDsSubset.length - 1
-            ? { index, label: acc[index].label || '' }
-            : acc[index].children
-        }, options)
+          const index = acc.findIndex((option) => option.value === ID);
+          return i === subcourtIDsSubset.length - 1 ? { index, label: acc[index].label || "" } : acc[index].children;
+        }, options);
         return (
           <StyledBreadcrumbs
             breadcrumbs={option.label}
@@ -379,14 +358,14 @@ const CourtCascaderModal = ({ onClick }) => {
             large
             optionLength={subcourtIDs.length}
           />
-        )
+        );
       })}
     </StyledModal>
-  )
-}
+  );
+};
 
 CourtCascaderModal.propTypes = {
-  onClick: PropTypes.func.isRequired
-}
+  onClick: PropTypes.func.isRequired,
+};
 
-export default CourtCascaderModal
+export default CourtCascaderModal;

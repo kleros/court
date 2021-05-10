@@ -61,7 +61,7 @@ const Identicon = ({ account, className, large, pinakion }) => {
             {!account && (
               <List.Item>
                 <List.Item.Meta
-                  description={<ETHAmount amount={drizzleState.balance} decimals={4} suffix={true} />}
+                  description={<ETHAmount amount={drizzleState.balance} decimals={4} tokenSymbol={true} />}
                   title="Balance"
                 />
               </List.Item>
@@ -69,7 +69,7 @@ const Identicon = ({ account, className, large, pinakion }) => {
             {pinakion && (
               <Spin spinning={!PNK}>
                 <List.Item>
-                  <List.Item.Meta description={<ETHAmount amount={PNK} suffix="PNK" />} title="PNK Balance" />
+                  <List.Item.Meta description={<ETHAmount amount={PNK} tokenSymbol="PNK" />} title="PNK Balance" />
                 </List.Item>
               </Spin>
             )}
