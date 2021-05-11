@@ -81,7 +81,9 @@ export default function Home() {
               type="primary"
             >
               <Present style={{ marginRight: "8px", verticalAlign: "text-top" }} />
-              Claim <TokenSymbol token="PNK" />
+              <span>
+                Claim <TokenSymbol token="PNK" />
+              </span>
             </StyledButton>
             <Link to="/courts">
               <StyledButton size="large" style={{ maxWidth: "120px" }} type="primary">
