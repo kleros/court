@@ -41,6 +41,7 @@ const StyledDiv = styled.div`
     text-align: right;
   }
 `;
+
 const StyledDivWhiteSmall = styled(StyledDiv)`
   color: white;
   font-size: 14px;
@@ -53,6 +54,7 @@ const StyledDivWhiteSmall = styled(StyledDiv)`
     text-align: center;
   }
 `;
+
 const StyledDivWhiteLarge = styled(StyledDiv)`
   color: white;
   font-size: 36px;
@@ -69,6 +71,7 @@ const StyledDivWhiteLarge = styled(StyledDiv)`
     text-align: center;
   }
 `;
+
 const StyledTopDiv = styled.div`
   font-weight: 500;
 
@@ -76,6 +79,7 @@ const StyledTopDiv = styled.div`
     margin-top: 30px;
   }
 `;
+
 const StyledCenterDiv = styled.div`
   font-size: 36px;
   font-weight: bold;
@@ -97,13 +101,19 @@ const RewardsCol = styled(Col)`
   gap: 1rem;
 
   @media (max-width: 991px) {
-    justify-content: center;
+    justify-content: flex-start;
+    text-align: left;
   }
 
   > div:last-of-type {
     display: flex;
     flex-direction: column;
     justify-content: center;
+
+    @media (max-width: 991px) {
+      align-items: flex-start;
+      text-align: left;
+    }
   }
 `;
 
@@ -115,6 +125,7 @@ const StyledRewardLogoWrapper = styled.div`
     max-width: none;
   }
 `;
+
 const AmountCol = styled(Col)`
   display: flex;
   justify-content: center;
@@ -123,9 +134,11 @@ const AmountCol = styled(Col)`
   text-align: center;
 
   @media (max-width: 991px) {
-    justify-content: center;
+    justify-content: flex-start;
+    text-align: left;
   }
 `;
+
 const StyledPurpleArrowBackground = styled(PurpleArrowBackground)`
   position: absolute;
   left: 0;
