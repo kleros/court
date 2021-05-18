@@ -8,6 +8,12 @@ import UniswapV2Factory from "../assets/contracts/uniswap-v2-factory.json";
 import UniswapV2Router02 from "../assets/contracts/uniswap-v2-router-02.json";
 
 const options = {
+  networkWhitelist: [
+    1, // Mainnet
+    3, // Ropsten
+    42, // Kovan
+    77, // Sokol
+  ],
   contracts: [
     {
       ...Kleros,
@@ -85,10 +91,13 @@ const options = {
     blocks: 3000,
   },
 };
-if (process.env.REACT_APP_WEB3_FALLBACK_URL)
+
+if (process.env.REACT_APP_WEB3_FALLBACK_URL) {
   options.web3 = process.env.REACT_APP_WEB3_FALLBACK_URL && {
     fallback: {
       url: process.env.REACT_APP_WEB3_FALLBACK_URL,
     },
   };
+}
+
 export default new Drizzle(options, generateStore(options));

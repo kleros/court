@@ -99,9 +99,9 @@ const createHandlers = ({ nativeToken, pnkToken, fromBlock }) => ({
 });
 
 export default (networkID, onNewNotifications) => {
-  const nativeToken = networkIDData[networkID].nativeToken || "ETH";
-  const pnkToken = networkIDData[networkID].pnkToken || "PNK";
-  const fromBlock = networkIDData[networkID].fromBlock || 0;
+  const nativeToken = networkIDData[networkID]?.nativeToken ?? "ETH";
+  const pnkToken = networkIDData[networkID]?.pnkToken ?? "PNK";
+  const fromBlock = networkIDData[networkID]?.fromBlock ?? 0;
 
   const handlers = useMemo(() => createHandlers({ nativeToken, pnkToken, fromBlock }), [
     nativeToken,
@@ -121,6 +121,10 @@ export default (networkID, onNewNotifications) => {
   );
 
   useEffect(() => {
+    if (!networkIDData[networkID]?.provider) {
+      return;
+    }
+
     const web3 = new Web3(networkIDData[networkID].provider);
     const klerosLiquid = new web3.eth.Contract(
       KlerosLiquid.abi,
@@ -153,6 +157,7 @@ export default (networkID, onNewNotifications) => {
         }
       });
     });
+
     const listener = klerosLiquid.events.allEvents({ fromBlock: 0 }).on("data", async (event) => {
       if (handlers[event.event]) {
         const notifications = handlers[event.event](
@@ -167,10 +172,12 @@ export default (networkID, onNewNotifications) => {
         }
       }
     });
+
     return () => {
       listener.unsubscribe();
       mounted = false;
     };
   }, [networkID, handlers, onNewNotifications, onNotificationClick]);
+
   return { notifications, onNotificationClick };
 };

@@ -13,9 +13,86 @@ import Identicon from "../components/identicon";
 import NetworkStatus from "../components/network-status";
 import NotificationSettings from "../components/notification-settings";
 import { ArchonInitializer } from "./archon";
+import ChainChangeWatcher from "./chain-change-watcher";
 import drizzle from "./drizzle";
 
 const { DrizzleProvider, Initializer } = drizzleReactHooks;
+
+export default function App() {
+  const [isMenuClosed, setIsMenuClosed] = useState(true);
+
+  return (
+    <>
+      <Helmet>
+        <title>Kleros · Court</title>
+        <link href="https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i,700,700i" rel="stylesheet" />
+      </Helmet>
+      <DrizzleProvider drizzle={drizzle}>
+        <Initializer
+          error={<C404 Web3 />}
+          loadingContractsAndAccounts={<C404 Web3 />}
+          loadingWeb3={<StyledSpin tip="Connecting to your Web3 provider." />}
+        >
+          <ChainChangeWatcher>
+            <ArchonInitializer>
+              <BrowserRouter>
+                <Layout>
+                  <StyledLayoutSider
+                    breakpoint="md"
+                    collapsedWidth="0"
+                    collapsed={isMenuClosed}
+                    onClick={() => setIsMenuClosed((previousState) => !previousState)}
+                  >
+                    <Menu theme="dark">{MenuItems}</Menu>
+                  </StyledLayoutSider>
+                  <Layout>
+                    <StyledLayoutHeader>
+                      <Row>
+                        <StyledLogoCol md={4} sm={12} xs={0}>
+                          <LogoNavLink to="/">
+                            <Logo />
+                          </LogoNavLink>
+                        </StyledLogoCol>
+                        <Col lg={16} md={12} xs={0}>
+                          <StyledMenu mode="horizontal" theme="dark">
+                            {MenuItems}
+                          </StyledMenu>
+                        </Col>
+                        <StyledTrayCol lg={4} md={8} sm={12} xs={24}>
+                          <StyledTray>
+                            <StyledNetworkStatus />
+                            <Identicon pinakion />
+                            <NotificationSettings settings={settings} />
+                            <StyledBuyPNK href="/tokens">Buy PNK</StyledBuyPNK>
+                          </StyledTray>
+                        </StyledTrayCol>
+                      </Row>
+                    </StyledLayoutHeader>
+                    <StyledLayoutContent>
+                      <Switch>
+                        <Route component={Home} exact path="/" />
+                        <Route component={Courts} exact path="/courts" />
+                        <Route component={Cases} exact path="/cases" />
+                        <Route component={Case} exact path="/cases/:ID" />
+                        <Route component={Tokens} exact path="/tokens" />
+                        <Route component={C404} />
+                      </Switch>
+                    </StyledLayoutContent>
+                    <Footer />
+                    <StyledClickaway
+                      isMenuClosed={isMenuClosed}
+                      onClick={isMenuClosed ? null : () => setIsMenuClosed(true)}
+                    />
+                  </Layout>
+                </Layout>
+              </BrowserRouter>
+            </ArchonInitializer>
+          </ChainChangeWatcher>
+        </Initializer>
+      </DrizzleProvider>
+    </>
+  );
+}
 
 const StyledSpin = styled(Spin)`
   left: 50%;
@@ -23,18 +100,23 @@ const StyledSpin = styled(Spin)`
   top: 50%;
   transform: translate(-50%, -50%);
 `;
+
 const C404 = loadable(() => import(/* webpackPrefetch: true */ "../containers/404"), {
   fallback: <StyledSpin />,
 });
+
 const Home = loadable(() => import(/* webpackPrefetch: true */ "../containers/home"), {
   fallback: <StyledSpin />,
 });
+
 const Courts = loadable(() => import(/* webpackPrefetch: true */ "../containers/courts"), {
   fallback: <StyledSpin />,
 });
+
 const Cases = loadable(() => import(/* webpackPrefetch: true */ "../containers/cases"), {
   fallback: <StyledSpin />,
 });
+
 const Case = loadable(
   async ({
     match: {
@@ -53,9 +135,11 @@ const Case = loadable(
     fallback: <StyledSpin />,
   }
 );
+
 const Tokens = loadable(() => import(/* webpackPrefetch: true */ "../containers/tokens"), {
   fallback: <StyledSpin />,
 });
+
 const MenuItems = [
   <Menu.Item key="home">
     <NavLink to="/">Home</NavLink>
@@ -76,6 +160,7 @@ const MenuItems = [
     </a>
   </Menu.Item>,
 ];
+
 const settings = {
   draw: "When I am drawn as a juror.",
   appeal: "When a case I ruled is appealed.",
@@ -84,6 +169,7 @@ const settings = {
   win: "When I win arbitration fees.",
   stake: "When my stakes are changed.",
 };
+
 const StyledLayoutSider = styled(Layout.Sider)`
   height: 100%;
   position: fixed;
@@ -99,6 +185,7 @@ const StyledLayoutSider = styled(Layout.Sider)`
     width: 50px;
   }
 `;
+
 const StyledLogoCol = styled(Col)`
   display: flex;
   align-items: center;
@@ -189,76 +276,3 @@ const LogoNavLink = styled(NavLink)`
     width: 100%;
   }
 `;
-
-export default function App() {
-  const [isMenuClosed, setIsMenuClosed] = useState(true);
-  return (
-    <>
-      <Helmet>
-        <title>Kleros · Court</title>
-        <link href="https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i,700,700i" rel="stylesheet" />
-      </Helmet>
-      <DrizzleProvider drizzle={drizzle}>
-        <Initializer
-          error={<C404 Web3 />}
-          loadingContractsAndAccounts={<C404 Web3 />}
-          loadingWeb3={<StyledSpin tip="Connecting to your Web3 provider." />}
-        >
-          <ArchonInitializer>
-            <BrowserRouter>
-              <Layout>
-                <StyledLayoutSider
-                  breakpoint="md"
-                  collapsedWidth="0"
-                  collapsed={isMenuClosed}
-                  onClick={() => setIsMenuClosed((previousState) => !previousState)}
-                >
-                  <Menu theme="dark">{MenuItems}</Menu>
-                </StyledLayoutSider>
-                <Layout>
-                  <StyledLayoutHeader>
-                    <Row>
-                      <StyledLogoCol md={4} sm={12} xs={0}>
-                        <LogoNavLink to="/">
-                          <Logo />
-                        </LogoNavLink>
-                      </StyledLogoCol>
-                      <Col lg={16} md={12} xs={0}>
-                        <StyledMenu mode="horizontal" theme="dark">
-                          {MenuItems}
-                        </StyledMenu>
-                      </Col>
-                      <StyledTrayCol lg={4} md={8} sm={12} xs={24}>
-                        <StyledTray>
-                          <StyledNetworkStatus />
-                          <Identicon pinakion />
-                          <NotificationSettings settings={settings} />
-                          <StyledBuyPNK href="/tokens">Buy PNK</StyledBuyPNK>
-                        </StyledTray>
-                      </StyledTrayCol>
-                    </Row>
-                  </StyledLayoutHeader>
-                  <StyledLayoutContent>
-                    <Switch>
-                      <Route component={Home} exact path="/" />
-                      <Route component={Courts} exact path="/courts" />
-                      <Route component={Cases} exact path="/cases" />
-                      <Route component={Case} exact path="/cases/:ID" />
-                      <Route component={Tokens} exact path="/tokens" />
-                      <Route component={C404} />
-                    </Switch>
-                  </StyledLayoutContent>
-                  <Footer />
-                  <StyledClickaway
-                    isMenuClosed={isMenuClosed}
-                    onClick={isMenuClosed ? null : () => setIsMenuClosed(true)}
-                  />
-                </Layout>
-              </Layout>
-            </BrowserRouter>
-          </ArchonInitializer>
-        </Initializer>
-      </DrizzleProvider>
-    </>
-  );
-}
