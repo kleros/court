@@ -10,18 +10,17 @@ const StyledListItem = styled(List.Item)`
   padding-right: 19px;
   position: relative;
 
-  .ant-list-item-extra {
-    font-size: 18px;
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
+  display: flex;
+  gap: 16px;
+
+  ::last-child {
+    margin-left: auto;
   }
 `;
 
 const ListItem = ({ children, extra, ...rest }) => (
-  <StyledListItem extra={extra} {...rest}>
-    {children}
+  <StyledListItem extra={<div>{extra}</div>} {...rest}>
+    <div>{children}</div>
   </StyledListItem>
 );
 
