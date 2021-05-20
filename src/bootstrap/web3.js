@@ -27,3 +27,22 @@ if (typeof window !== "undefined" && typeof window.web3 !== "undefined") {
 }
 
 export default web3;
+
+const chainIdToEndpoint = {
+  1: process.env.REACT_APP_WEB3_FALLBACK_URL,
+  3: process.env.REACT_APP_WEB3_FALLBACK_ROPSTEN_URL,
+  42: process.env.REACT_APP_WEB3_FALLBACK_KOVAN_URL,
+  77: process.env.REACT_APP_WEB3_FALLBACK_SOKOL_URL,
+};
+
+export function getReadOnlyWeb3(chainId) {
+  const endpoint = chainIdToEndpoint[chainId];
+
+  if (!endpoint) {
+    throw new Error(`Unsupported network: ${chainId}`);
+  }
+
+  const JsonRpcProvider = /^ws/.test(endpoint) ? Web3.providers.WebsocketProvider : Web3.providers.HttpProvider;
+
+  return new Web3(new JsonRpcProvider(endpoint));
+}

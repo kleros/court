@@ -8,9 +8,8 @@ import { Col, Layout, Menu, Row, Spin } from "antd";
 import { Helmet } from "react-helmet";
 import { BrowserRouter, NavLink, Route, Switch } from "react-router-dom";
 import { ReactComponent as Logo } from "../assets/images/logo.svg";
+import AccountStatus from "../components/account-status";
 import Footer from "../components/footer";
-import Identicon from "../components/identicon";
-import NetworkStatus from "../components/network-status";
 import NotificationSettings from "../components/notification-settings";
 import { ArchonInitializer } from "./archon";
 import ChainChangeWatcher from "./chain-change-watcher";
@@ -48,34 +47,44 @@ export default function App() {
                   <Layout>
                     <StyledLayoutHeader>
                       <Row>
-                        <StyledLogoCol md={4} sm={12} xs={0}>
+                        <StyledLogoCol lg={4} md={4} sm={12} xs={0}>
                           <LogoNavLink to="/">
                             <Logo />
                           </LogoNavLink>
                         </StyledLogoCol>
-                        <Col lg={16} md={12} xs={0}>
+                        <Col lg={14} md={12} xs={0} style={{ padding: "0 16px" }}>
                           <StyledMenu mode="horizontal" theme="dark">
                             {MenuItems}
                           </StyledMenu>
                         </Col>
-                        <StyledTrayCol lg={4} md={8} sm={12} xs={24}>
+                        <StyledTrayCol lg={6} md={8} sm={12} xs={24}>
                           <StyledTray>
-                            <StyledNetworkStatus />
-                            <Identicon pinakion />
+                            <AccountStatus />
                             <NotificationSettings settings={settings} />
-                            <StyledBuyPNK href="/tokens">Buy PNK</StyledBuyPNK>
                           </StyledTray>
                         </StyledTrayCol>
                       </Row>
                     </StyledLayoutHeader>
                     <StyledLayoutContent>
                       <Switch>
-                        <Route component={Home} exact path="/" />
-                        <Route component={Courts} exact path="/courts" />
-                        <Route component={Cases} exact path="/cases" />
-                        <Route component={Case} exact path="/cases/:ID" />
-                        <Route component={Tokens} exact path="/tokens" />
-                        <Route component={C404} />
+                        <Route exact path="/">
+                          <Home />
+                        </Route>
+                        <Route exact path="/courts">
+                          <Courts />
+                        </Route>
+                        <Route exact path="/cases">
+                          <Cases />
+                        </Route>
+                        <Route exact path="/cases/:ID">
+                          <Case />
+                        </Route>
+                        <Route exact path="/tokens">
+                          <Tokens />
+                        </Route>
+                        <Route path="*">
+                          <C404 />
+                        </Route>
                       </Switch>
                     </StyledLayoutContent>
                     <Footer />
@@ -237,23 +246,6 @@ const StyledTray = styled.div`
 
   > * {
     min-width: 0;
-  }
-`;
-
-const StyledNetworkStatus = styled(NetworkStatus)`
-  pointer-events: none;
-`;
-
-const StyledBuyPNK = styled.a`
-  border: 1px solid white;
-  border-radius: 3px;
-  color: #fff;
-  padding: 0.75rem 1.25rem;
-  text-decoration: none;
-  white-space: nowrap;
-
-  &:hover {
-    color: #fff;
   }
 `;
 

@@ -19,6 +19,7 @@ import { ReactComponent as Present } from "../assets/images/present.svg";
 const { useDrizzleState, useDrizzle } = drizzleReactHooks;
 
 const airdropChainIds = [1, 42, 77];
+const buyPnkChainIds = [1];
 
 export default function Home() {
   const drizzleState = useDrizzleState((drizzleState) => ({
@@ -28,6 +29,8 @@ export default function Home() {
 
   const { drizzle } = useDrizzle();
   const chainId = useChainId(drizzle.web3);
+
+  const isBuyPnkButtonVisible = buyPnkChainIds.includes(chainId);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalButtonVisible, setIsModalButtonVisible] = useState(false);
@@ -72,14 +75,11 @@ export default function Home() {
         title="Welcome!"
         description="This is the Kleros Juror Dashboard"
         extra={
-          <>
-            <StyledButton
+          <StyledButtonBar>
+            <StyledClaimButton
               onClick={showModal}
               size="large"
               style={{
-                marginRight: "16px",
-                backgroundColor: "#9013FE",
-                border: "none",
                 display: isModalButtonVisible ? "inline-block" : "none",
               }}
               type="primary"
@@ -88,13 +88,23 @@ export default function Home() {
               <span>
                 Claim <TokenSymbol token="PNK" />
               </span>
-            </StyledButton>
+            </StyledClaimButton>
+            <Link
+              to="/tokens"
+              style={{
+                display: isBuyPnkButtonVisible ? "inline-block" : "none",
+              }}
+            >
+              <StyledButton size="large" type="secondary">
+                Buy PNK
+              </StyledButton>
+            </Link>
             <Link to="/courts">
-              <StyledButton size="large" style={{ maxWidth: "120px" }} type="primary">
+              <StyledButton size="large" type="primary">
                 Join a Court
               </StyledButton>
             </Link>
-          </>
+          </StyledButtonBar>
         }
       />
       <RewardCard />
@@ -115,8 +125,33 @@ export default function Home() {
   );
 }
 
+const StyledButtonBar = styled.div`
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 16px;
+
+  @media (max-width: 576px) {
+    min-width: 100%;
+    flex-wrap: wrap;
+  }
+`;
+
 const StyledButton = styled(Button)`
   box-shadow: none;
-  float: right;
   text-shadow: none;
+`;
+
+const StyledClaimButton = styled(StyledButton)`
+  background-color: #9013fe;
+  border: none;
+
+  :hover,
+  :focus {
+    background-color: #a541fe;
+  }
+
+  :active {
+    background-color: #6601be;
+  }
 `;
