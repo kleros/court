@@ -13,141 +13,6 @@ import ETHAmount from "./eth-amount";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
-const StyledModal = styled(Modal)`
-  position: relative;
-  width: 90% !important;
-
-  .ant-modal {
-    &-header {
-      padding: 0;
-    }
-
-    &-close-icon svg {
-      fill: white;
-    }
-
-    &-body {
-      background: whitesmoke;
-      height: 286px;
-      margin-top: -1px;
-      overflow-x: scroll;
-      position: relative;
-    }
-
-    &-body::-webkit-scrollbar {
-      display: none;
-    }
-
-    &-footer {
-      color: #4d00b4;
-      height: 284px;
-      margin-top: 40px;
-      overflow-y: scroll;
-      padding: 52px 42px 28px;
-      text-align: left;
-    }
-  }
-`;
-
-const SelectButtonArea = styled.div`
-  background: #4004a3;
-  height: 60px;
-  margin: -52px -42px 0px -42px;
-  padding: 0;
-  position: absolute;
-  top: 390px;
-  width: 100%;
-  z-index: 2;
-`;
-
-const StyledButton = styled(Button)`
-  border-radius: 3px;
-  position: absolute;
-  right: 44px;
-  top: 15px;
-  width: 100px;
-  z-index: 3;
-`;
-const StyledDiv = styled.div`
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 20px;
-`;
-const StyledHeader = styled.div`
-  font-size: 18px;
-  font-weight: bold;
-`;
-const StyledTitleDiv = styled.div`
-  background: #4004a3;
-  color: white;
-  font-size: 20px;
-  font-weight: bold;
-  height: 54px;
-  line-height: 54px;
-  text-align: center;
-`;
-const StyledCascader = styled(Cascader)`
-  display: none;
-
-  & ~ div .popupClassName {
-    background: whitesmoke;
-    left: 0 !important;
-    min-width: 100%;
-    top: 0 !important;
-
-    .ant-cascader-menu {
-      border: 0;
-      height: 286px;
-      padding-top: 28px;
-      width: 226px;
-
-      &-item {
-        height: 38px;
-        padding: 5px 28px;
-
-        &-active {
-          color: white;
-        }
-      }
-    }
-
-    ul:nth-child(1) {
-      background: #4004a3;
-      border-radius: 0px;
-    }
-
-    ul:nth-child(3n + 1) {
-      .ant-cascader-menu-item-active {
-        background: #1e075f;
-      }
-    }
-
-    ul:nth-child(3n + 2) {
-      .ant-cascader-menu-item-active {
-        background: #4004a3;
-      }
-    }
-
-    ul:nth-child(3n) {
-      .ant-cascader-menu-item-active {
-        background: #009aff;
-      }
-    }
-  }
-`;
-const StyledBreadcrumbs = styled(Breadcrumbs)`
-  left: ${(props) => props.colorIndex * 226}px;
-  pointer-events: none;
-  position: absolute;
-  top: ${(props) => props.columnIndex * 38 + 28}px;
-  z-index: ${(props) => props.optionLength - props.colorIndex + 2000};
-`;
-const StyledPrefixDiv = styled.div`
-  left: 29px;
-  position: absolute;
-  top: 29px;
-  transform: translate(-50%, -50%);
-`;
 const ALPHA_DIVISOR = 1e4;
 
 const CourtCascaderModal = ({ onClick }) => {
@@ -304,9 +169,7 @@ const CourtCascaderModal = ({ onClick }) => {
                       <ReactMarkdown source={option.requiredSkills} />
                     </Col>
                   </Row>
-                ) : (
-                  ""
-                )}
+                ) : null}
                 <Row>
                   <Col md={4}>
                     <Hexagon className="ternary-fill" />
@@ -369,3 +232,145 @@ CourtCascaderModal.propTypes = {
 };
 
 export default CourtCascaderModal;
+
+const StyledModal = styled(Modal)`
+  position: relative;
+  width: 90% !important;
+
+  .ant-modal {
+    &-header {
+      padding: 0;
+    }
+
+    &-close-icon svg {
+      fill: white;
+    }
+
+    &-body {
+      background: whitesmoke;
+      height: 286px;
+      margin-top: -1px;
+      overflow-x: scroll;
+      position: relative;
+    }
+
+    &-body::-webkit-scrollbar {
+      display: none;
+    }
+
+    &-footer {
+      color: #4d00b4;
+      height: 284px;
+      margin-top: 40px;
+      overflow-y: scroll;
+      padding: 52px 42px 28px;
+      text-align: left;
+    }
+  }
+`;
+
+const SelectButtonArea = styled.div`
+  background: #4004a3;
+  height: 60px;
+  margin: -52px -42px 0px -42px;
+  padding: 0;
+  position: absolute;
+  top: 390px;
+  width: 100%;
+  z-index: 2;
+`;
+
+const StyledButton = styled(Button)`
+  border-radius: 3px;
+  position: absolute;
+  right: 44px;
+  top: 15px;
+  width: 100px;
+  z-index: 3;
+`;
+
+const StyledDiv = styled.div`
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+`;
+
+const StyledHeader = styled.div`
+  font-size: 18px;
+  font-weight: bold;
+`;
+
+const StyledTitleDiv = styled.div`
+  background: #4004a3;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  height: 54px;
+  line-height: 54px;
+  text-align: center;
+`;
+
+const StyledCascader = styled(Cascader)`
+  display: none;
+
+  & ~ div .popupClassName {
+    background: whitesmoke;
+    left: 0 !important;
+    min-width: 100%;
+    top: 0 !important;
+
+    .ant-cascader-menu {
+      border: 0;
+      height: 286px;
+      padding-top: 28px;
+      width: 226px;
+
+      &-item {
+        height: 38px;
+        padding: 5px 28px;
+
+        &-active {
+          color: white;
+        }
+      }
+    }
+
+    ul:nth-child(1) {
+      background: #4004a3;
+      border-radius: 0px;
+    }
+
+    ul:nth-child(3n + 1) {
+      .ant-cascader-menu-item-active {
+        background: #1e075f;
+      }
+    }
+
+    ul:nth-child(3n + 2) {
+      .ant-cascader-menu-item-active {
+        background: #4004a3;
+      }
+    }
+
+    ul:nth-child(3n) {
+      .ant-cascader-menu-item-active {
+        background: #009aff;
+      }
+    }
+  }
+`;
+
+const StyledBreadcrumbs = styled(Breadcrumbs)`
+  left: ${(props) => props.colorIndex * 226}px;
+  pointer-events: none;
+  position: absolute;
+  top: ${(props) => props.columnIndex * 38 + 28}px;
+  z-index: ${(props) => props.optionLength - props.colorIndex + 2000};
+`;
+
+const StyledPrefixDiv = styled.div`
+  left: 29px;
+  position: absolute;
+  top: 29px;
+  transform: translate(-50%, -50%);
+`;

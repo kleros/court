@@ -13,17 +13,21 @@ import RewardCard from "../components/reward-card";
 import ClaimModal from "../components/claim-modal";
 import TopBanner from "../components/top-banner";
 import TokenSymbol from "../components/token-symbol";
+import useChainId from "../hooks/use-chain-id";
 import { ReactComponent as Present } from "../assets/images/present.svg";
 
-const { useDrizzleState } = drizzleReactHooks;
+const { useDrizzleState, useDrizzle } = drizzleReactHooks;
 
-const airdropNetworkIds = [1, 42, 77];
+const airdropChainIds = [1, 42, 77];
 
 export default function Home() {
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
     web3: drizzleState.web3,
   }));
+
+  const { drizzle } = useDrizzle();
+  const chainId = useChainId(drizzle.web3);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalButtonVisible, setIsModalButtonVisible] = useState(false);
@@ -55,7 +59,7 @@ export default function Home() {
 
   return (
     <>
-      {airdropNetworkIds.includes(drizzleState.web3.networkId) ? (
+      {airdropChainIds.includes(chainId) ? (
         <ClaimModal
           visible={isModalVisible}
           onOk={handleOk}

@@ -7,10 +7,11 @@ import Web3 from "../bootstrap/web3";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import { ReactComponent as Kleros } from "../assets/images/kleros.svg";
 import { ReactComponent as RightArrow } from "../assets/images/right-arrow.svg";
+import useChainId from "../hooks/use-chain-id";
 import ETHAmount from "./eth-amount";
 import TokenSymbol from "./token-symbol";
 
-const networkIdToAidropParams = {
+const chainIdToParams = {
   1: {
     contractAddress: "0xdbc3088Dfebc3cc6A84B0271DaDe2696DB00Af38",
     snapshots: [
@@ -18,14 +19,12 @@ const networkIdToAidropParams = {
       "https://ipfs.kleros.io/ipfs/QmUCTdvyAWU8eEV1nwgiF7CwKpL5FnXiDxGD9FedFdrHYU/snapshot-2021-03.json",
       "https://ipfs.kleros.io/ipfs/QmXG2EKcd3tyMwoxhrqmBAu7gsrzgF3jCde75CjQzmg1Am/snapshot-2021-04.json",
     ],
+    blockExplorerBaseUrl: "https://etherscan.io",
   },
   42: {
     contractAddress: "0x193353d006Ab015216D34419a845989e76612475",
     snapshots: [],
-  },
-  77: {
-    contractAddress: "0x0000000000000000000000000000000000000000",
-    snapshots: [],
+    blockExplorerBaseUrl: "https://kovan.etherscan.io",
   },
 };
 
@@ -33,10 +32,10 @@ const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
 const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => {
   const { drizzle } = useDrizzle();
-  const drizzleState = useDrizzleState((drizzleState) => ({
+  const { account } = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
-    web3: drizzleState.web3,
   }));
+  const chainId = useChainId(drizzle.web3);
 
   const [claims, setClaims] = useState(0);
   const [txHash, setTxHash] = useState(null);
@@ -60,9 +59,13 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
 
   useEffect(() => {
     var responses = [];
-    const airdropParams = networkIdToAidropParams[drizzleState.web3.networkId];
+    const airdropParams = chainIdToParams[chainId];
 
-    const { snapshots = [] } = airdropParams;
+    if (!airdropParams) {
+      return;
+    }
+
+    const snapshots = airdropParams?.snapshots ?? [];
 
     for (var month = 0; month < snapshots.length; month++) {
       responses[month] = fetch(snapshots[month]);
@@ -107,10 +110,10 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       r.forEach(function (item) {
         if (item) {
           apyCallback(item.apy);
-          if (item.merkleTree.claims[drizzleState.account]) displayButton();
+          if (item.merkleTree.claims[account]) displayButton();
           setClaims((prevState) => {
-            if (prevState) return [...prevState, item.merkleTree.claims[drizzleState.account]];
-            else return [item.merkleTree.claims[drizzleState.account]];
+            if (prevState) return [...prevState, item.merkleTree.claims[account]];
+            else return [item.merkleTree.claims[account]];
           });
         } else
           setClaims((prevState) => {
@@ -121,12 +124,10 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
     );
 
     const contract = new Web3.eth.Contract(MerkleRedeem.abi, airdropParams.contractAddress);
-    const claimStatus = contract.methods.claimStatus(drizzleState.account, 0, 12).call();
-
-    //
+    const claimStatus = contract.methods.claimStatus(account, 0, 12).call();
 
     claimStatus.then((r) => setClaimStatus(r));
-  }, [drizzleState.account, drizzleState.web3.networkId, drizzle.web3.utils, modalState, apyCallback, displayButton]);
+  }, [account, chainId, drizzle.web3.utils, modalState, apyCallback, displayButton]);
 
   const handleClaim = () => {
     setModalState(1);
@@ -172,7 +173,11 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       });
 
   const claimWeeks = (claims) => {
-    const airdropParams = networkIdToAidropParams[drizzleState.web3.networkId];
+    const airdropParams = chainIdToParams[chainId];
+    if (!airdropParams) {
+      return;
+    }
+
     const contract = new Web3.eth.Contract(MerkleRedeem.abi, airdropParams.contractAddress);
     const args = claimObjects(claims).filter((_claim) => Boolean(claimStatus[_claim.week]) === false);
 
@@ -184,7 +189,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
         }, drizzle.web3.utils.toBN("0x0"))
     );
 
-    return contract.methods.claimWeeks(drizzleState.account, args).send({ from: drizzleState.account });
+    return contract.methods.claimWeeks(account, args).send({ from: account });
   };
 
   return (
@@ -305,7 +310,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
 
         {modalState === 1 && txHash && (
           <a
-            href={`https://${Number(drizzleState.web3.networkId) === 42 ? "kovan." : ""}etherscan.io/tx/${txHash}`}
+            href={`${chainIdToParams[chainId]?.blockExplorerBaseUrl}/tx/${txHash}`}
             target="_blank"
             rel="noopener noreferrer"
           >

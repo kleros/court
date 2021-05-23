@@ -4,8 +4,9 @@ import clsx from "clsx";
 import styled from "styled-components/macro";
 import { Badge } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
+import useChainId from "../hooks/use-chain-id";
 
-const { useDrizzleState } = drizzleReactHooks;
+const { useDrizzleState, useDrizzle } = drizzleReactHooks;
 
 const networkIdToNetworkName = {
   1: "Mainnet",
@@ -47,16 +48,17 @@ const StyledBadge = styled(Badge)`
 `;
 
 const NetworkStatus = ({ className }) => {
-  const { networkId, status } = useDrizzleState((drizzleState) => ({
-    networkId: drizzleState.web3.networkId,
+  const { status } = useDrizzleState((drizzleState) => ({
     status: drizzleState.web3.status,
   }));
+  const { drizzle } = useDrizzle();
+  const chainId = useChainId(drizzle.web3);
 
   return (
     <StyledBadge
       className={clsx(status, className)}
       status={networkStatusToBadgeStatus[status]}
-      text={networkIdToNetworkName[networkId]}
+      text={networkIdToNetworkName[chainId]}
     />
   );
 };
