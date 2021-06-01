@@ -82,6 +82,9 @@ export default function App() {
                         <Route exact path="/tokens">
                           <Tokens />
                         </Route>
+                        <Route exact path="/token-bridge">
+                          <TokenBridge />
+                        </Route>
                         <Route path="*">
                           <C404 />
                         </Route>
@@ -146,6 +149,10 @@ const Case = loadable(
 );
 
 const Tokens = loadable(() => import(/* webpackPrefetch: true */ "../containers/tokens"), {
+  fallback: <StyledSpin />,
+});
+
+const TokenBridge = loadable(() => import(/* webpackPrefetch: true */ "../containers/token-bridge"), {
   fallback: <StyledSpin />,
 });
 
@@ -230,7 +237,8 @@ const StyledMenu = styled(Menu)`
 
 const StyledLayoutContent = styled(Layout.Content)`
   background: #f2e3ff;
-  min-height: 100vh;
+  // The header takes exactly 64px
+  min-height: calc(100vh - 64px);
   padding: 0px 9.375vw 120px 9.375vw;
 `;
 

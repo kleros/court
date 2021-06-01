@@ -1,5 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import useChainId from "./use-chain-id";
+import usePrevious from "./use-previous";
 
 export default function useReloadOnChainChanged(web3) {
   const chainId = useChainId(web3);
@@ -11,14 +12,4 @@ export default function useReloadOnChainChanged(web3) {
       window.location.reload();
     }
   }, [previousChainId, chainId]);
-}
-
-function usePrevious(value) {
-  const ref = useRef();
-
-  useEffect(() => {
-    ref.current = value;
-  }, [value]);
-
-  return ref.current;
 }

@@ -1,18 +1,17 @@
+import React from "react";
 import t from "prop-types";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 
 const { useDrizzleState } = drizzleReactHooks;
 
-export default function TokenSymbol({ token }) {
-  const { networkId } = useDrizzleState(({ web3 }) => web3);
-
+export default function TokenSymbol({ chainId, token }) {
   if (token) {
-    return networkIdToTokenSuffix[networkId] && networkIdToTokenSuffix[networkId][token]
-      ? networkIdToTokenSuffix[networkId][token]
+    return chainIdToTokenSuffix[chainId] && chainIdToTokenSuffix[chainId][token]
+      ? chainIdToTokenSuffix[chainId][token]
       : token;
   }
 
-  const suffix = networkIdToSuffix[networkId] || "ETH";
+  const suffix = chainIdToSuffix[chainId] || "ETH";
   return suffix;
 }
 
@@ -20,7 +19,17 @@ TokenSymbol.propTypes = {
   token: t.string,
 };
 
-const networkIdToSuffix = {
+export function AutoDetectedTokenSymbol({ token }) {
+  const chainId = useDrizzleState((ds) => ds.web3.networkId);
+
+  return <TokenSymbol chainId={chainId} token={token} />;
+}
+
+AutoDetectedTokenSymbol.propTypes = {
+  token: t.string,
+};
+
+const chainIdToSuffix = {
   1: "ETH",
   3: "ETH",
   42: "ETH",
@@ -28,7 +37,7 @@ const networkIdToSuffix = {
   100: "xDAI",
 };
 
-const networkIdToTokenSuffix = {
+const chainIdToTokenSuffix = {
   1: { PNK: "PNK" },
   3: { PNK: "PNK" },
   42: { PNK: "PNK" },

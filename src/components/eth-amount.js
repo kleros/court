@@ -2,34 +2,34 @@ import React from "react";
 import t from "prop-types";
 import { Skeleton } from "antd";
 import styled from "styled-components/macro";
-import { drizzleReactHooks } from "@drizzle/react-plugin";
-import TokenSymbol from "./token-symbol";
+import Web3 from "web3";
+import { AutoDetectedTokenSymbol } from "./token-symbol";
 
-const { useDrizzle } = drizzleReactHooks;
+const { fromWei } = Web3.utils;
 
 export default function ETHAmount({ amount, decimals, tokenSymbol }) {
-  const { drizzle } = useDrizzle();
-
   if (amount === null) {
     return <StyledSkeleton active paragraph={false} title={SkeletonTitleProps} />;
   }
 
-  const value = formatNumber(
-    Number(
-      drizzle.web3.utils.fromWei(typeof amount === "number" ? formatNumber(amount, { decimals: 0 }) : String(amount))
-    ),
-    { decimals, useGrouping: true }
+  const numericValue = Number(
+    fromWei(typeof amount === "number" ? formatNumber(amount, { decimals: 0 }) : String(amount))
   );
+  const value = formatNumber(decimals === 0 ? Math.trunc(numericValue) : numericValue, { decimals, useGrouping: true });
 
   return tokenSymbol === true ? (
     <>
-      {value} <TokenSymbol />
+      {value} <AutoDetectedTokenSymbol />
     </>
   ) : tokenSymbol === false ? (
     value
+  ) : React.isValidElement(tokenSymbol) ? (
+    <>
+      {value} {tokenSymbol}
+    </>
   ) : (
     <>
-      {value} <TokenSymbol token={tokenSymbol} />
+      {value} <AutoDetectedTokenSymbol token={tokenSymbol} />
     </>
   );
 }
@@ -37,7 +37,7 @@ export default function ETHAmount({ amount, decimals, tokenSymbol }) {
 ETHAmount.propTypes = {
   amount: t.oneOfType([t.string.isRequired, t.number.isRequired, t.object.isRequired]),
   decimals: t.number,
-  tokenSymbol: t.oneOfType([t.bool, t.string.isRequired]),
+  tokenSymbol: t.oneOfType([t.bool, t.string.isRequired, t.element.isRequired]),
 };
 
 ETHAmount.defaultProps = {
