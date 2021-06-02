@@ -1,13 +1,44 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import KlerosLiquid from "../assets/contracts/kleros-liquid.json";
 import Web3 from "web3";
 
 const networkIDData = {
-  1: { name: "", provider: "https://mainnet.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde" },
-  3: { name: "_ROPSTEN", provider: "https://ropsten.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde" },
-  42: { name: "_KOVAN", provider: "https://kovan.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde" }
+  1: {
+    name: "",
+    provider: "https://mainnet.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
+    nativeToken: "ETH",
+    pnkToken: "PNK",
+    fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER
+      ? Number(process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER)
+      : 0,
+  },
+  3: {
+    name: "_ROPSTEN",
+    provider: "https://ropsten.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
+    nativeToken: "ETH",
+    pnkToken: "PNK",
+  },
+  42: {
+    name: "_KOVAN",
+    provider: "https://kovan.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
+    nativeToken: "ETH",
+    pnkToken: "PNK",
+  },
+  77: {
+    name: "_SOKOL",
+    provider: "https://sokol.poa.network",
+    nativeToken: "SPOA",
+    pnkToken: "stPNK",
+  },
+  100: {
+    name: "_XDAI",
+    provider: "https://rpc.xdaichain.com",
+    nativeToken: "xDAI",
+    pnkToken: "stPNK",
+  },
 };
-const handlers = {
+
+const createHandlers = ({ nativeToken, pnkToken, fromBlock }) => ({
   AppealDecision: async (_, klerosLiquid, block, event) => {
     const dispute = await klerosLiquid.methods.disputes(event.returnValues._disputeID).call();
     if (dispute.period !== "4") {
@@ -16,15 +47,17 @@ const handlers = {
         icon: "alert",
         message: `Case #${event.returnValues._disputeID} has been appealed.`,
         to: `/cases/${event.returnValues._disputeID}`,
-        type: "info"
+        type: "info",
       };
-      return (await klerosLiquid.getPastEvents("Draw", {
-        filter: { _disputeID: event.returnValues._disputeID },
-        fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER
-      })).map(d => ({
+      return (
+        await klerosLiquid.getPastEvents("Draw", {
+          filter: { _disputeID: event.returnValues._disputeID },
+          fromBlock,
+        })
+      ).map((d) => ({
         ...notification,
         account: d.returnValues._address,
-        key: `${event.blockNumber}-${event.transactionIndex}-${event.logIndex}-${d.returnValues._address}`
+        key: `${event.blockNumber}-${event.transactionIndex}-${event.logIndex}-${d.returnValues._address}`,
       }));
     }
   },
@@ -41,8 +74,8 @@ const handlers = {
             key: `${event.blockNumber}-${event.transactionIndex}-${event.logIndex}-${event.returnValues._address}`,
             message: `Congratulations! You have been drawn as a juror on case #${event.returnValues._disputeID}.`,
             to: `/cases/${event.returnValues._disputeID}`,
-            type: "info"
-          }
+            type: "info",
+          },
         ];
     }
   },
@@ -55,36 +88,66 @@ const handlers = {
           date: new Date(time),
           icon: "reward",
           key: `${event.blockNumber}-${event.transactionIndex}-${event.logIndex}-${event.returnValues._address}`,
-          message: `Case #${event.returnValues._disputeID} was executed. ETH: ${Number(web3.utils.fromWei(event.returnValues._ETHAmount)).toFixed(4)}, PNK: ${Number(web3.utils.fromWei(event.returnValues._tokenAmount)).toFixed(0)}.`,
+          message: `Case #${event.returnValues._disputeID} was executed. ${nativeToken}: ${Number(
+            web3.utils.fromWei(event.returnValues._ETHAmount)
+          ).toFixed(4)}, ${pnkToken}: ${Number(web3.utils.fromWei(event.returnValues._tokenAmount)).toFixed(0)}.`,
           to: `/cases/${event.returnValues._disputeID}`,
-          type: "info"
-        }
+          type: "info",
+        },
       ];
-  }
-};
+  },
+});
+
 export default (networkID, onNewNotifications) => {
+  const nativeToken = networkIDData[networkID]?.nativeToken ?? "ETH";
+  const pnkToken = networkIDData[networkID]?.pnkToken ?? "PNK";
+  const fromBlock = networkIDData[networkID]?.fromBlock ?? 0;
+
+  const handlers = useMemo(() => createHandlers({ nativeToken, pnkToken, fromBlock }), [
+    nativeToken,
+    pnkToken,
+    fromBlock,
+  ]);
+
   const [notifications, setNotifications] = useState();
   const onNotificationClick = useCallback(
     ({ currentTarget: { id } }) =>
-      setNotifications(notifications => {
+      setNotifications((notifications) => {
         localStorage.setItem(id, true);
-        const index = notifications.findIndex(n => n.key === id);
+        const index = notifications.findIndex((n) => n.key === id);
         return [...notifications.slice(0, index), ...notifications.slice(index + 1)];
       }),
     []
   );
+
   useEffect(() => {
+    if (!networkIDData[networkID]?.provider) {
+      return;
+    }
+
     const web3 = new Web3(networkIDData[networkID].provider);
-    const klerosLiquid = new web3.eth.Contract(KlerosLiquid.abi, process.env[`REACT_APP_KLEROS_LIQUID${networkIDData[networkID].name}_ADDRESS`]);
+    const klerosLiquid = new web3.eth.Contract(
+      KlerosLiquid.abi,
+      process.env[`REACT_APP_KLEROS_LIQUID${networkIDData[networkID].name}_ADDRESS`]
+    );
     let mounted = true;
-    web3.eth.getBlockNumber().then(blockNumber => {
+    web3.eth.getBlockNumber().then((blockNumber) => {
       const fromBlock = blockNumber - 256;
-      Promise.all([klerosLiquid.getPastEvents("AppealDecision", { fromBlock }), klerosLiquid.getPastEvents("Draw", { fromBlock }), klerosLiquid.getPastEvents("TokenAndETHShift", { fromBlock })]).then(async ([events1, events2, events3]) => {
+      Promise.all([
+        klerosLiquid.getPastEvents("AppealDecision", { fromBlock }),
+        klerosLiquid.getPastEvents("Draw", { fromBlock }),
+        klerosLiquid.getPastEvents("TokenAndETHShift", { fromBlock }),
+      ]).then(async ([events1, events2, events3]) => {
         const notifications = [];
         for (const event of [...events1, ...events2, ...events3]) {
-          let _notifications = await handlers[event.event](web3, klerosLiquid, await web3.eth.getBlock(event.blockNumber), event);
+          let _notifications = await handlers[event.event](
+            web3,
+            klerosLiquid,
+            await web3.eth.getBlock(event.blockNumber),
+            event
+          );
           if (_notifications) {
-            _notifications = _notifications.filter(n => !localStorage.getItem(n.key));
+            _notifications = _notifications.filter((n) => !localStorage.getItem(n.key));
             if (_notifications.length !== 0) notifications.push(..._notifications);
           }
         }
@@ -94,19 +157,27 @@ export default (networkID, onNewNotifications) => {
         }
       });
     });
-    const listener = klerosLiquid.events.allEvents({ fromBlock: 0 }).on("data", async event => {
+
+    const listener = klerosLiquid.events.allEvents({ fromBlock: 0 }).on("data", async (event) => {
       if (handlers[event.event]) {
-        const notifications = handlers[event.event](web3, klerosLiquid, await web3.eth.getBlock(event.blockNumber), event);
+        const notifications = handlers[event.event](
+          web3,
+          klerosLiquid,
+          await web3.eth.getBlock(event.blockNumber),
+          event
+        );
         if (notifications && mounted) {
-          setNotifications(_notifications => [...[...notifications].reverse(), ..._notifications]);
+          setNotifications((_notifications) => [...[...notifications].reverse(), ..._notifications]);
           onNewNotifications(notifications, onNotificationClick);
         }
       }
     });
+
     return () => {
       listener.unsubscribe();
       mounted = false;
     };
-  }, [networkID, onNewNotifications]);
+  }, [networkID, handlers, onNewNotifications, onNotificationClick]);
+
   return { notifications, onNotificationClick };
 };

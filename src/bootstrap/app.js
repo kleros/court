@@ -1,76 +1,145 @@
-import '../components/theme.css'
-import { BrowserRouter, NavLink, Route, Switch } from 'react-router-dom'
-import { Col, Layout, Menu, Row, Spin } from 'antd'
-import { drizzleReactHooks } from '@drizzle/react-plugin'
-import { ArchonInitializer } from './archon'
-import { Helmet } from 'react-helmet'
-import Identicon from '../components/identicon'
-import { ReactComponent as Logo } from '../assets/images/logo.svg'
-import Footer from '../components/footer'
-import NotificationSettings from '../components/notification-settings'
-import React, { useState } from 'react'
-import drizzle from './drizzle'
-import loadable from '@loadable/component'
-import styled from 'styled-components/macro'
+import "../components/theme.css";
+import "./app.css";
+import React, { useState } from "react";
+import loadable from "@loadable/component";
+import styled from "styled-components/macro";
+import { drizzleReactHooks } from "@drizzle/react-plugin";
+import { Col, Layout, Menu, Row, Spin } from "antd";
+import { Helmet } from "react-helmet";
+import { BrowserRouter, NavLink, Route, Switch } from "react-router-dom";
+import { ReactComponent as Logo } from "../assets/images/logo.svg";
+import Footer from "../components/footer";
+import Identicon from "../components/identicon";
+import NetworkStatus from "../components/network-status";
+import NotificationSettings from "../components/notification-settings";
+import { ArchonInitializer } from "./archon";
+import ChainChangeWatcher from "./chain-change-watcher";
+import drizzle from "./drizzle";
 
-import './app.css'
+const { DrizzleProvider, Initializer } = drizzleReactHooks;
 
-const { DrizzleProvider, Initializer } = drizzleReactHooks
+export default function App() {
+  const [isMenuClosed, setIsMenuClosed] = useState(true);
+
+  return (
+    <>
+      <Helmet>
+        <title>Kleros · Court</title>
+        <link href="https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i,700,700i" rel="stylesheet" />
+      </Helmet>
+      <DrizzleProvider drizzle={drizzle}>
+        <Initializer
+          error={<C404 Web3 />}
+          loadingContractsAndAccounts={<C404 Web3 />}
+          loadingWeb3={<StyledSpin tip="Connecting to your Web3 provider." />}
+        >
+          <ChainChangeWatcher>
+            <ArchonInitializer>
+              <BrowserRouter>
+                <Layout>
+                  <StyledLayoutSider
+                    breakpoint="md"
+                    collapsedWidth="0"
+                    collapsed={isMenuClosed}
+                    onClick={() => setIsMenuClosed((previousState) => !previousState)}
+                  >
+                    <Menu theme="dark">{MenuItems}</Menu>
+                  </StyledLayoutSider>
+                  <Layout>
+                    <StyledLayoutHeader>
+                      <Row>
+                        <StyledLogoCol md={4} sm={12} xs={0}>
+                          <LogoNavLink to="/">
+                            <Logo />
+                          </LogoNavLink>
+                        </StyledLogoCol>
+                        <Col lg={16} md={12} xs={0}>
+                          <StyledMenu mode="horizontal" theme="dark">
+                            {MenuItems}
+                          </StyledMenu>
+                        </Col>
+                        <StyledTrayCol lg={4} md={8} sm={12} xs={24}>
+                          <StyledTray>
+                            <StyledNetworkStatus />
+                            <Identicon pinakion />
+                            <NotificationSettings settings={settings} />
+                            <StyledBuyPNK href="/tokens">Buy PNK</StyledBuyPNK>
+                          </StyledTray>
+                        </StyledTrayCol>
+                      </Row>
+                    </StyledLayoutHeader>
+                    <StyledLayoutContent>
+                      <Switch>
+                        <Route component={Home} exact path="/" />
+                        <Route component={Courts} exact path="/courts" />
+                        <Route component={Cases} exact path="/cases" />
+                        <Route component={Case} exact path="/cases/:ID" />
+                        <Route component={Tokens} exact path="/tokens" />
+                        <Route component={C404} />
+                      </Switch>
+                    </StyledLayoutContent>
+                    <Footer />
+                    <StyledClickaway
+                      isMenuClosed={isMenuClosed}
+                      onClick={isMenuClosed ? null : () => setIsMenuClosed(true)}
+                    />
+                  </Layout>
+                </Layout>
+              </BrowserRouter>
+            </ArchonInitializer>
+          </ChainChangeWatcher>
+        </Initializer>
+      </DrizzleProvider>
+    </>
+  );
+}
 
 const StyledSpin = styled(Spin)`
   left: 50%;
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
-`
-const C404 = loadable(
-  () => import(/* webpackPrefetch: true */ '../containers/404'),
-  {
-    fallback: <StyledSpin />
-  }
-)
-const Home = loadable(
-  () => import(/* webpackPrefetch: true */ '../containers/home'),
-  {
-    fallback: <StyledSpin />
-  }
-)
-const Courts = loadable(
-  () => import(/* webpackPrefetch: true */ '../containers/courts'),
-  {
-    fallback: <StyledSpin />
-  }
-)
-const Cases = loadable(
-  () => import(/* webpackPrefetch: true */ '../containers/cases'),
-  {
-    fallback: <StyledSpin />
-  }
-)
+`;
+
+const C404 = loadable(() => import(/* webpackPrefetch: true */ "../containers/404"), {
+  fallback: <StyledSpin />,
+});
+
+const Home = loadable(() => import(/* webpackPrefetch: true */ "../containers/home"), {
+  fallback: <StyledSpin />,
+});
+
+const Courts = loadable(() => import(/* webpackPrefetch: true */ "../containers/courts"), {
+  fallback: <StyledSpin />,
+});
+
+const Cases = loadable(() => import(/* webpackPrefetch: true */ "../containers/cases"), {
+  fallback: <StyledSpin />,
+});
+
 const Case = loadable(
   async ({
     match: {
-      params: { ID }
-    }
+      params: { ID },
+    },
   }) => {
     try {
-      await drizzle.contracts.KlerosLiquid.methods.disputes(ID).call()
+      await drizzle.contracts.KlerosLiquid.methods.disputes(ID).call();
     } catch (err) {
-      console.error(err)
-      return C404
+      console.error(err);
+      return C404;
     }
-    return import(/* webpackPrefetch: true */ '../containers/case')
+    return import(/* webpackPrefetch: true */ "../containers/case");
   },
   {
-    fallback: <StyledSpin />
+    fallback: <StyledSpin />,
   }
-)
-const Tokens = loadable(
-  () => import(/* webpackPrefetch: true */ '../containers/tokens'),
-  {
-    fallback: <StyledSpin />
-  }
-)
+);
+
+const Tokens = loadable(() => import(/* webpackPrefetch: true */ "../containers/tokens"), {
+  fallback: <StyledSpin />,
+});
+
 const MenuItems = [
   <Menu.Item key="home">
     <NavLink to="/">Home</NavLink>
@@ -89,16 +158,18 @@ const MenuItems = [
     >
       Guide
     </a>
-  </Menu.Item>
-]
+  </Menu.Item>,
+];
+
 const settings = {
-  draw: 'When I am drawn as a juror.',
-  appeal: 'When a case I ruled is appealed.',
-  key: 'court',
-  lose: 'When I lose tokens.',
-  win: 'When I win arbitration fees.',
-  stake: 'When my stakes are changed.'
-}
+  draw: "When I am drawn as a juror.",
+  appeal: "When a case I ruled is appealed.",
+  key: "court",
+  lose: "When I lose tokens.",
+  win: "When I win arbitration fees.",
+  stake: "When my stakes are changed.",
+};
+
 const StyledLayoutSider = styled(Layout.Sider)`
   height: 100%;
   position: fixed;
@@ -113,19 +184,31 @@ const StyledLayoutSider = styled(Layout.Sider)`
     top: 12px;
     width: 50px;
   }
-`
-const StyledCol = styled(Col)`
-  align-items: center;
+`;
+
+const StyledLogoCol = styled(Col)`
   display: flex;
+  align-items: center;
   height: 64px;
-  justify-content: space-evenly;
+
+  @media (max-width: 769.98px) {
+    padding-left: 1rem;
+  }
 
   @media (max-width: 575px) {
     &.ant-col-xs-0 {
       display: none;
     }
   }
-`
+`;
+
+const StyledTrayCol = styled(Col)`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 64px;
+`;
+
 const StyledMenu = styled(Menu)`
   font-weight: 500;
   line-height: 64px !important;
@@ -134,110 +217,62 @@ const StyledMenu = styled(Menu)`
   .ant-menu-item-selected {
     background-color: transparent !important;
   }
-`
+`;
+
 const StyledLayoutContent = styled(Layout.Content)`
   background: #f2e3ff;
   min-height: 100vh;
   padding: 0px 9.375vw 120px 9.375vw;
-`
+`;
+
+const StyledLayoutHeader = styled(Layout.Header)`
+  height: auto;
+  line-height: initial;
+`;
+
+const StyledTray = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  > * {
+    min-width: 0;
+  }
+`;
+
+const StyledNetworkStatus = styled(NetworkStatus)`
+  pointer-events: none;
+`;
+
 const StyledBuyPNK = styled.a`
   border: 1px solid white;
   border-radius: 3px;
   color: #fff;
-  line-height: 16px;
-  padding: 11px 34px;
+  padding: 0.75rem 1.25rem;
   text-decoration: none;
+  white-space: nowrap;
 
   &:hover {
     color: #fff;
   }
-`
+`;
 
 const StyledClickaway = styled.div`
   background-color: black;
   height: 100%;
-  opacity: ${properties => (properties.isMenuClosed ? 0 : 0.4)};
-  pointer-events: ${properties => (properties.isMenuClosed ? 'none' : 'auto')};
+  opacity: ${(properties) => (properties.isMenuClosed ? 0 : 0.4)};
+  pointer-events: ${(properties) => (properties.isMenuClosed ? "none" : "auto")};
   position: fixed;
   transition: opacity 0.3s;
   width: 100%;
-`
+`;
 
 const LogoNavLink = styled(NavLink)`
-  margin-top: 25px;
-`
+  display: inline-block;
+  max-width: 120px;
 
-export default () => {
-  const [isMenuClosed, setIsMenuClosed] = useState(true)
-  return (
-    <>
-      <Helmet>
-        <title>Kleros · Court</title>
-        <link
-          href="https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i,700,700i"
-          rel="stylesheet"
-        />
-      </Helmet>
-      <DrizzleProvider drizzle={drizzle}>
-        <Initializer
-          error={<C404 Web3 />}
-          loadingContractsAndAccounts={<C404 Web3 />}
-          loadingWeb3={<StyledSpin tip="Connecting to your Web3 provider." />}
-        >
-          <ArchonInitializer>
-            <BrowserRouter>
-              <Layout>
-                <StyledLayoutSider
-                  breakpoint="md"
-                  collapsedWidth="0"
-                  collapsed={isMenuClosed}
-                  onClick={() =>
-                    setIsMenuClosed(previousState => !previousState)
-                  }
-                >
-                  <Menu theme="dark">{MenuItems}</Menu>
-                </StyledLayoutSider>
-                <Layout>
-                  <Layout.Header>
-                    <Row>
-                      <StyledCol md={3} sm={16} xs={0}>
-                        <LogoNavLink to="/">
-                          <Logo />
-                        </LogoNavLink>
-                      </StyledCol>
-                      <Col md={16} xs={0}>
-                        <StyledMenu mode="horizontal" theme="dark">
-                          {MenuItems}
-                        </StyledMenu>
-                      </Col>
-                      <StyledCol md={5} sm={8} xs={24}>
-                        <NotificationSettings settings={settings} />
-                        <Identicon pinakion />
-                        <StyledBuyPNK href="/tokens">Buy PNK</StyledBuyPNK>
-                      </StyledCol>
-                    </Row>
-                  </Layout.Header>
-                  <StyledLayoutContent>
-                    <Switch>
-                      <Route component={Home} exact path="/" />
-                      <Route component={Courts} exact path="/courts" />
-                      <Route component={Cases} exact path="/cases" />
-                      <Route component={Case} exact path="/cases/:ID" />
-                      <Route component={Tokens} exact path="/tokens" />
-                      <Route component={C404} />
-                    </Switch>
-                  </StyledLayoutContent>
-                  <Footer />
-                  <StyledClickaway
-                    isMenuClosed={isMenuClosed}
-                    onClick={isMenuClosed ? null : () => setIsMenuClosed(true)}
-                  />
-                </Layout>
-              </Layout>
-            </BrowserRouter>
-          </ArchonInitializer>
-        </Initializer>
-      </DrizzleProvider>
-    </>
-  )
-}
+  > svg {
+    display: block;
+    width: 100%;
+  }
+`;

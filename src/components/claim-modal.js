@@ -1,40 +1,47 @@
-import { Modal, Button, Spin } from "antd";
-import Web3 from "../bootstrap/web3";
-import MerkleRedeem from "../../node_modules/@kleros/pnk-merkle-drop-contracts/deployments/mainnet/MerkleRedeem.json";
-import PropTypes from "prop-types";
-
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import { Modal, Button, Spin } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
+import MerkleRedeem from "@kleros/pnk-merkle-drop-contracts/deployments/mainnet/MerkleRedeem.json";
+import Web3 from "../bootstrap/web3";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import { ReactComponent as Kleros } from "../assets/images/kleros.svg";
-
 import { ReactComponent as RightArrow } from "../assets/images/right-arrow.svg";
+import useChainId from "../hooks/use-chain-id";
+import ETHAmount from "./eth-amount";
+import TokenSymbol from "./token-symbol";
+
+const chainIdToParams = {
+  1: {
+    contractAddress: "0xdbc3088Dfebc3cc6A84B0271DaDe2696DB00Af38",
+    snapshots: [
+      "https://ipfs.kleros.io/ipfs/QmYJGrQBh68kAvqk57FdynEixdu4VY87mHme821rtPS92u/snapshot-1.json",
+      "https://ipfs.kleros.io/ipfs/QmUCTdvyAWU8eEV1nwgiF7CwKpL5FnXiDxGD9FedFdrHYU/snapshot-2021-03.json",
+      "https://ipfs.kleros.io/ipfs/QmXG2EKcd3tyMwoxhrqmBAu7gsrzgF3jCde75CjQzmg1Am/snapshot-2021-04.json",
+    ],
+    blockExplorerBaseUrl: "https://etherscan.io",
+  },
+  42: {
+    contractAddress: "0x193353d006Ab015216D34419a845989e76612475",
+    snapshots: [],
+    blockExplorerBaseUrl: "https://kovan.etherscan.io",
+  },
+};
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
 const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => {
   const { drizzle } = useDrizzle();
-  const drizzleState = useDrizzleState((drizzleState) => ({
+  const { account } = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
-    web3: drizzleState.web3,
   }));
+  const chainId = useChainId(drizzle.web3);
 
   const [claims, setClaims] = useState(0);
   const [txHash, setTxHash] = useState(null);
   const [claimStatus, setClaimStatus] = useState(0);
   const [modalState, setModalState] = useState(0);
   const [currentClaimValue, setCurrentClaimValue] = useState(12);
-
-  const CONTRACT_ADDRESSES = {
-    1: "0xdbc3088Dfebc3cc6A84B0271DaDe2696DB00Af38",
-    42: "0x193353d006Ab015216D34419a845989e76612475",
-  };
-
-  const SNAPSHOTS = [
-    "https://ipfs.kleros.io/ipfs/QmYJGrQBh68kAvqk57FdynEixdu4VY87mHme821rtPS92u/snapshot-1.json",
-    "https://ipfs.kleros.io/ipfs/QmUCTdvyAWU8eEV1nwgiF7CwKpL5FnXiDxGD9FedFdrHYU/snapshot-2021-03.json",
-    "https://ipfs.kleros.io/ipfs/QmXG2EKcd3tyMwoxhrqmBAu7gsrzgF3jCde75CjQzmg1Am/snapshot-2021-04.json",
-  ];
 
   const claimObjects = (claims) => {
     if (claims.length > 0)
@@ -52,8 +59,16 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
 
   useEffect(() => {
     var responses = [];
-    for (var month = 0; month < SNAPSHOTS.length; month++) {
-      responses[month] = fetch(SNAPSHOTS[month]);
+    const airdropParams = chainIdToParams[chainId];
+
+    if (!airdropParams) {
+      return;
+    }
+
+    const snapshots = airdropParams?.snapshots ?? [];
+
+    for (var month = 0; month < snapshots.length; month++) {
+      responses[month] = fetch(snapshots[month]);
     }
     const results = Promise.all(
       responses.map((promise) => promise.then((r) => r.json()).catch((e) => console.error(e)))
@@ -79,8 +94,15 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       .then((r) => r.json())
       .then((r) => apyCallback(drizzle.web3.utils.fromWei(r.data.totalStakeds[0].totalStakedAmount)))
       .catch(() => {
-        console.error("Falling back to last merkle tree for calculating apy");
-        results.then((trees) => apyCallback(drizzle.web3.utils.fromWei(trees.slice(-1)[0].averageTotalStaked.hex)));
+        console.warn("Falling back to last merkle tree for calculating APY");
+        results.then((trees) => {
+          if (trees.length === 0) {
+            console.warn("No snapshot found! Cannot calculate the APY");
+            return;
+          }
+
+          return apyCallback(drizzle.web3.utils.fromWei(trees.slice(-1)[0].averageTotalStaked.hex));
+        });
       });
 
     setClaims(0);
@@ -88,10 +110,10 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       r.forEach(function (item) {
         if (item) {
           apyCallback(item.apy);
-          if (item.merkleTree.claims[drizzleState.account]) displayButton();
+          if (item.merkleTree.claims[account]) displayButton();
           setClaims((prevState) => {
-            if (prevState) return [...prevState, item.merkleTree.claims[drizzleState.account]];
-            else return [item.merkleTree.claims[drizzleState.account]];
+            if (prevState) return [...prevState, item.merkleTree.claims[account]];
+            else return [item.merkleTree.claims[account]];
           });
         } else
           setClaims((prevState) => {
@@ -101,13 +123,11 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       })
     );
 
-    const contract = new Web3.eth.Contract(MerkleRedeem.abi, CONTRACT_ADDRESSES[drizzleState.web3.networkId]);
-    const claimStatus = contract.methods.claimStatus(drizzleState.account, 0, 12).call();
-
-    //
+    const contract = new Web3.eth.Contract(MerkleRedeem.abi, airdropParams.contractAddress);
+    const claimStatus = contract.methods.claimStatus(account, 0, 12).call();
 
     claimStatus.then((r) => setClaimStatus(r));
-  }, [drizzleState.account, drizzleState.web3.networkId, modalState]);
+  }, [account, chainId, drizzle.web3.utils, modalState, apyCallback, displayButton]);
 
   const handleClaim = () => {
     setModalState(1);
@@ -153,7 +173,12 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       });
 
   const claimWeeks = (claims) => {
-    const contract = new Web3.eth.Contract(MerkleRedeem.abi, CONTRACT_ADDRESSES[drizzleState.web3.networkId]);
+    const airdropParams = chainIdToParams[chainId];
+    if (!airdropParams) {
+      return;
+    }
+
+    const contract = new Web3.eth.Contract(MerkleRedeem.abi, airdropParams.contractAddress);
     const args = claimObjects(claims).filter((_claim) => Boolean(claimStatus[_claim.week]) === false);
 
     setCurrentClaimValue(
@@ -164,7 +189,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
         }, drizzle.web3.utils.toBN("0x0"))
     );
 
-    return contract.methods.claimWeeks(drizzleState.account, args).send({ from: drizzleState.account });
+    return contract.methods.claimWeeks(account, args).send({ from: account });
   };
 
   return (
@@ -178,7 +203,11 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       }}
       centered
       keyboard
-      okText="Claim Your PNK Tokens"
+      okText={
+        <>
+          Claim Your <TokenSymbol token="PNK" /> Tokens
+        </>
+      }
       onOk={onOk}
       onCancel={handleCancel}
       visible={visible}
@@ -198,13 +227,13 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
           marginBottom: "24px",
         }}
       >
-        {" "}
         {claims.length > 0 &&
           claimStatus.length > 0 &&
-          (modalState === 2
-            ? Number(drizzle.web3.utils.fromWei(currentClaimValue)).toFixed(0)
-            : Number(drizzle.web3.utils.fromWei(getTotalClaimable(claims))).toFixed(0))}{" "}
-        PNK{" "}
+          (modalState === 2 ? (
+            <ETHAmount amount={currentClaimValue} decimals={0} tokenSymbol="PNK" />
+          ) : (
+            <ETHAmount amount={getTotalClaimable(claims)} decimals={0} tokenSymbol="PNK" />
+          ))}
       </div>
       {modalState === 0 && (
         <>
@@ -218,7 +247,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
             </span>
           </div>
           <div style={{ fontSize: "24px", fontWeight: "500", marginTop: "8px" }}>
-            As a Kleros Juror, you will earn PNK for staking in Court.
+            As a Kleros Juror, you will earn <TokenSymbol token="PNK" /> for staking in Court.
           </div>
 
           <div
@@ -234,9 +263,11 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <div>Total Rewarded PNK:</div>
+              <div>
+                Total Rewarded <TokenSymbol token="PNK" />:
+              </div>
               <div style={{ fontWeight: "500", textAlign: "right" }}>
-                {claims && Number(drizzle.web3.utils.fromWei(getTotalRewarded(claims))).toFixed(0)} PNK
+                <ETHAmount amount={claims && getTotalRewarded(claims)} decimals={0} tokenSymbol="PNK" />
               </div>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -248,7 +279,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
                   textAlign: "right",
                 }}
               >
-                {claims && Number(drizzle.web3.utils.fromWei(getTotalClaimable(claims))).toFixed(0)} PNK
+                <ETHAmount amount={claims && getTotalClaimable(claims)} decimals={0} tokenSymbol="PNK" />
               </div>
             </div>
           </div>
@@ -279,7 +310,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
 
         {modalState === 1 && txHash && (
           <a
-            href={`https://${Number(drizzleState.web3.networkId) === 42 ? "kovan." : ""}etherscan.io/tx/${txHash}`}
+            href={`${chainIdToParams[chainId]?.blockExplorerBaseUrl}/tx/${txHash}`}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -320,7 +351,9 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
           }
           disabled={!claims || Number(drizzle.web3.utils.fromWei(getTotalClaimable(claims))).toFixed(0) < 1}
         >
-          Claim Your PNK Tokens
+          <span>
+            Claim Your <TokenSymbol token="PNK" /> Tokens
+          </span>
         </Button>
       )}
     </Modal>

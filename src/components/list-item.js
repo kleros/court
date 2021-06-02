@@ -1,26 +1,32 @@
-import { List } from 'antd'
-import React from 'react'
-import styled from 'styled-components/macro'
+import React from "react";
+import t from "prop-types";
+import styled from "styled-components/macro";
+import { List } from "antd";
 
 const StyledListItem = styled(List.Item)`
   color: #4004a3;
   font-weight: bold;
   padding-left: 19px;
+  padding-right: 19px;
   position: relative;
 
-  .ant-list-item-extra {
-    font-size: 18px;
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
+  display: flex;
+  gap: 16px;
+
+  ::last-child {
+    margin-left: auto;
   }
-`
+`;
 
 const ListItem = ({ children, extra, ...rest }) => (
-  <StyledListItem extra={extra} {...rest}>
-    {children}
+  <StyledListItem extra={<div>{extra}</div>} {...rest}>
+    <div>{children}</div>
   </StyledListItem>
-)
+);
 
-export default ListItem
+ListItem.propTypes = {
+  children: t.node,
+  extra: t.node,
+};
+
+export default ListItem;
