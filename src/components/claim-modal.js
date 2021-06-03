@@ -18,7 +18,7 @@ const chainIdToParams = {
       "https://ipfs.kleros.io/ipfs/QmYJGrQBh68kAvqk57FdynEixdu4VY87mHme821rtPS92u/snapshot-1.json",
       "https://ipfs.kleros.io/ipfs/QmUCTdvyAWU8eEV1nwgiF7CwKpL5FnXiDxGD9FedFdrHYU/snapshot-2021-03.json",
       "https://ipfs.kleros.io/ipfs/QmXG2EKcd3tyMwoxhrqmBAu7gsrzgF3jCde75CjQzmg1Am/snapshot-2021-04.json",
-      "https://ipfs.kleros.io/ipfs/QmeycKsUhLehetBtA5wBmVtdPvW9czEfjPqSGbnKuf1awc/snapshot-2021-05.json",
+      "https://ipfs.kleros.io/ipfs/QmYEpiCACmZttwxFqsG4sSYsCpUeGchEgJGSRQFPuB6Txe/snapshot-2021-05.json",
     ],
     blockExplorerBaseUrl: "https://etherscan.io",
   },
