@@ -4,9 +4,11 @@ import styled from "styled-components/macro";
 import { Link } from "react-router-dom";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import { TokenBridgeApiProvider, isSupportedChain } from "../api/token-bridge";
 import AlternativeChainCourt from "../components/alternative-chain-court";
 import CasesListCard from "../components/cases-list-card";
 import CourtsListCard from "../components/courts-list-card";
+import GetSideChainPnkButton from "../components/get-side-chain-pnk-button";
 import NotificationsCard from "../components/notifications-card";
 import OngoingCasesCard from "../components/ongoing-cases-card";
 import PerformanceCard from "../components/performance-card";
@@ -102,9 +104,14 @@ export default function Home() {
                 Buy PNK
               </StyledButton>
             </Link>
+            {isSupportedChain(chainId) ? (
+              <TokenBridgeApiProvider web3Provider={drizzle.web3.currentProvider} renderOnLoading={null}>
+                <GetSideChainPnkButton />
+              </TokenBridgeApiProvider>
+            ) : null}
             <Link to="/courts">
               <StyledButton size="large" type="primary">
-                Join a Court
+                See Courts
               </StyledButton>
             </Link>
           </StyledButtonBar>

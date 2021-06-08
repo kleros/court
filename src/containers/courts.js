@@ -4,10 +4,12 @@ import { Link } from "react-router-dom";
 import { Button, Col, Divider, Row, Spin } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import { TokenBridgeApiProvider, isSupportedChain } from "../api/token-bridge";
 import AlternativeChainCourt from "../components/alternative-chain-court";
 import CourtCard from "../components/court-card";
 import CourtCascaderModal from "../components/court-cascader-modal";
 import CourtDrawer from "../components/court-drawer";
+import GetSideChainPnkButton from "../components/get-side-chain-pnk-button";
 import PNKBalanceCard from "../components/pnk-balance-card";
 import RequiredChainIdGateway from "../components/required-chain-id-gateway";
 import RequiredChainIdModal from "../components/required-chain-id-modal";
@@ -53,6 +55,13 @@ export default function Courts() {
                 Buy PNK
               </StyledButton>
             </Link>
+
+            {isSupportedChain(chainId) ? (
+              <TokenBridgeApiProvider web3Provider={drizzle.web3.currentProvider} renderOnLoading={null}>
+                <GetSideChainPnkButton />
+              </TokenBridgeApiProvider>
+            ) : null}
+
             <StyledButton
               onClick={useCallback(() => setStakingID(null), [])}
               size="large"
