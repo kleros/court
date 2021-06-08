@@ -2,8 +2,7 @@ import React from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
-import { Icon, Modal } from "antd";
-import { ButtonLink } from "../adapters/antd";
+import { Button, Modal } from "antd";
 import { chainIdToNetworkName } from "../helpers/networks";
 import { TokenBridgeApiProvider, useTokenBridgeApi, isSupportedSideChain } from "../api/token-bridge";
 import useAccount from "../hooks/use-account";
@@ -19,31 +18,47 @@ export default function RequiredChainIdModal({ requiredChainId }) {
   const cleanRequiredChainId = useCleanRequiredChainId();
 
   return (
-    <StyledModal
-      visible
-      centered
-      width={640}
-      footer={
-        isSupportedSideChain(requiredChainId) ? (
-          <ButtonLink href="#" target="_blank" rel="noreferrer noopener">
-            <span>Any doubts? Learn how to add {chainIdToNetworkName[requiredChainId]} on Metamask</span>
-
-            <Icon type="arrow-right" />
-          </ButtonLink>
-        ) : null
-      }
-      title={<>Switch to {chainIdToNetworkName[requiredChainId]}</>}
-      onCancel={() => cleanRequiredChainId()}
-    >
-      <TokenBridgeApiProvider web3Provider={drizzle.web3.currentProvider}>
+    <TokenBridgeApiProvider web3Provider={drizzle.web3.currentProvider}>
+      <StyledModal
+        visible
+        centered
+        width={640}
+        footer={
+          isSupportedSideChain(requiredChainId) ? <SwitchNetworkButton requiredChainId={requiredChainId} /> : null
+        }
+        title={<>Switch to {chainIdToNetworkName[requiredChainId]}</>}
+        onCancel={() => cleanRequiredChainId()}
+      >
         <RequiredChainIdModalContent />
-      </TokenBridgeApiProvider>
-    </StyledModal>
+      </StyledModal>
+    </TokenBridgeApiProvider>
   );
 }
 
 RequiredChainIdModal.propTypes = {
   requiredChainId: t.number,
+};
+
+function SwitchNetworkButton({ requiredChainId }) {
+  const tokenBridgeApi = useTokenBridgeApi();
+
+  const switchChain = async () => {
+    try {
+      await tokenBridgeApi.destination.switchChain();
+    } catch {
+      // Do nothing...
+    }
+  };
+
+  return (
+    <Button onClick={switchChain}>
+      <span>Switch to {chainIdToNetworkName[requiredChainId]}</span>
+    </Button>
+  );
+}
+
+SwitchNetworkButton.propTypes = {
+  requiredChainId: t.number.isRequired,
 };
 
 function RequiredChainIdModalContent() {
