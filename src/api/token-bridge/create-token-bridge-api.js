@@ -12,15 +12,15 @@ const { toHex } = Web3.utils;
 
 export const supportedChains = {
   // Mainnet
-  1: {
-    chainId: 1,
-    chainName: "Mainnet",
-    nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
-    rpcUrls: [ensureEnv("REACT_APP_WEB3_FALLBACK_URL")],
-    blockExplorerUrls: [getBaseUrl(1)],
-    side: "ethereum",
-    counterPartyChainId: 100,
-  },
+  // 1: {
+  //   chainId: 1,
+  //   chainName: "Mainnet",
+  //   nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+  //   rpcUrls: [ensureEnv("REACT_APP_WEB3_FALLBACK_URL")],
+  //   blockExplorerUrls: [getBaseUrl(1)],
+  //   side: "ethereum",
+  //   counterPartyChainId: 100,
+  // },
   // Kovan
   42: {
     chainId: 42,
@@ -32,15 +32,15 @@ export const supportedChains = {
     counterPartyChainId: 77,
   },
   // xDai
-  100: {
-    chainId: 100,
-    chainName: "xDAI",
-    nativeCurrency: { name: "xDAI", symbol: "xDAI", decimals: 18 },
-    rpcUrls: [ensureEnv("REACT_APP_WEB3_FALLBACK_XDAI_URL")],
-    blockExplorerUrls: [getBaseUrl(100)],
-    side: "xDai",
-    counterPartyChainId: 1,
-  },
+  // 100: {
+  //   chainId: 100,
+  //   chainName: "xDAI",
+  //   nativeCurrency: { name: "xDAI", symbol: "xDAI", decimals: 18 },
+  //   rpcUrls: [ensureEnv("REACT_APP_WEB3_FALLBACK_XDAI_URL")],
+  //   blockExplorerUrls: [getBaseUrl(100)],
+  //   side: "xDai",
+  //   counterPartyChainId: 1,
+  // },
   // Sokol
   77: {
     chainId: 77,
