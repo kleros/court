@@ -44,7 +44,7 @@ export function createReadOnlyApi({ chainId, tokenBridge, wrappedPinakion, klero
     const feeRateBasisPoints = fee.mul(BASIS_POINTS_MULTIPLIER).div(desiredAmount);
 
     /**
-     * To obtain the required amount to get exactly the desired amount when briding,
+     * To obtain the required amount to get exactly the desired amount when bridging,
      * we have the following equation:
      *
      *  d = r - f
