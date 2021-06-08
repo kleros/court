@@ -1,5 +1,12 @@
 import { useEffect, useReducer, useState, useCallback } from "react";
 
+export const GeneratorState = {
+  Idle: "idle",
+  Running: "running",
+  Done: "done",
+  Error: "done",
+};
+
 export function useAsyncGenerator(fn) {
   const [iter, setIter] = useState();
   const run = useCallback(
@@ -63,17 +70,17 @@ export function useAsyncIterator(iter) {
 
   return {
     state: state.tag,
-    isIdle: state.tag === "idle",
-    isRunning: state.tag === "running",
-    isDone: state.tag === "done",
-    isError: state.tag === "error",
+    isIdle: state.tag === GeneratorState.Idle,
+    isRunning: state.tag === GeneratorState.Running,
+    isDone: state.tag === GeneratorState.Done,
+    isError: state.tag === GeneratorState.Error,
     value: state.context.value,
     error: state.context.error,
   };
 }
 
 const INITIAL_STATE = {
-  tag: "idle",
+  tag: GeneratorState.Idle,
   context: {
     value: undefined,
     error: null,
@@ -104,10 +111,10 @@ const INITIAL_STATE = {
 const generatorStateMachineReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case "VALUE_YIELDED":
-      return ["idle", "running"].includes(state.tag)
+      return [GeneratorState.Idle, GeneratorState.Running].includes(state.tag)
         ? {
             ...state,
-            tag: "running",
+            tag: GeneratorState.Running,
             context: {
               ...state.context,
               value: action.payload.value,
@@ -115,10 +122,10 @@ const generatorStateMachineReducer = (state = INITIAL_STATE, action) => {
           }
         : state;
     case "ERROR_THROWN":
-      return state.tag !== "finished"
+      return state.tag !== GeneratorState.Done
         ? {
             ...state,
-            tag: "error",
+            tag: GeneratorState.Error,
             context: {
               ...state.context,
               error: action.payload.error,
@@ -126,13 +133,15 @@ const generatorStateMachineReducer = (state = INITIAL_STATE, action) => {
           }
         : state;
     case "RETURNED":
-      return state.tag !== "error"
+      return state.tag !== GeneratorState.Error
         ? {
             ...state,
-            tag: "done",
+            tag: GeneratorState.Done,
           }
         : state;
-    default:
+    case "RESET":
       return INITIAL_STATE;
+    default:
+      return state;
   }
 };

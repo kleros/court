@@ -31,7 +31,6 @@ export function createReadOnlyApi({ chainId, tokenBridge, pinakion, klerosLiquid
 
   return {
     chainId,
-    side: "ethereum",
     getBalance,
     getStake,
     getAllowance,

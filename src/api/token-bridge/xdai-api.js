@@ -64,7 +64,6 @@ export function createReadOnlyApi({ chainId, tokenBridge, wrappedPinakion, klero
 
   return {
     chainId,
-    side: "xDai",
     getBalance,
     getStake,
     getAllowance,

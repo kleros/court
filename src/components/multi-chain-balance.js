@@ -4,8 +4,9 @@ import clsx from "clsx";
 import { Typography } from "antd";
 import Web3 from "web3";
 import styled from "styled-components/macro";
-import EthAmount from "../../../components/eth-amount";
-import TokenSymbol from "../../../components/token-symbol";
+import { chainIdToNetworkName } from "../helpers/networks";
+import EthAmount from "./eth-amount";
+import TokenSymbol from "./token-symbol";
 
 const { toBN, BN } = Web3.utils;
 
@@ -88,13 +89,6 @@ MultiChainBalance.propTypes = {
   originTotalStaked: t.oneOfType([t.string, t.number, t.instanceOf(BN), t.object]),
   destinationChainId: t.number.isRequired,
   destinationBalance: t.oneOfType([t.string, t.number, t.instanceOf(BN), t.object]),
-};
-
-const chainIdToNetworkName = {
-  1: "Ethereum Mainnet",
-  42: "Ethereum Kovan",
-  77: "POA Sokol",
-  100: "xDAI Chain",
 };
 
 function EntryRow({ error, value, description, tokenSymbol, className }) {

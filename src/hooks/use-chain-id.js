@@ -7,7 +7,7 @@ export default function useChainId(web3) {
     let isMounted = true;
 
     async function getChainId() {
-      if (isMounted) {
+      if (isMounted && typeof web3?.eth?.getChainId === "function") {
         const chainIdFromProvider = await web3.eth.getChainId();
         setChainId(chainIdFromProvider);
       }

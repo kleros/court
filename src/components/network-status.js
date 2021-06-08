@@ -2,18 +2,33 @@ import React from "react";
 import t from "prop-types";
 import clsx from "clsx";
 import styled from "styled-components/macro";
-import { Badge } from "antd";
+import { Badge, Skeleton } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import useChainId from "../hooks/use-chain-id";
+import { chainIdToNetworkShortName } from "../helpers/networks";
 
 const { useDrizzleState, useDrizzle } = drizzleReactHooks;
 
-const networkIdToNetworkName = {
-  1: "Mainnet",
-  3: "Ropsten",
-  42: "Kovan",
-  77: "Sokol",
-  100: "xDAI",
+export default function NetworkStatus({ className }) {
+  const { status } = useDrizzleState((drizzleState) => ({
+    status: drizzleState.web3.status,
+  }));
+  const { drizzle } = useDrizzle();
+  const chainId = useChainId(drizzle.web3);
+
+  return chainId ? (
+    <StyledBadge
+      className={clsx(status, className)}
+      status={networkStatusToBadgeStatus[status]}
+      text={chainIdToNetworkShortName[chainId]}
+    />
+  ) : (
+    <StyledSkeleton active paragraph={false} />
+  );
+}
+
+NetworkStatus.propTypes = {
+  className: t.string,
 };
 
 const networkStatusToBadgeStatus = {
@@ -47,24 +62,25 @@ const StyledBadge = styled(Badge)`
   }
 `;
 
-const NetworkStatus = ({ className }) => {
-  const { status } = useDrizzleState((drizzleState) => ({
-    status: drizzleState.web3.status,
-  }));
-  const { drizzle } = useDrizzle();
-  const chainId = useChainId(drizzle.web3);
+const StyledSkeleton = styled(Skeleton)`
+  && {
+    display: block;
+    width: 80px;
+    margin: 0;
 
-  return (
-    <StyledBadge
-      className={clsx(status, className)}
-      status={networkStatusToBadgeStatus[status]}
-      text={networkIdToNetworkName[chainId]}
-    />
-  );
-};
+    .ant-skeleton-content {
+      display: block;
+    }
 
-NetworkStatus.propTypes = {
-  className: t.string,
-};
-
-export default NetworkStatus;
+    .ant-skeleton-title {
+      margin: 0;
+      border-radius: 4px;
+      background-image: linear-gradient(
+        90deg,
+        rgba(242, 242, 242, 0.25) 25%,
+        rgba(230, 230, 230, 0.25) 37%,
+        rgba(242, 242, 242, 0.25) 63%
+      ) !important;
+    }
+  }
+`;

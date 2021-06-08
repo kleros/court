@@ -83,7 +83,7 @@ const TokenBridgeForm = Form.create()(({ form, maxAvailable, isSubmitting, disab
   return (
     <div>
       <StyledTitle level={3}>
-        Convert <TokenSymbol chainId={tokenBridgeApi.origin.chainId} token="PNK" />
+        Swap <TokenSymbol chainId={tokenBridgeApi.origin.chainId} token="PNK" />
       </StyledTitle>
       <Form hideRequiredMark layout="vertical" onSubmit={handleSubmit}>
         <StyledRow>

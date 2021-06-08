@@ -4,31 +4,50 @@ import TokenBridgeEthereum from "../../assets/contracts/token-bridge-ethereum.js
 import TokenBridgeXDai from "../../assets/contracts/token-bridge-xdai.json";
 import WrappedPinakion from "../../assets/contracts/wrapped-pinakion.json";
 import Pinakion from "../../assets/contracts/pinakion.json";
+import { getBaseUrl } from "../../helpers/block-explorer";
 import * as ethereum from "./ethereum-api";
 import * as xDai from "./xdai-api";
+
+const { toHex } = Web3.utils;
 
 export const supportedChains = {
   // Mainnet
   1: {
-    readOnlyProviderUrl: ensureEnv("REACT_APP_WEB3_FALLBACK_URL"),
+    chainId: 1,
+    chainName: "Mainnet",
+    nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+    rpcUrls: [ensureEnv("REACT_APP_WEB3_FALLBACK_URL")],
+    blockExplorerUrls: [getBaseUrl(1)],
     side: "ethereum",
     counterPartyChainId: 100,
   },
   // Kovan
   42: {
-    readOnlyProviderUrl: ensureEnv("REACT_APP_WEB3_FALLBACK_KOVAN_URL"),
+    chainId: 42,
+    chainName: "Kovan",
+    nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+    rpcUrls: [ensureEnv("REACT_APP_WEB3_FALLBACK_KOVAN_URL")],
+    blockExplorerUrls: [getBaseUrl(42)],
     side: "ethereum",
     counterPartyChainId: 77,
   },
   // xDai
   100: {
-    readOnlyProviderUrl: ensureEnv("REACT_APP_WEB3_FALLBACK_XDAI_URL"),
+    chainId: 100,
+    chainName: "xDAI",
+    nativeCurrency: { name: "xDAI", symbol: "xDAI", decimals: 18 },
+    rpcUrls: [ensureEnv("REACT_APP_WEB3_FALLBACK_XDAI_URL")],
+    blockExplorerUrls: [getBaseUrl(100)],
     side: "xDai",
     counterPartyChainId: 1,
   },
   // Sokol
   77: {
-    readOnlyProviderUrl: ensureEnv("REACT_APP_WEB3_FALLBACK_SOKOL_URL"),
+    chainId: 77,
+    chainName: "Sokol",
+    nativeCurrency: { name: "Sokol POA", symbol: "SPOA", decimals: 18 },
+    rpcUrls: [ensureEnv("REACT_APP_WEB3_FALLBACK_SOKOL_URL")],
+    blockExplorerUrls: [getBaseUrl(77)],
     side: "xDai",
     counterPartyChainId: 42,
   },
@@ -38,7 +57,7 @@ export default async function createTokenBridgeApi(provider) {
   const web3 = new Web3(provider);
   // Accounts is ignored because it's purpose is only to check whether
   // the provider can sign transactions or not.
-  const [chainId, ignoredAccounts] = await Promise.all([web3.eth.getChainId(), web3.eth.requestAccounts()]);
+  const [chainId] = await Promise.all([web3.eth.getChainId(), web3.eth.requestAccounts()]);
 
   const chainParams = supportedChains[chainId];
   if (!chainParams) {
@@ -51,17 +70,43 @@ export default async function createTokenBridgeApi(provider) {
     throw new Error(`Unsuported counter-party chain ID: ${counterPartyChainId} for chain ID: ${chainId}`);
   }
 
-  const counterPartyWeb3 = new Web3(getReadOnlyProvider(counterPartyChainParams.readOnlyProviderUrl));
+  const counterPartyWeb3 = new Web3(getReadOnlyProvider(counterPartyChainParams.rpcUrls[0]));
 
-  return chainParams.side === "ethereum"
-    ? {
-        origin: ethereum.createFullApi(ethereumParametersFactory[chainId](web3)),
-        destination: xDai.createReadOnlyApi(xDaiParametersFactory[counterPartyChainId](counterPartyWeb3)),
-      }
-    : {
-        origin: xDai.createFullApi(xDaiParametersFactory[chainId](web3)),
-        destination: ethereum.createReadOnlyApi(ethereumParametersFactory[counterPartyChainId](counterPartyWeb3)),
-      };
+  const api =
+    chainParams.side === "ethereum"
+      ? {
+          origin: ethereum.createFullApi(ethereumParametersFactory[chainId](web3)),
+          destination: xDai.createReadOnlyApi(xDaiParametersFactory[counterPartyChainId](counterPartyWeb3)),
+        }
+      : {
+          origin: xDai.createFullApi(xDaiParametersFactory[chainId](web3)),
+          destination: ethereum.createReadOnlyApi(ethereumParametersFactory[counterPartyChainId](counterPartyWeb3)),
+        };
+
+  const switchChain = createSwitchChain(provider);
+
+  api.origin.switchChain = switchChain.bind(null, api.origin.chainId);
+  api.destination.switchChain = switchChain.bind(null, api.destination.chainId);
+
+  return api;
+}
+
+function createSwitchChain(provider) {
+  return (chainId) => {
+    const chainParams = supportedChains[chainId];
+    return provider.request({
+      method: "wallet_addEthereumChain",
+      params: [
+        {
+          chainId: toHex(chainId),
+          chainName: chainParams.chainName,
+          nativeCurrency: chainParams.nativeCurrency,
+          rpcUrls: chainParams.rpcUrls,
+          blockExplorerUrls: chainParams.blockExplorerUrls,
+        },
+      ],
+    });
+  };
 }
 
 function getReadOnlyProvider(url) {

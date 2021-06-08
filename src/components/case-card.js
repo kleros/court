@@ -235,7 +235,7 @@ const CaseCard = ({ ID, draws }) => {
           </Row>
         </RewardBox>
         <StakeLocked>
-          Stake locked: <ETHAmount amount={disputeData && disputeData.atStake} decimals={2} tokenSymbol="PNK" />{" "}
+          Stake locked: <ETHAmount amount={disputeData && disputeData.atStake} decimals={0} tokenSymbol="PNK" />{" "}
           <Hint
             title="Locked Tokens"
             description="These are the tokens you have locked for the duration of the dispute."

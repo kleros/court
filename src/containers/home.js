@@ -4,6 +4,7 @@ import styled from "styled-components/macro";
 import { Link } from "react-router-dom";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import AlternativeChainCourt from "../components/alternative-chain-court";
 import CasesListCard from "../components/cases-list-card";
 import CourtsListCard from "../components/courts-list-card";
 import NotificationsCard from "../components/notifications-card";
@@ -13,6 +14,8 @@ import RewardCard from "../components/reward-card";
 import ClaimModal from "../components/claim-modal";
 import TopBanner from "../components/top-banner";
 import TokenSymbol from "../components/token-symbol";
+import RequiredChainIdGateway from "../components/required-chain-id-gateway";
+import RequiredChainIdModal from "../components/required-chain-id-modal";
 import useChainId from "../hooks/use-chain-id";
 import { ReactComponent as Present } from "../assets/images/present.svg";
 
@@ -60,7 +63,7 @@ export default function Home() {
     setApy(apy);
   }, []);
 
-  return (
+  const content = (
     <>
       {airdropChainIds.includes(chainId) ? (
         <ClaimModal
@@ -107,6 +110,7 @@ export default function Home() {
           </StyledButtonBar>
         }
       />
+      <AlternativeChainCourt />
       <RewardCard />
       <Row gutter={32}>
         <Col lg={8}>
@@ -122,6 +126,19 @@ export default function Home() {
       <OngoingCasesCard />
       <NotificationsCard />
     </>
+  );
+
+  return (
+    <RequiredChainIdGateway
+      renderOnMismatch={({ requiredChainId }) => (
+        <>
+          {content}
+          <RequiredChainIdModal requiredChainId={requiredChainId} />
+        </>
+      )}
+    >
+      {content}
+    </RequiredChainIdGateway>
   );
 }
 
