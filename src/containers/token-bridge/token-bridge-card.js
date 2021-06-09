@@ -73,9 +73,12 @@ export default function TokenBridgeCard() {
                 try {
                   await tokenBridgeApi.destination.switchChain();
                 } catch {
-                  // If the call fails, it means that it's not supported.
-                  // This happens for the native Ethereum Mainnet and well-known testnets,
-                  // such as Ropsten and Kovan. Apparently this is due to security reasons.
+                  /**
+                   * If the call fails, it means that it's not supported.
+                   * This happens for the native Ethereum Mainnet and well-known testnets,
+                   * such as Ropsten and Kovan. Apparently this is due to security reasons.
+                   * @see { @link https://docs.metamask.io/guide/rpc-api.html#wallet-addethereumchain }
+                   */
                   message.error({
                     key: "switch-network-fail",
                     content: "Failed to switch network. You need to do that manually through MetaMask.",
@@ -149,15 +152,19 @@ export default function TokenBridgeCard() {
               return (
                 <SwitchNetworkMessage
                   title={
-                    <>
-                      <span role="img" aria-label="tada">
-                        🎉
-                      </span>{" "}
-                      {originTokenSymbol} successfully converted!{" "}
-                      <span role="img" aria-label="tada">
-                        🎉
-                      </span>
-                    </>
+                    isSwapStepDone ? (
+                      <>
+                        <span role="img" aria-label="tada">
+                          🎉
+                        </span>{" "}
+                        {originTokenSymbol} successfully converted!{" "}
+                        <span role="img" aria-label="tada">
+                          🎉
+                        </span>
+                      </>
+                    ) : (
+                      "Token conversion skipped"
+                    )
                   }
                   wantedChainId={wantedChainId ?? tokenBridgeApi.destination.chainId}
                 />

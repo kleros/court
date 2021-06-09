@@ -37,7 +37,7 @@ RequiredChainIdGateway.defaultProps = {
 function DefaultRenderOnMismatch({ requiredChainId }) {
   return (
     <StyledCard>
-      <SwitchNetworkMessage title="You are in the wrong network" wantedChainId={requiredChainId} />
+      <SwitchNetworkMessage title="You are on the wrong network" wantedChainId={requiredChainId} />
     </StyledCard>
   );
 }
@@ -52,10 +52,12 @@ export function useSetRequiredChainId() {
   const queryParams = useQueryParams();
 
   return React.useCallback(
-    (requiredChainId) => {
+    (requiredChainId, { location: newLocation } = {}) => {
       if (requiredChainId === undefined || requiredChainId === null) {
         return;
       }
+
+      const newLocationMixin = typeof newLocation === "string" ? { pathname: newLocation } : newLocation;
 
       const newQueryParams = Object.fromEntries(
         Object.entries({
@@ -65,6 +67,7 @@ export function useSetRequiredChainId() {
       );
       history.replace({
         ...location,
+        ...newLocationMixin,
         search: new URLSearchParams(newQueryParams).toString(),
       });
     },

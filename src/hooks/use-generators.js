@@ -4,7 +4,7 @@ export const GeneratorState = {
   Idle: "idle",
   Running: "running",
   Done: "done",
-  Error: "done",
+  Error: "error",
 };
 
 export function useAsyncGenerator(fn) {

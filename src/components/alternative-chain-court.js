@@ -37,11 +37,12 @@ function AlternativeChainCourtLink() {
     try {
       await tokenBridgeApi.destination.switchChain();
     } catch {
-      // If the call fails, it means that it's not supported.
-      // This happens for the native Ethereum Mainnet and well-known testnets,
-      // such as Ropsten and Kovan. Apparently this is due to security reasons.
-      // In this case we just update the required chain ID on the UI so the users
-      // can make the switch themselves.
+      /**
+       * If the call fails, it means that it's not supported.
+       * This happens for the native Ethereum Mainnet and well-known testnets,
+       * such as Ropsten and Kovan. Apparently this is due to security reasons.
+       * @see { @link https://docs.metamask.io/guide/rpc-api.html#wallet-addethereumchain }
+       */
       setRequiredChainId(tokenBridgeApi.destination.chainId);
     }
   };
@@ -80,9 +81,15 @@ function useDestinationTokenData({ getBalance, account }) {
 }
 
 const StyledWrapper = styled.div`
-  margin: 24px 0 -48px;
+  margin: 24px 0 -56px;
   display: flex;
   justify-content: flex-end;
+  position: relative;
+  z-index: 200;
+
+  & + .ant-spin-nested-loading {
+    margin-top: 56px;
+  }
 `;
 
 const StyledSkeleton = styled(Skeleton).attrs(({ active = true, paragraph = false }) => ({ active, paragraph }))`
