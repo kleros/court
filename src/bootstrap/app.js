@@ -76,9 +76,7 @@ export default function App() {
                         <Route exact path="/cases">
                           <Cases />
                         </Route>
-                        <Route exact path="/cases/:ID">
-                          <Case />
-                        </Route>
+                        <Route exact path="/cases/:ID" component={Case} />
                         <Route exact path="/tokens">
                           <Tokens />
                         </Route>
