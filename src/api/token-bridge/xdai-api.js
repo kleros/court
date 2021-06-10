@@ -15,7 +15,8 @@ export function createReadOnlyApi({ chainId, tokenBridge, wrappedPinakion, klero
     return toBN(await klerosLiquidExtraViews.methods.stakeOf(address, subcourtId).call());
   }
 
-  async function getAllowance({ address: ignored }) {
+  // eslint-disable-next-line no-unused-vars
+  async function getAllowance({ address }) {
     return MAX_UINT256;
   }
 
