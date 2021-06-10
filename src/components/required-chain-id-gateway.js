@@ -37,7 +37,7 @@ RequiredChainIdGateway.defaultProps = {
 function DefaultRenderOnMismatch({ requiredChainId }) {
   return (
     <StyledCard>
-      <SwitchNetworkMessage title="You are on the wrong network" wantedChainId={requiredChainId} />
+      <SwitchNetworkMessage showSwitchButton title="You are on the wrong network" wantedChainId={requiredChainId} />
     </StyledCard>
   );
 }

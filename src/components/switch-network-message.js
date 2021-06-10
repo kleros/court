@@ -8,7 +8,7 @@ import { chainIdToNetworkName } from "../helpers/networks";
 
 const { useDrizzle } = drizzleReactHooks;
 
-export default function SwitchNetworkMessage({ title, wantedChainId }) {
+export default function SwitchNetworkMessage({ title, wantedChainId, showSwitchButton }) {
   const isSupported = isSupportedSideChain(wantedChainId);
   const { drizzle } = useDrizzle();
 
@@ -16,7 +16,7 @@ export default function SwitchNetworkMessage({ title, wantedChainId }) {
     <StyledSwitchNetworkMessage>
       <StyledTitle level={3}>{title}</StyledTitle>
       <StyledParagraph>Please switch to {chainIdToNetworkName[wantedChainId]} to proceed.</StyledParagraph>
-      {isSupported ? (
+      {showSwitchButton && isSupported ? (
         <TokenBridgeApiProvider web3Provider={drizzle.web3.currentProvider} renderOnLoading={null}>
           <SwitchNetworkButton />
         </TokenBridgeApiProvider>
@@ -28,6 +28,11 @@ export default function SwitchNetworkMessage({ title, wantedChainId }) {
 SwitchNetworkMessage.propTypes = {
   title: t.node.isRequired,
   wantedChainId: t.node.isRequired,
+  showSwitchButton: t.bool,
+};
+
+SwitchNetworkMessage.defaultProps = {
+  showSwitchButton: false,
 };
 
 function SwitchNetworkButton() {

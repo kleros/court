@@ -18,11 +18,6 @@ const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
 const { BN, toBN, fromWei, toWei } = Web3.utils;
 
-/**
- * The interface does not allow staking less than 1 PNK (which is 10^18 weiPNK).
- */
-const MIN_STAKEABLE_AMOUNT = toBN("1000000000000000000");
-
 export default function StakeModal({ ID, onCancel }) {
   const { drizzle, useCacheCall } = useDrizzle();
   const account = useAccount();
@@ -114,7 +109,7 @@ function NoTokensOnSideChainWarning() {
 const RECOMMENDED_UNSTAKED_BUFFER = toBN("2000000000000000000000");
 
 const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max }) => {
-  const { drizzle, useCacheCall, useCacheSend } = useDrizzle();
+  const { useCacheCall, useCacheSend } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
@@ -135,10 +130,6 @@ const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max })
   const selectedStakeValue = Number.parseInt(String(form.getFieldValue("PNK")));
   const selectedStake = toBN(toWei(String(Number.isNaN(selectedStakeValue) ? 0 : selectedStakeValue)));
   const shouldShowMaxStakeAlert = selectedStake.gt(maxRecommendedStake) && selectedStake.lte(max);
-
-  const hasEnoughStakeableTokens = stakedTokens !== undefined ? max.gte(MIN_STAKEABLE_AMOUNT) : true;
-  const chainId = useChainId();
-  const shouldShowSwitchNetworkAlert = hasEnoughStakeableTokens || !isSupportedSideChain(chainId);
 
   const loading = !min || !max;
   const { send, status } = useCacheSend("KlerosLiquid", "setStake");
@@ -183,9 +174,12 @@ const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max })
         <AvailableStake>
           <div>Available to Stake</div>
           <StyledAmountDiv style={{ marginBottom: "10px" }}>
-            <ETHAmount amount={max} /> PNK
+            <ETHAmount amount={max} tokenSymbol="PNK" />
           </StyledAmountDiv>
-          <div>(PNK in your wallet - PNK already staked)</div>
+          <div>
+            (<AutoDetectedTokenSymbol token="PNK" /> in your wallet - <AutoDetectedTokenSymbol token="PNK" /> already
+            staked)
+          </div>
         </AvailableStake>
       </StyledRow>
       <StyledRow gutter={24}>
@@ -193,7 +187,7 @@ const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max })
           <AmountBox>
             Min Stake
             <StyledAmountDiv>
-              <ETHAmount amount={minStake} /> PNK
+              <ETHAmount amount={minStake} tokenSymbol="PNK" />
             </StyledAmountDiv>
           </AmountBox>
         </Col>
@@ -201,7 +195,7 @@ const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max })
           <AmountBox>
             Total Staked
             <StyledAmountDiv>
-              <ETHAmount amount={stakedTokens} /> PNK
+              <ETHAmount amount={stakedTokens} tokenSymbol="PNK" />
             </StyledAmountDiv>
           </AmountBox>
         </Col>
@@ -302,11 +296,6 @@ const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max })
                     </>
                   }
                 />
-              ) : null}
-              {shouldShowSwitchNetworkAlert ? (
-                <TokenBridgeApiProvider web3Provider={drizzle.web3.currentProvider}>
-                  <NoTokensOnSideChainWarning />
-                </TokenBridgeApiProvider>
               ) : null}
             </>
           )}
