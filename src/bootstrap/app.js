@@ -6,7 +6,7 @@ import styled from "styled-components/macro";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { Col, Layout, Menu, Row, Spin } from "antd";
 import { Helmet } from "react-helmet";
-import { BrowserRouter, NavLink, Route, Switch } from "react-router-dom";
+import { BrowserRouter, NavLink, Route, Switch, useParams } from "react-router-dom";
 import { ReactComponent as Logo } from "../assets/images/logo.svg";
 import AccountStatus from "../components/account-status";
 import Footer from "../components/footer";
@@ -76,7 +76,9 @@ export default function App() {
                         <Route exact path="/cases">
                           <Cases />
                         </Route>
-                        <Route exact path="/cases/:ID" component={Case} />
+                        <Route exact path="/cases/:ID">
+                          <Case />
+                        </Route>
                         <Route exact path="/tokens">
                           <Tokens />
                         </Route>
@@ -127,12 +129,8 @@ const Cases = loadable(() => import(/* webpackPrefetch: true */ "../containers/c
   fallback: <StyledSpin />,
 });
 
-const Case = loadable(
-  async ({
-    match: {
-      params: { ID },
-    },
-  }) => {
+const CasePage = loadable(
+  async ({ ID }) => {
     try {
       await drizzle.contracts.KlerosLiquid.methods.disputes(ID).call();
     } catch (err) {
@@ -145,6 +143,11 @@ const Case = loadable(
     fallback: <StyledSpin />,
   }
 );
+
+const Case = () => {
+  const { ID } = useParams();
+  return <CasePage ID={ID} />;
+};
 
 const Tokens = loadable(() => import(/* webpackPrefetch: true */ "../containers/tokens"), {
   fallback: <StyledSpin />,
