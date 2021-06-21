@@ -124,11 +124,11 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       })
     );
 
-    const contract = new Web3.eth.Contract(MerkleRedeem.abi, airdropParams.contractAddress);
+    const contract = new drizzle.web3.eth.Contract(MerkleRedeem.abi, airdropParams.contractAddress);
     const claimStatus = contract.methods.claimStatus(account, 0, 12).call();
 
     claimStatus.then((r) => setClaimStatus(r));
-  }, [account, chainId, drizzle.web3.utils, modalState, apyCallback, displayButton]);
+  }, [account, chainId, drizzle.web3.utils, drizzle.web3.eth.Contract, modalState, apyCallback, displayButton]);
 
   const handleClaim = () => {
     setModalState(1);
