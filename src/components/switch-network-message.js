@@ -3,7 +3,7 @@ import t from "prop-types";
 import styled from "styled-components/macro";
 import { Button, Icon, Typography } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
-import { isSupportedSideChain, TokenBridgeApiProvider, useTokenBridgeApi } from "../api/token-bridge";
+import { isSupportedSideChain, SideChainApiProvider, useSideChainApi } from "../api/side-chain";
 import { chainIdToNetworkName } from "../helpers/networks";
 
 const { useDrizzle } = drizzleReactHooks;
@@ -17,9 +17,9 @@ export default function SwitchNetworkMessage({ title, wantedChainId, showSwitchB
       <StyledTitle level={3}>{title}</StyledTitle>
       <StyledParagraph>Please switch to {chainIdToNetworkName[wantedChainId]} to proceed.</StyledParagraph>
       {showSwitchButton && isSupported ? (
-        <TokenBridgeApiProvider web3Provider={drizzle.web3.currentProvider} renderOnLoading={null}>
+        <SideChainApiProvider web3Provider={drizzle.web3.currentProvider} renderOnLoading={null}>
           <SwitchNetworkButton />
-        </TokenBridgeApiProvider>
+        </SideChainApiProvider>
       ) : null}
     </StyledSwitchNetworkMessage>
   );
@@ -36,7 +36,7 @@ SwitchNetworkMessage.defaultProps = {
 };
 
 function SwitchNetworkButton() {
-  const tokenBridgeApi = useTokenBridgeApi();
+  const tokenBridgeApi = useSideChainApi();
 
   return (
     <Button

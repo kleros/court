@@ -82,9 +82,6 @@ export default function App() {
                         <Route exact path="/tokens">
                           <Tokens />
                         </Route>
-                        <Route exact path="/token-bridge">
-                          <TokenBridge />
-                        </Route>
                         <Route path="*">
                           <C404 />
                         </Route>
@@ -150,10 +147,6 @@ const Case = () => {
 };
 
 const Tokens = loadable(() => import(/* webpackPrefetch: true */ "../containers/tokens"), {
-  fallback: <StyledSpin />,
-});
-
-const TokenBridge = loadable(() => import(/* webpackPrefetch: true */ "../containers/token-bridge"), {
   fallback: <StyledSpin />,
 });
 

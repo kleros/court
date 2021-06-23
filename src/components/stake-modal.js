@@ -6,13 +6,12 @@ import { drizzleReactHooks } from "@drizzle/react-plugin";
 import Web3 from "web3";
 import infoImg from "../assets/images/info.png";
 import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
-import { chainIdToNetworkName } from "../helpers/networks.js";
 import useAccount from "../hooks/use-account";
 import useChainId from "../hooks/use-chain-id";
 import { AutoDetectedTokenSymbol } from "./token-symbol";
 import ETHAmount from "./eth-amount";
-import { isSupportedSideChain, TokenBridgeApiProvider, useTokenBridgeApi } from "../api/token-bridge";
-import { useSetRequiredChainId } from "./required-chain-id-gateway";
+import { isSupportedSideChain } from "../api/side-chain";
+import SideChainPnk from "./side-chain-pnk";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -21,21 +20,19 @@ const { BN, toBN, fromWei, toWei } = Web3.utils;
 export default function StakeModal({ ID, onCancel }) {
   const { drizzle, useCacheCall } = useDrizzle();
   const account = useAccount();
-  const chainId = useChainId();
+  const chainId = useChainId(drizzle.web3);
   const _balance = useCacheCall("MiniMeTokenERC20", "balanceOf", account);
   const balance = _balance && toBN(_balance);
   const juror = useCacheCall("KlerosLiquidExtraViews", "getJuror", account);
   const stakedTokens = juror && toBN(juror.stakedTokens);
   const max = balance && stakedTokens ? balance.sub(stakedTokens) : toBN("0");
 
-  const hasEnoughBalance = balance ? balance.gte(toBN("0")) : true;
+  const hasStekeableTokens = max?.gt(toBN("0")) ?? true;
 
-  return hasEnoughBalance || !isSupportedSideChain(chainId) ? (
-    <StakeModalForm ID={ID} onCancel={onCancel} stakedTokens={stakedTokens} max={max} />
+  return isSupportedSideChain(chainId) && !hasStekeableTokens ? (
+    <SideChainPnk unwrappedPnkModalProp={{ triggerCondition: "auto" }} />
   ) : (
-    <TokenBridgeApiProvider web3Provider={drizzle.web3.currentProvider}>
-      <NoTokensOnSideChainWarning />
-    </TokenBridgeApiProvider>
+    <StakeModalForm ID={ID} onCancel={onCancel} stakedTokens={stakedTokens} max={max} />
   );
 }
 
@@ -43,65 +40,6 @@ StakeModal.propTypes = {
   ID: t.string.isRequired,
   onCancel: t.func.isRequired,
 };
-
-function NoTokensOnSideChainWarning() {
-  const tokenBridgeApi = useTokenBridgeApi();
-  const originChainId = tokenBridgeApi.origin.chainId;
-  const destinationChainId = tokenBridgeApi.destination.chainId;
-  const switchToDestinationChain = tokenBridgeApi.destination.switchChain;
-
-  const setRequiredChainId = useSetRequiredChainId();
-
-  const switchNetwork = React.useCallback(async () => {
-    try {
-      await switchToDestinationChain();
-    } catch (err) {
-      /**
-       * If the call fails, it means that it's not supported.
-       * This happens for the native Ethereum Mainnet and well-known testnets,
-       * such as Ropsten and Kovan. Apparently this is due to security reasons.
-       * @see { @link https://docs.metamask.io/guide/rpc-api.html#wallet-addethereumchain }
-       */
-      setRequiredChainId(destinationChainId, { location: "/token-bridge" });
-    }
-  }, [switchToDestinationChain, setRequiredChainId, destinationChainId]);
-
-  const networkName = chainIdToNetworkName[originChainId];
-
-  const [visible, setVisible] = React.useState(true);
-
-  return (
-    <StyledModal
-      centered
-      closable={false}
-      maskClosable
-      visible={visible}
-      okText={
-        <span>
-          Get <AutoDetectedTokenSymbol token="PNK" />
-        </span>
-      }
-      onOk={switchNetwork}
-      cancelText="Ignore"
-      onCancel={() => setVisible(false)}
-      title={
-        <>
-          Insufficient <AutoDetectedTokenSymbol token="PNK" />
-        </>
-      }
-    >
-      <p
-        css={`
-          color: rgba(0, 0, 0, 0.85);
-          text-align: center;
-        `}
-      >
-        In order to use Kleros Court on {networkName}, you need to convert your PNK into stPNK (the wrapped PNK used for
-        staking on {networkName} courts).
-      </p>
-    </StyledModal>
-  );
-}
 
 /**
  * Recommended to have 2000+ PNK unstaked to avoid being unstaked after losing a case.
@@ -126,7 +64,7 @@ const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max })
   const minStake = subcourt ? toBN(subcourt.minStake) : toBN("0");
   const min = stake && minStake ? minStake.sub(stake) : toBN("0");
   const recommendedBalanceBuffer = RECOMMENDED_UNSTAKED_BUFFER;
-  const maxRecommendedStake = BN.max(min, max.sub(recommendedBalanceBuffer));
+  const maxRecommendedStake = BN.max(toBN("0"), BN.max(min, max.sub(recommendedBalanceBuffer)));
   const selectedStakeValue = Number.parseInt(String(form.getFieldValue("PNK")));
   const selectedStake = toBN(toWei(String(Number.isNaN(selectedStakeValue) ? 0 : selectedStakeValue)));
   const shouldShowMaxStakeAlert = selectedStake.gt(maxRecommendedStake) && selectedStake.lte(max);

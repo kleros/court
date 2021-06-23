@@ -29,10 +29,7 @@ export function Button({ children, className, ...props }) {
   );
 }
 
-Button.propTypes = {
-  children: t.node,
-  className: t.string,
-};
+Button.propTypes = AntdButton.propTypes;
 
 const pick = (keys) => (obj) =>
   keys.reduce(

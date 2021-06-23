@@ -116,6 +116,7 @@ const CourtCascaderModal = ({ onClick }) => {
 
   return (
     <StyledModal
+      $hideBody={subcourtIDs.length <= 1}
       centered
       footer={
         <>
@@ -247,6 +248,7 @@ const StyledModal = styled(Modal)`
     }
 
     &-body {
+      ${(p) => p.$hideBody && "display: none;"}
       background: whitesmoke;
       height: 286px;
       margin-top: -1px;
@@ -261,7 +263,7 @@ const StyledModal = styled(Modal)`
     &-footer {
       color: #4d00b4;
       height: 284px;
-      margin-top: 40px;
+      margin-top: ${(p) => (p.$hideBody ? 0 : "40px")};
       overflow-y: scroll;
       padding: 52px 42px 28px;
       text-align: left;

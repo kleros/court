@@ -1,13 +1,11 @@
 import React from "react";
+import t from "prop-types";
 import styled from "styled-components/macro";
-import { Link } from "react-router-dom";
-import { Icon, Skeleton } from "antd";
+import { Icon } from "antd";
 import { ButtonLink } from "../adapters/antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
-import { TokenBridgeApiProvider, useTokenBridgeApi, isSupportedChain } from "../api/token-bridge";
-import useAccount from "../hooks/use-account";
+import { requestSwitchToSideChain, getCounterPartyChainId, isSupportedSideChain } from "../api/side-chain";
 import useChainId from "../hooks/use-chain-id";
-import usePromise from "../hooks/use-promise";
 import { useSetRequiredChainId } from "../components/required-chain-id-gateway";
 import { chainIdToNetworkName } from "../helpers/networks";
 
@@ -17,68 +15,55 @@ export default function AlternativeChainCourt() {
   const { drizzle } = useDrizzle();
   const chainId = useChainId(drizzle.web3);
 
-  return isSupportedChain(chainId) ? (
-    <TokenBridgeApiProvider web3Provider={drizzle.web3.currentProvider} renderOnLoading={null}>
-      <AlternativeChainCourtLink />
-    </TokenBridgeApiProvider>
+  const setRequiredChainId = useSetRequiredChainId();
+
+  const destinationChainId = React.useMemo(() => {
+    try {
+      return getCounterPartyChainId(chainId);
+    } catch {
+      return undefined;
+    }
+  }, [chainId]);
+
+  const switchNetwork = React.useCallback(async () => {
+    if (isSupportedSideChain(destinationChainId)) {
+      try {
+        await requestSwitchToSideChain(drizzle.web3.currentProvider);
+      } catch (err) {
+        console.debug("Failed to request the switch to the side-chain:", err);
+        /**
+         * If the call fails, it means that it's not supported.
+         * This happens for the native Ethereum Mainnet and well-known testnets,
+         * such as Ropsten and Kovan. Apparently this is due to security reasons.
+         * @see { @link https://docs.metamask.io/guide/rpc-api.html#wallet-addethereumchain }
+         */
+        setRequiredChainId(destinationChainId);
+      }
+    } else if (destinationChainId) {
+      setRequiredChainId(destinationChainId);
+    }
+  }, [destinationChainId, setRequiredChainId, drizzle.web3.currentProvider]);
+
+  return destinationChainId ? (
+    <AlternativeChainCourtLink destinationChainId={destinationChainId} switchNetwork={switchNetwork} />
   ) : null;
 }
 
-function AlternativeChainCourtLink() {
-  const tokenBridgeApi = useTokenBridgeApi();
-  const account = useAccount();
-  const destinationChainId = tokenBridgeApi.destination.chainId;
-  const destinationToken = useDestinationTokenData({ getBalance: tokenBridgeApi.destination.getBalance, account });
-
-  const setRequiredChainId = useSetRequiredChainId();
-
-  const switchNetwork = async () => {
-    // Tries to automatically switch the chain...
-    try {
-      await tokenBridgeApi.destination.switchChain();
-    } catch {
-      /**
-       * If the call fails, it means that it's not supported.
-       * This happens for the native Ethereum Mainnet and well-known testnets,
-       * such as Ropsten and Kovan. Apparently this is due to security reasons.
-       * @see { @link https://docs.metamask.io/guide/rpc-api.html#wallet-addethereumchain }
-       */
-      setRequiredChainId(tokenBridgeApi.destination.chainId);
-    }
-  };
-
+function AlternativeChainCourtLink({ destinationChainId, switchNetwork }) {
   return (
     <StyledWrapper>
-      {destinationToken.balance === undefined ? (
-        <StyledSkeleton />
-      ) : String(destinationToken.balance) === "0" ? (
-        <Link to="/token-bridge" component={ButtonLink} type="link">
-          <span>Court on {chainIdToNetworkName[destinationChainId]}</span>
-          <Icon type="arrow-right" />
-        </Link>
-      ) : (
-        <ButtonLink onClick={switchNetwork}>
-          <span>Court on {chainIdToNetworkName[destinationChainId]}</span>
-          <Icon type="arrow-right" />
-        </ButtonLink>
-      )}
+      <ButtonLink onClick={switchNetwork}>
+        <span>Court on {chainIdToNetworkName[destinationChainId]}</span>
+        <Icon type="arrow-right" />
+      </ButtonLink>
     </StyledWrapper>
   );
 }
 
-function useDestinationTokenData({ getBalance, account }) {
-  const balance = usePromise(React.useMemo(() => getBalance({ address: account }), [getBalance, account]));
-
-  return React.useMemo(
-    () => ({
-      balance: balance.value,
-      errors: {
-        balance: balance.error,
-      },
-    }),
-    [balance.value, balance.error]
-  );
-}
+AlternativeChainCourtLink.propTypes = {
+  destinationChainId: t.number.isRequired,
+  switchNetwork: t.func.isRequired,
+};
 
 const StyledWrapper = styled.div`
   margin: 24px 0 -56px;
@@ -89,21 +74,5 @@ const StyledWrapper = styled.div`
 
   & + .ant-spin-nested-loading {
     margin-top: 56px;
-  }
-`;
-
-const StyledSkeleton = styled(Skeleton).attrs(({ active = true, paragraph = false }) => ({ active, paragraph }))`
-  &.ant-skeleton {
-    display: block;
-    width: 160px;
-  }
-
-  .ant-skeleton-title {
-    height: 16px;
-    margin: 8px 0;
-  }
-
-  .ant-skeleton-content {
-    display: block;
   }
 `;
