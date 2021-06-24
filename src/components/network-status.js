@@ -7,14 +7,13 @@ import { drizzleReactHooks } from "@drizzle/react-plugin";
 import useChainId from "../hooks/use-chain-id";
 import { chainIdToNetworkShortName } from "../helpers/networks";
 
-const { useDrizzleState, useDrizzle } = drizzleReactHooks;
+const { useDrizzleState } = drizzleReactHooks;
 
 export default function NetworkStatus({ className }) {
   const { status } = useDrizzleState((drizzleState) => ({
     status: drizzleState.web3.status,
   }));
-  const { drizzle } = useDrizzle();
-  const chainId = useChainId(drizzle.web3);
+  const chainId = useChainId();
 
   return chainId ? (
     <StyledBadge

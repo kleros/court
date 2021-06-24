@@ -1,6 +1,7 @@
 import "../components/theme.css";
 import "./app.css";
 import React, { useState } from "react";
+import t from "prop-types";
 import loadable from "@loadable/component";
 import styled from "styled-components/macro";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
@@ -11,11 +12,12 @@ import { ReactComponent as Logo } from "../assets/images/logo.svg";
 import AccountStatus from "../components/account-status";
 import Footer from "../components/footer";
 import NotificationSettings from "../components/notification-settings";
+import { ChainIdProvider } from "../hooks/use-chain-id";
 import { ArchonInitializer } from "./archon";
 import ChainChangeWatcher from "./chain-change-watcher";
 import drizzle from "./drizzle";
 
-const { DrizzleProvider, Initializer } = drizzleReactHooks;
+const { DrizzleProvider, Initializer, useDrizzle } = drizzleReactHooks;
 
 export default function App() {
   const [isMenuClosed, setIsMenuClosed] = useState(true);
@@ -32,76 +34,88 @@ export default function App() {
           loadingContractsAndAccounts={<C404 Web3 />}
           loadingWeb3={<StyledSpin tip="Connecting to your Web3 provider." />}
         >
-          <ChainChangeWatcher>
-            <ArchonInitializer>
-              <BrowserRouter>
-                <Layout>
-                  <StyledLayoutSider
-                    breakpoint="md"
-                    collapsedWidth="0"
-                    collapsed={isMenuClosed}
-                    onClick={() => setIsMenuClosed((previousState) => !previousState)}
-                  >
-                    <Menu theme="dark">{MenuItems}</Menu>
-                  </StyledLayoutSider>
+          <DrizzleChainIdProvider>
+            <ChainChangeWatcher>
+              <ArchonInitializer>
+                <BrowserRouter>
                   <Layout>
-                    <StyledLayoutHeader>
-                      <Row>
-                        <StyledLogoCol lg={4} md={4} sm={12} xs={0}>
-                          <LogoNavLink to="/">
-                            <Logo />
-                          </LogoNavLink>
-                        </StyledLogoCol>
-                        <Col lg={14} md={12} xs={0} style={{ padding: "0 16px" }}>
-                          <StyledMenu mode="horizontal" theme="dark">
-                            {MenuItems}
-                          </StyledMenu>
-                        </Col>
-                        <StyledTrayCol lg={6} md={8} sm={12} xs={24}>
-                          <StyledTray>
-                            <AccountStatus />
-                            <NotificationSettings settings={settings} />
-                          </StyledTray>
-                        </StyledTrayCol>
-                      </Row>
-                    </StyledLayoutHeader>
-                    <StyledLayoutContent>
-                      <Switch>
-                        <Route exact path="/">
-                          <Home />
-                        </Route>
-                        <Route exact path="/courts">
-                          <Courts />
-                        </Route>
-                        <Route exact path="/cases">
-                          <Cases />
-                        </Route>
-                        <Route exact path="/cases/:ID">
-                          <Case />
-                        </Route>
-                        <Route exact path="/tokens">
-                          <Tokens />
-                        </Route>
-                        <Route path="*">
-                          <C404 />
-                        </Route>
-                      </Switch>
-                    </StyledLayoutContent>
-                    <Footer />
-                    <StyledClickaway
-                      isMenuClosed={isMenuClosed}
-                      onClick={isMenuClosed ? null : () => setIsMenuClosed(true)}
-                    />
+                    <StyledLayoutSider
+                      breakpoint="md"
+                      collapsedWidth="0"
+                      collapsed={isMenuClosed}
+                      onClick={() => setIsMenuClosed((previousState) => !previousState)}
+                    >
+                      <Menu theme="dark">{MenuItems}</Menu>
+                    </StyledLayoutSider>
+                    <Layout>
+                      <StyledLayoutHeader>
+                        <Row>
+                          <StyledLogoCol lg={4} md={4} sm={12} xs={0}>
+                            <LogoNavLink to="/">
+                              <Logo />
+                            </LogoNavLink>
+                          </StyledLogoCol>
+                          <Col lg={14} md={12} xs={0} style={{ padding: "0 16px" }}>
+                            <StyledMenu mode="horizontal" theme="dark">
+                              {MenuItems}
+                            </StyledMenu>
+                          </Col>
+                          <StyledTrayCol lg={6} md={8} sm={12} xs={24}>
+                            <StyledTray>
+                              <AccountStatus />
+                              <NotificationSettings settings={settings} />
+                            </StyledTray>
+                          </StyledTrayCol>
+                        </Row>
+                      </StyledLayoutHeader>
+                      <StyledLayoutContent>
+                        <Switch>
+                          <Route exact path="/">
+                            <Home />
+                          </Route>
+                          <Route exact path="/courts">
+                            <Courts />
+                          </Route>
+                          <Route exact path="/cases">
+                            <Cases />
+                          </Route>
+                          <Route exact path="/cases/:ID">
+                            <Case />
+                          </Route>
+                          <Route exact path="/tokens">
+                            <Tokens />
+                          </Route>
+                          <Route path="*">
+                            <C404 />
+                          </Route>
+                        </Switch>
+                      </StyledLayoutContent>
+                      <Footer />
+                      <StyledClickaway
+                        isMenuClosed={isMenuClosed}
+                        onClick={isMenuClosed ? null : () => setIsMenuClosed(true)}
+                      />
+                    </Layout>
                   </Layout>
-                </Layout>
-              </BrowserRouter>
-            </ArchonInitializer>
-          </ChainChangeWatcher>
+                </BrowserRouter>
+              </ArchonInitializer>
+            </ChainChangeWatcher>
+          </DrizzleChainIdProvider>
         </Initializer>
       </DrizzleProvider>
     </>
   );
 }
+
+function DrizzleChainIdProvider({ children }) {
+  const { drizzle } = useDrizzle();
+
+  return <ChainIdProvider web3Provider={drizzle.web3.currentProvider}>{children}</ChainIdProvider>;
+}
+
+DrizzleChainIdProvider.propTypes = {
+  children: t.node,
+};
 
 const StyledSpin = styled(Spin)`
   left: 50%;

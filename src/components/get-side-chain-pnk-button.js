@@ -1,17 +1,13 @@
 import React from "react";
 import styled from "styled-components/macro";
-import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { Icon } from "antd";
 import { Button } from "../adapters/antd";
 import { getSideChainParams, isSupportedSideChain } from "../api/side-chain";
 import TokenSymbol from "./token-symbol";
 import useChainId from "../hooks/use-chain-id";
 
-const { useDrizzle } = drizzleReactHooks;
-
 export default function GetSideChainPnkButton({ size, type, icon, className, ...rest }) {
-  const { drizzle } = useDrizzle();
-  const chainId = useChainId(drizzle.web3);
+  const chainId = useChainId();
   const isSupported = isSupportedSideChain(chainId);
   const { bridgeAppUrl } = isSupported ? getSideChainParams(chainId) : {};
 

@@ -2,13 +2,10 @@ import React from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
 import { useHistory, useLocation } from "react-router-dom";
-import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { Card } from "antd";
 import useQueryParams from "../hooks/use-query-params";
 import useChainId from "../hooks/use-chain-id";
 import SwitchNetworkMessage from "./switch-network-message";
-
-const { useDrizzle } = drizzleReactHooks;
 
 export default function RequiredChainIdGateway({ children, render, renderOnMismatch }) {
   const queryParams = useQueryParams();
@@ -94,8 +91,7 @@ export function useCleanRequiredChainId() {
 }
 
 function useAutoClean(requiredChainId) {
-  const { drizzle } = useDrizzle();
-  const chainId = useChainId(drizzle.web3);
+  const chainId = useChainId();
 
   const clean = useCleanRequiredChainId();
 

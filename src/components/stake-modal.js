@@ -18,9 +18,9 @@ const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const { BN, toBN, fromWei, toWei } = Web3.utils;
 
 export default function StakeModal({ ID, onCancel }) {
-  const { drizzle, useCacheCall } = useDrizzle();
+  const { useCacheCall } = useDrizzle();
   const account = useAccount();
-  const chainId = useChainId(drizzle.web3);
+  const chainId = useChainId();
   const _balance = useCacheCall("MiniMeTokenERC20", "balanceOf", account);
   const balance = _balance && toBN(_balance);
   const juror = useCacheCall("KlerosLiquidExtraViews", "getJuror", account);

@@ -19,9 +19,10 @@ const { useDrizzle } = drizzleReactHooks;
 const { toBN } = Web3.utils;
 
 export default function SideChainPnkWrapper(props) {
-  const { drizzle } = useDrizzle();
-  const chainId = useChainId(drizzle.web3);
+  const chainId = useChainId();
   const isSupported = isSupportedSideChain(chainId);
+
+  const { drizzle } = useDrizzle();
 
   return isSupported ? (
     <SideChainApiProvider web3Provider={drizzle.web3.currentProvider}>
@@ -65,8 +66,7 @@ SideChainPnk.defaultProps = {
 };
 
 function ErrorModal({ balance, rawBalance, errors }) {
-  const { drizzle } = useDrizzle();
-  const chainId = useChainId(drizzle.web3);
+  const chainId = useChainId();
 
   return chainId ? (
     <StyledModal visible centered width={586} title="Something went wrong!" footer={null}>
@@ -85,8 +85,7 @@ ErrorModal.propTypes = {
 };
 
 function UnwrappedSideChainPnkModal({ triggerCondition, account, balance, rawBalance, errors }) {
-  const { drizzle } = useDrizzle();
-  const chainId = useChainId(drizzle.web3);
+  const chainId = useChainId();
 
   const { deposit } = useSideChainApi();
   const { run, isRunning, isDone, transactions, error } = useDepositTokens(deposit);
@@ -189,8 +188,7 @@ UnwrappedSideChainPnkModal.defaultProps = {
 };
 
 function GetSideChainPnkModal({ defaultVisible }) {
-  const { drizzle } = useDrizzle();
-  const chainId = useChainId(drizzle.web3);
+  const chainId = useChainId();
 
   const [visible, setVisible] = React.useState(defaultVisible);
   const handleCancel = () => setVisible(false);

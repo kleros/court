@@ -21,7 +21,7 @@ import SideChainPnk from "../components/side-chain-pnk";
 import useChainId from "../hooks/use-chain-id";
 import { ReactComponent as Present } from "../assets/images/present.svg";
 
-const { useDrizzleState, useDrizzle } = drizzleReactHooks;
+const { useDrizzleState } = drizzleReactHooks;
 
 const airdropChainIds = [1, 42, 77];
 const buyPnkChainIds = [1];
@@ -32,8 +32,7 @@ export default function Home() {
     web3: drizzleState.web3,
   }));
 
-  const { drizzle } = useDrizzle();
-  const chainId = useChainId(drizzle.web3);
+  const chainId = useChainId();
 
   const isBuyPnkButtonVisible = buyPnkChainIds.includes(chainId);
 

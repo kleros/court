@@ -12,8 +12,7 @@ import { chainIdToNetworkName } from "../helpers/networks";
 const { useDrizzle } = drizzleReactHooks;
 
 export default function AlternativeChainCourt() {
-  const { drizzle } = useDrizzle();
-  const chainId = useChainId(drizzle.web3);
+  const chainId = useChainId();
 
   const setRequiredChainId = useSetRequiredChainId();
 
@@ -25,6 +24,7 @@ export default function AlternativeChainCourt() {
     }
   }, [chainId]);
 
+  const { drizzle } = useDrizzle();
   const switchNetwork = React.useCallback(async () => {
     if (isSupportedSideChain(destinationChainId)) {
       try {

@@ -11,8 +11,8 @@ const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const supportedChainIds = [1];
 
 export default function BuyPnkCard() {
-  const { drizzle } = useDrizzle();
-  const chainId = useChainId(drizzle.web3);
+  const chainId = useChainId();
+
   return supportedChainIds.includes(chainId) ? <BuyPnkForm /> : <UnsupportedChain />;
 }
 

@@ -23,7 +23,7 @@ const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const buyPnkChainIds = [1];
 
 export default function Courts() {
-  const { drizzle, useCacheCall } = useDrizzle();
+  const { useCacheCall } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
@@ -31,7 +31,7 @@ export default function Courts() {
   const [stakingID, setStakingID] = useState();
   const juror = useCacheCall("KlerosLiquidExtraViews", "getJuror", drizzleState.account);
 
-  const chainId = useChainId(drizzle.web3);
+  const chainId = useChainId();
 
   const isBuyPnkButtonVisible = buyPnkChainIds.includes(chainId);
 
