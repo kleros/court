@@ -219,6 +219,7 @@ export default CourtCascaderModal;
 
 const StyledModal = styled(Modal)`
   position: relative;
+  isolation: isolate;
   padding-bottom: 0;
   width: 90% !important;
   height: 90vh;
@@ -226,6 +227,7 @@ const StyledModal = styled(Modal)`
   .ant-modal {
     &-header {
       padding: 0;
+      border: none;
     }
 
     &-close-icon svg {
@@ -239,10 +241,8 @@ const StyledModal = styled(Modal)`
     &-body {
       background: whitesmoke;
       height: 286px;
-      margin-top: -1px;
       overflow: hidden;
       position: relative;
-      isolation: isolate;
       padding: 0;
     }
 
@@ -296,11 +296,10 @@ const StyledTitleDiv = styled.div`
 
 const StyledCascader = styled(Cascader)`
   display: none;
-  isolation: isolate;
 
   & ~ div .popupClassName {
     background: whitesmoke;
-    min-width: 100%;
+    width: 100%;
     border-radius: 0;
     left: 0 !important;
     top: 0 !important;
