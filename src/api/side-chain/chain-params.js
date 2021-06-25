@@ -2,15 +2,15 @@ import { getBaseUrl } from "../../helpers/block-explorer";
 
 const supportedSideChains = {
   // xDai
-  100: {
-    // chainId: 100,
-    // chainName: "xDAI",
-    // nativeCurrency: { name: "xDAI", symbol: "xDAI", decimals: 18 },
-    // rpcUrls: [ensureEnv("REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL")],
-    // blockExplorerUrls: [getBaseUrl(100)],
-    // bridgeAppUrl: `https://omni.xdaichain.com/bridge?from=100&to=1&token=${ensureEnv("REACT_APP_PINAKION_ADDRESS")}`,
-    // mainChainId: 1,
-  },
+  // 100: {
+  //   chainId: 100,
+  //   chainName: "xDAI",
+  //   nativeCurrency: { name: "xDAI", symbol: "xDAI", decimals: 18 },
+  //   rpcUrls: [ensureEnv("REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL")],
+  //   blockExplorerUrls: [getBaseUrl(100)],
+  //   bridgeAppUrl: `https://omni.xdaichain.com/bridge?from=100&to=1&token=${ensureEnv("REACT_APP_PINAKION_ADDRESS")}`,
+  //   mainChainId: 1,
+  // },
   // Sokol
   77: {
     chainId: 77,
