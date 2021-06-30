@@ -21,9 +21,11 @@ window.document.addEventListener("DOMContentLoaded", async () => {
 
 if (typeof window !== "undefined" && typeof window.web3 !== "undefined") {
   web3 = new Web3(window.web3.currentProvider);
-} else if (process.env.REACT_APP_WEB3_FALLBACK_URL || process.env.REACT_APP_WEB3_FALLBACK_HTTPS_URL) {
+} else if (process.env.REACT_APP_WEB3_FALLBACK_HTTPS_URL || process.env.REACT_APP_WEB3_FALLBACK_URL) {
   // Fallback provider.
-  web3 = new Web3(process.env.REACT_APP_WEB3_PROVIDER_URL ?? process.env.REACT_APP_WEB3_FALLBACK_HTTPS_URL);
+  web3 = new Web3(process.env.REACT_APP_WEB3_FALLBACK_HTTPS_URL ?? process.env.REACT_APP_WEB3_FALLBACK_URL);
+} else {
+  throw new Error("No fallback Web3 URL provided!");
 }
 
 export default web3;

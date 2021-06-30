@@ -6,6 +6,8 @@ import CaseDetailsCard from "../components/case-details-card";
 import ETHAmount from "../components/eth-amount";
 import TimeAgo from "../components/time-ago";
 import TopBanner from "../components/top-banner";
+import RequiredChainIdGateway from "../components/required-chain-id-gateway";
+import RequiredChainIdModal from "../components/required-chain-id-modal";
 import styled from "styled-components/macro";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 
@@ -71,8 +73,11 @@ export default function Case() {
     }
     return disputeData;
   });
+
   return (
-    <>
+    <RequiredChainIdGateway
+      renderOnMismatch={({ requiredChainId }) => <RequiredChainIdModal requiredChainId={requiredChainId} />}
+    >
       <TopBanner
         description={
           <>
@@ -131,7 +136,7 @@ export default function Case() {
         title="Case Details"
       />
       <CaseDetailsCard ID={ID} />
-    </>
+    </RequiredChainIdGateway>
   );
 }
 

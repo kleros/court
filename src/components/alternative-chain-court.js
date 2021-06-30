@@ -8,11 +8,14 @@ import { requestSwitchToSideChain, getCounterPartyChainId, isSupportedSideChain 
 import useChainId from "../hooks/use-chain-id";
 import { useSetRequiredChainId } from "../components/required-chain-id-gateway";
 import { chainIdToNetworkName } from "../helpers/networks";
+import useAccount from "../hooks/use-account";
 
 const { useDrizzle } = drizzleReactHooks;
 
 export default function AlternativeChainCourt() {
   const chainId = useChainId();
+  const account = useAccount();
+  const hasAccount = !!account;
 
   const setRequiredChainId = useSetRequiredChainId();
 
@@ -44,7 +47,7 @@ export default function AlternativeChainCourt() {
     }
   }, [destinationChainId, setRequiredChainId, drizzle.web3.currentProvider]);
 
-  return destinationChainId ? (
+  return hasAccount && destinationChainId ? (
     <AlternativeChainCourtLink destinationChainId={destinationChainId} switchNetwork={switchNetwork} />
   ) : null;
 }

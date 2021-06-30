@@ -2,33 +2,50 @@ import React from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
-import { Button, Modal, Typography } from "antd";
+import { Button, Icon, Modal, Typography } from "antd";
 import { chainIdToNetworkName } from "../helpers/networks";
-import { SideChainApiProvider, useSideChainApi, isSupportedSideChain, isSupportedMainChain } from "../api/side-chain";
-import { useCleanRequiredChainId } from "./required-chain-id-gateway";
+import { isSupportedSideChain, requestSwitchToSideChain } from "../api/side-chain";
+import { useCleanRequiredChainId, useSetRequiredChainId } from "./required-chain-id-gateway";
+import useAccount from "../hooks/use-account";
 
 const { useDrizzle } = drizzleReactHooks;
 
 export default function RequiredChainIdModal({ requiredChainId }) {
-  const { drizzle } = useDrizzle();
+  const account = useAccount();
+  const hasAccount = !!account;
 
+  const networkName = chainIdToNetworkName[requiredChainId];
   const cleanRequiredChainId = useCleanRequiredChainId();
 
   return (
-    <SideChainApiProvider web3Provider={drizzle.web3.currentProvider}>
-      <StyledModal
-        visible
-        centered
-        width={640}
-        footer={
-          isSupportedSideChain(requiredChainId) ? <SwitchNetworkButton requiredChainId={requiredChainId} /> : null
-        }
-        title={<>Switch to {chainIdToNetworkName[requiredChainId]}</>}
-        onCancel={() => cleanRequiredChainId()}
-      >
-        {isSupportedMainChain(requiredChainId) ? <RequiredChainIdModalContent /> : null}
-      </StyledModal>
-    </SideChainApiProvider>
+    <StyledModal
+      visible
+      centered
+      width={640}
+      footer={
+        hasAccount && isSupportedSideChain(requiredChainId) ? (
+          <SwitchNetworkButton requiredChainId={requiredChainId} />
+        ) : null
+      }
+      title="Wrong Network"
+      onCancel={() => cleanRequiredChainId()}
+    >
+      {hasAccount ? (
+        isSupportedSideChain(requiredChainId) ? (
+          <StyledExplainer>Please click the button bellow or switch to {networkName} on MetaMask.</StyledExplainer>
+        ) : (
+          <StyledExplainer>Please switch to {networkName} on MetaMask.</StyledExplainer>
+        )
+      ) : (
+        <StyledExplainer>
+          You need an{" "}
+          <a href="https://ethereum.org/en/wallets/" target="_blank" rel="noreferrer noopener">
+            Ethereum Wallet
+          </a>{" "}
+          to be able to switch to {networkName}.
+        </StyledExplainer>
+      )}
+    </StyledModal>
   );
 }
 
@@ -37,19 +54,33 @@ RequiredChainIdModal.propTypes = {
 };
 
 function SwitchNetworkButton({ requiredChainId }) {
-  const tokenBridgeApi = useSideChainApi();
+  const { drizzle } = useDrizzle();
+
+  const setRequiredChainId = useSetRequiredChainId();
 
   const switchChain = async () => {
-    try {
-      await tokenBridgeApi.destination.switchChain();
-    } catch {
-      // Do nothing...
+    if (isSupportedSideChain(requiredChainId)) {
+      try {
+        await requestSwitchToSideChain(drizzle.web3.currentProvider);
+      } catch (err) {
+        console.warn("Failed to request the switch to the side-chain:", err);
+        /**
+         * If the call fails, it means that it's not supported.
+         * This happens for the native Ethereum Mainnet and well-known testnets,
+         * such as Ropsten and Kovan. Apparently this is due to security reasons.
+         * @see { @link https://docs.metamask.io/guide/rpc-api.html#wallet-addethereumchain }
+         */
+        setRequiredChainId(requiredChainId);
+      }
+    } else if (requiredChainId) {
+      setRequiredChainId(requiredChainId);
     }
   };
 
   return (
     <Button onClick={switchChain}>
       <span>Switch to {chainIdToNetworkName[requiredChainId]}</span>
+      <Icon type="arrow-right" />
     </Button>
   );
 }
@@ -57,10 +88,6 @@ function SwitchNetworkButton({ requiredChainId }) {
 SwitchNetworkButton.propTypes = {
   requiredChainId: t.number.isRequired,
 };
-
-function RequiredChainIdModalContent() {
-  return <StyledExplainer>Please switch to the required network on MetaMask.</StyledExplainer>;
-}
 
 const StyledModal = styled(Modal)`
   .ant-modal-header {
@@ -80,4 +107,6 @@ const StyledModal = styled(Modal)`
   }
 `;
 
-const StyledExplainer = styled(Typography.Paragraph)``;
+const StyledExplainer = styled(Typography.Paragraph)`
+  text-align: center;
+`;

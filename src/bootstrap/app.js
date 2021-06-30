@@ -110,7 +110,7 @@ export default function App() {
 function DrizzleChainIdProvider({ children }) {
   const { drizzle } = useDrizzle();
 
-  return <ChainIdProvider web3Provider={drizzle.web3.currentProvider}>{children}</ChainIdProvider>;
+  return <ChainIdProvider web3={drizzle.web3}>{children}</ChainIdProvider>;
 }
 
 DrizzleChainIdProvider.propTypes = {

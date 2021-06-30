@@ -9,9 +9,11 @@ import SwitchNetworkMessage from "./switch-network-message";
 
 export default function RequiredChainIdGateway({ children, render, renderOnMismatch }) {
   const queryParams = useQueryParams();
-  const requiredChainId = queryParams.requiredChainId && Number(queryParams.requiredChainId);
+  const parsedValue = Number.parseInt(queryParams.requiredChainId, 10);
+  const requiredChainId = Number.isNaN(parsedValue) ? undefined : parsedValue;
 
-  useAutoClean(requiredChainId);
+  useCleanWhenEmpty();
+  useCleanWhenMatching(requiredChainId);
 
   const content = children ?? render?.({ requiredChainId }) ?? null;
 
@@ -50,7 +52,7 @@ export function useSetRequiredChainId() {
 
   return React.useCallback(
     (requiredChainId, { location: newLocation } = {}) => {
-      if (requiredChainId === undefined || requiredChainId === null) {
+      if (Number.isNaN(Number.parseInt(requiredChainId, 10))) {
         return;
       }
 
@@ -90,7 +92,7 @@ export function useCleanRequiredChainId() {
   }, [history, location, queryParams]);
 }
 
-function useAutoClean(requiredChainId) {
+function useCleanWhenMatching(requiredChainId) {
   const chainId = useChainId();
 
   const clean = useCleanRequiredChainId();
@@ -100,6 +102,17 @@ function useAutoClean(requiredChainId) {
       clean();
     }
   }, [requiredChainId, chainId, clean]);
+}
+
+function useCleanWhenEmpty() {
+  const queryParams = useQueryParams();
+  const clean = useCleanRequiredChainId();
+
+  React.useEffect(() => {
+    if (queryParams.requiredChainId === "") {
+      clean();
+    }
+  }, [queryParams.requiredChainId, clean]);
 }
 
 const StyledCard = styled(Card)`

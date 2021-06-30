@@ -8,7 +8,7 @@ export default function useChainId() {
   return useContext(ChainIdContext);
 }
 
-export function ChainIdProvider({ web3Provider, children, renderOnError, renderOnLoading }) {
+export function ChainIdProvider({ web3, children, renderOnError, renderOnLoading }) {
   const [chainId, setChainId] = useState();
   const [error, setError] = useState();
 
@@ -17,12 +17,10 @@ export function ChainIdProvider({ web3Provider, children, renderOnError, renderO
 
     async function getChainId() {
       try {
-        const chainIdFromProvider = await web3Provider.request({
-          method: "eth_chainId",
-        });
+        const chainIdFromProvider = await web3.eth.getChainId();
 
         if (isMounted) {
-          setChainId(hexStringToNumber(chainIdFromProvider));
+          setChainId(chainIdFromProvider);
         }
       } catch (err) {
         if (isMounted) {
@@ -36,10 +34,10 @@ export function ChainIdProvider({ web3Provider, children, renderOnError, renderO
     return () => {
       isMounted = false;
     };
-  }, [web3Provider]);
+  }, [web3]);
 
   useEffect(() => {
-    if (typeof web3Provider.on !== "function") {
+    if (typeof web3?.currentProvider?.on !== "function") {
       return;
     }
 
@@ -54,13 +52,13 @@ export function ChainIdProvider({ web3Provider, children, renderOnError, renderO
       }
     };
 
-    web3Provider.on("chainChanged", handleNetworkChanged);
+    web3.currentProvider.on("chainChanged", handleNetworkChanged);
 
     return () => {
-      web3Provider.off("chainChanged", handleNetworkChanged);
+      web3.currentProvider.off("chainChanged", handleNetworkChanged);
       isMounted = false;
     };
-  }, [web3Provider]);
+  }, [web3]);
 
   const errorContent = error ? (typeof renderOnError === "function" ? renderOnError(error) : renderOnError) : null;
   const loadingContent =
@@ -80,11 +78,7 @@ const defaultRenderOnLoading = (
 const defaultRenderOnError = (error) => <Alert type="error" message={error.message} />;
 
 ChainIdProvider.propTypes = {
-  web3Provider: t.shape({
-    request: t.func.isRequired,
-    on: t.func,
-    off: t.func,
-  }).isRequired,
+  web3: t.object.isRequired,
   renderOnLoading: t.oneOfType([t.node, t.func]),
   renderOnError: t.oneOfType([t.node, t.func]),
   children: t.node,
