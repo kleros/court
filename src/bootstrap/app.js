@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import t from "prop-types";
 import loadable from "@loadable/component";
 import styled from "styled-components/macro";
-import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { Col, Layout, Menu, Row, Spin } from "antd";
 import { Helmet } from "react-helmet";
 import { BrowserRouter, NavLink, Route, Switch, useParams } from "react-router-dom";
@@ -15,9 +14,7 @@ import NotificationSettings from "../components/notification-settings";
 import { ChainIdProvider } from "../hooks/use-chain-id";
 import { ArchonInitializer } from "./archon";
 import ChainChangeWatcher from "./chain-change-watcher";
-import drizzle from "./drizzle";
-
-const { DrizzleProvider, Initializer, useDrizzle } = drizzleReactHooks;
+import drizzle, { DrizzleProvider, Initializer, useDrizzle } from "./drizzle";
 
 export default function App() {
   const [isMenuClosed, setIsMenuClosed] = useState(true);
@@ -116,6 +113,19 @@ function DrizzleChainIdProvider({ children }) {
 DrizzleChainIdProvider.propTypes = {
   children: t.node,
 };
+
+// function DrizzleForRequiredChainId() {
+//   const setDrizzle = useDrizzleSetter();
+//   const { requiredChainId } = useQueryParams();
+
+//   React.useEffect(() => {
+//     if (requiredChainId) {
+//       setDrizzle({ chainId: requiredChainId });
+//     }
+//   }, [setDrizzle, requiredChainId]);
+
+//   return null;
+// }
 
 const StyledSpin = styled(Spin)`
   left: 50%;

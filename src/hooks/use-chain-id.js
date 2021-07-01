@@ -37,7 +37,7 @@ export function ChainIdProvider({ web3, children, renderOnError, renderOnLoading
   }, [web3]);
 
   useEffect(() => {
-    if (typeof web3?.currentProvider?.on !== "function") {
+    if (typeof web3?.currentProvider?.on !== "function" || typeof web3?.currentProvider?.off !== "function") {
       return;
     }
 

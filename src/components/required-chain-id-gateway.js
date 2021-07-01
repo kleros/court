@@ -11,13 +11,14 @@ export default function RequiredChainIdGateway({ children, render, renderOnMisma
   const queryParams = useQueryParams();
   const parsedValue = Number.parseInt(queryParams.requiredChainId, 10);
   const requiredChainId = Number.isNaN(parsedValue) ? undefined : parsedValue;
+  const chainId = useChainId();
 
-  useCleanWhenEmpty();
-  useCleanWhenMatching(requiredChainId);
+  useClearWhenEmpty({ requiredChainId });
+  useClearWhenMatching({ chainId, requiredChainId });
 
   const content = children ?? render?.({ requiredChainId }) ?? null;
 
-  return requiredChainId === undefined ? content : renderOnMismatch({ requiredChainId });
+  return requiredChainId === undefined || requiredChainId === chainId ? content : renderOnMismatch({ requiredChainId });
 }
 
 RequiredChainIdGateway.propTypes = {
@@ -74,7 +75,7 @@ export function useSetRequiredChainId() {
   );
 }
 
-export function useCleanRequiredChainId() {
+export function useClearRequiredChainId() {
   const history = useHistory();
   const location = useLocation();
   const queryParams = useQueryParams();
@@ -92,10 +93,8 @@ export function useCleanRequiredChainId() {
   }, [history, location, queryParams]);
 }
 
-function useCleanWhenMatching(requiredChainId) {
-  const chainId = useChainId();
-
-  const clean = useCleanRequiredChainId();
+function useClearWhenMatching({ chainId, requiredChainId }) {
+  const clean = useClearRequiredChainId();
 
   React.useEffect(() => {
     if (chainId && requiredChainId && requiredChainId === chainId) {
@@ -104,15 +103,14 @@ function useCleanWhenMatching(requiredChainId) {
   }, [requiredChainId, chainId, clean]);
 }
 
-function useCleanWhenEmpty() {
-  const queryParams = useQueryParams();
-  const clean = useCleanRequiredChainId();
+function useClearWhenEmpty({ requiredChainId }) {
+  const clear = useClearRequiredChainId();
 
   React.useEffect(() => {
-    if (queryParams.requiredChainId === "") {
-      clean();
+    if (requiredChainId === undefined) {
+      clear();
     }
-  }, [queryParams.requiredChainId, clean]);
+  }, [requiredChainId, clear]);
 }
 
 const StyledCard = styled(Card)`

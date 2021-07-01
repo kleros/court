@@ -5,7 +5,7 @@ import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { Button, Icon, Modal, Typography } from "antd";
 import { chainIdToNetworkName } from "../helpers/networks";
 import { isSupportedSideChain, requestSwitchToSideChain } from "../api/side-chain";
-import { useCleanRequiredChainId, useSetRequiredChainId } from "./required-chain-id-gateway";
+import { useClearRequiredChainId, useSetRequiredChainId } from "./required-chain-id-gateway";
 import useAccount from "../hooks/use-account";
 
 const { useDrizzle } = drizzleReactHooks;
@@ -15,7 +15,7 @@ export default function RequiredChainIdModal({ requiredChainId }) {
   const hasAccount = !!account;
 
   const networkName = chainIdToNetworkName[requiredChainId];
-  const cleanRequiredChainId = useCleanRequiredChainId();
+  const cleanRequiredChainId = useClearRequiredChainId();
 
   return (
     <StyledModal
