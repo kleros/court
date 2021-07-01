@@ -13,7 +13,7 @@ export default function RequiredChainIdGateway({ children, render, renderOnMisma
   const requiredChainId = Number.isNaN(parsedValue) ? undefined : parsedValue;
   const chainId = useChainId();
 
-  useClearWhenEmpty({ requiredChainId });
+  useClearWhenInvalid({ requiredChainId: queryParams.requiredChainId });
   useClearWhenMatching({ chainId, requiredChainId });
 
   const content = children ?? render?.({ requiredChainId }) ?? null;
@@ -103,11 +103,11 @@ function useClearWhenMatching({ chainId, requiredChainId }) {
   }, [requiredChainId, chainId, clean]);
 }
 
-function useClearWhenEmpty({ requiredChainId }) {
+function useClearWhenInvalid({ requiredChainId }) {
   const clear = useClearRequiredChainId();
 
   React.useEffect(() => {
-    if (requiredChainId === undefined) {
+    if (requiredChainId !== undefined && Number.isNaN(Number.parseInt(requiredChainId, 10))) {
       clear();
     }
   }, [requiredChainId, clear]);
