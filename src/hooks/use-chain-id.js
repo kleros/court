@@ -1,15 +1,31 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, createContext, useContext } from "react";
+import { Alert, Spin } from "antd";
+import t from "prop-types";
 
-export default function useChainId(web3) {
+const ChainIdContext = createContext();
+
+export default function useChainId() {
+  return useContext(ChainIdContext);
+}
+
+export function ChainIdProvider({ web3, children, renderOnError, renderOnLoading }) {
   const [chainId, setChainId] = useState();
+  const [error, setError] = useState();
 
   useEffect(() => {
     let isMounted = true;
 
     async function getChainId() {
-      if (isMounted) {
+      try {
         const chainIdFromProvider = await web3.eth.getChainId();
-        setChainId(chainIdFromProvider);
+
+        if (isMounted) {
+          setChainId(chainIdFromProvider);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err);
+        }
       }
     }
 
@@ -21,23 +37,56 @@ export default function useChainId(web3) {
   }, [web3]);
 
   useEffect(() => {
+    if (typeof web3?.currentProvider?.on !== "function" || typeof web3?.currentProvider?.off !== "function") {
+      return;
+    }
+
     let isMounted = true;
 
     const handleNetworkChanged = (chainIdFromEvent) => {
       // chainChanged payload is the chain ID in hex format.
-      const normalizedChainId = Number.parseInt(chainIdFromEvent, 16);
-      setChainId(normalizedChainId);
+      const normalizedChainId = hexStringToNumber(chainIdFromEvent);
+
+      if (isMounted) {
+        setChainId(normalizedChainId);
+      }
     };
 
-    if (window.ethereum && isMounted) {
-      window.ethereum.addListener("chainChanged", handleNetworkChanged);
+    web3.currentProvider.on("chainChanged", handleNetworkChanged);
 
-      return () => {
-        window.ethereum.removeListener("chainChanged", handleNetworkChanged);
-        isMounted = false;
-      };
-    }
-  }, []);
+    return () => {
+      web3.currentProvider.off("chainChanged", handleNetworkChanged);
+      isMounted = false;
+    };
+  }, [web3]);
 
-  return chainId;
+  const errorContent = error ? (typeof renderOnError === "function" ? renderOnError(error) : renderOnError) : null;
+  const loadingContent =
+    chainId === undefined ? (typeof renderOnLoading === "function" ? renderOnLoading() : renderOnLoading) : null;
+
+  return (
+    <ChainIdContext.Provider value={chainId}>{errorContent ?? loadingContent ?? children}</ChainIdContext.Provider>
+  );
 }
+
+const defaultRenderOnLoading = (
+  <Spin spinning tip="Getting chain info...">
+    <div></div>
+  </Spin>
+);
+
+const defaultRenderOnError = (error) => <Alert type="error" message={error.message} />;
+
+ChainIdProvider.propTypes = {
+  web3: t.object.isRequired,
+  renderOnLoading: t.oneOfType([t.node, t.func]),
+  renderOnError: t.oneOfType([t.node, t.func]),
+  children: t.node,
+};
+
+ChainIdProvider.defaultProps = {
+  renderOnLoading: defaultRenderOnLoading,
+  renderOnError: defaultRenderOnError,
+};
+
+const hexStringToNumber = (chainId) => Number.parseInt(chainId, 16);

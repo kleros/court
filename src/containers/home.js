@@ -4,6 +4,7 @@ import styled from "styled-components/macro";
 import { Link } from "react-router-dom";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import AlternativeChainCourt from "../components/alternative-chain-court";
 import CasesListCard from "../components/cases-list-card";
 import CourtsListCard from "../components/courts-list-card";
 import NotificationsCard from "../components/notifications-card";
@@ -13,12 +14,17 @@ import RewardCard from "../components/reward-card";
 import ClaimModal from "../components/claim-modal";
 import TopBanner from "../components/top-banner";
 import TokenSymbol from "../components/token-symbol";
+import RequiredChainIdGateway from "../components/required-chain-id-gateway";
+import RequiredChainIdModal from "../components/required-chain-id-modal";
+import GetSideChainPnkButton from "../components/get-side-chain-pnk-button";
+import SideChainPnk from "../components/side-chain-pnk";
 import useChainId from "../hooks/use-chain-id";
 import { ReactComponent as Present } from "../assets/images/present.svg";
 
-const { useDrizzleState, useDrizzle } = drizzleReactHooks;
+const { useDrizzleState } = drizzleReactHooks;
 
 const airdropChainIds = [1, 42, 77];
+const buyPnkChainIds = [1];
 
 export default function Home() {
   const drizzleState = useDrizzleState((drizzleState) => ({
@@ -26,8 +32,9 @@ export default function Home() {
     web3: drizzleState.web3,
   }));
 
-  const { drizzle } = useDrizzle();
-  const chainId = useChainId(drizzle.web3);
+  const chainId = useChainId();
+
+  const isBuyPnkButtonVisible = buyPnkChainIds.includes(chainId);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalButtonVisible, setIsModalButtonVisible] = useState(false);
@@ -57,7 +64,7 @@ export default function Home() {
     setApy(apy);
   }, []);
 
-  return (
+  const content = (
     <>
       {airdropChainIds.includes(chainId) ? (
         <ClaimModal
@@ -72,14 +79,11 @@ export default function Home() {
         title="Welcome!"
         description="This is the Kleros Juror Dashboard"
         extra={
-          <>
-            <StyledButton
+          <StyledButtonBar>
+            <StyledClaimButton
               onClick={showModal}
               size="large"
               style={{
-                marginRight: "16px",
-                backgroundColor: "#9013FE",
-                border: "none",
                 display: isModalButtonVisible ? "inline-block" : "none",
               }}
               type="primary"
@@ -88,15 +92,27 @@ export default function Home() {
               <span>
                 Claim <TokenSymbol token="PNK" />
               </span>
-            </StyledButton>
-            <Link to="/courts">
-              <StyledButton size="large" style={{ maxWidth: "120px" }} type="primary">
-                Join a Court
+            </StyledClaimButton>
+            <Link
+              to="/tokens"
+              style={{
+                display: isBuyPnkButtonVisible ? "inline-block" : "none",
+              }}
+            >
+              <StyledButton size="large" type="secondary">
+                Buy PNK
               </StyledButton>
             </Link>
-          </>
+            <GetSideChainPnkButton />
+            <Link to="/courts">
+              <StyledButton size="large" type="primary">
+                See Courts
+              </StyledButton>
+            </Link>
+          </StyledButtonBar>
         }
       />
+      <AlternativeChainCourt />
       <RewardCard />
       <Row gutter={32}>
         <Col lg={8}>
@@ -111,12 +127,51 @@ export default function Home() {
       </Row>
       <OngoingCasesCard />
       <NotificationsCard />
+      <SideChainPnk showGetSideChainPnkModal={false} />
     </>
+  );
+
+  return (
+    <RequiredChainIdGateway
+      renderOnMismatch={({ requiredChainId }) => (
+        <>
+          {content}
+          <RequiredChainIdModal requiredChainId={requiredChainId} />
+        </>
+      )}
+    >
+      {content}
+    </RequiredChainIdGateway>
   );
 }
 
+const StyledButtonBar = styled.div`
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 16px;
+
+  @media (max-width: 576px) {
+    min-width: 100%;
+    flex-wrap: wrap;
+  }
+`;
+
 const StyledButton = styled(Button)`
   box-shadow: none;
-  float: right;
   text-shadow: none;
+`;
+
+const StyledClaimButton = styled(StyledButton)`
+  background-color: #9013fe;
+  border: none;
+
+  :hover,
+  :focus {
+    background-color: #a541fe;
+  }
+
+  :active {
+    background-color: #6601be;
+  }
 `;

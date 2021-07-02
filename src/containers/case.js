@@ -1,42 +1,22 @@
 import React, { useMemo } from "react";
-import t from "prop-types";
 import { Button, Row, Col, Tooltip } from "antd";
+import { useParams } from "react-router-dom";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import CaseDetailsCard from "../components/case-details-card";
 import ETHAmount from "../components/eth-amount";
 import TimeAgo from "../components/time-ago";
 import TopBanner from "../components/top-banner";
+import RequiredChainIdGateway from "../components/required-chain-id-gateway";
+import RequiredChainIdModal from "../components/required-chain-id-modal";
 import styled from "styled-components/macro";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
-const StyledDiv = styled.div`
-  font-weight: bold;
-`;
-const StyledBigTextDiv = styled(StyledDiv)`
-  font-size: 20px;
-`;
-const StyledButton = styled(Button)`
-  flex: 0 0 35%;
-  margin: 15px 5px 0px;
-`;
-const ResolvedTag = styled.div`
-  border: 1px solid;
-  border-radius: 3px;
-  float: right;
-  margin-right: 50px;
-  padding: 5px;
-  text-align: center;
-  width: 80px;
-`;
 const MANUAL_PASS_DELAY = 3600;
 
-export default function Case({
-  match: {
-    params: { ID },
-  },
-}) {
+export default function Case() {
+  const { ID } = useParams();
   const { drizzle, useCacheCall, useCacheEvents, useCacheSend } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
@@ -93,8 +73,11 @@ export default function Case({
     }
     return disputeData;
   });
+
   return (
-    <>
+    <RequiredChainIdGateway
+      renderOnMismatch={({ requiredChainId }) => <RequiredChainIdModal requiredChainId={requiredChainId} />}
+    >
       <TopBanner
         description={
           <>
@@ -153,14 +136,29 @@ export default function Case({
         title="Case Details"
       />
       <CaseDetailsCard ID={ID} />
-    </>
+    </RequiredChainIdGateway>
   );
 }
 
-Case.propTypes = {
-  match: t.shape({
-    params: t.shape({
-      ID: t.oneOfType([t.number, t.string]).isRequired,
-    }).isRequired,
-  }).isRequired,
-};
+const StyledDiv = styled.div`
+  font-weight: bold;
+`;
+
+const StyledBigTextDiv = styled(StyledDiv)`
+  font-size: 20px;
+`;
+
+const StyledButton = styled(Button)`
+  flex: 0 0 35%;
+  margin: 15px 5px 0px;
+`;
+
+const ResolvedTag = styled.div`
+  border: 1px solid;
+  border-radius: 3px;
+  float: right;
+  margin-right: 50px;
+  padding: 5px;
+  text-align: center;
+  width: 80px;
+`;

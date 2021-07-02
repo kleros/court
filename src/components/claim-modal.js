@@ -36,7 +36,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
   const { account } = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
-  const chainId = useChainId(drizzle.web3);
+  const chainId = useChainId();
 
   const [claims, setClaims] = useState(0);
   const [txHash, setTxHash] = useState(null);

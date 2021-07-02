@@ -1,7 +1,7 @@
-import { Card, Col, Row } from 'antd'
-import PropTypes from 'prop-types'
-import React from 'react'
-import styled from 'styled-components/macro'
+import React from "react";
+import t from "prop-types";
+import styled from "styled-components/macro";
+import { Card, Col, Row } from "antd";
 
 const StyledCard = styled(Card)`
   background: linear-gradient(270deg, #f2e3ff 22.92%, #ffffff 76.25%);
@@ -14,7 +14,7 @@ const StyledCard = styled(Card)`
   .ant-card-body {
     padding: 24px 0;
   }
-`
+`;
 
 const StyledDescriptionCol = styled(Col)`
   margin-bottom: 8px;
@@ -22,12 +22,12 @@ const StyledDescriptionCol = styled(Col)`
   @media (max-width: 640px) {
     display: none;
   }
-`
+`;
 
 const StyledTitleCol = styled(Col)`
   font-size: 24px;
   font-weight: bold;
-`
+`;
 const StyledExtraCol = styled(Col)`
   align-items: center;
   display: flex;
@@ -37,54 +37,51 @@ const StyledExtraCol = styled(Col)`
   @media (max-width: 500px) {
     flex-direction: column;
   }
-`
+`;
 
 const StyledTitleRow = styled(Row)`
   display: flex;
-
+  gap: 24px;
   justify-content: space-between;
   margin: 0;
-`
+`;
 
-const TopBanner = ({ description, extra, title, extraLong }) => {
-  if (extraLong)
-    return (
-      <StyledCard>
-        <StyledTitleRow align="middle" gutter={16} type="flex">
-          <StyledTitleCol md={3} offset={1} xs={10}>
-            {title}
-          </StyledTitleCol>
-          <Col md={11} xs={0}>
-            {description}
-          </Col>
-          <StyledExtraCol md={9} xs={11}>
-            {extra}
-          </StyledExtraCol>
-        </StyledTitleRow>
-      </StyledCard>
-    )
-
-  return (
+export default function TopBanner({ description, extra, title, extraLong }) {
+  return extraLong ? (
+    <StyledCard>
+      <StyledTitleRow align="middle" type="flex">
+        <StyledTitleCol md={4} xs={12}>
+          {title}
+        </StyledTitleCol>
+        <Col md={10} xs={0}>
+          {description}
+        </Col>
+        <StyledExtraCol md={10} xs={12}>
+          {extra}
+        </StyledExtraCol>
+      </StyledTitleRow>
+    </StyledCard>
+  ) : (
     <StyledCard>
       <StyledTitleRow type="flex">
-        <div style={{ marginRight: '8px' }}>
+        <div>
           <StyledTitleCol>{title}</StyledTitleCol>
           <StyledDescriptionCol>{description}</StyledDescriptionCol>
         </div>
         <StyledExtraCol>{extra}</StyledExtraCol>
       </StyledTitleRow>
     </StyledCard>
-  )
+  );
 }
 
 TopBanner.propTypes = {
-  description: PropTypes.node.isRequired,
-  extra: PropTypes.node,
-  title: PropTypes.string.isRequired
-}
+  description: t.node.isRequired,
+  extra: t.node,
+  title: t.string.isRequired,
+  extraLong: t.bool,
+};
 
 TopBanner.defaultProps = {
-  extra: null
-}
-
-export default TopBanner
+  extra: null,
+  extraLong: false,
+};

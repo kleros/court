@@ -8,7 +8,6 @@ import skillsImg from "../assets/images/skills.png";
 import rewardImg from "../assets/images/reward.png";
 import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
-import Breadcrumbs from "./breadcrumbs";
 import ETHAmount from "./eth-amount";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
@@ -133,64 +132,66 @@ const CourtCascaderModal = ({ onClick }) => {
               </StyledButton>
             </Tooltip>
           </SelectButtonArea>
-          <Skeleton active loading={option.loading}>
-            <Row gutter={16}>
-              <Col md={12}>
-                <StyledDiv>
-                  {option.label} | Min Stake = <ETHAmount amount={minStake} decimals={0} tokenSymbol="PNK" />
-                  <div style={{ fontWeight: "400", fontSize: "12px" }}>
-                    Each vote has a stake of{" "}
-                    <ETHAmount
-                      amount={
-                        minStake &&
-                        subcourtAlpha &&
-                        minStake.mul(subcourtAlpha).div(drizzle.web3.utils.toBN(ALPHA_DIVISOR))
-                      }
-                      decimals={0}
-                      tokenSymbol="PNK"
-                    />
-                    .
-                  </div>
-                </StyledDiv>
-                <ReactMarkdown source={option.description} />
-                <ReactMarkdown source={option.summary} />
-              </Col>
-              <Col md={12}>
-                {option.requiredSkills ? (
+          <StyledPolicyWrapper>
+            <Skeleton active loading={option.loading}>
+              <StyledPolicyRow gutter={16}>
+                <Col md={12}>
+                  <StyledPolicySection>
+                    {option.label} | Min Stake = <ETHAmount amount={minStake} decimals={0} tokenSymbol="PNK" />
+                    <div style={{ fontWeight: "400", fontSize: "12px" }}>
+                      Each vote has a stake of{" "}
+                      <ETHAmount
+                        amount={
+                          minStake &&
+                          subcourtAlpha &&
+                          minStake.mul(subcourtAlpha).div(drizzle.web3.utils.toBN(ALPHA_DIVISOR))
+                        }
+                        decimals={0}
+                        tokenSymbol="PNK"
+                      />
+                      .
+                    </div>
+                  </StyledPolicySection>
+                  <ReactMarkdown source={option.description} />
+                  <ReactMarkdown source={option.summary} />
+                </Col>
+                <Col md={12}>
+                  {option.requiredSkills ? (
+                    <Row>
+                      <Col md={4}>
+                        <Hexagon className="ternary-fill" />
+                        <StyledPrefixDiv>
+                          <img src={skillsImg} alt="skills" />
+                        </StyledPrefixDiv>
+                      </Col>
+                      <Col md={20}>
+                        <StyledHeader>Required Skills</StyledHeader>
+                        <ReactMarkdown source={option.requiredSkills} />
+                      </Col>
+                    </Row>
+                  ) : null}
                   <Row>
                     <Col md={4}>
                       <Hexagon className="ternary-fill" />
-                      <StyledPrefixDiv>
-                        <img src={skillsImg} alt="skills" />
+                      <StyledPrefixDiv style={{ top: "33px" }}>
+                        <img src={rewardImg} alt="reward" />
                       </StyledPrefixDiv>
                     </Col>
                     <Col md={20}>
-                      <StyledHeader>Required Skills</StyledHeader>
-                      <ReactMarkdown source={option.requiredSkills} />
+                      <StyledHeader>Reward</StyledHeader>
+                      <div>
+                        For each coherent vote you will receive{" "}
+                        <strong>
+                          <ETHAmount amount={feeForJuror || null} decimals={2} tokenSymbol={true} /> +
+                        </strong>
+                        .
+                      </div>
                     </Col>
                   </Row>
-                ) : null}
-                <Row>
-                  <Col md={4}>
-                    <Hexagon className="ternary-fill" />
-                    <StyledPrefixDiv style={{ top: "33px" }}>
-                      <img src={rewardImg} alt="reward" />
-                    </StyledPrefixDiv>
-                  </Col>
-                  <Col md={20}>
-                    <StyledHeader>Reward</StyledHeader>
-                    <div>
-                      For each coherent vote you will receive{" "}
-                      <strong>
-                        <ETHAmount amount={feeForJuror || null} decimals={2} tokenSymbol={true} /> +
-                      </strong>
-                      .
-                    </div>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-          </Skeleton>
+                </Col>
+              </StyledPolicyRow>
+            </Skeleton>
+          </StyledPolicyWrapper>
         </>
       }
       onCancel={useCallback(() => onClick(), [onClick])}
@@ -206,23 +207,6 @@ const CourtCascaderModal = ({ onClick }) => {
         popupVisible
         value={subcourtIDs}
       />
-      {subcourtIDs.slice(0, subcourtIDs.length - 1).map((ID, i) => {
-        const subcourtIDsSubset = subcourtIDs.slice(0, subcourtIDs.indexOf(ID) + 1);
-        const option = subcourtIDsSubset.reduce((acc, ID, i) => {
-          const index = acc.findIndex((option) => option.value === ID);
-          return i === subcourtIDsSubset.length - 1 ? { index, label: acc[index].label || "" } : acc[index].children;
-        }, options);
-        return (
-          <StyledBreadcrumbs
-            breadcrumbs={option.label}
-            colorIndex={i}
-            columnIndex={option.index}
-            key={`${ID}-${i}`}
-            large
-            optionLength={subcourtIDs.length}
-          />
-        );
-      })}
     </StyledModal>
   );
 };
@@ -235,68 +219,68 @@ export default CourtCascaderModal;
 
 const StyledModal = styled(Modal)`
   position: relative;
+  isolation: isolate;
+  padding-bottom: 0;
   width: 90% !important;
+  height: 90vh;
 
   .ant-modal {
     &-header {
       padding: 0;
+      border: none;
     }
 
     &-close-icon svg {
       fill: white;
     }
 
+    &-content {
+      height: 100%;
+    }
+
     &-body {
       background: whitesmoke;
       height: 286px;
-      margin-top: -1px;
-      overflow-x: scroll;
+      overflow: hidden;
       position: relative;
+      padding: 0;
     }
 
+    &-body::scrollbar,
     &-body::-webkit-scrollbar {
       display: none;
     }
 
     &-footer {
+      border: none;
       color: #4d00b4;
-      height: 284px;
-      margin-top: 40px;
-      overflow-y: scroll;
-      padding: 52px 42px 28px;
+      padding: 0;
       text-align: left;
+      height: calc(90vh - 400px);
     }
   }
 `;
 
 const SelectButtonArea = styled.div`
   background: #4004a3;
-  height: 60px;
-  margin: -52px -42px 0px -42px;
   padding: 0;
-  position: absolute;
-  top: 390px;
-  width: 100%;
-  z-index: 2;
+  display: flex;
+  align-items: center;
+  height: 60px;
+  padding: 0 24px;
 `;
 
 const StyledButton = styled(Button)`
   border-radius: 3px;
-  position: absolute;
-  right: 44px;
-  top: 15px;
   width: 100px;
-  z-index: 3;
-`;
 
-const StyledDiv = styled.div`
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 20px;
+  ${SelectButtonArea} > &:last-of-type {
+    margin-left: auto;
+  }
 `;
 
 const StyledHeader = styled.div`
-  font-size: 18px;
+  ffnt-size: 18px;
   font-weight: bold;
 `;
 
@@ -315,22 +299,37 @@ const StyledCascader = styled(Cascader)`
 
   & ~ div .popupClassName {
     background: whitesmoke;
+    width: 100%;
+    border-radius: 0;
     left: 0 !important;
-    min-width: 100%;
     top: 0 !important;
 
     .ant-cascader-menu {
-      border: 0;
+      position: relative;
       height: 286px;
-      padding-top: 28px;
       width: 226px;
+      padding-top: 0;
+      padding-bottom: 0;
+      border: 0;
+      border-radius: 0;
 
       &-item {
-        height: 38px;
-        padding: 5px 28px;
+        position: relative;
+        line-height: 28px;
+        min-height: 38px;
+        padding: 5px 18px;
+        white-space: normal;
 
         &-active {
           color: white;
+          .anticon {
+            color: white;
+          }
+        }
+
+        > .ant-cascader-menu-item-loading-icon {
+          top: 50%;
+          transform: translateY(-50%);
         }
       }
     }
@@ -348,7 +347,7 @@ const StyledCascader = styled(Cascader)`
 
     ul:nth-child(3n + 2) {
       .ant-cascader-menu-item-active {
-        background: #4004a3;
+        background: #9013fe;
       }
     }
 
@@ -360,17 +359,25 @@ const StyledCascader = styled(Cascader)`
   }
 `;
 
-const StyledBreadcrumbs = styled(Breadcrumbs)`
-  left: ${(props) => props.colorIndex * 226}px;
-  pointer-events: none;
-  position: absolute;
-  top: ${(props) => props.columnIndex * 38 + 28}px;
-  z-index: ${(props) => props.optionLength - props.colorIndex + 2000};
-`;
-
 const StyledPrefixDiv = styled.div`
   left: 29px;
   position: absolute;
   top: 29px;
   transform: translate(-50%, -50%);
+`;
+
+const StyledPolicyWrapper = styled.div`
+  padding: 24px;
+  height: 100%;
+`;
+
+const StyledPolicyRow = styled(Row)`
+  overflow: auto;
+  max-height: 100%;
+`;
+
+const StyledPolicySection = styled.section`
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
 `;

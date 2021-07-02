@@ -1,17 +1,26 @@
-import { Button, Col, Divider, Row, Spin } from "antd";
 import React, { useCallback, useState } from "react";
 import styled from "styled-components/macro";
+import { Link } from "react-router-dom";
+import { Button, Col, Divider, Row, Spin } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
+import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import AlternativeChainCourt from "../components/alternative-chain-court";
 import CourtCard from "../components/court-card";
 import CourtCascaderModal from "../components/court-cascader-modal";
-import PNKBalanceCard from "../components/pnk-balance-card";
 import CourtDrawer from "../components/court-drawer";
+import PNKBalanceCard from "../components/pnk-balance-card";
+import RequiredChainIdGateway from "../components/required-chain-id-gateway";
+import RequiredChainIdModal from "../components/required-chain-id-modal";
 import StakeModal from "../components/stake-modal";
-import TopBanner from "../components/top-banner";
 import TokenSymbol from "../components/token-symbol";
-import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import TopBanner from "../components/top-banner";
+import GetSideChainPnkButton from "../components/get-side-chain-pnk-button";
+import SideChainPnk from "../components/side-chain-pnk";
+import useChainId from "../hooks/use-chain-id";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
+
+const buyPnkChainIds = [1];
 
 export default function Courts() {
   const { useCacheCall } = useDrizzle();
@@ -21,7 +30,12 @@ export default function Courts() {
   const [activeID, setActiveID] = useState();
   const [stakingID, setStakingID] = useState();
   const juror = useCacheCall("KlerosLiquidExtraViews", "getJuror", drizzleState.account);
-  return (
+
+  const chainId = useChainId();
+
+  const isBuyPnkButtonVisible = buyPnkChainIds.includes(chainId);
+
+  const content = (
     <>
       <TopBanner
         description={
@@ -30,7 +44,18 @@ export default function Courts() {
           </>
         }
         extra={
-          <div className={{ width: "100%" }}>
+          <StyledButtonBar>
+            <Link
+              to="/tokens"
+              style={{
+                display: isBuyPnkButtonVisible ? "inline-block" : "none",
+              }}
+            >
+              <StyledButton size="large" type="secondary">
+                Buy PNK
+              </StyledButton>
+            </Link>
+            <GetSideChainPnkButton />
             <StyledButton
               onClick={useCallback(() => setStakingID(null), [])}
               size="large"
@@ -39,10 +64,11 @@ export default function Courts() {
             >
               Join a Court
             </StyledButton>
-          </div>
+          </StyledButtonBar>
         }
         title="Courts"
       />
+      <AlternativeChainCourt />
       {juror && juror.subcourtIDs.filter((ID) => ID !== "0").length > 0 ? <PNKBalanceCard /> : ""}
       <Spin spinning={!juror}>
         <Row gutter={40}>
@@ -70,7 +96,21 @@ export default function Courts() {
       ) : (
         <StakeModal ID={stakingID} onCancel={setStakingID} />
       )}
+      <SideChainPnk showGetSideChainPnkModal={false} />
     </>
+  );
+
+  return (
+    <RequiredChainIdGateway
+      renderOnMismatch={({ requiredChainId }) => (
+        <>
+          {content}
+          <RequiredChainIdModal requiredChainId={requiredChainId} />
+        </>
+      )}
+    >
+      {content}
+    </RequiredChainIdGateway>
   );
 }
 
@@ -82,6 +122,19 @@ const StyledCol = styled(Col)`
   text-align: center;
 `;
 
+const StyledButtonBar = styled.div`
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 16px;
+
+  @media (max-width: 576px) {
+    min-width: 100%;
+    flex-wrap: wrap;
+  }
+`;
+
 const StyledButton = styled(Button)`
-  float: right;
+  box-shadow: none;
+  text-shadow: none;
 `;

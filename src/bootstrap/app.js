@@ -1,22 +1,20 @@
 import "../components/theme.css";
 import "./app.css";
 import React, { useState } from "react";
+import t from "prop-types";
 import loadable from "@loadable/component";
 import styled from "styled-components/macro";
-import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { Col, Layout, Menu, Row, Spin } from "antd";
 import { Helmet } from "react-helmet";
-import { BrowserRouter, NavLink, Route, Switch } from "react-router-dom";
+import { BrowserRouter, NavLink, Route, Switch, useParams } from "react-router-dom";
 import { ReactComponent as Logo } from "../assets/images/logo.svg";
+import AccountStatus from "../components/account-status";
 import Footer from "../components/footer";
-import Identicon from "../components/identicon";
-import NetworkStatus from "../components/network-status";
 import NotificationSettings from "../components/notification-settings";
+import { ChainIdProvider } from "../hooks/use-chain-id";
 import { ArchonInitializer } from "./archon";
 import ChainChangeWatcher from "./chain-change-watcher";
-import drizzle from "./drizzle";
-
-const { DrizzleProvider, Initializer } = drizzleReactHooks;
+import drizzle, { DrizzleProvider, Initializer, useDrizzle } from "./drizzle";
 
 export default function App() {
   const [isMenuClosed, setIsMenuClosed] = useState(true);
@@ -33,66 +31,101 @@ export default function App() {
           loadingContractsAndAccounts={<C404 Web3 />}
           loadingWeb3={<StyledSpin tip="Connecting to your Web3 provider." />}
         >
-          <ChainChangeWatcher>
-            <ArchonInitializer>
-              <BrowserRouter>
-                <Layout>
-                  <StyledLayoutSider
-                    breakpoint="md"
-                    collapsedWidth="0"
-                    collapsed={isMenuClosed}
-                    onClick={() => setIsMenuClosed((previousState) => !previousState)}
-                  >
-                    <Menu theme="dark">{MenuItems}</Menu>
-                  </StyledLayoutSider>
+          <DrizzleChainIdProvider>
+            <ChainChangeWatcher>
+              <ArchonInitializer>
+                <BrowserRouter>
                   <Layout>
-                    <StyledLayoutHeader>
-                      <Row>
-                        <StyledLogoCol md={4} sm={12} xs={0}>
-                          <LogoNavLink to="/">
-                            <Logo />
-                          </LogoNavLink>
-                        </StyledLogoCol>
-                        <Col lg={16} md={12} xs={0}>
-                          <StyledMenu mode="horizontal" theme="dark">
-                            {MenuItems}
-                          </StyledMenu>
-                        </Col>
-                        <StyledTrayCol lg={4} md={8} sm={12} xs={24}>
-                          <StyledTray>
-                            <StyledNetworkStatus />
-                            <Identicon pinakion />
-                            <NotificationSettings settings={settings} />
-                            <StyledBuyPNK href="/tokens">Buy PNK</StyledBuyPNK>
-                          </StyledTray>
-                        </StyledTrayCol>
-                      </Row>
-                    </StyledLayoutHeader>
-                    <StyledLayoutContent>
-                      <Switch>
-                        <Route component={Home} exact path="/" />
-                        <Route component={Courts} exact path="/courts" />
-                        <Route component={Cases} exact path="/cases" />
-                        <Route component={Case} exact path="/cases/:ID" />
-                        <Route component={Tokens} exact path="/tokens" />
-                        <Route component={C404} />
-                      </Switch>
-                    </StyledLayoutContent>
-                    <Footer />
-                    <StyledClickaway
-                      isMenuClosed={isMenuClosed}
-                      onClick={isMenuClosed ? null : () => setIsMenuClosed(true)}
-                    />
+                    <StyledLayoutSider
+                      breakpoint="md"
+                      collapsedWidth="0"
+                      collapsed={isMenuClosed}
+                      onClick={() => setIsMenuClosed((previousState) => !previousState)}
+                    >
+                      <Menu theme="dark">{MenuItems}</Menu>
+                    </StyledLayoutSider>
+                    <Layout>
+                      <StyledLayoutHeader>
+                        <Row>
+                          <StyledLogoCol lg={4} md={4} sm={12} xs={0}>
+                            <LogoNavLink to="/">
+                              <Logo />
+                            </LogoNavLink>
+                          </StyledLogoCol>
+                          <Col lg={14} md={12} xs={0} style={{ padding: "0 16px" }}>
+                            <StyledMenu mode="horizontal" theme="dark">
+                              {MenuItems}
+                            </StyledMenu>
+                          </Col>
+                          <StyledTrayCol lg={6} md={8} sm={12} xs={24}>
+                            <StyledTray>
+                              <AccountStatus />
+                              <NotificationSettings settings={settings} />
+                            </StyledTray>
+                          </StyledTrayCol>
+                        </Row>
+                      </StyledLayoutHeader>
+                      <StyledLayoutContent>
+                        <Switch>
+                          <Route exact path="/">
+                            <Home />
+                          </Route>
+                          <Route exact path="/courts">
+                            <Courts />
+                          </Route>
+                          <Route exact path="/cases">
+                            <Cases />
+                          </Route>
+                          <Route exact path="/cases/:ID">
+                            <Case />
+                          </Route>
+                          <Route exact path="/tokens">
+                            <Tokens />
+                          </Route>
+                          <Route path="*">
+                            <C404 />
+                          </Route>
+                        </Switch>
+                      </StyledLayoutContent>
+                      <Footer />
+                      <StyledClickaway
+                        isMenuClosed={isMenuClosed}
+                        onClick={isMenuClosed ? null : () => setIsMenuClosed(true)}
+                      />
+                    </Layout>
                   </Layout>
-                </Layout>
-              </BrowserRouter>
-            </ArchonInitializer>
-          </ChainChangeWatcher>
+                </BrowserRouter>
+              </ArchonInitializer>
+            </ChainChangeWatcher>
+          </DrizzleChainIdProvider>
         </Initializer>
       </DrizzleProvider>
     </>
   );
 }
+
+function DrizzleChainIdProvider({ children }) {
+  const { drizzle } = useDrizzle();
+
+  return <ChainIdProvider web3={drizzle.web3}>{children}</ChainIdProvider>;
+}
+
+DrizzleChainIdProvider.propTypes = {
+  children: t.node,
+};
+
+// function DrizzleForRequiredChainId() {
+//   const setDrizzle = useDrizzleSetter();
+//   const { requiredChainId } = useQueryParams();
+
+//   React.useEffect(() => {
+//     if (requiredChainId) {
+//       setDrizzle({ chainId: requiredChainId });
+//     }
+//   }, [setDrizzle, requiredChainId]);
+
+//   return null;
+// }
 
 const StyledSpin = styled(Spin)`
   left: 50%;
@@ -117,12 +150,8 @@ const Cases = loadable(() => import(/* webpackPrefetch: true */ "../containers/c
   fallback: <StyledSpin />,
 });
 
-const Case = loadable(
-  async ({
-    match: {
-      params: { ID },
-    },
-  }) => {
+const CasePage = loadable(
+  async ({ ID }) => {
     try {
       await drizzle.contracts.KlerosLiquid.methods.disputes(ID).call();
     } catch (err) {
@@ -135,6 +164,11 @@ const Case = loadable(
     fallback: <StyledSpin />,
   }
 );
+
+const Case = () => {
+  const { ID } = useParams();
+  return <CasePage ID={ID} />;
+};
 
 const Tokens = loadable(() => import(/* webpackPrefetch: true */ "../containers/tokens"), {
   fallback: <StyledSpin />,
@@ -221,7 +255,8 @@ const StyledMenu = styled(Menu)`
 
 const StyledLayoutContent = styled(Layout.Content)`
   background: #f2e3ff;
-  min-height: 100vh;
+  // The header takes exactly 64px
+  min-height: calc(100vh - 64px);
   padding: 0px 9.375vw 120px 9.375vw;
 `;
 
@@ -237,23 +272,6 @@ const StyledTray = styled.div`
 
   > * {
     min-width: 0;
-  }
-`;
-
-const StyledNetworkStatus = styled(NetworkStatus)`
-  pointer-events: none;
-`;
-
-const StyledBuyPNK = styled.a`
-  border: 1px solid white;
-  border-radius: 3px;
-  color: #fff;
-  padding: 0.75rem 1.25rem;
-  text-decoration: none;
-  white-space: nowrap;
-
-  &:hover {
-    color: #fff;
   }
 `;
 

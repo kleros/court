@@ -1,12 +1,10 @@
+import { useEffect } from "react";
 import t from "prop-types";
-import { drizzleReactHooks } from "@drizzle/react-plugin";
-import useReloadOnChainChanged from "../hooks/use-reload-on-chain-changed";
-
-const { useDrizzle } = drizzleReactHooks;
+import useChainId from "../hooks/use-chain-id";
+import usePrevious from "../hooks/use-previous";
 
 export default function ChainChangeWatcher({ children }) {
-  const { drizzle } = useDrizzle();
-  useReloadOnChainChanged(drizzle.web3);
+  useReloadOnChainChanged();
 
   return children;
 }
@@ -14,3 +12,15 @@ export default function ChainChangeWatcher({ children }) {
 ChainChangeWatcher.propTypes = {
   children: t.node.isRequired,
 };
+
+function useReloadOnChainChanged() {
+  const chainId = useChainId();
+  const previousChainId = usePrevious(chainId);
+
+  useEffect(() => {
+    if (previousChainId !== undefined) {
+      console.info("Chain ID changed:", chainId);
+      window.location.reload();
+    }
+  }, [previousChainId, chainId]);
+}

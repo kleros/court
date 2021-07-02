@@ -12,14 +12,13 @@ import ListItem from "./list-item";
 import TimeAgo from "./time-ago";
 import useChainId from "../hooks/use-chain-id";
 
-const { useDrizzleState, useDrizzle } = drizzleReactHooks;
+const { useDrizzleState } = drizzleReactHooks;
 
 const NotificationsCard = ({ history }) => {
   const { account } = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
-  const { drizzle } = useDrizzle();
-  const chainId = useChainId(drizzle.web3);
+  const chainId = useChainId();
 
   const { notifications: _notifications } = useNotifications(
     chainId,
