@@ -8,7 +8,7 @@ const supportedSideChains = {
     nativeCurrency: { name: "xDAI", symbol: "xDAI", decimals: 18 },
     rpcUrls: [ensureEnv("REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL")],
     blockExplorerUrls: [getBaseUrl(100)],
-    bridgeAppUrl: `https://omni.xdaichain.com/bridge?from=100&to=1&token=${ensureEnv("REACT_APP_PINAKION_ADDRESS")}`,
+    bridgeAppUrl: `https://omni.xdaichain.com/bridge?from=1&to=100&token=${ensureEnv("REACT_APP_PINAKION_ADDRESS")}`,
     mainChainId: 1,
   },
   // Sokol
