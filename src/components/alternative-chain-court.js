@@ -47,7 +47,10 @@ export default function AlternativeChainCourt() {
     }
   }, [destinationChainId, setRequiredChainId, drizzle.web3.currentProvider]);
 
-  return hasAccount && destinationChainId ? (
+  return hasAccount &&
+    destinationChainId &&
+    // TODO: remove this after the xDAI launch announcement
+    destinationChainId !== 100 ? (
     <AlternativeChainCourtLink destinationChainId={destinationChainId} switchNetwork={switchNetwork} />
   ) : null;
 }
