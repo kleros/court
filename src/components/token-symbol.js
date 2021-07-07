@@ -38,9 +38,9 @@ const chainIdToSuffix = {
 };
 
 const chainIdToTokenSuffix = {
-  1: { PNK: "PNK", xPNK: "PNK" },
-  3: { PNK: "PNK", xPNK: "PNK" },
-  42: { PNK: "PNK", xPNK: "PNK" },
-  77: { PNK: "stPNK", xPNK: "xPNK" },
-  100: { PNK: "stPNK", xPNK: "xPNK" },
+  1: { PNK: "PNK", xPNK: "<<Invalid>>" },
+  3: { PNK: "PNK", xPNK: "<<Invalid>>" },
+  42: { PNK: "PNK", xPNK: "<<Invalid>>" },
+  77: { PNK: "stPNK", xPNK: "PNK" },
+  100: { PNK: "stPNK", xPNK: "PNK" },
 };

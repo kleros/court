@@ -27,14 +27,18 @@ export default function RequiredChainIdModal({ requiredChainId }) {
           <SwitchNetworkButton requiredChainId={requiredChainId} />
         ) : null
       }
-      title="Wrong Network"
+      title={`Switch to ${networkName}`}
       onCancel={() => cleanRequiredChainId()}
     >
       {hasAccount ? (
         isSupportedSideChain(requiredChainId) ? (
-          <StyledExplainer>Please click the button bellow or switch to {networkName} on MetaMask.</StyledExplainer>
+          <StyledExplainer>
+            To go to the Kleros Side-Chain Court, please click the button bellow or switch to {networkName} on MetaMask.
+          </StyledExplainer>
         ) : (
-          <StyledExplainer>Please switch to {networkName} on MetaMask.</StyledExplainer>
+          <StyledExplainer>
+            To go back to the main Kleros Court, please switch to {networkName} on MetaMask.
+          </StyledExplainer>
         )
       ) : (
         <StyledExplainer>
@@ -79,7 +83,7 @@ function SwitchNetworkButton({ requiredChainId }) {
 
   return (
     <Button onClick={switchChain}>
-      <span>Switch to {chainIdToNetworkName[requiredChainId]}</span>
+      <span>Go to Court on {chainIdToNetworkName[requiredChainId]}</span>
       <Icon type="arrow-right" />
     </Button>
   );
@@ -102,6 +106,7 @@ const StyledModal = styled(Modal)`
   }
 
   .ant-modal-footer {
+    padding: 16px 24px;
     border: none;
     text-align: center;
   }

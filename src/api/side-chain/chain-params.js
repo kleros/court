@@ -1,4 +1,12 @@
+import logoXPNK from "../../assets/images/xPNK.png";
+import logoStPNK from "../../assets/images/stPNK.png";
+
 import { getBaseUrl } from "../../helpers/block-explorer";
+
+export const Tokens = {
+  PNK: "PNK",
+  stPNK: "stPNK",
+};
 
 const supportedSideChains = {
   // xDai
@@ -10,6 +18,20 @@ const supportedSideChains = {
     blockExplorerUrls: [getBaseUrl(100)],
     bridgeAppUrl: `https://omni.xdaichain.com/bridge?from=1&to=100&token=${ensureEnv("REACT_APP_PINAKION_ADDRESS")}`,
     mainChainId: 1,
+    tokens: {
+      [Tokens.PNK]: {
+        address: ensureEnv("REACT_APP_RAW_PINAKION_XDAI_ADDRESS"),
+        symbol: "PNK",
+        decimals: 18,
+        image: `${window.location.origin}${logoXPNK}`,
+      },
+      [Tokens.stPNK]: {
+        address: ensureEnv("REACT_APP_PINAKION_XDAI_ADDRESS"),
+        symbol: "stPNK",
+        decimals: 18,
+        image: `${window.location.origin}${logoStPNK}`,
+      },
+    },
   },
   // Sokol
   77: {
@@ -22,6 +44,20 @@ const supportedSideChains = {
       "REACT_APP_PINAKION_KOVAN_ADDRESS"
     )}`,
     mainChainId: 42,
+    tokens: {
+      [Tokens.PNK]: {
+        address: ensureEnv("REACT_APP_RAW_PINAKION_SOKOL_ADDRESS"),
+        symbol: "PNK",
+        decimals: 18,
+        image: `${window.location.origin}${logoXPNK}`,
+      },
+      [Tokens.stPNK]: {
+        address: ensureEnv("REACT_APP_PINAKION_SOKOL_ADDRESS"),
+        symbol: "stPNK",
+        decimals: 18,
+        image: `${window.location.origin}${logoStPNK}`,
+      },
+    },
   },
 };
 
