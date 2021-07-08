@@ -4,6 +4,7 @@ import styled from "styled-components/macro";
 import { Button, Icon, Modal, Typography } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import Web3 from "web3";
+import createPersistedState from "use-persisted-state";
 import { ButtonLink } from "../adapters/antd";
 import {
   requestSwitchNetwork,
@@ -20,6 +21,7 @@ import useAccount from "../hooks/use-account";
 import usePromise from "../hooks/use-promise";
 import useInterval from "../hooks/use-interval";
 import useForceUpdate from "../hooks/use-force-update";
+import useQueryParams from "../hooks/use-query-params";
 import { useSetRequiredChainId } from "../components/required-chain-id-gateway";
 import MultiBalance from "./multi-balance";
 import TokenSymbol from "./token-symbol";
@@ -28,6 +30,8 @@ import { chainIdToNetworkName } from "../helpers/networks";
 const { useDrizzle } = drizzleReactHooks;
 
 const { toBN } = Web3.utils;
+
+const useIsXDaiEnabled = createPersistedState("@kleros/court/lab/xDAIEnabled");
 
 export default function AlternativeChainCourt() {
   const chainId = useChainId();
@@ -44,21 +48,38 @@ export default function AlternativeChainCourt() {
 
   const switchNetwork = useSwitchNetwork(destinationChainId);
 
+  const [isXDaiEnabled] = useIsXDaiEnabled(false);
+  useHiddenXDaiToggle();
+
   if (!hasAccount) {
     return null;
   }
 
   return isSupportedSideChain(destinationChainId) ? (
-    <DestinationChainIdContext.Provider value={destinationChainId}>
-      <StyledWrapper>
-        <AlternativeChainCourtWrapper />
-      </StyledWrapper>
-    </DestinationChainIdContext.Provider>
+    isXDaiEnabled ? (
+      <DestinationChainIdContext.Provider value={destinationChainId}>
+        <StyledWrapper>
+          <AlternativeChainCourtWrapper />
+        </StyledWrapper>
+      </DestinationChainIdContext.Provider>
+    ) : null
   ) : isSupportedMainChain(destinationChainId) ? (
     <StyledWrapper>
       <AlternativeChainCourtLink destinationChainId={destinationChainId} onClick={switchNetwork} />
     </StyledWrapper>
   ) : null;
+}
+
+// TODO: remove this after the xDAI public launch.
+function useHiddenXDaiToggle() {
+  const { enableXDai } = useQueryParams();
+  const [, setIsXDaiEnabled] = useIsXDaiEnabled(false);
+
+  React.useEffect(() => {
+    if (enableXDai !== undefined) {
+      setIsXDaiEnabled(true);
+    }
+  }, [enableXDai, setIsXDaiEnabled]);
 }
 
 const DestinationChainIdContext = React.createContext();
