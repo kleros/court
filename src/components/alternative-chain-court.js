@@ -268,7 +268,7 @@ function SideChainCourtModal({ balance, rawBalance, errors }) {
         closable
         visible={visible}
         width={586}
-        title="Before you go..."
+        title={null}
         onCancel={() => {
           setVisible(false);
           setAutoSwitchEnabled(false);
@@ -278,7 +278,7 @@ function SideChainCourtModal({ balance, rawBalance, errors }) {
             <AlternativeChainCourtLink
               destinationChainId={destinationChainId}
               ButtonComponent={Button}
-              text={`Switch to ${chainIdToNetworkName[destinationChainId]} Anyway`}
+              text={`Just take me to ${chainIdToNetworkName[destinationChainId]}`}
               icon={null}
               onClick={switchNetwork}
             />
@@ -292,15 +292,21 @@ function SideChainCourtModal({ balance, rawBalance, errors }) {
           </div>
         }
       >
-        <StyledExplainer>
-          We noticed you don&rsquo;t have <TokenSymbol chainId={destinationChainId} token="xPNK" /> on{" "}
-          {chainIdToNetworkName[destinationChainId]}.
-        </StyledExplainer>
-        <MultiBalance chainId={destinationChainId} errors={errors} balance={balance} rawBalance={rawBalance} />
+        <MultiBalance
+          title={`Your PNK Balance on ${chainIdToNetworkName[destinationChainId]}`}
+          chainId={destinationChainId}
+          errors={errors}
+          balance={balance}
+          rawBalance={rawBalance}
+          rowClassNames={{
+            balance: "muted",
+            rawBalance: "muted",
+          }}
+        />
         <StyledSpacer style={{ "--size": "2rem" }} />
         <StyledExplainer>
-          To be able to stake on Kleros Court there, first you need to get some{" "}
-          <TokenSymbol chainId={destinationChainId} token="xPNK" /> on {chainIdToNetworkName[destinationChainId]}.
+          To be able to stake on Kleros Court on {chainIdToNetworkName[destinationChainId]}, first you need to get some{" "}
+          <TokenSymbol chainId={destinationChainId} token="xPNK" /> for that chain.
         </StyledExplainer>
       </StyledModal>
     </>

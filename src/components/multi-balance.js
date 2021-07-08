@@ -9,7 +9,7 @@ import TokenSymbol, { AutoDetectedTokenSymbol } from "./token-symbol";
 
 const { BN } = Web3.utils;
 
-export default function MultiBalance({ chainId, errors, balance, rawBalance }) {
+export default function MultiBalance({ title, chainId, errors, balance, rawBalance, rowClassNames }) {
   const TokenSymbolComponent = chainId ? TokenSymbol : AutoDetectedTokenSymbol;
   const tokenSymbolProps = chainId ? { chainId } : {};
   const balanceTokenSymbol = <TokenSymbolComponent {...tokenSymbolProps} token="PNK" />;
@@ -17,7 +17,7 @@ export default function MultiBalance({ chainId, errors, balance, rawBalance }) {
 
   return (
     <StyledMultiChainBalance>
-      <StyledTitle level={3}>Your Balance</StyledTitle>
+      <StyledTitle level={3}>{title}</StyledTitle>
       <StyledContent>
         <table>
           <tbody>
@@ -26,14 +26,14 @@ export default function MultiBalance({ chainId, errors, balance, rawBalance }) {
               description="Not stakeable:"
               value={rawBalance}
               tokenSymbol={rawBalanceTokenSymbol}
-              className="highlight"
+              className={rowClassNames?.rawBalance ?? "highlight"}
             />
             <EntryRow
               error={errors.balance}
               description="Stakeable:"
               value={balance}
               tokenSymbol={balanceTokenSymbol}
-              className="muted"
+              className={rowClassNames?.balance ?? "muted"}
             ></EntryRow>
           </tbody>
         </table>
@@ -43,10 +43,23 @@ export default function MultiBalance({ chainId, errors, balance, rawBalance }) {
 }
 
 MultiBalance.propTypes = {
+  title: t.node,
   chainId: t.number,
   errors: t.object.isRequired,
   balance: t.oneOfType([t.string, t.number, t.instanceOf(BN), t.object]),
   rawBalance: t.oneOfType([t.string, t.number, t.instanceOf(BN), t.object]),
+  rowClassNames: t.shape({
+    balance: t.string,
+    rawBalance: t.string,
+  }),
+};
+
+MultiBalance.defaultProps = {
+  title: "Your Balance",
+  rowClassNames: {
+    balance: "highlight",
+    rawBalance: "muted",
+  },
 };
 
 function EntryRow({ error, value, description, tokenSymbol, className }) {
