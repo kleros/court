@@ -5,13 +5,15 @@ import { Typography } from "antd";
 import Web3 from "web3";
 import styled from "styled-components/macro";
 import EthAmount from "./eth-amount";
-import { AutoDetectedTokenSymbol } from "./token-symbol";
+import TokenSymbol, { AutoDetectedTokenSymbol } from "./token-symbol";
 
 const { BN } = Web3.utils;
 
-export default function MultiBalance({ errors, balance, rawBalance }) {
-  const balanceTokenSymbol = <AutoDetectedTokenSymbol token="PNK" />;
-  const rawBalanceTokenSymbol = <AutoDetectedTokenSymbol token="xPNK" />;
+export default function MultiBalance({ chainId, errors, balance, rawBalance }) {
+  const TokenSymbolComponent = chainId ? TokenSymbol : AutoDetectedTokenSymbol;
+  const tokenSymbolProps = chainId ? { chainId } : {};
+  const balanceTokenSymbol = <TokenSymbolComponent {...tokenSymbolProps} token="PNK" />;
+  const rawBalanceTokenSymbol = <TokenSymbolComponent {...tokenSymbolProps} token="xPNK" />;
 
   return (
     <StyledMultiChainBalance>
@@ -41,6 +43,7 @@ export default function MultiBalance({ errors, balance, rawBalance }) {
 }
 
 MultiBalance.propTypes = {
+  chainId: t.number,
   errors: t.object.isRequired,
   balance: t.oneOfType([t.string, t.number, t.instanceOf(BN), t.object]),
   rawBalance: t.oneOfType([t.string, t.number, t.instanceOf(BN), t.object]),

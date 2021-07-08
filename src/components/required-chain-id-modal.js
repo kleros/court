@@ -4,7 +4,7 @@ import styled from "styled-components/macro";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { Button, Icon, Modal, Typography } from "antd";
 import { chainIdToNetworkName } from "../helpers/networks";
-import { isSupportedSideChain, requestSwitchToSideChain } from "../api/side-chain";
+import { isSupportedSideChain, requestSwitchNetwork } from "../api/side-chain";
 import { useClearRequiredChainId, useSetRequiredChainId } from "./required-chain-id-gateway";
 import useAccount from "../hooks/use-account";
 
@@ -65,7 +65,7 @@ function SwitchNetworkButton({ requiredChainId }) {
   const switchChain = async () => {
     if (isSupportedSideChain(requiredChainId)) {
       try {
-        await requestSwitchToSideChain(drizzle.web3.currentProvider);
+        await requestSwitchNetwork(drizzle.web3.currentProvider, requiredChainId);
       } catch (err) {
         console.warn("Failed to request the switch to the side-chain:", err);
         /**
