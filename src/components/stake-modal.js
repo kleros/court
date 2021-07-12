@@ -151,7 +151,7 @@ const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max })
                   </div>
                 }
                 hasFeedback
-                label="PNK"
+                label={<AutoDetectedTokenSymbol token="PNK" />}
               >
                 {form.getFieldDecorator("PNK", {
                   initialValue: fromWei(String(maxRecommendedStake)),
@@ -179,7 +179,7 @@ const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max })
                         <>
                           You only have{" "}
                           <StyledValidatorAmountSpan>
-                            <ETHAmount amount={max} /> PNK
+                            <ETHAmount amount={max} token="PNK" />
                           </StyledValidatorAmountSpan>{" "}
                           available to stake.
                         </>

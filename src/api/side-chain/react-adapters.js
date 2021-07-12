@@ -51,7 +51,15 @@ const defaultRenderOnLoading = (
   </Spin>
 );
 
-const defaultRenderOnError = (error) => <Alert type="error" message={error.message} />;
+const defaultRenderOnError = (error) => (
+  <Alert
+    css={`
+      width: 100%;
+    `}
+    type="error"
+    message={error.message}
+  />
+);
 
 SideChainApiProvider.defaultProps = {
   renderOnLoading: defaultRenderOnLoading,

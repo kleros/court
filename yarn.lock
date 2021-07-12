@@ -1904,6 +1904,11 @@
   resolved "https://registry.yarnpkg.com/@types/unist/-/unist-2.0.3.tgz#9c088679876f374eb5983f150d4787aa6fb32d7e"
   integrity sha512-FvUupuM3rlRsRtCN+fDudtmytGO6iHJuuRKS1Ss0pG5z8oX0diNEw94UEL7hgDbpN94rgaK5R7sWm6RrSkZuAQ==
 
+"@use-it/event-listener@^0.1.2":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@use-it/event-listener/-/event-listener-0.1.6.tgz#5776274fec72f3f25af9ead1898e7f45bc435812"
+  integrity sha512-e6V7vbU8xpuqy4GZkTLExHffOFgxmGHo3kNWnlhzM/zcX2v+idbD/HaJ9sKdQMgTh+L7MIhdRDXGX3SdAViZzA==
+
 "@webassemblyjs/ast@1.7.6":
   version "1.7.6"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.7.6.tgz#3ef8c45b3e5e943a153a05281317474fef63e21e"
@@ -15212,6 +15217,13 @@ use-debounce@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/use-debounce/-/use-debounce-6.0.1.tgz#ed1eb2b30189408fb9792ea2887f4c6c3cb401a3"
   integrity sha512-kpvIxpa0vOLz/2I2sfNJ72mUeaT2CMNCu5BT1f2HkV9qZK27UVSOFf1sSSu+wjJE4TcR2VTXS2SM569+m3TN7Q==
+
+use-persisted-state@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/use-persisted-state/-/use-persisted-state-0.3.3.tgz#5e0f2236967cec7c34de33abc07ae6818e7c7451"
+  integrity sha512-pCNlvYC8+XjRxwnIut4teGC9f2p9aD88R8OGseQGZa2dvqG/h1vEGk1vRE1IZG0Vf161UDpn+NlW4+UGubQflQ==
+  dependencies:
+    "@use-it/event-listener" "^0.1.2"
 
 use@^3.1.0:
   version "3.1.1"

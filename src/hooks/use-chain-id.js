@@ -37,9 +37,12 @@ export function ChainIdProvider({ web3, children, renderOnError, renderOnLoading
   }, [web3]);
 
   useEffect(() => {
-    if (typeof web3?.currentProvider?.on !== "function" || typeof web3?.currentProvider?.off !== "function") {
-      return;
-    }
+    const addListener = (web3.currentProvider.on ?? web3.currentProvider.addListener ?? (() => {})).bind(
+      web3.currentProvider
+    );
+    const removeListener = (web3.currentProvider.off ?? web3.currentProvider.removeListener ?? (() => {})).bind(
+      web3.currentProvider
+    );
 
     let isMounted = true;
 
@@ -52,10 +55,10 @@ export function ChainIdProvider({ web3, children, renderOnError, renderOnLoading
       }
     };
 
-    web3.currentProvider.on("chainChanged", handleNetworkChanged);
+    addListener("chainChanged", handleNetworkChanged);
 
     return () => {
-      web3.currentProvider.off("chainChanged", handleNetworkChanged);
+      removeListener("chainChanged", handleNetworkChanged);
       isMounted = false;
     };
   }, [web3]);
