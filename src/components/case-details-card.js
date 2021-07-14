@@ -1,25 +1,25 @@
-import * as realitioLibQuestionFormatter from "@realitio/realitio-lib/formatters/question";
-import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, InputNumber, Row, Spin } from "antd";
 import React, { useCallback, useMemo, useState } from "react";
-import Web3 from "web3";
+import PropTypes from "prop-types";
+import styled from "styled-components/macro";
+import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, InputNumber, Row, Spin } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
+import * as realitioLibQuestionFormatter from "@realitio/realitio-lib/formatters/question";
+import ReactMarkdown from "react-markdown";
 import createPersistedState from "use-persisted-state";
+import Web3 from "web3";
+import { ReactComponent as Document } from "../assets/images/document.svg";
+import { ReactComponent as Folder } from "../assets/images/folder.svg";
+import { ReactComponent as Gavel } from "../assets/images/gavel.svg";
+import { ReactComponent as Scales } from "../assets/images/scales.svg";
 import { API } from "../bootstrap/api";
+import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import web3Salt from "../temp/web3-salt";
 import Attachment from "./attachment";
 import Breadcrumbs from "./breadcrumbs";
 import CaseRoundHistory from "./case-round-history";
 import CollapsableCard from "./collapsable-card";
 import CourtDrawer from "./court-drawer";
-import { ReactComponent as Document } from "../assets/images/document.svg";
-import { ReactComponent as Folder } from "../assets/images/folder.svg";
-import { ReactComponent as Gavel } from "../assets/images/gavel.svg";
-import { ReactComponent as Scales } from "../assets/images/scales.svg";
 import EvidenceTimeline from "./evidence-timeline";
-import PropTypes from "prop-types";
-import ReactMarkdown from "react-markdown";
-import styled from "styled-components/macro";
-import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
-import web3Salt from "../temp/web3-salt";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
