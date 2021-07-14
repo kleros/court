@@ -154,11 +154,11 @@ export default function CaseDetailsCard({ ID }) {
 
   const { account } = drizzleState;
   const { web3 } = drizzle;
-  const useStoredCommitedVote = React.useMemo(() => createPersistedState(`@kleros/court/${account}/${ID}/vote`), [
+  const useStoredCommittedVote = React.useMemo(() => createPersistedState(`@kleros/court/${account}/${ID}/vote`), [
     ID,
     account,
   ]);
-  const [committedVote, setCommittedVote] = useStoredCommitedVote();
+  const [committedVote, setCommittedVote] = useStoredCommittedVote();
 
   const sendOrRevealVote = useCallback(
     async (choice) => {
@@ -378,8 +378,8 @@ export default function CaseDetailsCard({ ID }) {
                     <Alert
                       showIcon
                       type="warning"
-                      message="Could not find your commited vote"
-                      description="You probably commited to your vote from another device. You will need to manually select the voted option(s) and submit it."
+                      message="Could not find your committed vote"
+                      description="You probably committed to your vote from another device. You will need to manually select the voted option(s) and submit it."
                       css={`
                         text-align: left;
                         margin-top: 2rem;
