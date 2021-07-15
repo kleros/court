@@ -310,49 +310,54 @@ export default function CaseDetailsCard({ ID }) {
               <StyledActionsDiv className="secondary-linear-background theme-linear-background">
                 {dispute.period !== "2" ? <GavelLarge /> : ""}
                 {votesData.drawnInCurrentRound ? (
-                  votesData.canVote ? (
-                    metaEvidence.metaEvidenceJSON.question ? (
-                      metaEvidence.metaEvidenceJSON.question
+                  <>
+                    <div
+                      css={`
+                        margin-bottom: 20px;
+                      `}
+                    >
+                      {metaEvidence.metaEvidenceJSON.question
+                        ? metaEvidence.metaEvidenceJSON.question
+                        : "What is your decision?"}
+                    </div>
+                    {votesData.voted ? (
+                      <>
+                        <div>
+                          You voted for: &ldquo;
+                          {votesData.voted === "0"
+                            ? "Refuse to Arbitrate"
+                            : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                                realitioLibQuestionFormatter.getAnswerString(
+                                  {
+                                    decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
+                                    outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
+                                    type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+                                  },
+                                  realitioLibQuestionFormatter.padToBytes32(
+                                    toBN(votesData.voted).sub(toBN("1")).toString(16)
+                                  )
+                                )) ||
+                              "Unknown Choice"}
+                          &rdquo;.
+                        </div>
+                        {Number(dispute.period) < 4 ? (
+                          <SecondaryActionText>Waiting for the vote result.</SecondaryActionText>
+                        ) : null}
+                      </>
+                    ) : dispute.period === "0" ? (
+                      "Waiting for evidence."
+                    ) : dispute.period === "1" ? (
+                      "Waiting to reveal your vote."
+                    ) : subcourts[subcourts.length - 1].hiddenVotes ? (
+                      votesData.committed ? (
+                        "You did not reveal your vote."
+                      ) : (
+                        "You did not commit a vote."
+                      )
                     ) : (
-                      "What is your decision?"
-                    )
-                  ) : votesData.voted ? (
-                    <>
-                      <div>
-                        You voted for: &ldquo;
-                        {votesData.voted === "0"
-                          ? "Refuse to Arbitrate"
-                          : (metaEvidence.metaEvidenceJSON.rulingOptions &&
-                              realitioLibQuestionFormatter.getAnswerString(
-                                {
-                                  decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-                                  outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
-                                  type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
-                                },
-                                realitioLibQuestionFormatter.padToBytes32(
-                                  toBN(votesData.voted).sub(toBN("1")).toString(16)
-                                )
-                              )) ||
-                            "Unknown Choice"}
-                        &rdquo;.
-                      </div>
-                      {Number(dispute.period) < 4 ? (
-                        <SecondaryActionText>Waiting for the vote result.</SecondaryActionText>
-                      ) : null}
-                    </>
-                  ) : dispute.period === "0" ? (
-                    "Waiting for evidence."
-                  ) : dispute.period === "1" ? (
-                    "Waiting to reveal your vote."
-                  ) : subcourts[subcourts.length - 1].hiddenVotes ? (
-                    votesData.committed ? (
-                      "You did not reveal your vote."
-                    ) : (
-                      "You did not commit a vote."
-                    )
-                  ) : (
-                    "You did not cast a vote."
-                  )
+                      "You did not cast a vote."
+                    )}
+                  </>
                 ) : (
                   "You were not drawn in the current round."
                 )}
@@ -414,14 +419,14 @@ export default function CaseDetailsCard({ ID }) {
                     value={justification}
                   />
                 )}
-                {Number(dispute.period) < 3 && votesData.canVote && metaEvidence.metaEvidenceJSON.rulingOptions ? (
+                {Number(dispute.period) < 3 && !votesData.voted && metaEvidence.metaEvidenceJSON.rulingOptions ? (
                   votesData.committed && committedVote !== undefined ? (
                     <StyledButtonsDiv>
                       <StyledButton
                         onClick={onRevealClick}
                         size="large"
                         type="primary"
-                        disabled={dispute.period !== "2"}
+                        disabled={!votesData.canVote || dispute.period !== "2"}
                       >
                         Reveal Vote
                       </StyledButton>
@@ -512,7 +517,7 @@ export default function CaseDetailsCard({ ID }) {
                 ) : null}
               </StyledActionsDiv>
               <StyledDiv className="secondary-background theme-background" style={{ display: "inherit" }}>
-                {Number(dispute.period) < "3" && (
+                {Number(dispute.period) < "3" && !votesData.voted ? (
                   <Button
                     disabled={!votesData.canVote}
                     ghost={votesData.canVote}
@@ -522,7 +527,7 @@ export default function CaseDetailsCard({ ID }) {
                   >
                     Refuse to Arbitrate
                   </Button>
-                )}
+                ) : null}
               </StyledDiv>
             </>
           ) : (
