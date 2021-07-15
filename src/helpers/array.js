@@ -46,7 +46,7 @@ export const range = (lengthOrStart, end) => {
  * @param {number} length The number of bits to generate the permutation.
  * @return {(0|1)[][]} The binary permutation of `length` bits.
  */
-export const binaryPermutation = (length) => {
+export const binaryPermutations = (length) => {
   const permutations = [];
   for (let i = 0; i < Math.pow(2, length); i++) {
     permutations.push(i.toString(2).padStart(length, "0").split("").map(Number));

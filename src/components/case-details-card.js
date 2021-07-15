@@ -14,7 +14,7 @@ import { ReactComponent as Scales } from "../assets/images/scales.svg";
 import { API } from "../bootstrap/api";
 import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import web3Salt from "../temp/web3-salt";
-import { range, binaryPermutation } from "../helpers/array";
+import { range, binaryPermutations } from "../helpers/array";
 import Attachment from "./attachment";
 import Breadcrumbs from "./breadcrumbs";
 import CaseRoundHistory from "./case-round-history";
@@ -699,7 +699,7 @@ const deriveVoteFromCommitThroughBruteForce = async ({ commit, salt, rulingOptio
   }
 
   if (rulingOptions.type === "multiple-select") {
-    const permutations = binaryPermutation(numberOfOptions);
+    const permutations = binaryPermutations(numberOfOptions);
 
     let encodedCommittedVote;
 
