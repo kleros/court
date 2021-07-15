@@ -14,6 +14,7 @@ import { ReactComponent as Scales } from "../assets/images/scales.svg";
 import { API } from "../bootstrap/api";
 import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import web3Salt from "../temp/web3-salt";
+import { range, binaryPermutation } from "../helpers/array";
 import Attachment from "./attachment";
 import Breadcrumbs from "./breadcrumbs";
 import CaseRoundHistory from "./case-round-history";
@@ -23,15 +24,7 @@ import EvidenceTimeline from "./evidence-timeline";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
-const { toBN } = Web3.utils;
-
-realitioLibQuestionFormatter.minNumber = realitioLibQuestionFormatter.minNumber.bind({
-  maxNumber: (...args) => {
-    const result = realitioLibQuestionFormatter.maxNumber(...args);
-    result.neg = result.negated;
-    return result;
-  },
-});
+const { toBN, soliditySha3 } = Web3.utils;
 
 export default function CaseDetailsCard({ ID }) {
   const { drizzle, useCacheCall, useCacheEvents, useCacheSend } = useDrizzle();
@@ -88,6 +81,7 @@ export default function CaseDetailsCard({ ID }) {
               ((dispute.period === "1" && !committed) ||
                 (dispute.period === "2" && (!subcourt.hiddenVotes || committed) && !vote.voted)),
             committed,
+            commit: vote.commit,
             currentRuling,
             drawnInCurrentRound,
             loading: !currentRuling,
@@ -160,6 +154,37 @@ export default function CaseDetailsCard({ ID }) {
   ]);
   const [committedVote, setCommittedVote] = useStoredCommittedVote();
 
+  React.useEffect(() => {
+    let mounted = true;
+
+    async function deriveCommitedVote() {
+      const { rulingOptions } = metaEvidence.metaEvidenceJSON;
+      const salt = await web3Salt(web3, account, VOTE_COMMIT_SALT_KEY, ID, dispute2.votesLengths.length - 1);
+      return deriveVoteFromCommitThroughBruteForce({
+        salt,
+        rulingOptions,
+        commit: votesData.commit,
+      });
+    }
+
+    if (votesData.committed && !votesData.voted && !committedVote && metaEvidence?.metaEvidenceJSON?.rulingOptions) {
+      deriveCommitedVote().then(
+        (result) => {
+          if (mounted && result !== undefined) {
+            setCommittedVote(result);
+          }
+        },
+        (err) => {
+          console.warn("Error while trying to derive the commited vote", err);
+        }
+      );
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [votesData, committedVote, metaEvidence, web3, account, ID, dispute2, setCommittedVote]);
+
   const sendOrRevealVote = useCallback(
     async (choice) => {
       API.putJustifications(web3, account, {
@@ -174,13 +199,7 @@ export default function CaseDetailsCard({ ID }) {
         votesData.voteIDs,
         choice,
         subcourts[subcourts.length - 1].hiddenVotes
-          ? await web3Salt(
-              web3,
-              account,
-              "Please sign this message to secure your vote. This is unrelated from your main Ethereum account and will not be able to send any transactions.",
-              ID,
-              dispute2.votesLengths.length - 1
-            )
+          ? await web3Salt(web3, account, VOTE_COMMIT_SALT_KEY, ID, dispute2.votesLengths.length - 1)
           : 0
       );
     },
@@ -220,9 +239,7 @@ export default function CaseDetailsCard({ ID }) {
             decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
             type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
           });
-          choice = realitioLibQuestionFormatter.padToBytes32(
-            drizzle.web3.utils.toBN(choice).add(drizzle.web3.utils.toBN("1")).toString(16)
-          );
+          choice = realitioLibQuestionFormatter.padToBytes32(toBN(choice).add(toBN("1")).toString(16));
           break;
         default:
           break;
@@ -231,15 +248,9 @@ export default function CaseDetailsCard({ ID }) {
         sendCommit(
           ID,
           votesData.voteIDs,
-          drizzle.web3.utils.soliditySha3(
+          soliditySha3(
             choice,
-            await web3Salt(
-              drizzle.web3,
-              drizzleState.account,
-              "Please sign this message to secure your vote. This is unrelated from your main Ethereum account and will not be able to send any transactions.",
-              ID,
-              dispute2.votesLengths.length - 1
-            )
+            await web3Salt(web3, account, VOTE_COMMIT_SALT_KEY, ID, dispute2.votesLengths.length - 1)
           )
         );
         setCommittedVote(choice);
@@ -255,8 +266,8 @@ export default function CaseDetailsCard({ ID }) {
       dispute,
       ID,
       votesData.voteIDs,
-      drizzle.web3,
-      drizzleState.account,
+      web3,
+      account,
       dispute2,
       sendOrRevealVote,
     ]
@@ -298,14 +309,18 @@ export default function CaseDetailsCard({ ID }) {
             <>
               <StyledActionsDiv className="secondary-linear-background theme-linear-background">
                 {dispute.period !== "2" ? <GavalLarge /> : ""}
-                {votesData.drawnInCurrentRound
-                  ? votesData.canVote
-                    ? metaEvidence.metaEvidenceJSON.question
-                      ? metaEvidence.metaEvidenceJSON.question
-                      : "What is your decision?"
-                    : votesData.voted
-                    ? `You voted for: ${
-                        votesData.voted === "0"
+                {votesData.drawnInCurrentRound ? (
+                  votesData.canVote ? (
+                    metaEvidence.metaEvidenceJSON.question ? (
+                      metaEvidence.metaEvidenceJSON.question
+                    ) : (
+                      "What is your decision?"
+                    )
+                  ) : votesData.voted ? (
+                    <>
+                      <div>
+                        You voted for: &ldquo;
+                        {votesData.voted === "0"
                           ? "Refuse to Arbitrate"
                           : (metaEvidence.metaEvidenceJSON.rulingOptions &&
                               realitioLibQuestionFormatter.getAnswerString(
@@ -315,48 +330,53 @@ export default function CaseDetailsCard({ ID }) {
                                   type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
                                 },
                                 realitioLibQuestionFormatter.padToBytes32(
-                                  drizzle.web3.utils
-                                    .toBN(votesData.voted)
-                                    .sub(drizzle.web3.utils.toBN("1"))
-                                    .toString(16)
+                                  toBN(votesData.voted).sub(toBN("1")).toString(16)
                                 )
                               )) ||
-                            "Unknown Choice"
-                      }.`
-                    : dispute.period === "0"
-                    ? "Waiting for evidence."
-                    : dispute.period === "1"
-                    ? "Waiting to reveal your vote."
-                    : subcourts[subcourts.length - 1].hiddenVotes
-                    ? votesData.committed
-                      ? "You did not reveal your vote."
-                      : "You did not commit a vote."
-                    : "You did not cast a vote."
-                  : "You were not drawn in the current round."}
+                            "Unknown Choice"}
+                        &rdquo;.
+                      </div>
+                      {Number(dispute.period) < 4 ? (
+                        <SecondaryActionText>Waiting for the vote result.</SecondaryActionText>
+                      ) : null}
+                    </>
+                  ) : dispute.period === "0" ? (
+                    "Waiting for evidence."
+                  ) : dispute.period === "1" ? (
+                    "Waiting to reveal your vote."
+                  ) : subcourts[subcourts.length - 1].hiddenVotes ? (
+                    votesData.committed ? (
+                      "You did not reveal your vote."
+                    ) : (
+                      "You did not commit a vote."
+                    )
+                  ) : (
+                    "You did not cast a vote."
+                  )
+                ) : (
+                  "You were not drawn in the current round."
+                )}
                 {dispute.period === "4" && (
                   <SecondaryActionText>
-                    {` The winner in this case was "${
-                      votesData.currentRuling === "0"
-                        ? "Refuse to Arbitrate"
-                        : (metaEvidence.metaEvidenceJSON.rulingOptions &&
-                            realitioLibQuestionFormatter.getAnswerString(
-                              {
-                                decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-                                outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
-                                type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
-                              },
-                              realitioLibQuestionFormatter.padToBytes32(
-                                drizzle.web3.utils
-                                  .toBN(votesData.currentRuling)
-                                  .sub(drizzle.web3.utils.toBN("1"))
-                                  .toString(16)
-                              )
-                            )) ||
-                          "Unknown Choice"
-                    }".`}
+                    The winner in this case was: &ldquo;
+                    {votesData.currentRuling === "0"
+                      ? "Refuse to Arbitrate"
+                      : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                          realitioLibQuestionFormatter.getAnswerString(
+                            {
+                              decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
+                              outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
+                              type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+                            },
+                            realitioLibQuestionFormatter.padToBytes32(
+                              toBN(votesData.currentRuling).sub(toBN("1")).toString(16)
+                            )
+                          )) ||
+                        "Unknown Choice"}
+                    &rdquo;.
                   </SecondaryActionText>
                 )}
-                {votesData.committed ? (
+                {votesData.committed && !votesData.voted ? (
                   committedVote !== undefined ? (
                     <SecondaryActionText>
                       You committed to:{" "}
@@ -394,10 +414,15 @@ export default function CaseDetailsCard({ ID }) {
                     value={justification}
                   />
                 )}
-                {Number(dispute.period) < 3 && metaEvidence.metaEvidenceJSON.rulingOptions ? (
+                {Number(dispute.period) < 3 && votesData.canVote && metaEvidence.metaEvidenceJSON.rulingOptions ? (
                   votesData.committed && committedVote !== undefined ? (
                     <StyledButtonsDiv>
-                      <StyledButton onClick={onRevealClick} size="large" type="primary">
+                      <StyledButton
+                        onClick={onRevealClick}
+                        size="large"
+                        type="primary"
+                        disabled={dispute.period !== "2"}
+                      >
                         Reveal Vote
                       </StyledButton>
                     </StyledButtonsDiv>
@@ -406,16 +431,22 @@ export default function CaseDetailsCard({ ID }) {
                       {metaEvidence.metaEvidenceJSON.rulingOptions.type !== "single-select" && (
                         <StyledButtonsDiv>
                           {metaEvidence.metaEvidenceJSON.rulingOptions.type === "multiple-select" ? (
-                            <Checkbox.Group
-                              disabled={!votesData.canVote}
-                              name="ruling"
-                              onChange={setComplexRuling}
-                              options={
-                                metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
-                                metaEvidence.metaEvidenceJSON.rulingOptions.titles.slice(0, 255)
-                              }
-                              value={complexRuling}
-                            />
+                            <div
+                              css={`
+                                padding-top: 1rem;
+                              `}
+                            >
+                              <Checkbox.Group
+                                disabled={!votesData.canVote}
+                                name="ruling"
+                                onChange={setComplexRuling}
+                                options={
+                                  metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
+                                  metaEvidence.metaEvidenceJSON.rulingOptions.titles.slice(0, 255)
+                                }
+                                value={complexRuling}
+                              />
+                            </div>
                           ) : metaEvidence.metaEvidenceJSON.rulingOptions.type === "datetime" ? (
                             <DatePicker
                               disabled={!votesData.canVote}
@@ -629,6 +660,67 @@ CaseDetailsCard.propTypes = {
   ID: PropTypes.string.isRequired,
 };
 
+realitioLibQuestionFormatter.minNumber = realitioLibQuestionFormatter.minNumber.bind({
+  maxNumber: (...args) => {
+    const result = realitioLibQuestionFormatter.maxNumber(...args);
+    result.neg = result.negated;
+    return result;
+  },
+});
+
+/**
+ * This function will try to derive the original vote made by a juror by generating every
+ * possible vote and combining them with the salt to compare against the on-chain commit.
+ *
+ * It works only for cases whose ruling type is one of [`single-select`, `multiple-select`].
+ *
+ * Asymptotic complexity:
+ * - `single-select`: `O(n)`
+ * - `multiple-select`: `O(2^n)`
+ *
+ * @param {object} args
+ * @param {string} args.commit The commit stored on-chain.
+ * @param {string} args.salt The salt for the commit.
+ * @param {object} args.rulingOptions The ruling options metadata.
+ * @return {string|undefined} The derived vote, if any.
+ */
+const deriveVoteFromCommitThroughBruteForce = async ({ commit, salt, rulingOptions }) => {
+  const numberOfOptions = rulingOptions.titles.length;
+
+  if (rulingOptions.type === "single-select") {
+    const committedVote = range(numberOfOptions + 1).find((choice) => soliditySha3(choice, salt) === commit);
+    return committedVote && String(committedVote);
+  }
+
+  if (rulingOptions.type === "multiple-select") {
+    const permutations = binaryPermutation(numberOfOptions);
+
+    let encodedCommittedVote;
+
+    permutations.find((choice) => {
+      let encodedAnswer = realitioLibQuestionFormatter.answerToBytes32(choice, {
+        decimals: rulingOptions.precision,
+        type: rulingOptions.type,
+      });
+      encodedAnswer = realitioLibQuestionFormatter.padToBytes32(toBN(encodedAnswer).add(toBN("1")).toString(16));
+
+      if (soliditySha3(encodedAnswer, salt) !== commit) {
+        return false;
+      }
+
+      encodedCommittedVote = encodedAnswer;
+      return true;
+    });
+
+    return encodedCommittedVote;
+  }
+
+  return undefined;
+};
+
+const VOTE_COMMIT_SALT_KEY =
+  "Please sign this message to secure your vote. This is unrelated from your main Ethereum account and will not be able to send any transactions.";
+
 const StyledCard = styled(Card)`
   border-radius: 12px;
   box-shadow: 0px 6px 36px #bc9cff;
@@ -672,6 +764,7 @@ const StyledCard = styled(Card)`
     }
   }
 `;
+
 const StyledDiv = styled.div`
   align-items: center;
   color: white;
@@ -680,13 +773,16 @@ const StyledDiv = styled.div`
   font-size: 24px;
   padding: 34px 10px;
 `;
+
 const StyledActionsDiv = styled(StyledDiv)`
   min-height: 250px;
   overflow: hidden;
 `;
+
 const SecondaryActionText = styled.div`
   margin-top: 30px;
 `;
+
 const StyledInputTextArea = styled(Input.TextArea)`
   background: rgba(255, 255, 255, 0.3);
   border: none;
@@ -695,6 +791,7 @@ const StyledInputTextArea = styled(Input.TextArea)`
   margin: 24px 0;
   width: 70%;
 `;
+
 const StyledButtonsDiv = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -709,10 +806,12 @@ const StyledButtonsDiv = styled.div`
     color: white;
   }
 `;
+
 const StyledButton = styled(Button)`
   flex: 0 0 35%;
   margin: 20px 5px 15px;
 `;
+
 const StyledPoliciesButton = styled(Button)`
   border: 1px solid #4d00b4;
   border-radius: 3px;
@@ -721,6 +820,7 @@ const StyledPoliciesButton = styled(Button)`
   padding-left: 40px;
   position: relative;
 `;
+
 const GavalLarge = styled(Gavel)`
   height: 150px;
   opacity: 0.15;
@@ -728,6 +828,7 @@ const GavalLarge = styled(Gavel)`
   top: 50px;
   width: 150px;
 `;
+
 const StyledDocument = styled(Document)`
   height: 18px;
   left: 17px;
@@ -739,12 +840,14 @@ const StyledDocument = styled(Document)`
     fill: #4d00b4;
   }
 `;
+
 const StyledBreadcrumbs = styled(Breadcrumbs)`
   bottom: -20px;
   font-size: 10px;
   left: 0;
   position: absolute;
 `;
+
 const StyledInnerCard = styled(Card)`
   border: 1px solid #d09cff;
   border-radius: 3px;
@@ -807,9 +910,11 @@ const StyledInnerCard = styled(Card)`
     }
   }
 `;
+
 const StyledIFrame = styled.iframe`
   width: 100%;
 `;
+
 const StyledInnerCardActionsTitleDiv = styled.div`
   background: linear-gradient(204.14deg, #ffffff -6.48%, #f5f1fd 45.52%);
   border-radius: 6px 6px 0 0;
