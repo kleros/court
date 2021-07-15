@@ -188,12 +188,14 @@ export default function CaseDetailsCard({ ID }) {
 
   const sendOrRevealVote = useCallback(
     async (choice) => {
-      API.putJustifications(web3, account, {
-        appeal: disputeExtraInfo.votesLengths.length - 1,
-        disputeID: ID,
-        justification,
-        voteIDs: votesData.voteIDs,
-      });
+      if (justification && justification.trim().length > 0) {
+        API.putJustifications(web3, account, {
+          appeal: disputeExtraInfo.votesLengths.length - 1,
+          disputeID: ID,
+          justification,
+          voteIDs: votesData.voteIDs,
+        });
+      }
 
       sendVote(
         ID,
