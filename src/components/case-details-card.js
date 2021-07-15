@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components/macro";
 import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, InputNumber, Row, Spin } from "antd";
@@ -149,13 +149,13 @@ export default function CaseDetailsCard({ ID }) {
 
   const { account } = drizzleState;
   const { web3 } = drizzle;
-  const useStoredCommittedVote = React.useMemo(() => createPersistedState(`@kleros/court/${account}/${ID}/vote`), [
+  const useStoredCommittedVote = useMemo(() => createPersistedState(`@kleros/court/${account}/${ID}/vote`), [
     ID,
     account,
   ]);
   const [committedVote, setCommittedVote] = useStoredCommittedVote();
 
-  React.useEffect(() => {
+  useEffect(() => {
     let mounted = true;
 
     async function deriveCommitedVote() {
