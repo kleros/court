@@ -38,7 +38,7 @@ export default function CaseDetailsCard({ ID }) {
   const [justification, setJustification] = useState();
   const [complexRuling, setComplexRuling] = useState();
   const dispute = useCacheCall("KlerosLiquid", "disputes", ID);
-  const dispute2 = useCacheCall("KlerosLiquid", "getDispute", ID);
+  const disputeExtraInfo = useCacheCall("KlerosLiquid", "getDispute", ID);
   const draws = useCacheEvents(
     "KlerosLiquid",
     "Draw",
@@ -53,9 +53,10 @@ export default function CaseDetailsCard({ ID }) {
   const votesData = useCacheCall(["KlerosLiquid"], (call) => {
     let votesData = { loading: true };
     const currentRuling = call("KlerosLiquid", "currentRuling", ID);
-    if (dispute && dispute2 && draws) {
+    if (dispute && disputeExtraInfo && draws) {
       const drawnInCurrentRound =
-        draws.length > 0 && Number(draws[draws.length - 1].returnValues._appeal) === dispute2.votesLengths.length - 1;
+        draws.length > 0 &&
+        Number(draws[draws.length - 1].returnValues._appeal) === disputeExtraInfo.votesLengths.length - 1;
       const vote =
         drawnInCurrentRound &&
         call(
@@ -71,7 +72,7 @@ export default function CaseDetailsCard({ ID }) {
           drawnInCurrentRound && vote.commit !== "0x0000000000000000000000000000000000000000000000000000000000000000";
         votesData = draws.reduce(
           (acc, d) => {
-            if (Number(d.returnValues._appeal) === dispute2.votesLengths.length - 1)
+            if (Number(d.returnValues._appeal) === disputeExtraInfo.votesLengths.length - 1)
               acc.voteIDs.push(d.returnValues._voteID);
             return acc;
           },
@@ -159,7 +160,7 @@ export default function CaseDetailsCard({ ID }) {
 
     async function deriveCommitedVote() {
       const { rulingOptions } = metaEvidence.metaEvidenceJSON;
-      const salt = await web3Salt(web3, account, VOTE_COMMIT_SALT_KEY, ID, dispute2.votesLengths.length - 1);
+      const salt = await web3Salt(web3, account, VOTE_COMMIT_SALT_KEY, ID, disputeExtraInfo.votesLengths.length - 1);
       return deriveVoteFromCommitThroughBruteForce({
         salt,
         rulingOptions,
@@ -183,12 +184,12 @@ export default function CaseDetailsCard({ ID }) {
     return () => {
       mounted = false;
     };
-  }, [votesData, committedVote, metaEvidence, web3, account, ID, dispute2, setCommittedVote]);
+  }, [votesData, committedVote, metaEvidence, web3, account, ID, disputeExtraInfo, setCommittedVote]);
 
   const sendOrRevealVote = useCallback(
     async (choice) => {
       API.putJustifications(web3, account, {
-        appeal: dispute2.votesLengths.length - 1,
+        appeal: disputeExtraInfo.votesLengths.length - 1,
         disputeID: ID,
         justification,
         voteIDs: votesData.voteIDs,
@@ -199,11 +200,11 @@ export default function CaseDetailsCard({ ID }) {
         votesData.voteIDs,
         choice,
         subcourts[subcourts.length - 1].hiddenVotes
-          ? await web3Salt(web3, account, VOTE_COMMIT_SALT_KEY, ID, dispute2.votesLengths.length - 1)
+          ? await web3Salt(web3, account, VOTE_COMMIT_SALT_KEY, ID, disputeExtraInfo.votesLengths.length - 1)
           : 0
       );
     },
-    [dispute2, votesData, web3, account, subcourts, ID, justification, sendVote]
+    [disputeExtraInfo, votesData, web3, account, subcourts, ID, justification, sendVote]
   );
 
   const onRevealClick = useCallback(() => {
@@ -250,7 +251,7 @@ export default function CaseDetailsCard({ ID }) {
           votesData.voteIDs,
           soliditySha3(
             choice,
-            await web3Salt(web3, account, VOTE_COMMIT_SALT_KEY, ID, dispute2.votesLengths.length - 1)
+            await web3Salt(web3, account, VOTE_COMMIT_SALT_KEY, ID, disputeExtraInfo.votesLengths.length - 1)
           )
         );
         setCommittedVote(choice);
@@ -268,7 +269,7 @@ export default function CaseDetailsCard({ ID }) {
       votesData.voteIDs,
       web3,
       account,
-      dispute2,
+      disputeExtraInfo,
       sendOrRevealVote,
     ]
   );
@@ -633,7 +634,7 @@ export default function CaseDetailsCard({ ID }) {
               ruling={dispute.period === "4" ? votesData.currentRuling : null}
             />
           </CollapsableCard>
-          {dispute2 &&
+          {disputeExtraInfo &&
             metaEvidence &&
             metaEvidence.metaEvidenceJSON.rulingOptions &&
             metaEvidence.metaEvidenceJSON.rulingOptions.type === "single-select" && (
@@ -647,7 +648,7 @@ export default function CaseDetailsCard({ ID }) {
                 <CaseRoundHistory
                   ID={ID}
                   dispute={{
-                    ...dispute2,
+                    ...disputeExtraInfo,
                     ...dispute,
                   }}
                   ruling={dispute.period === "4" ? votesData.currentRuling : null}
