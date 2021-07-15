@@ -308,7 +308,7 @@ export default function CaseDetailsCard({ ID }) {
           {!votesData.loading && subcourts && metaEvidence ? (
             <>
               <StyledActionsDiv className="secondary-linear-background theme-linear-background">
-                {dispute.period !== "2" ? <GavalLarge /> : ""}
+                {dispute.period !== "2" ? <GavelLarge /> : ""}
                 {votesData.drawnInCurrentRound ? (
                   votesData.canVote ? (
                     metaEvidence.metaEvidenceJSON.question ? (
@@ -821,7 +821,7 @@ const StyledPoliciesButton = styled(Button)`
   position: relative;
 `;
 
-const GavalLarge = styled(Gavel)`
+const GavelLarge = styled(Gavel)`
   height: 150px;
   opacity: 0.15;
   position: absolute;
