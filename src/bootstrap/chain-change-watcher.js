@@ -18,8 +18,7 @@ function useReloadOnChainChanged() {
   const previousChainId = usePrevious(chainId);
 
   useEffect(() => {
-    if (previousChainId !== undefined) {
-      console.info("Chain ID changed:", chainId);
+    if (chainId !== undefined && previousChainId !== undefined && chainId !== previousChainId) {
       window.location.reload();
     }
   }, [previousChainId, chainId]);
