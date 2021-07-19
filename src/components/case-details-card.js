@@ -31,6 +31,10 @@ export default function CaseDetailsCard({ ID }) {
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
+  const { account } = drizzleState;
+  const { web3 } = drizzle;
+  const { KlerosLiquid } = drizzle.contracts;
+
   const loadPolicy = useDataloader.loadPolicy();
   const getMetaEvidence = useDataloader.getMetaEvidence();
   const getEvidence = useDataloader.getEvidence();
@@ -124,14 +128,14 @@ export default function CaseDetailsCard({ ID }) {
   let evidence;
   if (dispute) {
     if (dispute.ruled) {
-      metaEvidence = getMetaEvidence(dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID, {
+      metaEvidence = getMetaEvidence(dispute.arbitrated, KlerosLiquid.address, ID, {
         strictHashes: false,
       });
     } else {
-      metaEvidence = getMetaEvidence(dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
+      metaEvidence = getMetaEvidence(dispute.arbitrated, KlerosLiquid.address, ID);
     }
 
-    evidence = getEvidence(dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
+    evidence = getEvidence(dispute.arbitrated, KlerosLiquid.address, ID);
   }
   const { send: sendCommit, status: sendCommitStatus } = useCacheSend("KlerosLiquid", "castCommit");
   const { send: sendVote, status: sendVoteStatus } = useCacheSend("KlerosLiquid", "castVote");
@@ -147,8 +151,6 @@ export default function CaseDetailsCard({ ID }) {
     [metaEvidence]
   );
 
-  const { account } = drizzleState;
-  const { web3 } = drizzle;
   const useStoredCommittedVote = useMemo(() => createPersistedState(`@kleros/court/${account}/${ID}/vote`), [
     ID,
     account,
@@ -568,7 +570,7 @@ export default function CaseDetailsCard({ ID }) {
                     )}?${encodeURIComponent(
                       JSON.stringify({
                         arbitrableContractAddress: dispute.arbitrated,
-                        arbitratorContractAddress: drizzle.contracts.KlerosLiquid.address,
+                        arbitratorContractAddress: KlerosLiquid.address,
                         disputeID: ID,
                       })
                     )}`}

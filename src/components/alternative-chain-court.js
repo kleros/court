@@ -4,7 +4,6 @@ import styled from "styled-components/macro";
 import { Button, Icon, Modal, Typography } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import Web3 from "web3";
-import createPersistedState from "use-persisted-state";
 import { ButtonLink } from "../adapters/antd";
 import {
   requestSwitchNetwork,
@@ -21,8 +20,8 @@ import useAccount from "../hooks/use-account";
 import usePromise from "../hooks/use-promise";
 import useInterval from "../hooks/use-interval";
 import useForceUpdate from "../hooks/use-force-update";
-import useQueryParams from "../hooks/use-query-params";
-import { useSetRequiredChainId } from "../components/required-chain-id-gateway";
+import { useSetRequiredChainId } from "./required-chain-id-gateway";
+import AlternativeChainBanner from "./alternative-chain-banner";
 import MultiBalance from "./multi-balance";
 import TokenSymbol from "./token-symbol";
 import { chainIdToNetworkName } from "../helpers/networks";
@@ -30,8 +29,6 @@ import { chainIdToNetworkName } from "../helpers/networks";
 const { useDrizzle } = drizzleReactHooks;
 
 const { toBN } = Web3.utils;
-
-const useIsXDaiEnabled = createPersistedState("@kleros/court/lab/xDAIEnabled");
 
 export default function AlternativeChainCourt() {
   const chainId = useChainId();
@@ -48,38 +45,36 @@ export default function AlternativeChainCourt() {
 
   const switchNetwork = useSwitchNetwork(destinationChainId);
 
-  const [isXDaiEnabled] = useIsXDaiEnabled(false);
-  useHiddenXDaiToggle();
-
   if (!hasAccount) {
     return null;
   }
 
   return isSupportedSideChain(destinationChainId) ? (
-    isXDaiEnabled ? (
-      <DestinationChainIdContext.Provider value={destinationChainId}>
-        <StyledWrapper>
-          <AlternativeChainCourtWrapper />
-        </StyledWrapper>
-      </DestinationChainIdContext.Provider>
-    ) : null
+    <DestinationChainIdContext.Provider value={destinationChainId}>
+      <AlternativeChainBanner
+        message={
+          <>
+            Kleros Court is now{" "}
+            <StyledResponsiveBannerButton type="link" onClick={switchNetwork}>
+              available on {chainIdToNetworkName[destinationChainId]}
+            </StyledResponsiveBannerButton>
+            .
+          </>
+        }
+      />
+      <StyledWrapper>
+        <AlternativeChainCourtWrapper />
+      </StyledWrapper>
+    </DestinationChainIdContext.Provider>
   ) : isSupportedMainChain(destinationChainId) ? (
     <StyledWrapper>
-      <AlternativeChainCourtLink destinationChainId={destinationChainId} onClick={switchNetwork} />
+      <AlternativeChainCourtLink
+        ButtonComponent={StyledButtonLink}
+        destinationChainId={destinationChainId}
+        onClick={switchNetwork}
+      />
     </StyledWrapper>
   ) : null;
-}
-
-// TODO: remove this after the xDAI public launch.
-function useHiddenXDaiToggle() {
-  const { enableXDai } = useQueryParams();
-  const [, setIsXDaiEnabled] = useIsXDaiEnabled(false);
-
-  React.useEffect(() => {
-    if (enableXDai !== undefined) {
-      setIsXDaiEnabled(true);
-    }
-  }, [enableXDai, setIsXDaiEnabled]);
 }
 
 const DestinationChainIdContext = React.createContext();
@@ -115,7 +110,11 @@ function SideChainCourtDecisionTree() {
   const switchNetwork = useSwitchNetwork(destinationChainId);
 
   return hasErrors || hasAnyBalance ? (
-    <AlternativeChainCourtLink destinationChainId={destinationChainId} onClick={switchNetwork} />
+    <AlternativeChainCourtLink
+      ButtonComponent={StyledButtonLink}
+      destinationChainId={destinationChainId}
+      onClick={switchNetwork}
+    />
   ) : (
     <SideChainCourtModal balance={balance} rawBalance={rawBalance} errors={errors} />
   );
@@ -262,7 +261,11 @@ function SideChainCourtModal({ balance, rawBalance, errors }) {
 
   return (
     <>
-      <AlternativeChainCourtLink destinationChainId={destinationChainId} onClick={() => setVisible(true)} />
+      <AlternativeChainCourtLink
+        ButtonComponent={StyledButtonLink}
+        destinationChainId={destinationChainId}
+        onClick={() => setVisible(true)}
+      />
       <StyledModal
         centered
         closable
@@ -372,4 +375,32 @@ const StyledSpacer = styled.span`
   clear: both;
   width: 100%;
   margin-bottom: var(--size, 1rem);
+`;
+
+const StyledButtonLink = styled(ButtonLink)`
+  @media (max-width: 767.98px) {
+    min-height: 48px;
+  }
+`;
+
+const StyledResponsiveBannerButton = styled(Button)`
+  color: inherit;
+  line-height: inherit;
+  height: auto;
+  padding: 0;
+  font-weight: 600;
+
+  :hover,
+  :focus,
+  :active {
+    color: inherit;
+
+    &&& > span {
+      text-decoration: underline;
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    min-height: 48px;
+  }
 `;

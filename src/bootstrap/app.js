@@ -7,7 +7,7 @@ import styled from "styled-components/macro";
 import { Col, Layout, Menu, Row, Spin } from "antd";
 import { Helmet } from "react-helmet";
 import { BrowserRouter, NavLink, Route, Switch, useParams } from "react-router-dom";
-import { ReactComponent as Logo } from "../assets/images/logo.svg";
+import { ReactComponent as Logo } from "../assets/images/kleros-logo-flat-light.svg";
 import AccountStatus from "../components/account-status";
 import Footer from "../components/footer";
 import NotificationSettings from "../components/notification-settings";
@@ -208,6 +208,7 @@ const StyledLayoutSider = styled(Layout.Sider)`
   height: 100%;
   position: fixed;
   z-index: 2000;
+  background-color: #4d00b4;
 
   @media (min-width: 768px) {
     display: none;
@@ -217,6 +218,11 @@ const StyledLayoutSider = styled(Layout.Sider)`
     right: -50px;
     top: 12px;
     width: 50px;
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+
+  .ant-menu-dark {
+    background: transparent;
   }
 `;
 
@@ -248,8 +254,27 @@ const StyledMenu = styled(Menu)`
   line-height: 64px !important;
   text-align: center;
 
-  .ant-menu-item-selected {
-    background-color: transparent !important;
+  &.ant-menu-dark {
+    background-color: transparent;
+  }
+
+  && {
+    .ant-menu-item > a {
+      color: rgba(255, 255, 255, 0.85);
+
+      &.hover,
+      &.focus {
+        color: rgba(255, 255, 255, 1);
+      }
+    }
+
+    .ant-menu-item-selected {
+      background-color: transparent !important;
+
+      > a {
+        color: rgba(255, 255, 255, 1);
+      }
+    }
   }
 `;
 
@@ -263,6 +288,7 @@ const StyledLayoutContent = styled(Layout.Content)`
 const StyledLayoutHeader = styled(Layout.Header)`
   height: auto;
   line-height: initial;
+  background-color: #4d00b4;
 `;
 
 const StyledTray = styled.div`
@@ -276,13 +302,18 @@ const StyledTray = styled.div`
 `;
 
 const StyledClickaway = styled.div`
-  background-color: black;
+  position: fixed;
+  z-index: 1000;
+  width: 100%;
   height: 100%;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: black;
   opacity: ${(properties) => (properties.isMenuClosed ? 0 : 0.4)};
   pointer-events: ${(properties) => (properties.isMenuClosed ? "none" : "auto")};
-  position: fixed;
   transition: opacity 0.3s;
-  width: 100%;
 `;
 
 const LogoNavLink = styled(NavLink)`
