@@ -865,12 +865,10 @@ const StyledInnerCard = styled(Card)`
   cursor: initial;
   margin-bottom: 38px;
 
-  .ant-card {
-    &-head {
+  &.ant-card {
+    .ant-card-head {
       margin: 0 21px 0 17px;
       padding: 0;
-
-      &-title {
 
       &-title {
         align-items: center;
@@ -879,21 +877,20 @@ const StyledInnerCard = styled(Card)`
       }
     }
 
-    &-body {
+    .ant-card-body {
       padding: 21px 20px 42px;
     }
 
-    &-actions {
+    .ant-card-actions {
       background: linear-gradient(204.14deg, #ffffff -6.48%, #f5f1fd 45.52%);
       border: none;
       height: 70px;
-      padding-left: 20px;
       position: relative;
       text-align: center;
 
       & > li {
         border: none;
-        margin: 12px 8px;
+        margin: 12px 0;
         width: auto !important;
 
         path {
@@ -901,15 +898,19 @@ const StyledInnerCard = styled(Card)`
         }
 
         &:first-child {
-          left: 48%;
+          margin-left: 0;
+          margin-right: 0;
           position: absolute;
           top: 4px;
+          left: 50%;
+          transform: translateX(-50%);
         }
 
         &:last-child {
-          left: 40%;
           position: absolute;
           top: 0;
+          left: 50%;
+          transform: translateX(-50%);
         }
 
         /* stylelint-disable-next-line no-descending-specificity */
@@ -926,20 +927,18 @@ const StyledIFrame = styled.iframe`
 `;
 
 const StyledInnerCardActionsTitleDiv = styled.div`
+  position: absolute;
+  top: -55px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 168px;
+  height: 28px;
+  line-height: 28px;
   background: linear-gradient(204.14deg, #ffffff -6.48%, #f5f1fd 45.52%);
   border-radius: 6px 6px 0 0;
-  height: 28px;
-  left: 20px;
-  line-height: 28px;
-  position: absolute;
   text-align: center;
-  top: -55px;
-  width: 167px;
-
-  @media (max-width: 500px) {
-    left: -40px;
-  }
 `;
+
 const ArbitrableInterfaceDiv = styled.div`
   border-top: 1px solid #d09cff;
   font-size: 18px;
