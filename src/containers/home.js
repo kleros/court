@@ -76,8 +76,7 @@ export default function Home() {
         />
       ) : null}
       <TopBanner
-        title="Welcome!"
-        description="This is the Kleros Juror Dashboard"
+        title="My Dashboard"
         extra={
           <StyledButtonBar>
             <StyledClaimButton

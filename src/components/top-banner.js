@@ -3,9 +3,50 @@ import t from "prop-types";
 import styled from "styled-components/macro";
 import { Card, Col, Row } from "antd";
 
+export default function TopBanner({ description, extra, title, extraLong }) {
+  return extraLong ? (
+    <StyledCard>
+      <StyledTitleRow align="middle" type="flex">
+        <StyledTitleCol md={4} xs={12}>
+          {title}
+        </StyledTitleCol>
+        <Col md={10} xs={0}>
+          {description}
+        </Col>
+        <StyledExtraCol md={10} xs={12}>
+          {extra}
+        </StyledExtraCol>
+      </StyledTitleRow>
+    </StyledCard>
+  ) : (
+    <StyledCard>
+      <StyledTitleRow type="flex">
+        <div>
+          <StyledTitleCol>{title}</StyledTitleCol>
+          <StyledDescriptionCol>{description}</StyledDescriptionCol>
+        </div>
+        <StyledExtraCol>{extra}</StyledExtraCol>
+      </StyledTitleRow>
+    </StyledCard>
+  );
+}
+
+TopBanner.propTypes = {
+  description: t.node,
+  extra: t.node,
+  title: t.string.isRequired,
+  extraLong: t.bool,
+};
+
+TopBanner.defaultProps = {
+  description: null,
+  extra: null,
+  extraLong: false,
+};
+
 const StyledCard = styled(Card)`
   background: linear-gradient(270deg, #f2e3ff 22.92%, #ffffff 76.25%);
-  box-shadow: 0px 3px 24px #bc9cff;
+  box-shadow: 0px 18px 24px -6px rgba(188, 156, 255, 0.4);
   color: #4d00b4;
   margin: 0 -9.375vw 28px -9.375vw;
   min-height: 88px;
@@ -45,43 +86,3 @@ const StyledTitleRow = styled(Row)`
   justify-content: space-between;
   margin: 0;
 `;
-
-export default function TopBanner({ description, extra, title, extraLong }) {
-  return extraLong ? (
-    <StyledCard>
-      <StyledTitleRow align="middle" type="flex">
-        <StyledTitleCol md={4} xs={12}>
-          {title}
-        </StyledTitleCol>
-        <Col md={10} xs={0}>
-          {description}
-        </Col>
-        <StyledExtraCol md={10} xs={12}>
-          {extra}
-        </StyledExtraCol>
-      </StyledTitleRow>
-    </StyledCard>
-  ) : (
-    <StyledCard>
-      <StyledTitleRow type="flex">
-        <div>
-          <StyledTitleCol>{title}</StyledTitleCol>
-          <StyledDescriptionCol>{description}</StyledDescriptionCol>
-        </div>
-        <StyledExtraCol>{extra}</StyledExtraCol>
-      </StyledTitleRow>
-    </StyledCard>
-  );
-}
-
-TopBanner.propTypes = {
-  description: t.node.isRequired,
-  extra: t.node,
-  title: t.string.isRequired,
-  extraLong: t.bool,
-};
-
-TopBanner.defaultProps = {
-  extra: null,
-  extraLong: false,
-};

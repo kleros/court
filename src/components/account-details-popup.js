@@ -3,10 +3,11 @@ import t from "prop-types";
 import styled from "styled-components/macro";
 import { List, Popover, Spin, Divider } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
+import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import ETHAddress from "./eth-address";
 import ETHAmount from "./eth-amount";
 import Identicon from "./identicon";
-import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import { AutoDetectedTokenSymbol } from "./token-symbol";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -48,7 +49,14 @@ export default function AccountDetailsPopup({ trigger, pinakion, className }) {
             {pinakion && (
               <Spin spinning={!PNK}>
                 <List.Item>
-                  <List.Item.Meta description={<ETHAmount amount={PNK} tokenSymbol="PNK" />} title="PNK Balance" />
+                  <List.Item.Meta
+                    description={<ETHAmount amount={PNK} tokenSymbol="PNK" />}
+                    title={
+                      <>
+                        <AutoDetectedTokenSymbol token="PNK" /> Balance
+                      </>
+                    }
+                  />
                 </List.Item>
               </Spin>
             )}

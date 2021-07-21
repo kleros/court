@@ -4,10 +4,17 @@ import styled from "styled-components/macro";
 import { Affix, Button, Divider, Modal, Typography } from "antd";
 import Web3 from "web3";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
-import { isSupportedSideChain, SideChainApiProvider, useSideChainApi } from "../api/side-chain";
+import {
+  isSupportedSideChain,
+  requestWatchToken,
+  SideChainApiProvider,
+  Tokens,
+  useSideChainApi,
+} from "../api/side-chain";
 import useChainId from "../hooks/use-chain-id";
 import useAccount from "../hooks/use-account";
 import usePromise from "../hooks/use-promise";
+import useForceUpdate from "../hooks/use-force-update";
 import { useAsyncGenerator } from "../hooks/use-generators";
 import TokenSymbol from "./token-symbol";
 import MultiBalance from "./multi-balance";
@@ -34,15 +41,32 @@ export default function SideChainPnkWrapper(props) {
 function SideChainPnk({ showUnwrappedPnkModal, unwrappedPnkModalProps, showGetSideChainPnkModal }) {
   const account = useAccount();
   const { getRawBalance, getBalance } = useSideChainApi();
-  const tokenData = useTokenData({ getRawBalance, getBalance, account });
+  const [tokenData, refetch] = useTokenData({ getRawBalance, getBalance, account });
   const { balance, rawBalance, errors, hasErrors } = tokenData;
+
+  const { drizzle } = useDrizzle();
+  const [hasBalance, hasRawBalance] = [tokenData.balance, tokenData.rawBalance].map((value) =>
+    value ? toBN(value).gt(toBN("0")) : false
+  );
+
+  React.useEffect(() => {
+    if (hasBalance) {
+      requestWatchToken(drizzle.web3.currentProvider, Tokens.stPNK);
+    }
+  }, [drizzle.web3.currentProvider, hasBalance]);
+
+  React.useEffect(() => {
+    if (hasRawBalance) {
+      requestWatchToken(drizzle.web3.currentProvider, Tokens.PNK);
+    }
+  }, [drizzle.web3.currentProvider, hasRawBalance]);
 
   if (hasErrors) {
     return <ErrorModal balance={balance} rawBalance={rawBalance} errors={errors} />;
   }
 
   if (showUnwrappedPnkModal && rawBalance?.gt(toBN("0"))) {
-    return <UnwrappedSideChainPnkModal {...unwrappedPnkModalProps} {...tokenData} account={account} />;
+    return <UnwrappedSideChainPnkModal {...unwrappedPnkModalProps} {...tokenData} account={account} onDone={refetch} />;
   }
 
   if (showGetSideChainPnkModal && rawBalance?.isZero() && balance?.isZero()) {
@@ -84,7 +108,7 @@ ErrorModal.propTypes = {
   }),
 };
 
-function UnwrappedSideChainPnkModal({ triggerCondition, account, balance, rawBalance, errors }) {
+function UnwrappedSideChainPnkModal({ triggerCondition, account, balance, rawBalance, errors, onDone }) {
   const chainId = useChainId();
 
   const { deposit } = useSideChainApi();
@@ -110,8 +134,9 @@ function UnwrappedSideChainPnkModal({ triggerCondition, account, balance, rawBal
   React.useEffect(() => {
     if (isDone) {
       setVisible(false);
+      onDone();
     }
-  }, [isDone]);
+  }, [isDone, onDone]);
 
   const cancelButtonDisabled = isRunning;
   const handleCancel = () => {
@@ -181,10 +206,12 @@ UnwrappedSideChainPnkModal.propTypes = {
     rawBalance: t.instanceOf(Error),
   }),
   triggerCondition: t.oneOf(["click", "auto", "both"]),
+  onDone: t.func,
 };
 
 UnwrappedSideChainPnkModal.defaultProps = {
   triggerCondition: "both",
+  onDone: () => {},
 };
 
 function GetSideChainPnkModal({ defaultVisible }) {
@@ -229,8 +256,21 @@ GetSideChainPnkModal.defaultProps = {
 };
 
 function useTokenData({ getRawBalance, getBalance, account }) {
-  const rawBalance = usePromise(React.useMemo(() => getRawBalance({ address: account }), [getRawBalance, account]));
-  const balance = usePromise(React.useMemo(() => getBalance({ address: account }), [getBalance, account]));
+  const [token, forceUpdate] = useForceUpdate();
+  const rawBalance = usePromise(
+    React.useCallback(
+      () => getRawBalance({ address: account }),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [getRawBalance, account, token]
+    )
+  );
+  const balance = usePromise(
+    React.useCallback(
+      () => getBalance({ address: account }),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [getBalance, account, token]
+    )
+  );
 
   const errorInfo = React.useMemo(
     () => ({
@@ -243,7 +283,7 @@ function useTokenData({ getRawBalance, getBalance, account }) {
     [balance.error, rawBalance.error]
   );
 
-  return React.useMemo(
+  const tokenData = React.useMemo(
     () => ({
       balance: balance.value,
       rawBalance: rawBalance.value,
@@ -251,6 +291,8 @@ function useTokenData({ getRawBalance, getBalance, account }) {
     }),
     [balance.value, rawBalance.value, errorInfo]
   );
+
+  return [tokenData, forceUpdate];
 }
 
 function useDepositTokens(depositTokens) {

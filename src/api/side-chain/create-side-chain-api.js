@@ -8,9 +8,7 @@ import * as xDai from "./xdai-api";
 
 export default async function createSideChainApi(provider) {
   const web3 = new Web3(provider);
-  // Accounts is ignored because it's purpose is only to check whether
-  // the provider can sign transactions or not.
-  const [chainId] = await Promise.all([web3.eth.getChainId(), web3.eth.requestAccounts()]);
+  const chainId = await web3.eth.getChainId();
 
   if (!isSupportedSideChain(chainId)) {
     throw new Error(`Unsuported chain ID: ${chainId}`);

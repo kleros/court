@@ -195,7 +195,7 @@ const CourtCascaderModal = ({ onClick }) => {
         </>
       }
       onCancel={useCallback(() => onClick(), [onClick])}
-      title={<StyledTitleDiv>Join Court</StyledTitleDiv>}
+      title="Join Court"
       visible
     >
       <StyledCascader
@@ -226,8 +226,8 @@ const StyledModal = styled(Modal)`
 
   .ant-modal {
     &-header {
-      padding: 0;
       border: none;
+      background: #4004a3;
     }
 
     &-close-icon svg {
@@ -236,6 +236,14 @@ const StyledModal = styled(Modal)`
 
     &-content {
       height: 100%;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+    }
+
+    &-title {
+      text-align: center;
+      color: #ffffff;
+      font-size: 20px;
     }
 
     &-body {
@@ -282,16 +290,6 @@ const StyledButton = styled(Button)`
 const StyledHeader = styled.div`
   ffnt-size: 18px;
   font-weight: bold;
-`;
-
-const StyledTitleDiv = styled.div`
-  background: #4004a3;
-  color: white;
-  font-size: 20px;
-  font-weight: bold;
-  height: 54px;
-  line-height: 54px;
-  text-align: center;
 `;
 
 const StyledCascader = styled(Cascader)`
