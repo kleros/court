@@ -51,17 +51,6 @@ export default function AlternativeChainCourt() {
 
   return isSupportedSideChain(destinationChainId) ? (
     <DestinationChainIdContext.Provider value={destinationChainId}>
-      <AlternativeChainBanner
-        message={
-          <>
-            Kleros Court is now{" "}
-            <StyledResponsiveBannerButton type="link" onClick={switchNetwork}>
-              available on {chainIdToNetworkName[destinationChainId]}
-            </StyledResponsiveBannerButton>
-            .
-          </>
-        }
-      />
       <StyledWrapper>
         <AlternativeChainCourtWrapper />
       </StyledWrapper>
@@ -110,13 +99,56 @@ function SideChainCourtDecisionTree() {
   const switchNetwork = useSwitchNetwork(destinationChainId);
 
   return hasErrors || hasAnyBalance ? (
-    <AlternativeChainCourtLink
-      ButtonComponent={StyledButtonLink}
-      destinationChainId={destinationChainId}
-      onClick={switchNetwork}
-    />
+    <>
+      <AlternativeChainCourtLink
+        ButtonComponent={StyledButtonLink}
+        destinationChainId={destinationChainId}
+        onClick={switchNetwork}
+      />
+      <AlternativeChainBanner
+        message={
+          <>
+            Kleros Court is now available on{" "}
+            {
+              <AlternativeChainCourtLink
+                ButtonComponent={StyledResponsiveBannerButton}
+                icon={null}
+                destinationChainId={destinationChainId}
+                text={chainIdToNetworkName[destinationChainId]}
+              />
+            }
+            .
+          </>
+        }
+      />
+    </>
   ) : (
-    <SideChainCourtModal balance={balance} rawBalance={rawBalance} errors={errors} />
+    <>
+      <SideChainCourtModal balance={balance} rawBalance={rawBalance} errors={errors} />
+      <AlternativeChainBanner
+        message={
+          <>
+            Kleros Court is now available on{" "}
+            {
+              <SideChainCourtModal
+                balance={balance}
+                rawBalance={rawBalance}
+                errors={errors}
+                trigger={
+                  <AlternativeChainCourtLink
+                    ButtonComponent={StyledResponsiveBannerButton}
+                    icon={null}
+                    destinationChainId={destinationChainId}
+                    text={chainIdToNetworkName[destinationChainId]}
+                  />
+                }
+              />
+            }
+            .
+          </>
+        }
+      />
+    </>
   );
 }
 
@@ -244,7 +276,7 @@ const StyledWrapper = styled.div`
   }
 `;
 
-function SideChainCourtModal({ balance, rawBalance, errors }) {
+function SideChainCourtModal({ balance, rawBalance, errors, trigger }) {
   const [visible, setVisible] = React.useState(false);
   const destinationChainId = useDestinationChainId();
 
@@ -252,6 +284,17 @@ function SideChainCourtModal({ balance, rawBalance, errors }) {
 
   const [autoSwitchEnabled, setAutoSwitchEnabled] = React.useState(false);
   const hasAnyBalance = [balance, rawBalance].some((value) => (value ? toBN(value).gt(toBN("0")) : false));
+
+  const triggerElement = React.cloneElement(trigger, {
+    destinationChainId,
+    onClick: (e) => {
+      if (typeof trigger.props?.onClick === "function") {
+        trigger.props.onClick(e);
+      }
+
+      setVisible(true);
+    },
+  });
 
   React.useEffect(() => {
     if (autoSwitchEnabled && hasAnyBalance) {
@@ -261,11 +304,7 @@ function SideChainCourtModal({ balance, rawBalance, errors }) {
 
   return (
     <>
-      <AlternativeChainCourtLink
-        ButtonComponent={StyledButtonLink}
-        destinationChainId={destinationChainId}
-        onClick={() => setVisible(true)}
-      />
+      {triggerElement}
       <StyledModal
         centered
         closable
@@ -319,10 +358,15 @@ function SideChainCourtModal({ balance, rawBalance, errors }) {
 SideChainCourtModal.propTypes = {
   balance: t.oneOfType([t.string, t.any.isRequired]),
   rawBalance: t.oneOfType([t.string, t.any.isRequired]),
+  trigger: t.element,
   errors: t.shape({
     balance: t.instanceOf(Error),
     rawBalance: t.instanceOf(Error),
   }),
+};
+
+SideChainCourtModal.defaultProps = {
+  trigger: <AlternativeChainCourtLink ButtonComponent={StyledButtonLink} />,
 };
 
 const StyledModal = styled(Modal)`
@@ -383,7 +427,10 @@ const StyledButtonLink = styled(ButtonLink)`
   }
 `;
 
-const StyledResponsiveBannerButton = styled(Button)`
+const StyledResponsiveBannerButton = styled(Button).attrs((props) => ({
+  ...props,
+  type: props.type ?? "link",
+}))`
   color: inherit;
   line-height: inherit;
   height: auto;
