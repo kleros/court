@@ -76,7 +76,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       responses.map((promise) => promise.then((r) => r.json()).catch((e) => console.error(e)))
     );
 
-    fetch("https://api.thegraph.com/subgraphs/name/napolean0/kleros", {
+    fetch("https://api.thegraph.com/subgraphs/name/salgozino/klerosboard", {
       headers: {
         Accept: "*/*",
         "Content-Type": "application/json",
@@ -84,8 +84,8 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       body: JSON.stringify({
         query: `
     {
-      totalStakeds {
-        totalStakedAmount
+      klerosCounters {
+        tokenStaked
       }
     }
         `,
@@ -94,7 +94,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       mode: "cors",
     })
       .then((r) => r.json())
-      .then((r) => apyCallback(drizzle.web3.utils.fromWei(r.data.totalStakeds[0].totalStakedAmount)))
+      .then((r) => apyCallback(drizzle.web3.utils.fromWei(r.data.klerosCounters[0].tokenStaked)))
       .catch(() => {
         console.warn("Falling back to last merkle tree for calculating APY");
         results.then((trees) => {
