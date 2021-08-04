@@ -238,7 +238,6 @@ const JustificationsBox = styled(Box)`
   border-left: 1px solid #4d00b4;
   height: 100%;
   text-align: center;
-  word-break: break-all;
   @media (max-width: 768px) {
     border-left: none;
     border-top: 1px solid #4d00b4;
@@ -266,7 +265,6 @@ const ScrollBarContainer = styled.div`
 `;
 
 const JustificationText = styled.div`
-  height: 300px;
-  overflow-y: scroll;
-  white-space: pre-wrap;
+  max-height: 300px;
+  overflow: auto;
 `;
