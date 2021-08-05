@@ -18,19 +18,19 @@ const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const { BN, toBN, fromWei, toWei } = Web3.utils;
 
 export default function StakeModal({ ID, onCancel }) {
+  const chainId = useChainId();
   const { useCacheCall } = useDrizzle();
   const account = useAccount();
-  const chainId = useChainId();
   const _balance = useCacheCall("MiniMeTokenERC20", "balanceOf", account);
   const balance = _balance && toBN(_balance);
   const juror = useCacheCall("KlerosLiquidExtraViews", "getJuror", account);
   const stakedTokens = juror && toBN(juror.stakedTokens);
   const max = balance && stakedTokens ? balance.sub(stakedTokens) : toBN("0");
 
-  const hasStekeableTokens = max?.gt(toBN("0")) ?? true;
+  const hasBalance = balance?.gt(toBN("0")) ?? true;
 
-  return isSupportedSideChain(chainId) && !hasStekeableTokens ? (
-    <SideChainPnk unwrappedPnkModalProp={{ triggerCondition: "auto" }} />
+  return isSupportedSideChain(chainId) && !hasBalance ? (
+    <SideChainPnk unwrappedPnkModalProps={{ triggerCondition: "auto" }} />
   ) : (
     <StakeModalForm ID={ID} onCancel={onCancel} stakedTokens={stakedTokens} max={max} />
   );
