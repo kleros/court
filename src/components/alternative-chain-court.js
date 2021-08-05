@@ -226,14 +226,14 @@ function useSwitchNetwork(destinationChainId) {
     try {
       await requestSwitchNetwork(drizzle.web3.currentProvider, destinationChainId);
     } catch (err) {
-      console.debug("Failed to request the switch to the side-chain:", err);
-      /**
-       * If the call fails, it means that it's not supported.
-       * This happens for the native Ethereum Mainnet and well-known testnets,
-       * such as Ropsten and Kovan. Apparently this is due to security reasons.
-       * @see { @link https://docs.metamask.io/guide/rpc-api.html#wallet-addethereumchain }
-       */
-      setRequiredChainId(destinationChainId);
+      // 4001 is the MetaMask error code when users deny permission.
+      if (err.code !== 4001) {
+        /**
+         * If the call fails with any other reason, then set the global required chain ID.
+         */
+        console.warn("Failed to request the switch to the side-chain:", err);
+        setRequiredChainId(destinationChainId);
+      }
     }
   }, [destinationChainId, setRequiredChainId, drizzle.web3.currentProvider]);
 }
