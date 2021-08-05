@@ -49,21 +49,27 @@ export default function AlternativeChainCourt() {
     return null;
   }
 
-  return isSupportedSideChain(destinationChainId) ? (
+  if (destinationChainId === undefined) {
+    return null;
+  }
+
+  return (
     <DestinationChainIdContext.Provider value={destinationChainId}>
-      <StyledWrapper>
-        <AlternativeChainCourtWrapper />
-      </StyledWrapper>
+      {isSupportedSideChain(destinationChainId) ? (
+        <StyledWrapper>
+          <AlternativeChainCourtWrapper />
+        </StyledWrapper>
+      ) : isSupportedMainChain(destinationChainId) ? (
+        <StyledWrapper>
+          <AlternativeChainCourtLink
+            ButtonComponent={StyledButtonLink}
+            destinationChainId={destinationChainId}
+            onClick={switchNetwork}
+          />
+        </StyledWrapper>
+      ) : null}
     </DestinationChainIdContext.Provider>
-  ) : isSupportedMainChain(destinationChainId) ? (
-    <StyledWrapper>
-      <AlternativeChainCourtLink
-        ButtonComponent={StyledButtonLink}
-        destinationChainId={destinationChainId}
-        onClick={switchNetwork}
-      />
-    </StyledWrapper>
-  ) : null;
+  );
 }
 
 const DestinationChainIdContext = React.createContext();
@@ -100,11 +106,7 @@ function SideChainCourtDecisionTree() {
 
   return hasErrors || hasAnyBalance ? (
     <>
-      <AlternativeChainCourtLink
-        ButtonComponent={StyledButtonLink}
-        destinationChainId={destinationChainId}
-        onClick={switchNetwork}
-      />
+      <AlternativeChainCourtLink ButtonComponent={StyledButtonLink} onClick={switchNetwork} />
       <AlternativeChainBanner
         message={
           <>
@@ -113,8 +115,8 @@ function SideChainCourtDecisionTree() {
               <AlternativeChainCourtLink
                 ButtonComponent={StyledResponsiveBannerButton}
                 icon={null}
-                destinationChainId={destinationChainId}
                 text={chainIdToNetworkName[destinationChainId]}
+                onClick={switchNetwork}
               />
             }
             .
@@ -138,7 +140,6 @@ function SideChainCourtDecisionTree() {
                   <AlternativeChainCourtLink
                     ButtonComponent={StyledResponsiveBannerButton}
                     icon={null}
-                    destinationChainId={destinationChainId}
                     text={chainIdToNetworkName[destinationChainId]}
                   />
                 }
@@ -192,7 +193,8 @@ function useTokenData({ getRawBalance, getBalance, account }) {
   return [tokenData, forceUpdate];
 }
 
-function AlternativeChainCourtLink({ destinationChainId, text, icon, onClick, ButtonComponent, buttonProps }) {
+function AlternativeChainCourtLink({ text, icon, onClick, ButtonComponent, buttonProps }) {
+  const destinationChainId = useDestinationChainId();
   const buttonText = text || `Court on ${chainIdToNetworkName[destinationChainId]}`;
 
   return (
@@ -204,10 +206,9 @@ function AlternativeChainCourtLink({ destinationChainId, text, icon, onClick, Bu
 }
 
 AlternativeChainCourtLink.propTypes = {
-  destinationChainId: t.number.isRequired,
   text: t.node,
   icon: t.node,
-  onClick: t.func.isRequired,
+  onClick: t.func,
   ButtonComponent: t.elementType,
   buttonProps: t.object,
 };
@@ -216,6 +217,7 @@ AlternativeChainCourtLink.defaultProps = {
   icon: <Icon type="arrow-right" />,
   ButtonComponent: ButtonLink,
   buttonProps: {},
+  onClick: () => {},
 };
 
 function useSwitchNetwork(destinationChainId) {
@@ -226,14 +228,14 @@ function useSwitchNetwork(destinationChainId) {
     try {
       await requestSwitchNetwork(drizzle.web3.currentProvider, destinationChainId);
     } catch (err) {
-      console.debug("Failed to request the switch to the side-chain:", err);
-      /**
-       * If the call fails, it means that it's not supported.
-       * This happens for the native Ethereum Mainnet and well-known testnets,
-       * such as Ropsten and Kovan. Apparently this is due to security reasons.
-       * @see { @link https://docs.metamask.io/guide/rpc-api.html#wallet-addethereumchain }
-       */
-      setRequiredChainId(destinationChainId);
+      // 4001 is the MetaMask error code when users deny permission.
+      if (err.code !== 4001) {
+        /**
+         * If the call fails with any other reason, then set the global required chain ID.
+         */
+        console.warn("Failed to request the switch to the side-chain:", err);
+        setRequiredChainId(destinationChainId);
+      }
     }
   }, [destinationChainId, setRequiredChainId, drizzle.web3.currentProvider]);
 }
@@ -276,6 +278,12 @@ const StyledWrapper = styled.div`
   }
 `;
 
+const StyledButtonLink = styled(ButtonLink)`
+  @media (max-width: 767.98px) {
+    min-height: 48px;
+  }
+`;
+
 function SideChainCourtModal({ balance, rawBalance, errors, trigger }) {
   const [visible, setVisible] = React.useState(false);
   const destinationChainId = useDestinationChainId();
@@ -286,7 +294,6 @@ function SideChainCourtModal({ balance, rawBalance, errors, trigger }) {
   const hasAnyBalance = [balance, rawBalance].some((value) => (value ? toBN(value).gt(toBN("0")) : false));
 
   const triggerElement = React.cloneElement(trigger, {
-    destinationChainId,
     onClick: (e) => {
       if (typeof trigger.props?.onClick === "function") {
         trigger.props.onClick(e);
@@ -419,12 +426,6 @@ const StyledSpacer = styled.span`
   clear: both;
   width: 100%;
   margin-bottom: var(--size, 1rem);
-`;
-
-const StyledButtonLink = styled(ButtonLink)`
-  @media (max-width: 767.98px) {
-    min-height: 48px;
-  }
 `;
 
 const StyledResponsiveBannerButton = styled(Button).attrs((props) => ({
