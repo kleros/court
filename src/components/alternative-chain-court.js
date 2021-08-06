@@ -61,11 +61,7 @@ export default function AlternativeChainCourt() {
         </StyledWrapper>
       ) : isSupportedMainChain(destinationChainId) ? (
         <StyledWrapper>
-          <AlternativeChainCourtLink
-            ButtonComponent={StyledButtonLink}
-            destinationChainId={destinationChainId}
-            onClick={switchNetwork}
-          />
+          <AlternativeChainCourtLink ButtonComponent={StyledButtonLink} onClick={switchNetwork} />
         </StyledWrapper>
       ) : null}
     </DestinationChainIdContext.Provider>
@@ -325,7 +321,6 @@ function SideChainCourtModal({ balance, rawBalance, errors, trigger }) {
         footer={
           <div>
             <AlternativeChainCourtLink
-              destinationChainId={destinationChainId}
               ButtonComponent={Button}
               text={`Just take me to ${chainIdToNetworkName[destinationChainId]}`}
               icon={null}
