@@ -63,7 +63,7 @@
     "@ant-design/icons": "^4.5.0",
     "@drizzle/react-plugin": "^1.5.3",
     "@drizzle/store": "^1.5.3",
-    "@kleros/archon": "^1.2.4",
+    "@kleros/archon": "^2.0.1",
     "@kleros/pnk-merkle-drop-contracts": "^0.1.0",
     "@loadable/component": "^5.5.0",
     "@realitio/realitio-lib": "^1.0.2",
@@ -95,7 +95,7 @@
     "web3": "1.5.1"
   },
   "volta": {
-    "node": "10.24.1",
+    "node": "16.6.1",
     "yarn": "1.22.10"
   }
 }

@@ -1628,16 +1628,15 @@
     "@ethersproject/properties" "^5.1.0"
     "@ethersproject/strings" "^5.1.0"
 
-"@kleros/archon@^1.2.4":
-  version "1.2.4"
-  resolved "https://registry.yarnpkg.com/@kleros/archon/-/archon-1.2.4.tgz#73be8164745430b8c22c425050341a18684bdacd"
-  integrity sha512-dmUjat8jzdCQFy9SBzkoaIfBpbpvxmbW5fmwdCjCTTqFu8HTQhT5qeAGtN2W+Dz4JZYazGyoZVqr2l7mNp0FAQ==
+"@kleros/archon@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@kleros/archon/-/archon-2.0.1.tgz#bb02310ce4c2c6b247f30e8d8e375ef85d04d63c"
+  integrity sha512-OsaffDdlGL32fHxJHQB+XbOtMCuhDpOWPVmCDmGnZHhUWdFqbOF/A4g9pBkeT3c4dsJtxIspSPE8++fHB+/OtA==
   dependencies:
     axios "^0.21.0"
     iframe "^1.0.0"
     js-sha3 "^0.8.0"
     multihashes "0.4.14"
-    web3 "^1.3.6"
 
 "@kleros/pnk-merkle-drop-contracts@^0.1.0":
   version "0.1.0"
@@ -15971,20 +15970,7 @@ web3-utils@1.5.1:
     randombytes "^2.1.0"
     utf8 "3.0.0"
 
-web3@^1.2.1, web3@^1.3.6:
-  version "1.3.6"
-  resolved "https://registry.yarnpkg.com/web3/-/web3-1.3.6.tgz#599425461c3f9a8cbbefa70616438995f4a064cc"
-  integrity sha512-jEpPhnL6GDteifdVh7ulzlPrtVQeA30V9vnki9liYlUvLV82ZM7BNOQJiuzlDePuE+jZETZSP/0G/JlUVt6pOA==
-  dependencies:
-    web3-bzz "1.3.6"
-    web3-core "1.3.6"
-    web3-eth "1.3.6"
-    web3-eth-personal "1.3.6"
-    web3-net "1.3.6"
-    web3-shh "1.3.6"
-    web3-utils "1.3.6"
-
-web3@^1.5.1:
+web3@1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/web3/-/web3-1.5.1.tgz#a69d8913a57f6fcbe13daf15412f83224eb3002e"
   integrity sha512-qoXFBcnannngLR/BOgDvRcR1HxeG+fZPXaB2nle9xFUCdT7FjSBQcFG6LxZy+M2vHId7ONlbqSPLd2BbVLWVgA==
@@ -15996,6 +15982,19 @@ web3@^1.5.1:
     web3-net "1.5.1"
     web3-shh "1.5.1"
     web3-utils "1.5.1"
+
+web3@^1.2.1:
+  version "1.3.6"
+  resolved "https://registry.yarnpkg.com/web3/-/web3-1.3.6.tgz#599425461c3f9a8cbbefa70616438995f4a064cc"
+  integrity sha512-jEpPhnL6GDteifdVh7ulzlPrtVQeA30V9vnki9liYlUvLV82ZM7BNOQJiuzlDePuE+jZETZSP/0G/JlUVt6pOA==
+  dependencies:
+    web3-bzz "1.3.6"
+    web3-core "1.3.6"
+    web3-eth "1.3.6"
+    web3-eth-personal "1.3.6"
+    web3-net "1.3.6"
+    web3-shh "1.3.6"
+    web3-utils "1.3.6"
 
 webidl-conversions@^4.0.2:
   version "4.0.2"
