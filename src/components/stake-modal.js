@@ -11,7 +11,7 @@ import useChainId from "../hooks/use-chain-id";
 import { AutoDetectedTokenSymbol } from "./token-symbol";
 import ETHAmount from "./eth-amount";
 import { isSupportedSideChain } from "../api/side-chain";
-import SideChainPnk from "./side-chain-pnk";
+import SideChainPnkActions from "./side-chain/pnk-actions";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -30,7 +30,7 @@ export default function StakeModal({ ID, onCancel }) {
   const hasBalance = balance?.gt(toBN("0")) ?? true;
 
   return isSupportedSideChain(chainId) && !hasBalance ? (
-    <SideChainPnk unwrappedPnkModalProps={{ triggerCondition: "auto" }} />
+    <SideChainPnkActions unwrappedPnkModalProps={{ triggerCondition: "auto" }} />
   ) : (
     <StakeModalForm ID={ID} onCancel={onCancel} stakedTokens={stakedTokens} max={max} />
   );

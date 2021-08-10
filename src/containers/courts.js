@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Button, Col, Divider, Row, Spin } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
-import AlternativeChainCourt from "../components/alternative-chain-court";
+import SwitchCourtChain from "../components/side-chain/switch-court-chain";
 import CourtCard from "../components/court-card";
 import CourtCascaderModal from "../components/court-cascader-modal";
 import CourtDrawer from "../components/court-drawer";
@@ -14,8 +14,8 @@ import RequiredChainIdModal from "../components/required-chain-id-modal";
 import StakeModal from "../components/stake-modal";
 import TokenSymbol from "../components/token-symbol";
 import TopBanner from "../components/top-banner";
-import GetSideChainPnkButton from "../components/get-side-chain-pnk-button";
-import SideChainPnk from "../components/side-chain-pnk";
+import GetSideChainPnkButton from "../components/side-chain/get-pnk-button";
+import SideChainPnkActions from "../components/side-chain/pnk-actions";
 import useChainId from "../hooks/use-chain-id";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
@@ -68,7 +68,7 @@ export default function Courts() {
         }
         title="Courts"
       />
-      <AlternativeChainCourt />
+      <SwitchCourtChain />
       {juror && juror.subcourtIDs.filter((ID) => ID !== "0").length > 0 ? <PNKBalanceCard /> : ""}
       <Spin spinning={!juror}>
         <Row gutter={40}>
@@ -96,7 +96,7 @@ export default function Courts() {
       ) : (
         <StakeModal ID={stakingID} onCancel={setStakingID} />
       )}
-      <SideChainPnk showGetSideChainPnkModal={false} />
+      <SideChainPnkActions showGetSideChainPnkModal={false} />
     </>
   );
 

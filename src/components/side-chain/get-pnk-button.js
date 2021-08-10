@@ -1,12 +1,12 @@
 import React from "react";
 import styled from "styled-components/macro";
 import { Icon } from "antd";
-import { Button } from "../adapters/antd";
-import { getSideChainParams, isSupportedSideChain } from "../api/side-chain";
-import TokenSymbol from "./token-symbol";
-import useChainId from "../hooks/use-chain-id";
+import { Button } from "../../adapters/antd";
+import { getSideChainParams, isSupportedSideChain } from "../../api/side-chain";
+import useChainId from "../../hooks/use-chain-id";
+import TokenSymbol from "../token-symbol";
 
-export default function GetSideChainPnkButton({ size, type, icon, className, ...rest }) {
+export default function GetPnkButton({ size, type, icon, className, ...rest }) {
   const chainId = useChainId();
   const isSupported = isSupportedSideChain(chainId);
   const { bridgeAppUrl } = isSupported ? getSideChainParams(chainId) : {};
@@ -29,9 +29,9 @@ export default function GetSideChainPnkButton({ size, type, icon, className, ...
   ) : null;
 }
 
-GetSideChainPnkButton.propTypes = Button.propTypes;
+GetPnkButton.propTypes = Button.propTypes;
 
-GetSideChainPnkButton.defaultProps = {
+GetPnkButton.defaultProps = {
   size: "large",
   type: "secondary",
 };
