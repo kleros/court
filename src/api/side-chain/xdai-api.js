@@ -30,10 +30,10 @@ export function createApi({
       _getTokensStatsFromExtraView({ address }),
     ]);
 
-    const { locked, stakedWithDelay } = fromExtraView;
+    const { locked, stakedPlusPending } = fromExtraView;
 
-    const delayedStake = stakedWithDelay.sub(staked);
-    const mixinFromView = delayedStake.eq(ZERO) ? { locked } : { delayedStake, locked };
+    const pendingStake = stakedPlusPending.sub(staked);
+    const mixinFromView = pendingStake.eq(ZERO) ? { locked } : { pendingStake, locked };
 
     return {
       balance,
@@ -57,7 +57,7 @@ export function createApi({
     const { lockedTokens, stakedTokens } = await klerosLiquidExtraViews.methods.getJuror(address).call();
     return {
       locked: toBN(lockedTokens),
-      stakedWithDelay: toBN(stakedTokens),
+      stakedPlusPending: toBN(stakedTokens),
     };
   }
 

@@ -1,21 +1,21 @@
 import React from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
-import { Alert, Button, Col, Divider, Form, Icon, InputNumber, Row, Typography } from "antd";
+import { Alert, Button, Col, Form, Icon, InputNumber, Row, Typography } from "antd";
 import { useDebouncedCallback } from "use-debounce";
 import Web3 from "web3";
-import { getCounterPartyChainId, useSideChainApi } from "../../api/side-chain";
+import { useSideChainApi } from "../../api/side-chain";
 import BalanceTable from "../../components/balance-table";
 import MultiTransactionStatus from "../../components/multi-transaction-status";
 import TokenSymbol, { AutoDetectedTokenSymbol } from "../../components/token-symbol";
-import useChainId from "../../hooks/use-chain-id";
+import { chainIdToNetworkShortName } from "../../helpers/networks";
 import useAccount from "../../hooks/use-account";
 import { useAsyncGenerator } from "../../hooks/use-generators";
 import usePromise from "../../hooks/use-promise";
 
 const { fromWei, toWei, toBN } = Web3.utils;
 
-export default function ConvertPnkFormWrapper() {
+export default function ConvertPnkFormWrapper({ onDone }) {
   const sideChainApi = useSideChainApi();
   const account = useAccount();
 
@@ -38,10 +38,16 @@ export default function ConvertPnkFormWrapper() {
     [run, account]
   );
 
+  React.useEffect(() => {
+    if (isDone) {
+      onDone();
+    }
+  }, [isDone, onDone]);
+
   return (
     <>
       <PnkBalanceTable {...tokenStats?.value} error={tokenStats.error} />
-      <StyledDivider />
+      <StyledSpacer style={{ "--size": "3rem" }} />
       <ConvertPnkForm
         maxAvailable={hasAvailableTokens ? tokenStats.value.available : "0"}
         disabled={!hasAvailableTokens || isDone}
@@ -50,13 +56,21 @@ export default function ConvertPnkFormWrapper() {
       />
       {transactions.length > 0 ? (
         <>
-          <StyledDivider $size={0.5} />
+          <StyledSpacer style={{ "--size": "1.5rem" }} />
           <MultiTransactionStatus transactions={transactions} chainId={sideChainApi.chainId} error={error} />
         </>
       ) : null}
     </>
   );
 }
+
+ConvertPnkFormWrapper.propTypes = {
+  onDone: t.func,
+};
+
+ConvertPnkFormWrapper.defaultProps = {
+  onDone: () => {},
+};
 
 function useWithdrawTokens(withdrawTokens) {
   const { run, ...withdrawResult } = useAsyncGenerator(withdrawTokens);
@@ -79,10 +93,11 @@ function useWithdrawTokens(withdrawTokens) {
     run,
     transactions,
     ...withdrawResult,
+    // isDone: true,
   };
 }
 
-function PnkBalanceTable({ balance, locked, delayedStake, staked, available, error }) {
+function PnkBalanceTable({ balance, locked, pendingStake, staked, available, error }) {
   const tokenSymbol = <AutoDetectedTokenSymbol token="PNK" />;
 
   return (
@@ -90,23 +105,23 @@ function PnkBalanceTable({ balance, locked, delayedStake, staked, available, err
       <BalanceTable title="Your Balance">
         <BalanceTable.Row description="Total:" value={balance} error={error} tokenSymbol={tokenSymbol} />
         <BalanceTable.Row
-          description="Locked:"
+          description="Locked in cases:"
           value={locked}
           error={error}
           tokenSymbol={tokenSymbol}
           variant="warning"
         />
         <BalanceTable.Row
-          description="Staked:"
+          description="Staked on courts:"
           value={staked}
           error={error}
           tokenSymbol={tokenSymbol}
           variant="warning"
         />
-        {delayedStake ? (
+        {pendingStake ? (
           <BalanceTable.Row
-            description="Delayed Stake*:"
-            value={delayedStake}
+            description="Pending stake*:"
+            value={pendingStake}
             error={error}
             tokenSymbol={tokenSymbol}
             variant="warning"
@@ -114,31 +129,31 @@ function PnkBalanceTable({ balance, locked, delayedStake, staked, available, err
         ) : null}
         <BalanceTable.EmptyRow />
         <BalanceTable.Row
-          description="Available:"
+          description="Available to convert:"
           value={available}
           error={error}
           tokenSymbol={tokenSymbol}
           variant="primary"
         />
       </BalanceTable>
-      {delayedStake ? (
+      {pendingStake ? (
         <>
-          <StyledDivider />
+          <StyledSpacer style={{ "--size": "1.5rem" }} />
           <Alert
             showIcon
             type="info"
-            message="*Delayed stake changes"
+            message="*Pending stake changes"
             description={
               <>
                 <p>
                   When you stake or unstake on a Court, the Kleros main smart contract <strong>might</strong> not be
-                  able to process the stake changes right the way. If so, it usually takes a couple of minutes to a few
+                  able to process the stake changes right away. If so, it usually takes a couple of minutes to a few
                   hours for your stake changes to be processed.
                 </p>
                 <p>
                   This means that if you have just unstaked, you will not be able to convert those {tokenSymbol} right
                   now. On the other hand, if you just staked, you can convert those {tokenSymbol} now, but the stake
-                  changes will silently fail when they are processed.
+                  changes will not be processed.
                 </p>
               </>
             }
@@ -152,17 +167,16 @@ function PnkBalanceTable({ balance, locked, delayedStake, staked, available, err
 PnkBalanceTable.propTypes = {
   balance: t.oneOfType([t.string, t.number, t.object]),
   locked: t.oneOfType([t.string, t.number, t.object]),
-  delayedStake: t.oneOfType([t.string, t.number, t.object]),
+  pendingStake: t.oneOfType([t.string, t.number, t.object]),
   staked: t.oneOfType([t.string, t.number, t.object]),
   available: t.oneOfType([t.string, t.number, t.object]),
   error: t.instanceOf(Error),
 };
 
 const ConvertPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, disabled, onFinish }) => {
-  const chainId = useChainId();
-  const destinationChainId = getCounterPartyChainId(chainId);
-
   const sideChainApi = useSideChainApi();
+
+  const { chainId, destinationChainId } = sideChainApi;
 
   const feeRatio = usePromise(React.useCallback(() => sideChainApi.getFeeRatio(), [sideChainApi]));
 
@@ -239,6 +253,19 @@ const ConvertPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, disabl
         Convert <TokenSymbol chainId={chainId} token="PNK" />
       </StyledTitle>
       <Form hideRequiredMark layout="vertical" onSubmit={handleSubmit}>
+        {feeRatio?.value ? (
+          <>
+            <StyledFeeNote
+              css={`
+                margin-top: -0.5rem;
+              `}
+            >
+              There is a {formatPercent(feeRatio?.value)} fee charged by the Token Bridge operators when sending tokens
+              back to {chainIdToNetworkShortName[destinationChainId]}.
+            </StyledFeeNote>
+            <StyledSpacer style={{ "--size": "0.5rem" }} />
+          </>
+        ) : null}
         <StyledRow>
           <StyledFieldCol>
             <StyledFormItem
@@ -277,13 +304,6 @@ const ConvertPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, disabl
             </StyledFormItem>
           </StyledFieldCol>
         </StyledRow>
-
-        {feeRatio?.value ? (
-          <StyledFeeNote>
-            There is a {formatPercent(feeRatio?.value)} fee charged by the Token Bridge operators.
-          </StyledFeeNote>
-        ) : null}
-
         <Button
           block
           type="primary"
@@ -386,13 +406,15 @@ const StyledCompositeLabel = styled.span`
   }
 `;
 
-const StyledDivider = styled(Divider)`
-  border: none !important;
-  background: none !important;
-`;
-
 const StyledFeeNote = styled.p`
   color: rgba(0, 0, 0, 0.45);
   font-size: 12px;
-  text-align: right;
+  text-align: center;
+`;
+
+const StyledSpacer = styled.span`
+  display: flex;
+  clear: both;
+  width: 100%;
+  margin-bottom: var(--size, 1rem);
 `;

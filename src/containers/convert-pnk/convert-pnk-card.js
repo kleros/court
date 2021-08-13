@@ -4,29 +4,54 @@ import { useHistory, useLocation } from "react-router-dom";
 import { Card, Divider } from "antd";
 import TokenSymbol from "../../components/token-symbol";
 import SteppedContent from "../../components/stepped-content";
-import { useSideChainApi } from "../../api/side-chain";
+import { getCounterPartyChainId, isSupportedMainChain, isSupportedSideChain } from "../../api/side-chain";
 import { chainIdToNetworkShortName } from "../../helpers/networks";
+import useChainId from "../../hooks/use-chain-id";
 import useQueryParams from "../../hooks/use-query-params";
 import ConvertPnkForm from "./convert-pnk-form";
+import SwitchChainButton from "./switch-chain-button";
+import ClaimTokensButton from "./claim-tokens-button";
 
 export default function ConvertPnkCard() {
-  const sideChainApi = useSideChainApi();
-  const { chainId, destinationChainId } = sideChainApi;
+  const currentChainId = useChainId();
+  const counterPartyChainId = getCounterPartyChainId(currentChainId);
 
-  // eslint-disable-next-line no-unused-vars
+  const originChainId = isSupportedMainChain(counterPartyChainId) ? currentChainId : counterPartyChainId;
+  const targetChainId = isSupportedMainChain(counterPartyChainId) ? counterPartyChainId : currentChainId;
+
   const { step, next, first } = useStep();
+
+  const handleFormDone = React.useCallback(() => {
+    next();
+  }, [next]);
+
+  React.useEffect(() => {
+    if (step === 1 && isSupportedMainChain(currentChainId)) {
+      next();
+    }
+  }, [step, currentChainId, next]);
+
+  React.useEffect(() => {
+    if (step === 2 && isSupportedSideChain(currentChainId)) {
+      first();
+    }
+  }, [step, currentChainId, first]);
 
   return (
     <StyledCard
       title={
         <>
-          Send <TokenSymbol chainId={chainId} token="PNK" /> to {chainIdToNetworkShortName[destinationChainId]}
+          Send <TokenSymbol chainId={originChainId} token="PNK" /> to {chainIdToNetworkShortName[targetChainId]}
         </>
       }
     >
-      <StyledExplainerText>
-        Keep in mind that <TokenSymbol chainId={chainId} token="PNK" /> that are staked or locked cannot be sent to{" "}
-        {chainIdToNetworkShortName[destinationChainId]}.
+      <StyledExplainerText
+        css={`
+          margin-top: -1rem;
+        `}
+      >
+        Keep in mind that <TokenSymbol chainId={originChainId} token="PNK" /> that are staked or locked cannot be sent
+        to {chainIdToNetworkShortName[targetChainId]}.
       </StyledExplainerText>
       <StyledDivider />
       <SteppedContent
@@ -36,19 +61,23 @@ export default function ConvertPnkCard() {
           {
             title: "Convert",
             children() {
-              return <ConvertPnkForm maxAvailable="10000000000000000000" />;
+              return isSupportedSideChain(currentChainId) ? (
+                <ConvertPnkForm onDone={handleFormDone} />
+              ) : (
+                <SwitchChainButton destinationChainId={originChainId} />
+              );
             },
           },
           {
-            title: `Switch to ${chainIdToNetworkShortName[destinationChainId]}`,
+            title: `Switch to ${chainIdToNetworkShortName[targetChainId]}`,
             children() {
-              return null;
+              return <SwitchChainButton destinationChainId={targetChainId} />;
             },
           },
           {
             title: "Claim",
             children() {
-              return null;
+              return <ClaimTokensButton />;
             },
           },
         ]}

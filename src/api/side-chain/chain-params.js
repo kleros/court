@@ -17,6 +17,7 @@ const supportedSideChains = {
     rpcUrls: [ensureEnv("REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL")],
     blockExplorerUrls: [getBaseUrl(100)],
     bridgeAppUrl: `https://omni.xdaichain.com/bridge?from=1&to=100&token=${ensureEnv("REACT_APP_PINAKION_ADDRESS")}`,
+    bridgeAppHistoryUrl: "https://omni.xdaichain.com/history",
     mainChainId: 1,
     tokens: {
       [Tokens.PNK]: {
@@ -43,6 +44,7 @@ const supportedSideChains = {
     bridgeAppUrl: `https://sokol-omnibridge.web.app/bridge?from=42&to=77&token=${ensureEnv(
       "REACT_APP_PINAKION_KOVAN_ADDRESS"
     )}`,
+    bridgeAppHistoryUrl: "https://sokol-omnibridge.web.app/history",
     mainChainId: 42,
     tokens: {
       [Tokens.PNK]: {

@@ -1,8 +1,9 @@
 import React from "react";
 import styled from "styled-components/macro";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
-import { Divider } from "antd";
-import { getCounterPartyChainId, isSupportedSideChain, SideChainApiProvider } from "../../api/side-chain";
+import { Divider, Spin } from "antd";
+import { getCounterPartyChainId, isSupportedMainChain, SideChainApiProvider } from "../../api/side-chain";
+import { getReadOnlyWeb3 } from "../../bootstrap/web3";
 import TokenSymbol from "../../components/token-symbol";
 import TopBanner from "../../components/top-banner";
 import { chainIdToNetworkName } from "../../helpers/networks";
@@ -16,29 +17,55 @@ export default function ConvertPnkWrapper() {
   const chainId = useChainId();
   const { drizzle } = useDrizzle();
 
-  if (!isSupportedSideChain(chainId)) {
-    return <C404 />;
-  }
+  const web3Provider = React.useMemo(() => {
+    try {
+      return isSupportedMainChain(chainId)
+        ? getReadOnlyWeb3({ chainId: getCounterPartyChainId(chainId) })
+        : drizzle.web3.currentProvider;
+    } catch (err) {
+      console.warn("Failed to get a provider for the side-chain API:", err);
+      return null;
+    }
+  }, [drizzle.web3.currentProvider, chainId]);
 
-  return (
-    <SideChainApiProvider web3Provider={drizzle.web3.currentProvider}>
+  return web3Provider ? (
+    <SideChainApiProvider
+      web3Provider={web3Provider}
+      renderOnLoading={() => (
+        <Spin
+          spinning
+          tip="Initializing side-chain API..."
+          css={`
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+          `}
+        />
+      )}
+    >
       <ConvertPnk />
     </SideChainApiProvider>
+  ) : (
+    <C404 />
   );
 }
 
 function ConvertPnk() {
-  const chainId = useChainId();
-  const destinationChainId = getCounterPartyChainId(chainId);
+  const currentChainId = useChainId();
+  const counterPartyChainId = getCounterPartyChainId(currentChainId);
+
+  const originChainId = isSupportedMainChain(counterPartyChainId) ? currentChainId : counterPartyChainId;
+  const targetChainId = isSupportedMainChain(counterPartyChainId) ? counterPartyChainId : currentChainId;
 
   return (
     <>
       <TopBanner
-        title="Convert stPNK"
+        title="Convert to PNK"
         description={
           <>
-            Send your <TokenSymbol chainId={chainId} token="PNK" /> to get{" "}
-            <TokenSymbol chainId={destinationChainId} token="PNK" /> back on {chainIdToNetworkName[destinationChainId]}
+            Send your <TokenSymbol chainId={originChainId} token="PNK" /> to get{" "}
+            <TokenSymbol chainId={targetChainId} token="PNK" /> back on {chainIdToNetworkName[targetChainId]}
           </>
         }
       />
