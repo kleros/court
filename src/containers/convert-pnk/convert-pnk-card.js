@@ -1,7 +1,8 @@
 import React from "react";
 import styled from "styled-components/macro";
-import { useHistory, useLocation } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import { Card, Divider } from "antd";
+import { ButtonLink } from "../../adapters/antd";
 import TokenSymbol from "../../components/token-symbol";
 import SteppedContent from "../../components/stepped-content";
 import { getCounterPartyChainId, isSupportedMainChain, isSupportedSideChain } from "../../api/side-chain";
@@ -57,9 +58,34 @@ export default function ConvertPnkCard() {
       <SteppedContent
         size="small"
         current={step}
+        renderFinalContent={() => (
+          <div
+            css={`
+              text-align: center;
+            `}
+          >
+            <StyledFinalMessage>
+              <span role="img" aria-label="Party popper emoji">
+                🎉
+              </span>{" "}
+              You have successfully sent your <TokenSymbol chainId={originChainId} token="PNK" /> to{" "}
+              {chainIdToNetworkShortName[targetChainId]}!{" "}
+              <span role="img" aria-label="Party popper emoji">
+                🎉
+              </span>
+            </StyledFinalMessage>
+            <Link to="/" component={ButtonLink}>
+              Go to the Home Page
+            </Link>
+          </div>
+        )}
         steps={[
           {
-            title: "Convert",
+            title: (
+              <>
+                Convert <TokenSymbol chainId={originChainId} token="PNK" />
+              </>
+            ),
             children() {
               return isSupportedSideChain(currentChainId) ? (
                 <ConvertPnkForm onDone={handleFormDone} />
@@ -75,9 +101,13 @@ export default function ConvertPnkCard() {
             },
           },
           {
-            title: "Claim",
+            title: (
+              <>
+                Claim <TokenSymbol chainId={targetChainId} token="PNK" />
+              </>
+            ),
             children() {
-              return <ClaimTokensButton />;
+              return <ClaimTokensButton onDone={next} />;
             },
           },
         ]}
@@ -188,6 +218,15 @@ const StyledExplainerText = styled.p`
   color: rgba(0, 0, 0, 0.45);
   font-size: 14px;
   text-align: center;
+`;
+
+const StyledFinalMessage = styled.p`
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+  padding: 1rem 0;
 `;
 
 const StyledDivider = styled(Divider)`

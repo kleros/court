@@ -1,7 +1,7 @@
 import React from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
-import { Alert, Button, Col, Form, Icon, InputNumber, Row, Typography } from "antd";
+import { Alert, Button, Col, Form, Icon, InputNumber, Row, Skeleton } from "antd";
 import { useDebouncedCallback } from "use-debounce";
 import Web3 from "web3";
 import { useSideChainApi } from "../../api/side-chain";
@@ -147,13 +147,13 @@ function PnkBalanceTable({ balance, locked, pendingStake, staked, available, err
               <>
                 <p>
                   When you stake or unstake on a Court, the Kleros main smart contract <strong>might</strong> not be
-                  able to process the stake changes right away. If so, it usually takes a couple of minutes to a few
-                  hours for your stake changes to be processed.
+                  able to process the stake changes right away. It usually takes a couple of minutes to a few hours for
+                  your stake changes to be processed.
                 </p>
                 <p>
                   This means that if you have just unstaked, you will not be able to convert those {tokenSymbol} right
-                  now. On the other hand, if you just staked, you can convert those {tokenSymbol} now, but the stake
-                  changes will not be processed.
+                  now. On the other hand, if you just staked, you can convert those {tokenSymbol} now, but the pending
+                  stake changes will be discarded.
                 </p>
               </>
             }
@@ -249,23 +249,18 @@ const ConvertPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, disabl
 
   return (
     <div>
-      <StyledTitle level={3}>
-        Convert <TokenSymbol chainId={chainId} token="PNK" />
-      </StyledTitle>
       <Form hideRequiredMark layout="vertical" onSubmit={handleSubmit}>
-        {feeRatio?.value ? (
-          <>
-            <StyledFeeNote
-              css={`
-                margin-top: -0.5rem;
-              `}
-            >
-              There is a {formatPercent(feeRatio?.value)} fee charged by the Token Bridge operators when sending tokens
-              back to {chainIdToNetworkShortName[destinationChainId]}.
-            </StyledFeeNote>
-            <StyledSpacer style={{ "--size": "0.5rem" }} />
-          </>
-        ) : null}
+        <StyledFeeNote>
+          There is a{" "}
+          {Number.isNaN(Number(feeRatio?.value)) ? (
+            <StyledSkeleton active paragraph={false} />
+          ) : (
+            formatPercent(feeRatio?.value)
+          )}{" "}
+          fee charged by the Token Bridge operators when sending tokens back to{" "}
+          {chainIdToNetworkShortName[destinationChainId]}.
+        </StyledFeeNote>
+        <StyledSpacer style={{ "--size": "0.5rem" }} />
         <StyledRow>
           <StyledFieldCol>
             <StyledFormItem
@@ -326,10 +321,6 @@ function formatPercent(value) {
 function hasErrors(fieldsError) {
   return Object.keys(fieldsError).some((field) => fieldsError[field]);
 }
-
-const StyledTitle = styled(Typography.Title)`
-  text-align: center;
-`;
 
 const StyledRow = styled(Row)`
   display: flex;
@@ -406,10 +397,30 @@ const StyledCompositeLabel = styled.span`
   }
 `;
 
+const StyledSkeleton = styled(Skeleton)``;
+
 const StyledFeeNote = styled.p`
   color: rgba(0, 0, 0, 0.45);
   font-size: 12px;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ${StyledSkeleton} {
+    display: inline-flex;
+    width: 30px;
+
+    ::before,
+    ::after {
+      content: " ";
+      white-space: pre;
+    }
+
+    .ant-skeleton-title {
+      margin: 0;
+    }
+  }
 `;
 
 const StyledSpacer = styled.span`
