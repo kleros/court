@@ -2,6 +2,7 @@ import React from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
 import { Button, Icon, Modal, Typography } from "antd";
+import { Link } from "react-router-dom";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import Web3 from "web3";
 import { ButtonLink } from "../../adapters/antd";
@@ -20,7 +21,7 @@ import useAccount from "../../hooks/use-account";
 import usePromise from "../../hooks/use-promise";
 import useInterval from "../../hooks/use-interval";
 import useForceUpdate from "../../hooks/use-force-update";
-import { chainIdToNetworkName } from "../../helpers/networks";
+import { chainIdToNetworkName, chainIdToNetworkShortName } from "../../helpers/networks";
 import { useSetRequiredChainId } from "../required-chain-id-gateway";
 import AnnouncementBanner from "./announcement-banner";
 import MultiBalance from "../multi-balance";
@@ -61,6 +62,11 @@ export default function SwitchCourtChain() {
         </StyledButtonWrapper>
       ) : isSupportedMainChain(destinationChainId) ? (
         <StyledButtonWrapper>
+          <Link component={StyledButtonLink} to="/convert-pnk" icon="swap">
+            <span>
+              Send <TokenSymbol chainId={chainId} token="PNK" /> to {chainIdToNetworkShortName[destinationChainId]}
+            </span>
+          </Link>
           <CustomButton
             text={`Court on ${chainIdToNetworkName[destinationChainId]}`}
             iconAfter={<Icon type="arrow-right" />}

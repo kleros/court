@@ -1,9 +1,10 @@
 import Web3 from "web3";
 import KlerosLiquidExtraViews from "../../assets/contracts/kleros-liquid-extra-views.json";
+import KlerosLiquid from "../../assets/contracts/kleros-liquid.json";
 import TokenBridgeXDai from "../../assets/contracts/token-bridge-xdai.json";
 import WrappedPinakion from "../../assets/contracts/wrapped-pinakion.json";
 import XPinakion from "../../assets/contracts/x-pinakion.json";
-import { isSupportedSideChain } from "./chain-params";
+import { getCounterPartyChainId, isSupportedSideChain } from "./chain-params";
 import * as xDai from "./xdai-api";
 
 export default async function createSideChainApi(provider) {
@@ -29,15 +30,18 @@ const xDaiParametersFactory = {
         KlerosLiquidExtraViews.abi,
         ensureEnv("REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_XDAI_ADDRESS")
       ),
+      klerosLiquid: new web3.eth.Contract(KlerosLiquid.abi, ensureEnv("REACT_APP_KLEROS_LIQUID_XDAI_ADDRESS")),
     };
 
     contracts.tokenBridge.options.handleRevert = true;
     contracts.wrappedPinakion.options.handleRevert = true;
     contracts.klerosLiquidExtraViews.options.handleRevert = true;
+    contracts.klerosLiquid.options.handleRevert = true;
 
     return {
       ...contracts,
       chainId: 100,
+      destinationChainId: getCounterPartyChainId(100),
     };
   },
   77: (web3) => {
@@ -49,15 +53,18 @@ const xDaiParametersFactory = {
         KlerosLiquidExtraViews.abi,
         ensureEnv("REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_SOKOL_ADDRESS")
       ),
+      klerosLiquid: new web3.eth.Contract(KlerosLiquid.abi, ensureEnv("REACT_APP_KLEROS_LIQUID_SOKOL_ADDRESS")),
     };
 
     contracts.tokenBridge.options.handleRevert = true;
     contracts.wrappedPinakion.options.handleRevert = true;
     contracts.klerosLiquidExtraViews.options.handleRevert = true;
+    contracts.klerosLiquid.options.handleRevert = true;
 
     return {
       ...contracts,
       chainId: 77,
+      destinationChainId: getCounterPartyChainId(77),
     };
   },
 };

@@ -2,33 +2,80 @@ import Web3 from "web3";
 import createError from "../../helpers/create-error";
 import { promiEventToAsyncGenerator } from "../../helpers/transactions";
 
-const { toBN } = Web3.utils;
+const { BN, toBN, toWei } = Web3.utils;
 
-const MAX_UINT256 = toBN("2").pow(toBN("256")).sub(toBN("1"));
+const ZERO = toBN("0");
 
-export function createApi({ chainId, tokenBridge, wrappedPinakion, xPinakion, klerosLiquidExtraViews }) {
+export function createApi({
+  chainId,
+  destinationChainId,
+  tokenBridge,
+  wrappedPinakion,
+  xPinakion,
+  klerosLiquid,
+  klerosLiquidExtraViews,
+}) {
   async function getBalance({ address }) {
     return toBN(await wrappedPinakion.methods.balanceOf(address).call());
-  }
-
-  // eslint-disable-next-line no-unused-vars
-  async function getAllowance({ address }) {
-    return MAX_UINT256;
   }
 
   async function getRawBalance({ address }) {
     return toBN(await xPinakion.methods.balanceOf(address).call());
   }
 
-  async function getRawAllowance({ address }) {
-    return toBN(await xPinakion.methods.allowance(address, wrappedPinakion.options.address).call());
+  async function getTokenStats({ address }) {
+    const [balance, staked, fromExtraView] = await Promise.all([
+      getBalance({ address }),
+      _getStakedTokens({ address }),
+      _getTokensStatsFromExtraView({ address }),
+    ]);
+
+    const { locked, stakedWithDelay } = fromExtraView;
+
+    const delayedStake = stakedWithDelay.sub(staked);
+    const mixinFromView = delayedStake.eq(ZERO) ? { locked } : { delayedStake, locked };
+
+    return {
+      balance,
+      staked,
+      ...mixinFromView,
+      available: _getAvailableTokens({
+        balance,
+        locked: fromExtraView.locked,
+        staked,
+      }),
+    };
   }
 
-  async function getStake({ address, subcourtId = "0" }) {
-    return toBN(await klerosLiquidExtraViews.methods.stakeOf(address, subcourtId).call());
+  async function _getStakedTokens({ address }) {
+    const juror = await klerosLiquid.methods.jurors(address).call();
+
+    return toBN(juror.stakedTokens);
   }
 
-  async function getFee({ amount }) {
+  async function _getTokensStatsFromExtraView({ address }) {
+    const { lockedTokens, stakedTokens } = await klerosLiquidExtraViews.methods.getJuror(address).call();
+    return {
+      locked: toBN(lockedTokens),
+      stakedWithDelay: toBN(stakedTokens),
+    };
+  }
+
+  /**
+   * Jurors are allowed to unstake all tokens, even if some of them are locked because
+   * of an ongoing disputes.
+   * To get the amount available to be bridged, we take the minimum between the difference
+   * between the jurors balance and their locked tokens and the difference between the balance
+   * and their staked tokens.
+   * There might be a case when the amount of staked tokens of a juror is lower than their
+   * balance. In this case, we simply return zero.
+   */
+  function _getAvailableTokens({ balance, locked, staked }) {
+    const available = BN.min(balance.sub(locked), balance.sub(staked));
+    return available.lt(ZERO) ? ZERO : available;
+  }
+
+  async function _getFee({ amount }) {
     amount = toBN(amount);
 
     const feeType = await tokenBridge.methods.HOME_TO_FOREIGN_FEE().call();
@@ -37,10 +84,19 @@ export function createApi({ chainId, tokenBridge, wrappedPinakion, xPinakion, kl
   }
 
   async function getRelayedAmount({ originalAmount }) {
-    return toBN(originalAmount).sub(await getFee({ amount: originalAmount }));
+    return toBN(originalAmount).sub(await _getFee({ amount: originalAmount }));
   }
 
   const BASIS_POINTS_MULTIPLIER = toBN("10000");
+
+  async function getFeeRatio() {
+    const relayedAmount = toBN(toWei("1"));
+    const fee = await _getFee({ amount: relayedAmount });
+
+    const ratioBasisPoints = fee.mul(BASIS_POINTS_MULTIPLIER).div(relayedAmount);
+
+    return ratioBasisPoints.toNumber() / BASIS_POINTS_MULTIPLIER.toNumber();
+  }
 
   async function getRequiredAmount({ desiredAmount }) {
     desiredAmount = toBN(desiredAmount);
@@ -49,7 +105,7 @@ export function createApi({ chainId, tokenBridge, wrappedPinakion, xPinakion, kl
       return toBN("0");
     }
 
-    const fee = await getFee({ amount: desiredAmount });
+    const fee = await _getFee({ amount: desiredAmount });
     const feeRateBasisPoints = fee.mul(BASIS_POINTS_MULTIPLIER).div(desiredAmount);
 
     /**
@@ -74,7 +130,7 @@ export function createApi({ chainId, tokenBridge, wrappedPinakion, xPinakion, kl
   async function* deposit({ address, amount }) {
     amount = toBN(amount);
 
-    const [balance, allowance] = await Promise.all([getRawBalance({ address }), getRawAllowance({ address })]);
+    const [balance, allowance] = await Promise.all([getRawBalance({ address }), _getRawAllowance({ address })]);
 
     if (balance.lt(amount)) {
       throw createError("Amount is greater than balance");
@@ -125,6 +181,10 @@ export function createApi({ chainId, tokenBridge, wrappedPinakion, xPinakion, kl
     }
   }
 
+  async function _getRawAllowance({ address }) {
+    return toBN(await xPinakion.methods.allowance(address, wrappedPinakion.options.address).call());
+  }
+
   async function* withdraw({ amount, address }) {
     amount = toBN(amount);
 
@@ -150,12 +210,11 @@ export function createApi({ chainId, tokenBridge, wrappedPinakion, xPinakion, kl
 
   return {
     chainId,
+    destinationChainId,
     getBalance,
-    getAllowance,
     getRawBalance,
-    getRawAllowance,
-    getStake,
-    getFee,
+    getTokenStats,
+    getFeeRatio,
     getRelayedAmount,
     getRequiredAmount,
     deposit,

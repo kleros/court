@@ -16,7 +16,7 @@ export default function MultiBalance({ title, chainId, errors, balance, rawBalan
   const rawBalanceTokenSymbol = <TokenSymbolComponent {...tokenSymbolProps} token="xPNK" />;
 
   return (
-    <StyledMultiChainBalance>
+    <StyledMultiBalance>
       <StyledTitle level={3}>{title}</StyledTitle>
       <StyledContent>
         <table>
@@ -38,7 +38,7 @@ export default function MultiBalance({ title, chainId, errors, balance, rawBalan
           </tbody>
         </table>
       </StyledContent>
-    </StyledMultiChainBalance>
+    </StyledMultiBalance>
   );
 }
 
@@ -90,7 +90,7 @@ EntryRow.propTypes = {
   className: t.string,
 };
 
-const StyledMultiChainBalance = styled.section``;
+const StyledMultiBalance = styled.section``;
 
 const StyledTitle = styled(Typography.Title)`
   text-align: center;
