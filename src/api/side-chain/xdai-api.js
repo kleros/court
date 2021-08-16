@@ -41,7 +41,7 @@ export function createApi({
       ...mixinFromView,
       available: _getAvailableTokens({
         balance,
-        locked: fromExtraView.locked,
+        locked,
         staked,
       }),
     };
@@ -62,13 +62,11 @@ export function createApi({
   }
 
   /**
-   * Jurors are allowed to unstake all tokens, even if some of them are locked because
-   * of an ongoing disputes.
-   * To get the amount available to be bridged, we take the minimum between the difference
-   * between the jurors balance and their locked tokens and the difference between the balance
-   * and their staked tokens.
-   * There might be a case when the amount of staked tokens of a juror is lower than their
-   * balance. In this case, we simply return zero.
+   * Jurors are allowed to unstake all tokens, even if some of them are locked because of ongoing disputes.
+   * To get the amount available to be bridged, we take the minimum between the difference between the jurors balance
+   * and their locked tokens and the difference between the balance and their staked tokens.
+   * Also there might be a case when the amount of staked tokens of a juror is lower than their balance. In this case,
+   * we simply return zero.
    */
   function _getAvailableTokens({ balance, locked, staked }) {
     const available = BN.min(balance.sub(locked), balance.sub(staked));
