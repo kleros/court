@@ -8,7 +8,7 @@ const useXDaiCourtAlert = createPersistedState("@kleros/court/alert/xdai-court")
 
 const bannerRoot = document.querySelector("#banner-root");
 
-export default function AlternativeChainBanner({ message = "Kleros Court is now available on xDAI." }) {
+export default function AnnouncementBanner({ message = "Kleros Court is now available on xDAI." }) {
   const [isAlertVisible, setAlertVisible] = useXDaiCourtAlert(true);
 
   return isAlertVisible

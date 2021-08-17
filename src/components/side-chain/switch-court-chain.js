@@ -2,35 +2,36 @@ import React from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
 import { Button, Icon, Modal, Typography } from "antd";
+import { Link } from "react-router-dom";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import Web3 from "web3";
-import { ButtonLink } from "../adapters/antd";
+import { ButtonLink } from "../../adapters/antd";
 import {
-  requestSwitchNetwork,
+  requestSwitchChain,
   getCounterPartyChainId,
   isSupportedSideChain,
   SideChainApiProvider,
   useSideChainApi,
   getSideChainParams,
   isSupportedMainChain,
-} from "../api/side-chain";
-import { getReadOnlyWeb3 } from "../bootstrap/web3";
-import useChainId from "../hooks/use-chain-id";
-import useAccount from "../hooks/use-account";
-import usePromise from "../hooks/use-promise";
-import useInterval from "../hooks/use-interval";
-import useForceUpdate from "../hooks/use-force-update";
-import { useSetRequiredChainId } from "./required-chain-id-gateway";
-import AlternativeChainBanner from "./alternative-chain-banner";
-import MultiBalance from "./multi-balance";
-import TokenSymbol from "./token-symbol";
-import { chainIdToNetworkName } from "../helpers/networks";
+} from "../../api/side-chain";
+import { getReadOnlyWeb3 } from "../../bootstrap/web3";
+import useChainId from "../../hooks/use-chain-id";
+import useAccount from "../../hooks/use-account";
+import usePromise from "../../hooks/use-promise";
+import useInterval from "../../hooks/use-interval";
+import useForceUpdate from "../../hooks/use-force-update";
+import { chainIdToNetworkName, chainIdToNetworkShortName } from "../../helpers/networks";
+import { useSetRequiredChainId } from "../required-chain-id-gateway";
+import AnnouncementBanner from "./announcement-banner";
+import MultiBalance from "../multi-balance";
+import TokenSymbol from "../token-symbol";
 
 const { useDrizzle } = drizzleReactHooks;
 
 const { toBN } = Web3.utils;
 
-export default function AlternativeChainCourt() {
+export default function SwitchCourtChain() {
   const chainId = useChainId();
   const account = useAccount();
   const hasAccount = !!account;
@@ -43,7 +44,7 @@ export default function AlternativeChainCourt() {
     }
   }, [chainId]);
 
-  const switchNetwork = useSwitchNetwork(destinationChainId);
+  const switchChain = useSwitchChain(destinationChainId);
 
   if (!hasAccount) {
     return null;
@@ -56,13 +57,23 @@ export default function AlternativeChainCourt() {
   return (
     <DestinationChainIdContext.Provider value={destinationChainId}>
       {isSupportedSideChain(destinationChainId) ? (
-        <StyledWrapper>
-          <AlternativeChainCourtWrapper />
-        </StyledWrapper>
+        <StyledButtonWrapper>
+          <SideChainCourtWrapper />
+        </StyledButtonWrapper>
       ) : isSupportedMainChain(destinationChainId) ? (
-        <StyledWrapper>
-          <AlternativeChainCourtLink ButtonComponent={StyledButtonLink} onClick={switchNetwork} />
-        </StyledWrapper>
+        <StyledButtonWrapper>
+          <Link component={StyledButtonLink} to="/convert-pnk" icon="swap">
+            <span>
+              Send <TokenSymbol chainId={chainId} token="PNK" /> to {chainIdToNetworkShortName[destinationChainId]}
+            </span>
+          </Link>
+          <CustomButton
+            text={`Court on ${chainIdToNetworkName[destinationChainId]}`}
+            iconAfter={<Icon type="arrow-right" />}
+            as={StyledButtonLink}
+            onClick={switchChain}
+          />
+        </StyledButtonWrapper>
       ) : null}
     </DestinationChainIdContext.Provider>
   );
@@ -74,7 +85,7 @@ function useDestinationChainId() {
   return React.useContext(DestinationChainIdContext);
 }
 
-function AlternativeChainCourtWrapper() {
+function SideChainCourtWrapper() {
   const destinationChainId = useDestinationChainId();
   const web3 = React.useMemo(() => getReadOnlyWeb3({ chainId: destinationChainId }), [destinationChainId]);
 
@@ -98,32 +109,35 @@ function SideChainCourtDecisionTree() {
   const hasAnyBalance = [balance, rawBalance].some((value) => (value ? toBN(value).gt(toBN("0")) : false));
 
   const destinationChainId = useDestinationChainId();
-  const switchNetwork = useSwitchNetwork(destinationChainId);
+  const switchChain = useSwitchChain(destinationChainId);
 
   return hasErrors || hasAnyBalance ? (
     <>
-      <AlternativeChainCourtLink ButtonComponent={StyledButtonLink} onClick={switchNetwork} />
-      <AlternativeChainBanner
+      <AnnouncementBanner
         message={
           <>
             Kleros Court is now available on{" "}
             {
-              <AlternativeChainCourtLink
-                ButtonComponent={StyledResponsiveBannerButton}
-                icon={null}
+              <CustomButton
+                as={StyledResponsiveBannerButton}
                 text={chainIdToNetworkName[destinationChainId]}
-                onClick={switchNetwork}
+                onClick={switchChain}
               />
             }
             .
           </>
         }
       />
+      <CustomButton
+        text={`Court on ${chainIdToNetworkName[destinationChainId]}`}
+        iconAfter={<Icon type="arrow-right" />}
+        as={StyledButtonLink}
+        onClick={switchChain}
+      />
     </>
   ) : (
     <>
-      <SideChainCourtModal balance={balance} rawBalance={rawBalance} errors={errors} />
-      <AlternativeChainBanner
+      <AnnouncementBanner
         message={
           <>
             Kleros Court is now available on{" "}
@@ -133,16 +147,24 @@ function SideChainCourtDecisionTree() {
                 rawBalance={rawBalance}
                 errors={errors}
                 trigger={
-                  <AlternativeChainCourtLink
-                    ButtonComponent={StyledResponsiveBannerButton}
-                    icon={null}
-                    text={chainIdToNetworkName[destinationChainId]}
-                  />
+                  <CustomButton as={StyledResponsiveBannerButton} text={chainIdToNetworkName[destinationChainId]} />
                 }
               />
             }
             .
           </>
+        }
+      />
+      <SideChainCourtModal
+        balance={balance}
+        rawBalance={rawBalance}
+        errors={errors}
+        trigger={
+          <CustomButton
+            iconAfter={<Icon type="arrow-right" />}
+            as={StyledButtonLink}
+            text={`Court on ${chainIdToNetworkName[destinationChainId]}`}
+          />
         }
       />
     </>
@@ -189,40 +211,38 @@ function useTokenData({ getRawBalance, getBalance, account }) {
   return [tokenData, forceUpdate];
 }
 
-function AlternativeChainCourtLink({ text, icon, onClick, ButtonComponent, buttonProps }) {
-  const destinationChainId = useDestinationChainId();
-  const buttonText = text || `Court on ${chainIdToNetworkName[destinationChainId]}`;
+function CustomButton({ text, iconBefore, iconAfter, as, ...additionalProps }) {
+  const Component = as;
 
   return (
-    <ButtonComponent {...buttonProps} onClick={onClick}>
-      <span>{buttonText}</span>
-      {icon}
-    </ButtonComponent>
+    <Component {...additionalProps}>
+      {iconBefore}
+      <span>{text}</span>
+      {iconAfter}
+    </Component>
   );
 }
 
-AlternativeChainCourtLink.propTypes = {
-  text: t.node,
-  icon: t.node,
-  onClick: t.func,
-  ButtonComponent: t.elementType,
-  buttonProps: t.object,
+CustomButton.propTypes = {
+  text: t.node.isRequired,
+  iconBefore: t.node,
+  iconAfter: t.node,
+  as: t.elementType,
 };
 
-AlternativeChainCourtLink.defaultProps = {
-  icon: <Icon type="arrow-right" />,
-  ButtonComponent: ButtonLink,
-  buttonProps: {},
-  onClick: () => {},
+CustomButton.defaultProps = {
+  iconBefore: null,
+  iconAfter: null,
+  as: ButtonLink,
 };
 
-function useSwitchNetwork(destinationChainId) {
+function useSwitchChain(destinationChainId) {
   const { drizzle } = useDrizzle();
   const setRequiredChainId = useSetRequiredChainId();
 
   return React.useCallback(async () => {
     try {
-      await requestSwitchNetwork(drizzle.web3.currentProvider, destinationChainId);
+      await requestSwitchChain(drizzle.web3.currentProvider, destinationChainId);
     } catch (err) {
       // 4001 is the MetaMask error code when users deny permission.
       if (err.code !== 4001) {
@@ -236,38 +256,54 @@ function useSwitchNetwork(destinationChainId) {
   }, [destinationChainId, setRequiredChainId, drizzle.web3.currentProvider]);
 }
 
-function GetSideChainPnkLink({ icon, ButtonComponent, buttonProps }) {
+function GetSideChainPnkLink({ icon, as, ...additionalProps }) {
+  const Component = as;
   const destinationChainId = useDestinationChainId();
   const { bridgeAppUrl } = getSideChainParams(destinationChainId);
 
   return (
-    <ButtonComponent href={bridgeAppUrl} target="_blank" rel="noreferrer noopener" {...buttonProps}>
+    <Component href={bridgeAppUrl} target="_blank" rel="noreferrer noopener" {...additionalProps}>
       <span>
         Get <TokenSymbol chainId={destinationChainId} token="xPNK" /> for {chainIdToNetworkName[destinationChainId]}
       </span>
       {icon}
-    </ButtonComponent>
+    </Component>
   );
 }
 
 GetSideChainPnkLink.propTypes = {
   icon: t.node,
-  ButtonComponent: t.elementType,
-  buttonProps: t.object,
+  as: t.elementType,
 };
 
 GetSideChainPnkLink.defaultProps = {
   icon: <Icon type="arrow-right" />,
-  ButtonComponent: ButtonLink,
-  buttonProps: {},
+  as: ButtonLink,
 };
 
-const StyledWrapper = styled.div`
-  margin: 24px 0 -56px;
+const StyledButtonWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin: 24px 0 -56px;
   position: relative;
-  z-index: 200;
+  z-index: 100;
+
+  @media (max-width: 575.98px) {
+    gap: 0;
+    flex-direction: column-reverse;
+    align-items: center;
+  }
+
+  a.ant-btn {
+    padding-top: 0;
+    line-height: 28px;
+
+    @media (max-width: 767.98px) {
+      line-height: 44px;
+    }
+  }
 
   & + .ant-spin-nested-loading {
     margin-top: 56px;
@@ -284,7 +320,7 @@ function SideChainCourtModal({ balance, rawBalance, errors, trigger }) {
   const [visible, setVisible] = React.useState(false);
   const destinationChainId = useDestinationChainId();
 
-  const switchNetwork = useSwitchNetwork(destinationChainId);
+  const switchChain = useSwitchChain(destinationChainId);
 
   const [autoSwitchEnabled, setAutoSwitchEnabled] = React.useState(false);
   const hasAnyBalance = [balance, rawBalance].some((value) => (value ? toBN(value).gt(toBN("0")) : false));
@@ -301,9 +337,9 @@ function SideChainCourtModal({ balance, rawBalance, errors, trigger }) {
 
   React.useEffect(() => {
     if (autoSwitchEnabled && hasAnyBalance) {
-      switchNetwork();
+      switchChain();
     }
-  }, [autoSwitchEnabled, hasAnyBalance, switchNetwork]);
+  }, [autoSwitchEnabled, hasAnyBalance, switchChain]);
 
   return (
     <>
@@ -320,19 +356,13 @@ function SideChainCourtModal({ balance, rawBalance, errors, trigger }) {
         }}
         footer={
           <div>
-            <AlternativeChainCourtLink
-              ButtonComponent={Button}
+            <CustomButton
+              as={Button}
               text={`Just take me to ${chainIdToNetworkName[destinationChainId]}`}
-              icon={null}
-              onClick={switchNetwork}
+              iconBefore={<Icon type="check-circle" />}
+              onClick={switchChain}
             />
-            <GetSideChainPnkLink
-              ButtonComponent={Button}
-              buttonProps={{
-                type: "primary",
-                onClick: () => setAutoSwitchEnabled(true),
-              }}
-            />
+            <GetSideChainPnkLink as={Button} type="primary" onClick={() => setAutoSwitchEnabled(true)} />
           </div>
         }
       >
@@ -368,7 +398,7 @@ SideChainCourtModal.propTypes = {
 };
 
 SideChainCourtModal.defaultProps = {
-  trigger: <AlternativeChainCourtLink ButtonComponent={StyledButtonLink} />,
+  trigger: <CustomButton as={StyledButtonLink} />,
 };
 
 const StyledModal = styled(Modal)`

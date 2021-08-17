@@ -10,22 +10,22 @@ import {
   SideChainApiProvider,
   Tokens,
   useSideChainApi,
-} from "../api/side-chain";
-import useChainId from "../hooks/use-chain-id";
-import useAccount from "../hooks/use-account";
-import usePromise from "../hooks/use-promise";
-import useForceUpdate from "../hooks/use-force-update";
-import { useAsyncGenerator } from "../hooks/use-generators";
-import TokenSymbol from "./token-symbol";
-import MultiBalance from "./multi-balance";
-import MultiTransactionStatus from "./multi-transaction-status";
-import GetSideChainPnkButton from "./get-side-chain-pnk-button";
+} from "../../api/side-chain";
+import useChainId from "../../hooks/use-chain-id";
+import useAccount from "../../hooks/use-account";
+import usePromise from "../../hooks/use-promise";
+import useForceUpdate from "../../hooks/use-force-update";
+import { useAsyncGenerator } from "../../hooks/use-generators";
+import TokenSymbol from "../token-symbol";
+import MultiBalance from "../multi-balance";
+import MultiTransactionStatus from "../multi-transaction-status";
+import GetSideChainPnkButton from "./get-pnk-button";
 
 const { useDrizzle } = drizzleReactHooks;
 
 const { toBN } = Web3.utils;
 
-export default function SideChainPnkWrapper(props) {
+export default function SideChainPnkActionsWrapper(props) {
   const chainId = useChainId();
   const isSupported = isSupportedSideChain(chainId);
 
@@ -33,12 +33,12 @@ export default function SideChainPnkWrapper(props) {
 
   return isSupported ? (
     <SideChainApiProvider web3Provider={drizzle.web3.currentProvider}>
-      <SideChainPnk {...props} />
+      <SideChainPnkActions {...props} />
     </SideChainApiProvider>
   ) : null;
 }
 
-function SideChainPnk({ showUnwrappedPnkModal, unwrappedPnkModalProps, showGetSideChainPnkModal }) {
+function SideChainPnkActions({ showUnwrappedPnkModal, unwrappedPnkModalProps, showGetSideChainPnkModal }) {
   const account = useAccount();
   const { getRawBalance, getBalance } = useSideChainApi();
   const [tokenData, refetch] = useTokenData({ getRawBalance, getBalance, account });
@@ -76,7 +76,7 @@ function SideChainPnk({ showUnwrappedPnkModal, unwrappedPnkModalProps, showGetSi
   return null;
 }
 
-SideChainPnk.propTypes = {
+SideChainPnkActions.propTypes = {
   showUnwrappedPnkModal: t.bool,
   unwrappedPnkModalProps: t.shape({
     triggerCondition: t.oneOf(["click", "auto", "both"]),
@@ -84,7 +84,7 @@ SideChainPnk.propTypes = {
   showGetSideChainPnkModal: t.bool,
 };
 
-SideChainPnk.defaultProps = {
+SideChainPnkActions.defaultProps = {
   showUnwrappedPnkModal: true,
   showGetSideChainPnkModal: true,
 };

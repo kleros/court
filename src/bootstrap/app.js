@@ -82,6 +82,9 @@ export default function App() {
                           <Route exact path="/tokens">
                             <Tokens />
                           </Route>
+                          <Route exact path="/convert-pnk">
+                            <ConvertPnk />
+                          </Route>
                           <Route path="*">
                             <C404 />
                           </Route>
@@ -171,6 +174,10 @@ const Case = () => {
 };
 
 const Tokens = loadable(() => import(/* webpackPrefetch: true */ "../containers/tokens"), {
+  fallback: <StyledSpin />,
+});
+
+const ConvertPnk = loadable(() => import(/* webpackPrefetch: true */ "../containers/convert-pnk"), {
   fallback: <StyledSpin />,
 });
 

@@ -4,7 +4,7 @@ import styled from "styled-components/macro";
 import { Link } from "react-router-dom";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
-import AlternativeChainCourt from "../components/alternative-chain-court";
+import SwitchCourtChain from "../components/side-chain/switch-court-chain";
 import CasesListCard from "../components/cases-list-card";
 import CourtsListCard from "../components/courts-list-card";
 import NotificationsCard from "../components/notifications-card";
@@ -16,8 +16,8 @@ import TopBanner from "../components/top-banner";
 import TokenSymbol from "../components/token-symbol";
 import RequiredChainIdGateway from "../components/required-chain-id-gateway";
 import RequiredChainIdModal from "../components/required-chain-id-modal";
-import GetSideChainPnkButton from "../components/get-side-chain-pnk-button";
-import SideChainPnk from "../components/side-chain-pnk";
+import GetSideChainPnkButton from "../components/side-chain/get-pnk-button";
+import SideChainPnkActions from "../components/side-chain/pnk-actions";
 import useChainId from "../hooks/use-chain-id";
 import { ReactComponent as Present } from "../assets/images/present.svg";
 
@@ -111,7 +111,7 @@ export default function Home() {
           </StyledButtonBar>
         }
       />
-      <AlternativeChainCourt />
+      <SwitchCourtChain />
       <RewardCard />
       <Row gutter={32}>
         <Col lg={8}>
@@ -126,7 +126,7 @@ export default function Home() {
       </Row>
       <OngoingCasesCard />
       <NotificationsCard />
-      <SideChainPnk showGetSideChainPnkModal={false} />
+      <SideChainPnkActions showGetSideChainPnkModal={false} />
     </>
   );
 
