@@ -93,7 +93,6 @@ function useWithdrawTokens(withdrawTokens) {
     run,
     transactions,
     ...withdrawResult,
-    // isDone: true,
   };
 }
 
@@ -314,7 +313,7 @@ const ConvertPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, disabl
 });
 
 function formatPercent(value) {
-  const nf = new Intl.NumberFormat([], { style: "percent", maximumFractionDigits: 2 });
+  const nf = new Intl.NumberFormat([], { style: "percent", maximumFractionDigits: 3 });
   return nf.format(value);
 }
 
@@ -399,7 +398,7 @@ const StyledCompositeLabel = styled.span`
 
 const StyledSkeleton = styled(Skeleton)``;
 
-const StyledFeeNote = styled.p`
+const StyledFeeNote = styled.div`
   color: rgba(0, 0, 0, 0.45);
   font-size: 12px;
   text-align: center;

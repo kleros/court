@@ -77,7 +77,10 @@ export function createApi({
     amount = toBN(amount);
 
     const feeType = await tokenBridge.methods.HOME_TO_FOREIGN_FEE().call();
-    const token = wrappedPinakion.options.address;
+    /**
+     * The token that will actually be bridged is the raw PNK on xDAI.
+     */
+    const token = xPinakion.options.address;
     return toBN(await tokenBridge.methods.calculateFee(feeType, token, amount).call());
   }
 
