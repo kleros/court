@@ -3,7 +3,7 @@ import DeversiFi from "../assets/images/deversifi.png";
 import { ReactComponent as Uniswap } from "../assets/images/uniswap.svg";
 import { ReactComponent as Loopring } from "../assets/images/loopring.svg";
 import KyberSwap from "../assets/images/kyber.png";
-import Transak from "../assets/images/transak.png";
+import { ReactComponent as Guardarian } from "../assets/images/guardarian.svg";
 import { ReactComponent as OneInch } from "../assets/images/OneInch.svg";
 import Paraswap from "../assets/images/paraswap.jpg";
 import { ReactComponent as Balancer } from "../assets/images/balancer.svg";
@@ -83,8 +83,8 @@ const Exchanges = [
     link: "https://www.okex.com/markets/spot-info/pnk-usdt",
   },
   {
-    logo: <img src={Transak} alt={"Transak"} />,
-    link: "https://transak.com/",
+    logo: <Guardarian />,
+    link: "https://guardarian.com/",
   },
 ];
 
