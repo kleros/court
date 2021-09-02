@@ -34,7 +34,7 @@ const chainIdToParams = {
     contractAddress: "0xf1A9589880DbF393F32A5b2d5a0054Fa10385074",
     snapshots: [
       "https://ipfs.kleros.io/ipfs/QmRJQn5K3zaKH5TaSb3xEq8WBpJZhEaEKURj2kFssqEkeb/xdai-snapshot-2021-07.json",
-      // "https://ipfs.kleros.io/ipfs/QmUWvWmW53xZYqQEx1i1w4eCGg7nowpHZ6WY5caJdPDDZK/xdai-snapshot-2021-08.json",
+      "https://ipfs.kleros.io/ipfs/QmUWvWmW53xZYqQEx1i1w4eCGg7nowpHZ6WY5caJdPDDZK/xdai-snapshot-2021-08.json",
     ],
     blockExplorerBaseUrl: "https://blockscout.com/poa/xdai/",
   },
