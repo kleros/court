@@ -9,6 +9,7 @@ import rewardImg from "../assets/images/reward.png";
 import { ReactComponent as Hexagon } from "../assets/images/hexagon.svg";
 import { ReactComponent as Scales } from "../assets/images/scales.svg";
 import { useDataloader } from "../bootstrap/dataloader";
+import useChainId from "../hooks/use-chain-id";
 import Hint from "./hint";
 import ETHAmount from "./eth-amount";
 
@@ -130,7 +131,9 @@ const StakeLocked = styled.div`
   line-height: 16px;
   text-align: right;
 `;
+
 const CaseCard = ({ ID, draws }) => {
+  const chainId = useChainId();
   const { drizzle, useCacheCall } = useDrizzle();
   const getMetaEvidence = useDataloader.getMetaEvidence();
   const dispute = useCacheCall("KlerosLiquid", "disputes", ID);
@@ -175,11 +178,11 @@ const CaseCard = ({ ID, draws }) => {
   let metaEvidence;
   if (dispute) {
     if (dispute.ruled) {
-      metaEvidence = getMetaEvidence(dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID, {
+      metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID, {
         strictHashes: false,
       });
     } else {
-      metaEvidence = getMetaEvidence(dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
+      metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
     }
   }
   return (

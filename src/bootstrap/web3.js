@@ -38,11 +38,15 @@ const chainIdToRpcEndpoint = {
   100: process.env.REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL,
 };
 
-export function getReadOnlyWeb3({ chainId }) {
+export function getReadOnlyRpcUrl({ chainId }) {
   const url = chainIdToRpcEndpoint[chainId];
   if (!url) {
     throw new Error(`Unsupported chain ID: ${chainId}`);
   }
 
-  return new Web3(url);
+  return url;
+}
+
+export function getReadOnlyWeb3({ chainId }) {
+  return new Web3(getReadOnlyRpcUrl({ chainId }));
 }
