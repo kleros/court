@@ -41,6 +41,7 @@ const funcs = {
             arbitrableContractAddress: contractAddress,
             arbitratorContractAddress: arbitratorAddress,
             jsonRpcUrl,
+            chainID: chainId,
           },
           strictHashes: true,
           ...options,

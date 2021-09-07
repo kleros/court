@@ -130,7 +130,6 @@ export default function CaseDetailsCard({ ID }) {
   let evidence;
 
   const chainId = useChainId();
-  const jsonRpcUrl = useMemo(() => getReadOnlyRpcUrl({ chainId }), [chainId]);
 
   if (dispute) {
     if (dispute.ruled) {
@@ -305,14 +304,37 @@ export default function CaseDetailsCard({ ID }) {
     }
   }, [metaEvidence]);
 
-  const evidenceDisplayInterfaceURI = useMemo(() => {
+  const evidenceDisplayInterfaceURL = useMemo(() => {
+    const normalizeIPFSUri = (uri) => uri.replace(/^\/ipfs\//, "https://ipfs.kleros.io/ipfs/");
     if (metaEvidence?.metaEvidenceJSON?.evidenceDisplayInterfaceURI) {
-      return metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI.replace(
-        /^\/ipfs\//,
-        "https://ipfs.kleros.io/ipfs/"
-      );
+      const { evidenceDisplayInterfaceURI, _v = "0" } = metaEvidence.metaEvidenceJSON;
+      let url = normalizeIPFSUri(evidenceDisplayInterfaceURI);
+
+      if (_v === "0") {
+        url += `?${encodeURIComponent(
+          JSON.stringify({
+            disputeID: ID,
+            arbitrableContractAddress: dispute.arbitrated,
+            arbitratorContractAddress: KlerosLiquid.address,
+            jsonRpcUrl: getReadOnlyRpcUrl({ chainId }),
+            chainID: chainId,
+          })
+        )}`;
+      } else {
+        const searchParams = new URLSearchParams({
+          disputeID: ID,
+          arbitrableContractAddress: dispute.arbitrated,
+          arbitratorContractAddress: KlerosLiquid.address,
+          jsonRpcUrl: getReadOnlyRpcUrl({ chainId }),
+          chainID: chainId,
+        });
+
+        url += `?${searchParams.toString()}`;
+      }
+
+      return url;
     }
-  }, [metaEvidence]);
+  }, [metaEvidence, ID, dispute, chainId, KlerosLiquid.address]);
 
   return (
     <StyledCard
@@ -581,14 +603,7 @@ export default function CaseDetailsCard({ ID }) {
                 {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
                   <StyledIFrame
                     frameBorder="0"
-                    src={`${evidenceDisplayInterfaceURI}?${encodeURIComponent(
-                      JSON.stringify({
-                        arbitrableContractAddress: dispute.arbitrated,
-                        arbitratorContractAddress: KlerosLiquid.address,
-                        disputeID: ID,
-                        jsonRpcUrl,
-                      })
-                    )}`}
+                    src={evidenceDisplayInterfaceURL}
                     title="MetaEvidence Display"
                     height={metaEvidence.metaEvidenceJSON.evidenceDisplayHeight || "215px"}
                   />
