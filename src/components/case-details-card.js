@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import styled from "styled-components/macro";
 import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, InputNumber, Row, Spin } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
-import * as realitioLibQuestionFormatter from "@realitio/realitio-lib/formatters/question";
+import * as realitioLibQuestionFormatter from "@reality.eth/reality-eth-lib/formatters/question";
 import ReactMarkdown from "react-markdown";
 import createPersistedState from "use-persisted-state";
 import Web3 from "web3";
@@ -227,7 +227,7 @@ export default function CaseDetailsCard({ ID }) {
             : [];
           break;
         case "datetime":
-          choice = complexRuling.utcOffset(0).set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).unix(); // 12:00:00 AM for everyday.
+          choice = complexRuling;
           break;
         case "uint":
           choice = complexRuling;
@@ -463,6 +463,7 @@ export default function CaseDetailsCard({ ID }) {
                               disabledDate={disabledDate}
                               onChange={setComplexRuling}
                               size="large"
+                              showTime
                               value={complexRuling}
                             />
                           ) : (
