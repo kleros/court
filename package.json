@@ -66,7 +66,7 @@
     "@kleros/archon": "^2.0.1",
     "@kleros/pnk-merkle-drop-contracts": "^0.1.0",
     "@loadable/component": "^5.5.0",
-    "@realitio/realitio-lib": "^1.0.2",
+    "@reality.eth/reality-eth-lib": "^3.0.0",
     "@sentry/browser": "^4.6.4",
     "antd": "^3.10.8",
     "clsx": "^1.1.1",
