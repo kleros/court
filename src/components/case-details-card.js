@@ -233,7 +233,7 @@ export default function CaseDetailsCard({ ID }) {
             : [];
           break;
         case "datetime":
-          choice = complexRuling;
+          choice = complexRuling.unix();
           break;
         case "uint":
           choice = complexRuling;
