@@ -15,12 +15,14 @@ import { API } from "../bootstrap/api";
 import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import web3Salt from "../temp/web3-salt";
 import { range, binaryPermutations } from "../helpers/array";
+import useChainId from "../hooks/use-chain-id";
 import Attachment from "./attachment";
 import Breadcrumbs from "./breadcrumbs";
 import CaseRoundHistory from "./case-round-history";
 import CollapsableCard from "./collapsable-card";
 import CourtDrawer from "./court-drawer";
 import EvidenceTimeline from "./evidence-timeline";
+import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -126,17 +128,21 @@ export default function CaseDetailsCard({ ID }) {
   });
   let metaEvidence;
   let evidence;
+
+  const chainId = useChainId();
+
   if (dispute) {
     if (dispute.ruled) {
-      metaEvidence = getMetaEvidence(dispute.arbitrated, KlerosLiquid.address, ID, {
+      metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, KlerosLiquid.address, ID, {
         strictHashes: false,
       });
     } else {
-      metaEvidence = getMetaEvidence(dispute.arbitrated, KlerosLiquid.address, ID);
+      metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, KlerosLiquid.address, ID);
     }
 
     evidence = getEvidence(dispute.arbitrated, KlerosLiquid.address, ID);
   }
+
   const { send: sendCommit, status: sendCommitStatus } = useCacheSend("KlerosLiquid", "castCommit");
   const { send: sendVote, status: sendVoteStatus } = useCacheSend("KlerosLiquid", "castVote");
   const onJustificationChange = useCallback(({ currentTarget: { value } }) => setJustification(value), []);
@@ -297,6 +303,39 @@ export default function CaseDetailsCard({ ID }) {
       return actions;
     }
   }, [metaEvidence]);
+
+  const evidenceDisplayInterfaceURL = useMemo(() => {
+    const normalizeIPFSUri = (uri) => uri.replace(/^\/ipfs\//, "https://ipfs.kleros.io/ipfs/");
+    if (metaEvidence?.metaEvidenceJSON?.evidenceDisplayInterfaceURI) {
+      const { evidenceDisplayInterfaceURI, _v = "0" } = metaEvidence.metaEvidenceJSON;
+      let url = normalizeIPFSUri(evidenceDisplayInterfaceURI);
+
+      if (_v === "0") {
+        url += `?${encodeURIComponent(
+          JSON.stringify({
+            disputeID: ID,
+            arbitrableContractAddress: dispute.arbitrated,
+            arbitratorContractAddress: KlerosLiquid.address,
+            jsonRpcUrl: getReadOnlyRpcUrl({ chainId }),
+            chainID: chainId,
+          })
+        )}`;
+      } else {
+        const searchParams = new URLSearchParams({
+          disputeID: ID,
+          arbitrableContractAddress: dispute.arbitrated,
+          arbitratorContractAddress: KlerosLiquid.address,
+          jsonRpcUrl: getReadOnlyRpcUrl({ chainId }),
+          chainID: chainId,
+        });
+
+        url += `?${searchParams.toString()}`;
+      }
+
+      return url;
+    }
+  }, [metaEvidence, ID, dispute, chainId, KlerosLiquid.address]);
+
   return (
     <StyledCard
       actions={[
@@ -564,16 +603,7 @@ export default function CaseDetailsCard({ ID }) {
                 {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
                   <StyledIFrame
                     frameBorder="0"
-                    src={`${metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI.replace(
-                      /^\/ipfs\//,
-                      "https://ipfs.kleros.io/ipfs/"
-                    )}?${encodeURIComponent(
-                      JSON.stringify({
-                        arbitrableContractAddress: dispute.arbitrated,
-                        arbitratorContractAddress: KlerosLiquid.address,
-                        disputeID: ID,
-                      })
-                    )}`}
+                    src={evidenceDisplayInterfaceURL}
                     title="MetaEvidence Display"
                     height={metaEvidence.metaEvidenceJSON.evidenceDisplayHeight || "215px"}
                   />

@@ -5,6 +5,7 @@ import { Col, Radio, Row, Skeleton } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { useAPI } from "../bootstrap/api";
 import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import useChainId from "../hooks/use-chain-id";
 import ScrollBar from "./scroll-bar";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
@@ -19,15 +20,16 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
   const [round, setRound] = useState(dispute.votesLengths.length - 1);
   const [rulingOption, setRulingOption] = useState(Number(ruling) || 1);
   const [justificationIndex, setJustificationIndex] = useState(0);
+  const chainId = useChainId();
 
   let metaEvidence;
   if (dispute)
     if (dispute.ruled) {
-      metaEvidence = getMetaEvidence(dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID, {
+      metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID, {
         strictHashes: false,
       });
     } else {
-      metaEvidence = getMetaEvidence(dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
+      metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
     }
 
   const justifications = dispute.votesLengths.map((_, i) => {
