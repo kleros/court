@@ -233,7 +233,7 @@ export default function CaseDetailsCard({ ID }) {
             : [];
           break;
         case "datetime":
-          choice = complexRuling.unix();
+          choice = complexRuling.utcOffset(0).set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).unix(); // 12:00:00 AM for everyday.
           break;
         case "uint":
           choice = complexRuling;
@@ -501,7 +501,6 @@ export default function CaseDetailsCard({ ID }) {
                               disabled={!votesData.canVote}
                               disabledDate={disabledDate}
                               onChange={setComplexRuling}
-                              showTime
                               size="large"
                               value={complexRuling}
                             />
