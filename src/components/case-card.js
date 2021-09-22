@@ -179,7 +179,7 @@ const CaseCard = ({ ID, draws }) => {
   if (dispute) {
     if (dispute.ruled) {
       metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID, {
-        strictHashes: false,
+        strict: false,
       });
     } else {
       metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);

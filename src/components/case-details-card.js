@@ -133,7 +133,7 @@ export default function CaseDetailsCard({ ID }) {
   if (dispute) {
     if (dispute.ruled) {
       metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, KlerosLiquid.address, ID, {
-        strictHashes: false,
+        strict: false,
       });
     } else {
       metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, KlerosLiquid.address, ID);
@@ -311,27 +311,25 @@ export default function CaseDetailsCard({ ID }) {
     const normalizeIPFSUri = (uri) => uri.replace(/^\/ipfs\//, "https://ipfs.kleros.io/ipfs/");
     if (metaEvidence?.metaEvidenceJSON?.evidenceDisplayInterfaceURI) {
       const { evidenceDisplayInterfaceURI, _v = "0" } = metaEvidence.metaEvidenceJSON;
+      const arbitratorChainID = metaEvidence.metaEvidenceJSON?.arbitratorChainID ?? chainId;
+      const arbitrableChainID = metaEvidence.metaEvidenceJSON?.arbitrableChainID ?? arbitratorChainID;
+
       let url = normalizeIPFSUri(evidenceDisplayInterfaceURI);
 
-      if (_v === "0") {
-        url += `?${encodeURIComponent(
-          JSON.stringify({
-            disputeID: ID,
-            arbitrableContractAddress: dispute.arbitrated,
-            arbitratorContractAddress: KlerosLiquid.address,
-            jsonRpcUrl: getReadOnlyRpcUrl({ chainId }),
-            chainID: chainId,
-          })
-        )}`;
-      } else {
-        const searchParams = new URLSearchParams({
-          disputeID: ID,
-          arbitrableContractAddress: dispute.arbitrated,
-          arbitratorContractAddress: KlerosLiquid.address,
-          jsonRpcUrl: getReadOnlyRpcUrl({ chainId }),
-          chainID: chainId,
-        });
+      const injectedParams = {
+        disputeID: ID,
+        arbitratorContractAddress: KlerosLiquid.address,
+        arbitratorJsonRpcUrl: getReadOnlyRpcUrl({ chainId: arbitratorChainID }),
+        arbitratorChainID,
+        arbitrableContractAddress: dispute.arbitrated,
+        arbitrableChainID,
+        arbitrableJsonRpcUrl: getReadOnlyRpcUrl({ chainId: arbitrableChainID }),
+      };
 
+      if (_v === "0") {
+        url += `?${encodeURIComponent(JSON.stringify(injectedParams))}`;
+      } else {
+        const searchParams = new URLSearchParams(injectedParams);
         url += `?${searchParams.toString()}`;
       }
 
