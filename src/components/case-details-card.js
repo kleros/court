@@ -561,17 +561,32 @@ export default function CaseDetailsCard({ ID }) {
                 ) : null}
               </StyledActionsDiv>
               <StyledDiv className="secondary-background theme-background" style={{ display: "inherit" }}>
-                {Number(dispute.period) < "3" && !votesData.voted ? (
-                  <Button
-                    disabled={!votesData.canVote}
-                    ghost={votesData.canVote}
-                    id={0}
-                    onClick={onVoteClick}
-                    size="large"
-                  >
-                    Refuse to Arbitrate
-                  </Button>
-                ) : null}
+                <div>
+                  {Number(dispute.period) < "3" && !votesData.voted ? (
+                    <Button
+                      disabled={!votesData.canVote}
+                      ghost={votesData.canVote}
+                      id={0}
+                      onClick={onVoteClick}
+                      size="large"
+                    >
+                      Refuse to Arbitrate
+                    </Button>
+                  ) : null}
+                </div>
+                <div style={{ marginTop: "32px" }}>
+                  {Number(dispute.period) < "3" && !votesData.voted ? (
+                    <Button
+                      disabled={!votesData.canVote}
+                      ghost={votesData.canVote}
+                      id={"0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"}
+                      onClick={onVoteClick}
+                      size="large"
+                    >
+                      Answered Too Soon
+                    </Button>
+                  ) : null}
+                </div>
               </StyledDiv>
             </>
           ) : (
