@@ -579,7 +579,7 @@ export default function CaseDetailsCard({ ID }) {
                     <Button
                       disabled={!votesData.canVote}
                       ghost={votesData.canVote}
-                      id={"0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"}
+                      id={"0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"}
                       onClick={onVoteClick}
                       size="large"
                     >
