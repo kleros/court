@@ -244,7 +244,6 @@ export default function CaseDetailsCard({ ID }) {
           choice = id;
           break;
       }
-
       switch (typeSwitch) {
         case "multiple-select":
         case "datetime":
@@ -581,17 +580,17 @@ export default function CaseDetailsCard({ ID }) {
 
                 {metaEvidence.metaEvidenceJSON.rulingOptions &&
                   metaEvidence.metaEvidenceJSON.rulingOptions.reserved &&
-                  Object.entries(metaEvidence.metaEvidenceJSON.rulingOptions.reserved).map((item) => (
-                    <div key={item[0]} style={{ marginTop: "32px" }}>
+                  Object.entries(metaEvidence.metaEvidenceJSON.rulingOptions.reserved).map(([ruling, title]) => (
+                    <div key={ruling} style={{ marginTop: "32px" }}>
                       {Number(dispute.period) < "3" && !votesData.voted ? (
                         <Button
                           disabled={!votesData.canVote}
                           ghost={votesData.canVote}
-                          id={item[0]}
+                          id={ruling}
                           onClick={onVoteClick}
                           size="large"
                         >
-                          {item[1]}
+                          {title}
                         </Button>
                       ) : null}
                     </div>
