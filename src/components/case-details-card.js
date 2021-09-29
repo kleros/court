@@ -25,7 +25,6 @@ import EvidenceTimeline from "./evidence-timeline";
 import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
-
 const { toBN, soliditySha3 } = Web3.utils;
 
 export default function CaseDetailsCard({ ID }) {
@@ -225,7 +224,10 @@ export default function CaseDetailsCard({ ID }) {
     async ({ currentTarget: { id } }) => {
       let choice;
       const typeSwitch =
-        id !== "0" && metaEvidence.metaEvidenceJSON.rulingOptions && metaEvidence.metaEvidenceJSON.rulingOptions.type;
+        id !== "0" &&
+        !Object.keys(metaEvidence.metaEvidenceJSON.rulingOptions.reserved).includes(id) &&
+        metaEvidence.metaEvidenceJSON.rulingOptions &&
+        metaEvidence.metaEvidenceJSON.rulingOptions.type;
       switch (typeSwitch) {
         case "multiple-select":
           choice = metaEvidence.metaEvidenceJSON.rulingOptions.titles
@@ -255,6 +257,7 @@ export default function CaseDetailsCard({ ID }) {
         default:
           break;
       }
+
       if (dispute.period === "1") {
         sendCommit(
           ID,
@@ -561,17 +564,37 @@ export default function CaseDetailsCard({ ID }) {
                 ) : null}
               </StyledActionsDiv>
               <StyledDiv className="secondary-background theme-background" style={{ display: "inherit" }}>
-                {Number(dispute.period) < "3" && !votesData.voted ? (
-                  <Button
-                    disabled={!votesData.canVote}
-                    ghost={votesData.canVote}
-                    id={0}
-                    onClick={onVoteClick}
-                    size="large"
-                  >
-                    Refuse to Arbitrate
-                  </Button>
-                ) : null}
+                <div>
+                  {Number(dispute.period) < "3" && !votesData.voted ? (
+                    <Button
+                      disabled={!votesData.canVote}
+                      ghost={votesData.canVote}
+                      id={0}
+                      onClick={onVoteClick}
+                      size="large"
+                    >
+                      Refuse to Arbitrate
+                    </Button>
+                  ) : null}
+                </div>
+
+                {metaEvidence.metaEvidenceJSON.rulingOptions &&
+                  metaEvidence.metaEvidenceJSON.rulingOptions.reserved &&
+                  Object.entries(metaEvidence.metaEvidenceJSON.rulingOptions.reserved).map(([ruling, title]) => (
+                    <div key={ruling} style={{ marginTop: "32px" }}>
+                      {Number(dispute.period) < "3" && !votesData.voted ? (
+                        <Button
+                          disabled={!votesData.canVote}
+                          ghost={votesData.canVote}
+                          id={ruling}
+                          onClick={onVoteClick}
+                          size="large"
+                        >
+                          {title}
+                        </Button>
+                      ) : null}
+                    </div>
+                  ))}
               </StyledDiv>
             </>
           ) : (
