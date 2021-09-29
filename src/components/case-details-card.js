@@ -25,7 +25,7 @@ import EvidenceTimeline from "./evidence-timeline";
 import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
-
+const UINT_MAX = "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
 const { toBN, soliditySha3 } = Web3.utils;
 
 export default function CaseDetailsCard({ ID }) {
@@ -225,7 +225,10 @@ export default function CaseDetailsCard({ ID }) {
     async ({ currentTarget: { id } }) => {
       let choice;
       const typeSwitch =
-        id !== "0" && metaEvidence.metaEvidenceJSON.rulingOptions && metaEvidence.metaEvidenceJSON.rulingOptions.type;
+        id !== "0" &&
+        id !== UINT_MAX &&
+        metaEvidence.metaEvidenceJSON.rulingOptions &&
+        metaEvidence.metaEvidenceJSON.rulingOptions.type;
       switch (typeSwitch) {
         case "multiple-select":
           choice = metaEvidence.metaEvidenceJSON.rulingOptions.titles
@@ -255,6 +258,7 @@ export default function CaseDetailsCard({ ID }) {
         default:
           break;
       }
+
       if (dispute.period === "1") {
         sendCommit(
           ID,
@@ -574,19 +578,25 @@ export default function CaseDetailsCard({ ID }) {
                     </Button>
                   ) : null}
                 </div>
-                <div style={{ marginTop: "32px" }}>
-                  {Number(dispute.period) < "3" && !votesData.voted ? (
-                    <Button
-                      disabled={!votesData.canVote}
-                      ghost={votesData.canVote}
-                      id={"0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"}
-                      onClick={onVoteClick}
-                      size="large"
-                    >
-                      Answered Too Soon
-                    </Button>
-                  ) : null}
-                </div>
+                {metaEvidence.metaEvidenceJSON.rulingOptions &&
+                  metaEvidence.metaEvidenceJSON.rulingOptions.reserved &&
+                  metaEvidence.metaEvidenceJSON.rulingOptions.reserved[UINT_MAX] && (
+                    <div style={{ marginTop: "32px" }}>
+                      {Number(dispute.period) < "3" && !votesData.voted ? (
+                        <Button
+                          disabled={!votesData.canVote}
+                          ghost={votesData.canVote}
+                          id={UINT_MAX}
+                          onClick={onVoteClick}
+                          size="large"
+                        >
+                          {metaEvidence.metaEvidenceJSON.rulingOptions &&
+                            metaEvidence.metaEvidenceJSON.rulingOptions.reserved &&
+                            metaEvidence.metaEvidenceJSON.rulingOptions.reserved[UINT_MAX]}
+                        </Button>
+                      ) : null}
+                    </div>
+                  )}
               </StyledDiv>
             </>
           ) : (
