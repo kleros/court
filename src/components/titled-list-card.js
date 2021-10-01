@@ -115,7 +115,7 @@ const TitledListCard = ({ children, loading, prefix, title, apy }) => (
             getPopupContainer={triggerNode => triggerNode}
           >
             <StyledTooltipDiv>
-              {`${((1000000 / apy) * 12 * 100).toFixed(2)}% APY`}
+              {`${((900000 / apy) * 12 * 100).toFixed(2)}% APY`}
               <Question
                 style={{
                   verticalAlign: 'text-bottom',
