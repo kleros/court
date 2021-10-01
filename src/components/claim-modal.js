@@ -22,6 +22,7 @@ const chainIdToParams = {
       "https://ipfs.kleros.io/ipfs/QmQ6Bdih6SR4KjoMeAPwvkfp33pYTQXEAAkSeZxGeHXCpo/snapshot-2021-06.json",
       "https://ipfs.kleros.io/ipfs/QmUvo4mMGCz4dK8dMY1D68RBqEmyg1qpjxauo99FGDkMos/snapshot-2021-07.json",
       "https://ipfs.kleros.io/ipfs/Qmdv94xuQoe5yy88NyBC8sRFLXwx7sqpWJKbGX5xx1cKjM/snapshot-2021-08.json",
+      "https://ipfs.kleros.io/ipfs/QmTJNeQ9mSyrKiPDaRxX9ektijkZXofra3wYwzbiej1ppB/snapshot-2021-09.json",
     ],
     blockExplorerBaseUrl: "https://etherscan.io",
   },
@@ -35,6 +36,7 @@ const chainIdToParams = {
     snapshots: [
       "https://ipfs.kleros.io/ipfs/QmRJQn5K3zaKH5TaSb3xEq8WBpJZhEaEKURj2kFssqEkeb/xdai-snapshot-2021-07.json",
       "https://ipfs.kleros.io/ipfs/QmUWvWmW53xZYqQEx1i1w4eCGg7nowpHZ6WY5caJdPDDZK/xdai-snapshot-2021-08.json",
+      "https://ipfs.kleros.io/ipfs/QmeqtF2wFoUd5uNDuXwPTwCyaF5ZjgKFLuqSQQQ2uM5qEP/xdai-snapshot-2021-09.json",
     ],
     blockExplorerBaseUrl: "https://blockscout.com/poa/xdai/",
   },
