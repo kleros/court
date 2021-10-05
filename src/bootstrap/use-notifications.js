@@ -18,6 +18,12 @@ const networkIDData = {
     nativeToken: "ETH",
     pnkToken: "PNK",
   },
+  4: {
+    name: "_RINKEBY",
+    provider: "https://rinkeby.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
+    nativeToken: "ETH",
+    pnkToken: "PNK",
+  },
   42: {
     name: "_KOVAN",
     provider: "https://kovan.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
