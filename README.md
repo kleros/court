@@ -4,9 +4,7 @@
 
 <p align="center">
   <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code_style-standard-brightgreen.svg" alt="JavaScript Style Guide"></a>
-  <a href="https://travis-ci.org/kleros/court"><img src="https://travis-ci.org/kleros/court.svg?branch=master" alt="Build Status"></a>
-  <a href="https://david-dm.org/kleros/court"><img src="https://david-dm.org/kleros/court.svg" alt="Dependencies"></a>
-  <a href="https://david-dm.org/kleros/court?type=dev"><img src="https://david-dm.org/kleros/court/dev-status.svg" alt="Dev Dependencies"></a>
+  <a href="https://app.netlify.com/sites/kleros-court/deploys"><img src="https://api.netlify.com/api/v1/badges/9d473c79-3afe-4acd-8d2c-1715aea70357/deploy-status" alt="Netlify Status"></a>
   <a href="https://github.com/facebook/jest"><img src="https://img.shields.io/badge/tested_with-jest-99424f.svg" alt="Tested with Jest"></a>
   <a href="https://conventionalcommits.org"><img src="https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg" alt="Conventional Commits"></a>
   <a href="http://commitizen.github.io/cz-cli/"><img src="https://img.shields.io/badge/commitizen-friendly-brightgreen.svg" alt="Commitizen Friendly"></a>
