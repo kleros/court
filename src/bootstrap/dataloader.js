@@ -38,12 +38,12 @@ const funcs = {
         {
           scriptParameters: {
             disputeID,
-            arbitrableContractAddress: contractAddress,
             arbitratorContractAddress: arbitratorAddress,
-            jsonRpcUrl,
-            chainID: chainId,
+            arbitratorJsonRpcUrl: jsonRpcUrl,
+            arbitratorChainID: chainId,
+            arbitrableContractAddress: contractAddress,
           },
-          strictHashes: true,
+          strict: true,
           ...options,
         }
       );
