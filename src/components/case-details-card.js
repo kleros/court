@@ -225,7 +225,11 @@ export default function CaseDetailsCard({ ID }) {
       let choice;
       const typeSwitch =
         id !== "0" &&
-        !Object.keys(metaEvidence.metaEvidenceJSON.rulingOptions.reserved).includes(id) &&
+        !Object.keys(
+          metaEvidence.metaEvidenceJSON.rulingOptions && metaEvidence.metaEvidenceJSON.rulingOptions.reserved
+            ? metaEvidence.metaEvidenceJSON.rulingOptions.reserved
+            : {}
+        ).includes(id) &&
         metaEvidence.metaEvidenceJSON.rulingOptions &&
         metaEvidence.metaEvidenceJSON.rulingOptions.type;
       switch (typeSwitch) {
