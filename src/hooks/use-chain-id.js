@@ -13,6 +13,10 @@ export function ChainIdProvider({ web3, children, renderOnError, renderOnLoading
   const [error, setError] = useState();
 
   useEffect(() => {
+    if (!web3) {
+      return;
+    }
+
     let isMounted = true;
 
     async function getChainId() {
@@ -37,6 +41,10 @@ export function ChainIdProvider({ web3, children, renderOnError, renderOnLoading
   }, [web3]);
 
   useEffect(() => {
+    if (!web3) {
+      return;
+    }
+
     const addListener = (web3.currentProvider.on ?? web3.currentProvider.addListener ?? (() => {})).bind(
       web3.currentProvider
     );
@@ -67,9 +75,9 @@ export function ChainIdProvider({ web3, children, renderOnError, renderOnLoading
   const loadingContent =
     chainId === undefined ? (typeof renderOnLoading === "function" ? renderOnLoading() : renderOnLoading) : null;
 
-  return (
+  return chainId ? (
     <ChainIdContext.Provider value={chainId}>{errorContent ?? loadingContent ?? children}</ChainIdContext.Provider>
-  );
+  ) : null;
 }
 
 const defaultRenderOnLoading = (
