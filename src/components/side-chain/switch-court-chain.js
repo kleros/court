@@ -224,7 +224,7 @@ function CustomButton({ text, iconBefore, iconAfter, as, ...additionalProps }) {
 }
 
 CustomButton.propTypes = {
-  text: t.node.isRequired,
+  text: t.node,
   iconBefore: t.node,
   iconAfter: t.node,
   as: t.elementType,
