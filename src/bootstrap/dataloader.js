@@ -27,23 +27,22 @@ const funcs = {
         })
       )
       .then((evidence) => evidence.filter((e) => e.evidenceJSONValid && (!e.evidenceJSON.fileURI || e.fileValid))),
-  async getMetaEvidence(chainId, contractAddress, arbitratorAddress, disputeID, options) {
+  async getMetaEvidence(arbitratorChainID, contractAddress, arbitratorAddress, disputeID, options) {
     try {
-      const jsonRpcUrl = getReadOnlyRpcUrl({ chainId });
       const dispute = await archon.arbitrable.getDispute(contractAddress, arbitratorAddress, disputeID, { ...options });
 
       const metaEvidence = await archon.arbitrable.getMetaEvidence(
         contractAddress,
         disputeID === "560" ? "2" : dispute.metaEvidenceID,
         {
+          strict: true,
+          getJsonRpcUrl: (chainId) => getReadOnlyRpcUrl({ chainId }),
           scriptParameters: {
             disputeID,
+            arbitratorChainID,
             arbitratorContractAddress: arbitratorAddress,
-            arbitratorJsonRpcUrl: jsonRpcUrl,
-            arbitratorChainID: chainId,
-            arbitrableContractAddress: contractAddress,
+            // arbitrableContractAddress is injected automatically by archon
           },
-          strict: true,
           ...options,
         }
       );
