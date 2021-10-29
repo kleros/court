@@ -110,25 +110,12 @@ export default function App() {
 function DrizzleChainIdProvider({ children }) {
   const { drizzle } = useDrizzle();
 
-  return <ChainIdProvider web3={drizzle.web3}>{children}</ChainIdProvider>;
+  return drizzle.web3 ? <ChainIdProvider web3={drizzle.web3}>{children}</ChainIdProvider> : <C404 Web3 />;
 }
 
 DrizzleChainIdProvider.propTypes = {
   children: t.node,
 };
-
-// function DrizzleForRequiredChainId() {
-//   const setDrizzle = useDrizzleSetter();
-//   const { requiredChainId } = useQueryParams();
-
-//   React.useEffect(() => {
-//     if (requiredChainId) {
-//       setDrizzle({ chainId: requiredChainId });
-//     }
-//   }, [setDrizzle, requiredChainId]);
-
-//   return null;
-// }
 
 const StyledSpin = styled(Spin)`
   left: 50%;
