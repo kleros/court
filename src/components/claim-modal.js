@@ -38,6 +38,7 @@ const chainIdToParams = {
       "https://ipfs.kleros.io/ipfs/QmRJQn5K3zaKH5TaSb3xEq8WBpJZhEaEKURj2kFssqEkeb/xdai-snapshot-2021-07.json",
       "https://ipfs.kleros.io/ipfs/QmUWvWmW53xZYqQEx1i1w4eCGg7nowpHZ6WY5caJdPDDZK/xdai-snapshot-2021-08.json",
       "https://ipfs.kleros.io/ipfs/QmeqtF2wFoUd5uNDuXwPTwCyaF5ZjgKFLuqSQQQ2uM5qEP/xdai-snapshot-2021-09.json",
+      "https://ipfs.kleros.io/ipfs/QmUtVwhcqhX3vm6rtzEKD9K5eCMFR6b7VjotTGKts2Njmm/xdai-snapshot-2021-10.json",
     ],
     blockExplorerBaseUrl: "https://blockscout.com/poa/xdai/",
   },
