@@ -23,7 +23,7 @@ const chainIdToParams = {
       "https://ipfs.kleros.io/ipfs/QmUvo4mMGCz4dK8dMY1D68RBqEmyg1qpjxauo99FGDkMos/snapshot-2021-07.json",
       "https://ipfs.kleros.io/ipfs/Qmdv94xuQoe5yy88NyBC8sRFLXwx7sqpWJKbGX5xx1cKjM/snapshot-2021-08.json",
       "https://ipfs.kleros.io/ipfs/QmTJNeQ9mSyrKiPDaRxX9ektijkZXofra3wYwzbiej1ppB/snapshot-2021-09.json",
-      "https://ipfs.kleros.io/ipfs/QmYgN7UivCxxeTmXMGjRSytGAVf2Uju7MF752yLf462d4P/snapshot-8.json",
+      "https://ipfs.kleros.io/ipfs/QmRPFBHemHrmGFQCvxtwA13VQs2dR9KujZCBYMXrpw6pHd/snapshot-2021-10.json",
     ],
     blockExplorerBaseUrl: "https://etherscan.io",
   },
