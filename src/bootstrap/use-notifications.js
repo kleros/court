@@ -24,6 +24,12 @@ const networkIDData = {
     nativeToken: "ETH",
     pnkToken: "PNK",
   },
+  5: {
+    name: "_GOERLI",
+    provider: "https://goerli.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
+    nativeToken: "ETH",
+    pnkToken: "PNK",
+  },
   42: {
     name: "_KOVAN",
     provider: "https://kovan.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
