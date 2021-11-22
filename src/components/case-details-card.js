@@ -323,6 +323,7 @@ export default function CaseDetailsCard({ ID }) {
 
       const injectedParams = {
         disputeID: ID,
+        chainID: chainId, // Deprecated. Use arbitratorChainID and arbitrableChainID instead.
         arbitratorContractAddress: KlerosLiquid.address,
         arbitratorJsonRpcUrl: getReadOnlyRpcUrl({ chainId: arbitratorChainID }),
         arbitratorChainID,
