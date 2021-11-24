@@ -13,6 +13,7 @@ const defaultOptions = {
     1, // Mainnet
     3, // Ropsten
     4, // Rinkeby
+    5, // Görli
     42, // Kovan
     77, // Sokol
     100, // xDAI
@@ -22,8 +23,9 @@ const defaultOptions = {
       ...Kleros,
       networks: {
         1: { address: process.env.REACT_APP_KLEROS_ADDRESS },
-        3: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" },
-        4: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" },
+        3: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
+        4: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
+        5: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
         42: { address: process.env.REACT_APP_KLEROS_KOVAN_ADDRESS },
         77: { address: process.env.REACT_APP_KLEROS_SOKOL_ADDRESS },
         100: { address: process.env.REACT_APP_KLEROS_XDAI_ADDRESS },
@@ -35,6 +37,7 @@ const defaultOptions = {
         1: { address: process.env.REACT_APP_KLEROS_LIQUID_ADDRESS },
         3: { address: process.env.REACT_APP_KLEROS_LIQUID_ROPSTEN_ADDRESS },
         4: { address: process.env.REACT_APP_KLEROS_LIQUID_RINKEBY_ADDRESS },
+        5: { address: process.env.REACT_APP_KLEROS_LIQUID_GOERLI_ADDRESS },
         42: { address: process.env.REACT_APP_KLEROS_LIQUID_KOVAN_ADDRESS },
         77: { address: process.env.REACT_APP_KLEROS_LIQUID_SOKOL_ADDRESS },
         100: { address: process.env.REACT_APP_KLEROS_LIQUID_XDAI_ADDRESS },
@@ -46,6 +49,7 @@ const defaultOptions = {
         1: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_ADDRESS },
         3: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_ROPSTEN_ADDRESS },
         4: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_RINKEBY_ADDRESS },
+        5: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_GOERLI_ADDRESS },
         42: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_KOVAN_ADDRESS },
         77: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_SOKOL_ADDRESS },
         100: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_XDAI_ADDRESS },
@@ -57,6 +61,7 @@ const defaultOptions = {
         1: { address: process.env.REACT_APP_PINAKION_ADDRESS },
         3: { address: process.env.REACT_APP_PINAKION_ROPSTEN_ADDRESS },
         4: { address: process.env.REACT_APP_PINAKION_RINKEBY_ADDRESS },
+        5: { address: process.env.REACT_APP_PINAKION_GOERLI_ADDRESS },
         42: { address: process.env.REACT_APP_PINAKION_KOVAN_ADDRESS },
         77: { address: process.env.REACT_APP_PINAKION_SOKOL_ADDRESS },
         100: { address: process.env.REACT_APP_PINAKION_XDAI_ADDRESS },
@@ -68,6 +73,7 @@ const defaultOptions = {
         1: { address: process.env.REACT_APP_POLICY_REGISTRY_ADDRESS },
         3: { address: process.env.REACT_APP_POLICY_REGISTRY_ROPSTEN_ADDRESS },
         4: { address: process.env.REACT_APP_POLICY_REGISTRY_RINKEBY_ADDRESS },
+        5: { address: process.env.REACT_APP_POLICY_REGISTRY_GOERLI_ADDRESS },
         42: { address: process.env.REACT_APP_POLICY_REGISTRY_KOVAN_ADDRESS },
         77: { address: process.env.REACT_APP_POLICY_REGISTRY_SOKOL_ADDRESS },
         100: { address: process.env.REACT_APP_POLICY_REGISTRY_XDAI_ADDRESS },
@@ -77,8 +83,9 @@ const defaultOptions = {
       ...UniswapV2Factory,
       networks: {
         1: { address: process.env.REACT_APP_UNISWAP_V2_FACTORY_ADDRESS },
-        3: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" },
-        4: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" },
+        3: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
+        4: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
+        5: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
         42: { address: process.env.REACT_APP_UNISWAP_V2_FACTORY_KOVAN_ADDRESS },
         77: { address: process.env.REACT_APP_UNISWAP_V2_FACTORY_SOKOL_ADDRESS },
         100: { address: process.env.REACT_APP_UNISWAP_V2_FACTORY_XDAI_ADDRESS },
@@ -90,6 +97,7 @@ const defaultOptions = {
         1: { address: process.env.REACT_APP_UNISWAP_V2_ROUTER_02_ADDRESS },
         3: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" },
         4: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" },
+        5: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
         42: { address: process.env.REACT_APP_UNISWAP_V2_ROUTER_02_KOVAN_ADDRESS },
         77: { address: process.env.REACT_APP_UNISWAP_V2_ROUTER_02_SOKOL_ADDRESS },
         100: { address: process.env.REACT_APP_UNISWAP_V2_ROUTER_02_XDAI_ADDRESS },
@@ -106,6 +114,7 @@ const chainIdToFallbackUrl = {
   1: process.env.REACT_APP_WEB3_FALLBACK_URL,
   3: process.env.REACT_APP_WEB3_FALLBACK_ROPSTEN_URL,
   4: process.env.REACT_APP_WEB3_FALLBACK_RINKEBY_URL,
+  5: process.env.REACT_APP_WEB3_FALLBACK_GOERLI_URL,
   42: process.env.REACT_APP_WEB3_FALLBACK_KOVAN_URL,
   77: process.env.REACT_APP_WEB3_FALLBACK_SOKOL_URL,
   100: process.env.REACT_APP_WEB3_FALLBACK_XDAI_URL,
