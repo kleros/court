@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import IframeResizer from "iframe-resizer-react";
 import PropTypes from "prop-types";
 import styled from "styled-components/macro";
 import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, InputNumber, Row, Spin } from "antd";
@@ -627,11 +628,11 @@ export default function CaseDetailsCard({ ID }) {
               <StyledInnerCard actions={metaEvidenceActions}>
                 <ReactMarkdown source={metaEvidence.metaEvidenceJSON.description} />
                 {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
-                  <StyledIFrame
+                  <IframeResizer
                     frameBorder="0"
+                    log
                     src={evidenceDisplayInterfaceURL}
-                    title="MetaEvidence Display"
-                    height={metaEvidence.metaEvidenceJSON.evidenceDisplayHeight || "215px"}
+                    style={{ width: "1px", minWidth: "100%" }}
                   />
                 )}
                 {metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI && (
@@ -976,10 +977,6 @@ const StyledInnerCard = styled(Card)`
       }
     }
   }
-`;
-
-const StyledIFrame = styled.iframe`
-  width: 100%;
 `;
 
 const StyledInnerCardActionsTitleDiv = styled.div`
