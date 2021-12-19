@@ -722,10 +722,9 @@ export default function CaseDetailsCard({ ID }) {
           </>
         )}
         {activeSubcourtID !== undefined && <CourtDrawer ID={activeSubcourtID} onClose={setActiveSubcourtID} />}
-        asd
       </StyledCard>
 
-      {dispute && (
+      {dispute && votesData.loading && (
         <div key={0} style={{ marginTop: "32px" }}>
           {Number(dispute.period) < "3" && !votesData.voted && (
             <>
@@ -735,7 +734,8 @@ export default function CaseDetailsCard({ ID }) {
               </div>
               <Button
                 style={{ color: "#4d00b4", marginTop: "16px", float: "right" }}
-                disabled={false}
+                disabled={!votesData.canVote}
+                ghost={!votesData.canVote}
                 id={0}
                 onClick={onVoteClick}
                 size="large"
