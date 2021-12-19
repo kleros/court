@@ -344,99 +344,79 @@ export default function CaseDetailsCard({ ID }) {
   }, [metaEvidence, ID, dispute, chainId, KlerosLiquid.address]);
 
   return (
-    <StyledCard
-      actions={[
-        <Spin
-          key="main"
-          spinning={
-            votesData.loading ||
-            !subcourts ||
-            !metaEvidence ||
-            sendCommitStatus === "pending" ||
-            sendVoteStatus === "pending"
-          }
-        >
-          {!votesData.loading && subcourts && metaEvidence ? (
-            <>
-              <StyledActionsDiv className="secondary-linear-background theme-linear-background">
-                {dispute.period !== "2" ? <GavelLarge /> : ""}
-                {votesData.drawnInCurrentRound ? (
-                  <>
-                    <div
-                      css={`
-                        margin-bottom: 20px;
-                      `}
-                    >
-                      {metaEvidence.metaEvidenceJSON.question
-                        ? metaEvidence.metaEvidenceJSON.question
-                        : "What is your decision?"}
-                    </div>
-                    {votesData.voted ? (
-                      <>
-                        <div>
-                          You voted for: &ldquo;
-                          {votesData.voted === "0"
-                            ? "Refuse to Arbitrate"
-                            : (metaEvidence.metaEvidenceJSON.rulingOptions &&
-                                realitioLibQuestionFormatter.getAnswerString(
-                                  {
-                                    decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-                                    outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
-                                    type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
-                                  },
-                                  realitioLibQuestionFormatter.padToBytes32(
-                                    toBN(votesData.voted).sub(toBN("1")).toString(16)
-                                  )
-                                )) ||
-                              "Unknown Choice"}
-                          &rdquo;.
-                        </div>
-                        {Number(dispute.period) < 4 ? (
-                          <SecondaryActionText>Waiting for the vote result.</SecondaryActionText>
-                        ) : null}
-                      </>
-                    ) : dispute.period === "0" ? (
-                      "Waiting for evidence."
-                    ) : dispute.period === "1" ? (
-                      "Waiting to reveal your vote."
-                    ) : subcourts[subcourts.length - 1].hiddenVotes ? (
-                      votesData.committed ? (
-                        "You did not reveal your vote."
+    <>
+      <StyledCard
+        actions={[
+          <Spin
+            key="main"
+            spinning={
+              votesData.loading ||
+              !subcourts ||
+              !metaEvidence ||
+              sendCommitStatus === "pending" ||
+              sendVoteStatus === "pending"
+            }
+          >
+            {!votesData.loading && subcourts && metaEvidence ? (
+              <>
+                <StyledActionsDiv className="secondary-linear-background theme-linear-background">
+                  {dispute.period !== "2" ? <GavelLarge /> : ""}
+                  {votesData.drawnInCurrentRound ? (
+                    <>
+                      <div
+                        css={`
+                          margin-bottom: 20px;
+                        `}
+                      >
+                        {metaEvidence.metaEvidenceJSON.question
+                          ? metaEvidence.metaEvidenceJSON.question
+                          : "What is your decision?"}
+                      </div>
+                      {votesData.voted ? (
+                        <>
+                          <div>
+                            You voted for: &ldquo;
+                            {votesData.voted === "0"
+                              ? "Refuse to Arbitrate"
+                              : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                                  realitioLibQuestionFormatter.getAnswerString(
+                                    {
+                                      decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
+                                      outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
+                                      type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+                                    },
+                                    realitioLibQuestionFormatter.padToBytes32(
+                                      toBN(votesData.voted).sub(toBN("1")).toString(16)
+                                    )
+                                  )) ||
+                                "Unknown Choice"}
+                            &rdquo;.
+                          </div>
+                          {Number(dispute.period) < 4 ? (
+                            <SecondaryActionText>Waiting for the vote result.</SecondaryActionText>
+                          ) : null}
+                        </>
+                      ) : dispute.period === "0" ? (
+                        "Waiting for evidence."
+                      ) : dispute.period === "1" ? (
+                        "Waiting to reveal your vote."
+                      ) : subcourts[subcourts.length - 1].hiddenVotes ? (
+                        votesData.committed ? (
+                          "You did not reveal your vote."
+                        ) : (
+                          "You did not commit a vote."
+                        )
                       ) : (
-                        "You did not commit a vote."
-                      )
-                    ) : (
-                      "You did not cast a vote."
-                    )}
-                  </>
-                ) : (
-                  "You were not drawn in the current round."
-                )}
-                {dispute.period === "4" && (
-                  <SecondaryActionText>
-                    The winner in this case was: &ldquo;
-                    {votesData.currentRuling === "0"
-                      ? "Refuse to Arbitrate"
-                      : (metaEvidence.metaEvidenceJSON.rulingOptions &&
-                          realitioLibQuestionFormatter.getAnswerString(
-                            {
-                              decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-                              outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
-                              type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
-                            },
-                            realitioLibQuestionFormatter.padToBytes32(
-                              toBN(votesData.currentRuling).sub(toBN("1")).toString(16)
-                            )
-                          )) ||
-                        "Unknown Choice"}
-                    &rdquo;.
-                  </SecondaryActionText>
-                )}
-                {votesData.committed && !votesData.voted ? (
-                  committedVote !== undefined ? (
+                        "You did not cast a vote."
+                      )}
+                    </>
+                  ) : (
+                    "You were not drawn in the current round."
+                  )}
+                  {dispute.period === "4" && (
                     <SecondaryActionText>
-                      You committed to:{" "}
-                      {votesData.voted === "0"
+                      The winner in this case was: &ldquo;
+                      {votesData.currentRuling === "0"
                         ? "Refuse to Arbitrate"
                         : (metaEvidence.metaEvidenceJSON.rulingOptions &&
                             realitioLibQuestionFormatter.getAnswerString(
@@ -445,281 +425,328 @@ export default function CaseDetailsCard({ ID }) {
                                 outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
                                 type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
                               },
-                              realitioLibQuestionFormatter.padToBytes32(toBN(committedVote).sub(toBN("1")).toString(16))
+                              realitioLibQuestionFormatter.padToBytes32(
+                                toBN(votesData.currentRuling).sub(toBN("1")).toString(16)
+                              )
                             )) ||
                           "Unknown Choice"}
-                      .
+                      &rdquo;.
                     </SecondaryActionText>
-                  ) : (
-                    <Alert
-                      showIcon
-                      type="warning"
-                      message="Could not find your committed vote"
-                      description="You probably committed to your vote from another device. You will need to manually select the voted option(s) and submit it."
-                      css={`
-                        text-align: left;
-                        margin-top: 2rem;
-                      `}
+                  )}
+                  {votesData.committed && !votesData.voted ? (
+                    committedVote !== undefined ? (
+                      <SecondaryActionText>
+                        You committed to:{" "}
+                        {votesData.voted === "0"
+                          ? "Refuse to Arbitrate"
+                          : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                              realitioLibQuestionFormatter.getAnswerString(
+                                {
+                                  decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
+                                  outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
+                                  type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+                                },
+                                realitioLibQuestionFormatter.padToBytes32(
+                                  toBN(committedVote).sub(toBN("1")).toString(16)
+                                )
+                              )) ||
+                            "Unknown Choice"}
+                        .
+                      </SecondaryActionText>
+                    ) : (
+                      <Alert
+                        showIcon
+                        type="warning"
+                        message="Could not find your committed vote"
+                        description="You probably committed to your vote from another device. You will need to manually select the voted option(s) and submit it."
+                        css={`
+                          text-align: left;
+                          margin-top: 2rem;
+                        `}
+                      />
+                    )
+                  ) : null}
+                  {votesData.canVote && dispute.period === "2" && (
+                    <StyledInputTextArea
+                      onChange={onJustificationChange}
+                      placeholder="Justify your vote here..."
+                      value={justification}
                     />
-                  )
-                ) : null}
-                {votesData.canVote && dispute.period === "2" && (
-                  <StyledInputTextArea
-                    onChange={onJustificationChange}
-                    placeholder="Justify your vote here..."
-                    value={justification}
-                  />
-                )}
-                {Number(dispute.period) < 3 && !votesData.voted && metaEvidence.metaEvidenceJSON.rulingOptions ? (
-                  votesData.committed && committedVote !== undefined ? (
-                    <StyledButtonsDiv>
-                      <StyledButton
-                        onClick={onRevealClick}
-                        size="large"
-                        type="primary"
-                        disabled={!votesData.canVote || dispute.period !== "2"}
-                      >
-                        Reveal Vote
-                      </StyledButton>
-                    </StyledButtonsDiv>
-                  ) : (
-                    <>
-                      {metaEvidence.metaEvidenceJSON.rulingOptions.type !== "single-select" && (
-                        <StyledButtonsDiv>
-                          {metaEvidence.metaEvidenceJSON.rulingOptions.type === "multiple-select" ? (
-                            <div
-                              css={`
-                                padding-top: 1rem;
-                              `}
-                            >
-                              <Checkbox.Group
+                  )}
+                  {Number(dispute.period) < 3 && !votesData.voted && metaEvidence.metaEvidenceJSON.rulingOptions ? (
+                    votesData.committed && committedVote !== undefined ? (
+                      <StyledButtonsDiv>
+                        <StyledButton
+                          onClick={onRevealClick}
+                          size="large"
+                          type="primary"
+                          disabled={!votesData.canVote || dispute.period !== "2"}
+                        >
+                          Reveal Vote
+                        </StyledButton>
+                      </StyledButtonsDiv>
+                    ) : (
+                      <>
+                        {metaEvidence.metaEvidenceJSON.rulingOptions.type !== "single-select" && (
+                          <StyledButtonsDiv>
+                            {metaEvidence.metaEvidenceJSON.rulingOptions.type === "multiple-select" ? (
+                              <div
+                                css={`
+                                  padding-top: 1rem;
+                                `}
+                              >
+                                <Checkbox.Group
+                                  disabled={!votesData.canVote}
+                                  name="ruling"
+                                  onChange={setComplexRuling}
+                                  options={
+                                    metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
+                                    metaEvidence.metaEvidenceJSON.rulingOptions.titles.slice(0, 255)
+                                  }
+                                  value={complexRuling}
+                                />
+                              </div>
+                            ) : metaEvidence.metaEvidenceJSON.rulingOptions.type === "datetime" ? (
+                              <DatePicker
                                 disabled={!votesData.canVote}
-                                name="ruling"
+                                disabledDate={disabledDate}
                                 onChange={setComplexRuling}
-                                options={
-                                  metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
-                                  metaEvidence.metaEvidenceJSON.rulingOptions.titles.slice(0, 255)
-                                }
+                                size="large"
+                                showTime
                                 value={complexRuling}
                               />
-                            </div>
-                          ) : metaEvidence.metaEvidenceJSON.rulingOptions.type === "datetime" ? (
-                            <DatePicker
-                              disabled={!votesData.canVote}
-                              disabledDate={disabledDate}
-                              onChange={setComplexRuling}
-                              size="large"
-                              showTime
-                              value={complexRuling}
-                            />
-                          ) : (
-                            <InputNumber
-                              disabled={!votesData.canVote}
-                              max={Number(
-                                realitioLibQuestionFormatter
-                                  .maxNumber({
+                            ) : (
+                              <InputNumber
+                                disabled={!votesData.canVote}
+                                max={Number(
+                                  realitioLibQuestionFormatter
+                                    .maxNumber({
+                                      decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
+                                      type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+                                    })
+                                    .minus(1)
+                                )}
+                                min={Number(
+                                  realitioLibQuestionFormatter.minNumber({
                                     decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
                                     type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
                                   })
-                                  .minus(1)
-                              )}
-                              min={Number(
-                                realitioLibQuestionFormatter.minNumber({
-                                  decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-                                  type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
-                                })
-                              )}
-                              onChange={setComplexRuling}
-                              precision={metaEvidence.metaEvidenceJSON.rulingOptions.precision}
-                              size="large"
-                              value={complexRuling}
-                            />
-                          )}
-                        </StyledButtonsDiv>
-                      )}
-                      <StyledButtonsDiv>
-                        {metaEvidence.metaEvidenceJSON.rulingOptions.type === "single-select" ? (
-                          metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
-                          metaEvidence.metaEvidenceJSON.rulingOptions.titles.slice(0, 2 ** 256 - 1).map((t, i) => (
+                                )}
+                                onChange={setComplexRuling}
+                                precision={metaEvidence.metaEvidenceJSON.rulingOptions.precision}
+                                size="large"
+                                value={complexRuling}
+                              />
+                            )}
+                          </StyledButtonsDiv>
+                        )}
+                        <StyledButtonsDiv>
+                          {metaEvidence.metaEvidenceJSON.rulingOptions.type === "single-select" ? (
+                            metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
+                            metaEvidence.metaEvidenceJSON.rulingOptions.titles.slice(0, 2 ** 256 - 1).map((t, i) => (
+                              <StyledButton
+                                disabled={!votesData.canVote}
+                                id={i + 1}
+                                key={t}
+                                onClick={onVoteClick}
+                                size="large"
+                                type="primary"
+                              >
+                                {t}
+                              </StyledButton>
+                            ))
+                          ) : (
                             <StyledButton
-                              disabled={!votesData.canVote}
-                              id={i + 1}
-                              key={t}
+                              disabled={!votesData.canVote || !complexRuling}
                               onClick={onVoteClick}
                               size="large"
                               type="primary"
                             >
-                              {t}
+                              Submit
                             </StyledButton>
-                          ))
-                        ) : (
-                          <StyledButton
-                            disabled={!votesData.canVote || !complexRuling}
+                          )}
+                        </StyledButtonsDiv>
+                      </>
+                    )
+                  ) : null}
+                </StyledActionsDiv>
+                <StyledDiv className="secondary-background theme-background" style={{ display: "inherit" }}>
+                  <div>
+                    {Number(dispute.period) < "3" && !votesData.voted ? (
+                      <Button
+                        disabled={!votesData.canVote}
+                        ghost={votesData.canVote}
+                        id={0}
+                        onClick={onVoteClick}
+                        size="large"
+                      >
+                        Refuse to Arbitrate
+                      </Button>
+                    ) : null}
+                  </div>
+
+                  {metaEvidence.metaEvidenceJSON.rulingOptions &&
+                    metaEvidence.metaEvidenceJSON.rulingOptions.reserved &&
+                    Object.entries(metaEvidence.metaEvidenceJSON.rulingOptions.reserved).map(([ruling, title]) => (
+                      <div key={ruling} style={{ marginTop: "32px" }}>
+                        {Number(dispute.period) < "3" && !votesData.voted ? (
+                          <Button
+                            disabled={!votesData.canVote}
+                            ghost={votesData.canVote}
+                            id={ruling}
                             onClick={onVoteClick}
                             size="large"
-                            type="primary"
                           >
-                            Submit
-                          </StyledButton>
-                        )}
-                      </StyledButtonsDiv>
-                    </>
-                  )
-                ) : null}
-              </StyledActionsDiv>
-              <StyledDiv className="secondary-background theme-background" style={{ display: "inherit" }}>
-                <div>
-                  {Number(dispute.period) < "3" && !votesData.voted ? (
-                    <Button
-                      disabled={!votesData.canVote}
-                      ghost={votesData.canVote}
-                      id={0}
-                      onClick={onVoteClick}
-                      size="large"
-                    >
-                      Refuse to Arbitrate
-                    </Button>
-                  ) : null}
-                </div>
-
-                {metaEvidence.metaEvidenceJSON.rulingOptions &&
-                  metaEvidence.metaEvidenceJSON.rulingOptions.reserved &&
-                  Object.entries(metaEvidence.metaEvidenceJSON.rulingOptions.reserved).map(([ruling, title]) => (
-                    <div key={ruling} style={{ marginTop: "32px" }}>
-                      {Number(dispute.period) < "3" && !votesData.voted ? (
-                        <Button
-                          disabled={!votesData.canVote}
-                          ghost={votesData.canVote}
-                          id={ruling}
-                          onClick={onVoteClick}
-                          size="large"
-                        >
-                          {title}
-                        </Button>
-                      ) : null}
-                    </div>
-                  ))}
-              </StyledDiv>
-            </>
-          ) : (
-            <StyledDiv className="secondary-linear-background theme-linear-background" />
-          )}
-        </Spin>,
-      ]}
-      extra={
-        <StyledPoliciesButton
-          onClick={useCallback(() => dispute && setActiveSubcourtID(dispute.subcourtID), [dispute])}
-        >
-          <StyledDocument /> Policies
-        </StyledPoliciesButton>
-      }
-      loading={!metaEvidence}
-      title={
-        <>
-          {metaEvidence && metaEvidence.metaEvidenceJSON.title}
-          {subcourts && <StyledBreadcrumbs breadcrumbs={subcourts.map((s) => s.name)} />}
-        </>
-      }
-    >
-      {metaEvidence && (
-        <>
-          <Row>
-            <Col span={24}>
-              <StyledInnerCard actions={metaEvidenceActions}>
-                <ReactMarkdown source={metaEvidence.metaEvidenceJSON.description} />
-                {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
-                  <IframeResizer
-                    frameBorder="0"
-                    log
-                    src={evidenceDisplayInterfaceURL}
-                    style={{ width: "1px", minWidth: "100%" }}
-                  />
-                )}
-                {metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI && (
-                  <ArbitrableInterfaceDiv>
-                    <a
-                      href={metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Icon type="double-right" style={{ marginRight: "5px" }} />
-                      Go to the Arbitrable Application
-                    </a>
-                  </ArbitrableInterfaceDiv>
-                )}
-                {ID === "302" ? (
-                  <ArbitrableInterfaceDiv>
-                    This realitio dispute has been created by Omen, we advise you to read the{" "}
-                    <a target="_blank" rel="noopener noreferrer" href={"https://omen.eth.link/rules.pdf"}>
-                      Omen Rules
-                    </a>{" "}
-                    and consult the evidence provided in the{" "}
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href={"https://omen.eth.link/#/0xffbc624070cb014420a6f7547fd05dfe635e2db2"}
-                    >
-                      Market Comments.
-                    </a>
-                  </ArbitrableInterfaceDiv>
-                ) : null}
-                {ID === "532" ? (
-                  <ArbitrableInterfaceDiv>
-                    This realitio dispute has been created by Omen, we advise you to read the{" "}
-                    <a target="_blank" rel="noopener noreferrer" href={"https://omen.eth.link/rules.pdf"}>
-                      Omen Rules
-                    </a>{" "}
-                    and consult the evidence provided in the{" "}
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href={"https://omen.eth.link/#/0x95b2271039b020aba31b933039e042b60b063800"}
-                    >
-                      Market Comments.
-                    </a>
-                  </ArbitrableInterfaceDiv>
-                ) : null}
-              </StyledInnerCard>
-            </Col>
-          </Row>
-          <CollapsableCard
-            title={
-              <>
-                <Folder /> {`Evidence (${evidence ? evidence.length : 0})`}
+                            {title}
+                          </Button>
+                        ) : null}
+                      </div>
+                    ))}
+                </StyledDiv>
               </>
-            }
-          >
-            <EvidenceTimeline
-              evidence={evidence}
-              metaEvidence={metaEvidence}
-              ruling={dispute.period === "4" ? votesData.currentRuling : null}
-            />
-          </CollapsableCard>
-          {disputeExtraInfo &&
-            metaEvidence &&
-            metaEvidence.metaEvidenceJSON.rulingOptions &&
-            metaEvidence.metaEvidenceJSON.rulingOptions.type === "single-select" && (
-              <CollapsableCard
-                title={
-                  <>
-                    <Scales /> Dispute History
-                  </>
-                }
-              >
-                <CaseRoundHistory
-                  ID={ID}
-                  dispute={{
-                    ...disputeExtraInfo,
-                    ...dispute,
-                  }}
-                  ruling={dispute.period === "4" ? votesData.currentRuling : null}
-                />
-              </CollapsableCard>
+            ) : (
+              <StyledDiv className="secondary-linear-background theme-linear-background" />
             )}
-        </>
+          </Spin>,
+        ]}
+        extra={
+          <StyledPoliciesButton
+            onClick={useCallback(() => dispute && setActiveSubcourtID(dispute.subcourtID), [dispute])}
+          >
+            <StyledDocument /> Policies
+          </StyledPoliciesButton>
+        }
+        loading={!metaEvidence}
+        title={
+          <>
+            {metaEvidence && metaEvidence.metaEvidenceJSON.title}
+            {subcourts && <StyledBreadcrumbs breadcrumbs={subcourts.map((s) => s.name)} />}
+          </>
+        }
+      >
+        {metaEvidence && (
+          <>
+            <Row>
+              <Col span={24}>
+                <StyledInnerCard actions={metaEvidenceActions}>
+                  <ReactMarkdown source={metaEvidence.metaEvidenceJSON.description} />
+                  {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
+                    <IframeResizer
+                      frameBorder="0"
+                      log
+                      src={evidenceDisplayInterfaceURL}
+                      style={{ width: "1px", minWidth: "100%" }}
+                    />
+                  )}
+                  {metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI && (
+                    <ArbitrableInterfaceDiv>
+                      <a
+                        href={metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Icon type="double-right" style={{ marginRight: "5px" }} />
+                        Go to the Arbitrable Application
+                      </a>
+                    </ArbitrableInterfaceDiv>
+                  )}
+                  {ID === "302" ? (
+                    <ArbitrableInterfaceDiv>
+                      This realitio dispute has been created by Omen, we advise you to read the{" "}
+                      <a target="_blank" rel="noopener noreferrer" href={"https://omen.eth.link/rules.pdf"}>
+                        Omen Rules
+                      </a>{" "}
+                      and consult the evidence provided in the{" "}
+                      <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href={"https://omen.eth.link/#/0xffbc624070cb014420a6f7547fd05dfe635e2db2"}
+                      >
+                        Market Comments.
+                      </a>
+                    </ArbitrableInterfaceDiv>
+                  ) : null}
+                  {ID === "532" ? (
+                    <ArbitrableInterfaceDiv>
+                      This realitio dispute has been created by Omen, we advise you to read the{" "}
+                      <a target="_blank" rel="noopener noreferrer" href={"https://omen.eth.link/rules.pdf"}>
+                        Omen Rules
+                      </a>{" "}
+                      and consult the evidence provided in the{" "}
+                      <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href={"https://omen.eth.link/#/0x95b2271039b020aba31b933039e042b60b063800"}
+                      >
+                        Market Comments.
+                      </a>
+                    </ArbitrableInterfaceDiv>
+                  ) : null}
+                </StyledInnerCard>
+              </Col>
+            </Row>
+            <CollapsableCard
+              title={
+                <>
+                  <Folder /> {`Evidence (${evidence ? evidence.length : 0})`}
+                </>
+              }
+            >
+              <EvidenceTimeline
+                evidence={evidence}
+                metaEvidence={metaEvidence}
+                ruling={dispute.period === "4" ? votesData.currentRuling : null}
+              />
+            </CollapsableCard>
+            {disputeExtraInfo &&
+              metaEvidence &&
+              metaEvidence.metaEvidenceJSON.rulingOptions &&
+              metaEvidence.metaEvidenceJSON.rulingOptions.type === "single-select" && (
+                <CollapsableCard
+                  title={
+                    <>
+                      <Scales /> Dispute History
+                    </>
+                  }
+                >
+                  <CaseRoundHistory
+                    ID={ID}
+                    dispute={{
+                      ...disputeExtraInfo,
+                      ...dispute,
+                    }}
+                    ruling={dispute.period === "4" ? votesData.currentRuling : null}
+                  />
+                </CollapsableCard>
+              )}
+          </>
+        )}
+        {activeSubcourtID !== undefined && <CourtDrawer ID={activeSubcourtID} onClose={setActiveSubcourtID} />}
+        asd
+      </StyledCard>
+
+      {dispute && (
+        <div key={0} style={{ marginTop: "32px" }}>
+          {Number(dispute.period) < "3" && !votesData.voted && (
+            <>
+              <div>
+                The dispute is failing to load and appears to be broken. In this case, it is advised to refuse to
+                arbitrate. Please cast your vote using button below.
+              </div>
+              <Button
+                style={{ color: "#4d00b4", marginTop: "16px", float: "right" }}
+                disabled={false}
+                id={0}
+                onClick={onVoteClick}
+                size="large"
+              >
+                {"Refuse to Arbitrate"}
+              </Button>
+            </>
+          )}
+        </div>
       )}
-      {activeSubcourtID !== undefined && <CourtDrawer ID={activeSubcourtID} onClose={setActiveSubcourtID} />}
-    </StyledCard>
+    </>
   );
 }
 
