@@ -724,7 +724,7 @@ export default function CaseDetailsCard({ ID }) {
         {activeSubcourtID !== undefined && <CourtDrawer ID={activeSubcourtID} onClose={setActiveSubcourtID} />}
       </StyledCard>
 
-      {dispute && votesData.loading && (
+      {dispute && !votesData.loading && (
         <div key={0} style={{ marginTop: "32px" }}>
           {Number(dispute.period) < "3" && !votesData.voted && (
             <>
