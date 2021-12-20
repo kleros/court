@@ -726,6 +726,24 @@ export default function CaseDetailsCard({ ID }) {
 
       {dispute && !votesData.loading && !metaEvidence && (
         <div key={0} style={{ marginTop: "32px" }}>
+          {votesData.voted && (
+            <div>
+              You successfully voted for{" "}
+              {votesData.voted === "0"
+                ? "Refuse to Arbitrate"
+                : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                    realitioLibQuestionFormatter.getAnswerString(
+                      {
+                        decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
+                        outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
+                        type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+                      },
+                      realitioLibQuestionFormatter.padToBytes32(toBN(votesData.voted).sub(toBN("1")).toString(16))
+                    )) ||
+                  "Unknown Choice"}
+              .
+            </div>
+          )}
           {Number(dispute.period) < "3" && !votesData.voted && (
             <>
               <div>
