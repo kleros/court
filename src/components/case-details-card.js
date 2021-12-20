@@ -724,13 +724,13 @@ export default function CaseDetailsCard({ ID }) {
         {activeSubcourtID !== undefined && <CourtDrawer ID={activeSubcourtID} onClose={setActiveSubcourtID} />}
       </StyledCard>
 
-      {dispute && !votesData.loading && (
+      {dispute && !votesData.loading && !metaEvidence && (
         <div key={0} style={{ marginTop: "32px" }}>
           {Number(dispute.period) < "3" && !votesData.voted && (
             <>
               <div>
-                The dispute is failing to load and appears to be broken. In this case, it is advised to refuse to
-                arbitrate. Please cast your vote using button below.
+                If the dispute is failing to load and appears to be broken it is advised to refuse to arbitrate. Please
+                cast your vote using button below.
               </div>
               <Button
                 style={{ color: "#4d00b4", marginTop: "16px", float: "right" }}
