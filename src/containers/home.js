@@ -24,7 +24,7 @@ import { ReactComponent as Present } from "../assets/images/present.svg";
 const { useDrizzleState } = drizzleReactHooks;
 
 const airdropChainIds = [1, 42, 77, 100];
-const buyPnkChainIds = [1];
+const buyPnkChainIds = [1, 100];
 
 export default function Home() {
   const drizzleState = useDrizzleState((drizzleState) => ({

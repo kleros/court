@@ -4,14 +4,17 @@ import { drizzleReactHooks } from "@drizzle/react-plugin";
 import BuyPNKCard from "../components/buy-pnk-card";
 import OTCCard from "../components/otc-card";
 import PNKBalanceCard from "../components/pnk-balance-card";
-import PNKExchangesCard from "../components/pnk-exchanges-card";
+import PNKMainnetExchangesCard from "../components/pnk-exchanges-card";
+import PNKXdaiExchangesCard from "../components/pnk-xdai-exchanges-card";
 import TopBanner from "../components/top-banner";
+import useChainId from "../hooks/use-chain-id";
 import TokenSymbol from "../components/token-symbol";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
 export default function Tokens() {
+  const chainId = useChainId();
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
@@ -32,50 +35,96 @@ export default function Tokens() {
     send,
     oldKlerosWithdrawableBalance,
   ]);
-
-  return (
-    <>
-      <TopBanner
-        description={
-          <Skeleton active loading={!juror} paragraph={false}>
-            {hasOldKlerosWithdrawableBalance ? (
-              `Looks like you have some PNK in the old Kleros. Click the button on the right to withdraw${
-                hasOldKlerosAtStake ? " what is not locked and come back later when the periods have passed" : ""
-              }.`
-            ) : hasOldKlerosAtStake ? (
-              "Looks like you have some PNK locked in the old Kleros. Come back later when the periods have passed to withdraw."
-            ) : (
+  if (chainId === 1) {
+    return (
+      <>
+        <TopBanner
+          description={
+            <Skeleton active loading={!juror} paragraph={false}>
+              {hasOldKlerosWithdrawableBalance ? (
+                `Looks like you have some PNK in the old Kleros. Click the button on the right to withdraw${
+                  hasOldKlerosAtStake ? " what is not locked and come back later when the periods have passed" : ""
+                }.`
+              ) : hasOldKlerosAtStake ? (
+                "Looks like you have some PNK locked in the old Kleros. Come back later when the periods have passed to withdraw."
+              ) : (
+                <>
+                  The more <TokenSymbol token="PNK" /> you stake, the higher your chances of being drawn as a juror.
+                </>
+              )}
+            </Skeleton>
+          }
+          extra={
+            hasOldKlerosWithdrawableBalance && (
               <>
-                The more <TokenSymbol token="PNK" /> you stake, the higher your chances of being drawn as a juror.
+                <Button loading={status === "pending"} onClick={onWithdrawClick} size="large" type="primary">
+                  Withdraw
+                </Button>
+                {status === "error" && <Alert banner closable message="Error in withdrawal." type={status} />}
               </>
-            )}
-          </Skeleton>
-        }
-        extra={
-          hasOldKlerosWithdrawableBalance && (
-            <>
-              <Button loading={status === "pending"} onClick={onWithdrawClick} size="large" type="primary">
-                Withdraw
-              </Button>
-              {status === "error" && <Alert banner closable message="Error in withdrawal." type={status} />}
-            </>
-          )
-        }
-        title="Buy PNK"
-      />
-      <PNKBalanceCard />
-      <Row gutter={40}>
-        <Col lg={8} md={12}>
-          <BuyPNKCard />
-        </Col>
-        <Col lg={16} md={12}>
-          <PNKExchangesCard />
-        </Col>
-      </Row>
-      <Divider />
-      <Row>
-        <OTCCard />
-      </Row>
-    </>
-  );
+            )
+          }
+          title="Buy PNK"
+        />
+        <PNKBalanceCard />
+        <Row gutter={40}>
+          <Col lg={8} md={12}>
+            <BuyPNKCard />
+          </Col>
+          <Col lg={16} md={12}>
+            <PNKMainnetExchangesCard />
+          </Col>
+        </Row>
+        <Divider />
+        <Row>
+          <OTCCard />
+        </Row>
+      </>
+    );
+  }
+
+  if (chainId === 100) {
+    return (
+      <>
+        <TopBanner
+          description={
+            <Skeleton active loading={!juror} paragraph={false}>
+              {hasOldKlerosWithdrawableBalance ? (
+                `Looks like you have some PNK in the old Kleros. Click the button on the right to withdraw${
+                  hasOldKlerosAtStake ? " what is not locked and come back later when the periods have passed" : ""
+                }.`
+              ) : hasOldKlerosAtStake ? (
+                "Looks like you have some PNK locked in the old Kleros. Come back later when the periods have passed to withdraw."
+              ) : (
+                <>
+                  The more <TokenSymbol token="PNK" /> you stake, the higher your chances of being drawn as a juror.
+                </>
+              )}
+            </Skeleton>
+          }
+          extra={
+            hasOldKlerosWithdrawableBalance && (
+              <>
+                <Button loading={status === "pending"} onClick={onWithdrawClick} size="large" type="primary">
+                  Withdraw
+                </Button>
+                {status === "error" && <Alert banner closable message="Error in withdrawal." type={status} />}
+              </>
+            )
+          }
+          title="Buy PNK"
+        />
+        <PNKBalanceCard />
+        <Row gutter={40}>
+          <Col lg={8} md={12}>
+            <PNKXdaiExchangesCard />
+          </Col>
+        </Row>
+        <Divider />
+        <Row>
+          <OTCCard />
+        </Row>
+      </>
+    );
+  }
 }

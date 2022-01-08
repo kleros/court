@@ -8,7 +8,8 @@ import TokenSymbol from "../token-symbol";
 
 export default function GetPnkButton({ size, type, icon, className, ...rest }) {
   const chainId = useChainId();
-  const isSupported = isSupportedSideChain(chainId);
+  // xdai now shows "Buy PNK" button instead
+  const isSupported = isSupportedSideChain(chainId) && chainId !== 100;
   const { bridgeAppUrl } = isSupported ? getSideChainParams(chainId) : {};
 
   return isSupported ? (
