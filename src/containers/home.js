@@ -16,7 +16,6 @@ import TopBanner from "../components/top-banner";
 import TokenSymbol from "../components/token-symbol";
 import RequiredChainIdGateway from "../components/required-chain-id-gateway";
 import RequiredChainIdModal from "../components/required-chain-id-modal";
-import GetSideChainPnkButton from "../components/side-chain/get-pnk-button";
 import SideChainPnkActions from "../components/side-chain/pnk-actions";
 import useChainId from "../hooks/use-chain-id";
 import { ReactComponent as Present } from "../assets/images/present.svg";
@@ -102,7 +101,6 @@ export default function Home() {
                 Buy PNK
               </StyledButton>
             </Link>
-            <GetSideChainPnkButton />
             <Link to="/courts">
               <StyledButton size="large" type="primary">
                 See Courts

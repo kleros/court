@@ -1,6 +1,7 @@
 import React from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
+import { Link } from "react-router-dom";
 import { Affix, Button, Divider, Modal, Typography } from "antd";
 import Web3 from "web3";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
@@ -19,7 +20,6 @@ import { useAsyncGenerator } from "../../hooks/use-generators";
 import TokenSymbol from "../token-symbol";
 import MultiBalance from "../multi-balance";
 import MultiTransactionStatus from "../multi-transaction-status";
-import GetSideChainPnkButton from "./get-pnk-button";
 
 const { useDrizzle } = drizzleReactHooks;
 
@@ -241,7 +241,16 @@ function GetSideChainPnkModal({ defaultVisible }) {
           text-align: center;
         `}
       >
-        <GetSideChainPnkButton block type="link" size={null} icon="arrow-right" />
+        <Link
+          to="/tokens"
+          style={{
+            display: "inline-block",
+          }}
+        >
+          <StyledButton size="large" type="secondary">
+            Buy PNK
+          </StyledButton>
+        </Link>
       </div>
     </StyledModal>
   );
@@ -390,4 +399,9 @@ const StyledPulseButton = styled(Button)`
       box-shadow: 0 0 0 0 rgba(26, 255, 76, 0), 2px 2px 8px rgba(0, 0, 0, 0.5);
     }
   }
+`;
+
+const StyledButton = styled(Button)`
+  box-shadow: none;
+  text-shadow: none;
 `;
