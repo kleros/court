@@ -116,7 +116,7 @@ export default function Tokens() {
         />
         <PNKBalanceCard />
         <Row gutter={40}>
-          <Col lg={8} md={12}>
+          <Col>
             <PNKXdaiExchangesCard />
           </Col>
         </Row>
