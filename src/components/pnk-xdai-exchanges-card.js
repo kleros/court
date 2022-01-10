@@ -1,5 +1,5 @@
 import { ReactComponent as Swapr } from "../assets/images/swapr.svg";
-import { ReactComponent as Omnibridge } from "../assets/images/omnibridge.svg";
+import Omnibridge from "../assets/images/omnibridge.png";
 import React from "react";
 import styled from "styled-components/macro";
 
@@ -29,7 +29,7 @@ const StyledExchangeSection = styled.div`
 
 const Exchanges = [
   {
-    logo: <Omnibridge />,
+    logo: <img src={Omnibridge} alt={"Omnibridge"} />,
     link: "https://omni.xdaichain.com/bridge?from=1&to=100&token=0x93ed3fbe21207ec2e8f2d3c3de6e058cb73bc04d",
   },
   {
