@@ -34,8 +34,7 @@ const Exchanges = [
   },
   {
     logo: <Swapr />,
-    // this token address doesn't redirect, how to direct user to the token?
-    link: "https://swapr.eth.link/#/swap?chainId=100&token=0x37b60f4e9a31a64ccc0024dce7d0fd07eaa0f7b3",
+    link: "https://swapr.eth.link/#/swap?inputCurrency=0x37b60f4e9a31a64ccc0024dce7d0fd07eaa0f7b3&chainId=100",
   },
 ];
 
@@ -49,4 +48,3 @@ export default () => (
     ))}
   </StyledExchangeSection>
 );
- 
