@@ -12,7 +12,7 @@ import { ReactComponent as Document } from "../assets/images/document.svg";
 import { ReactComponent as Folder } from "../assets/images/folder.svg";
 import { ReactComponent as Gavel } from "../assets/images/gavel.svg";
 import { ReactComponent as Scales } from "../assets/images/scales.svg";
-import { API, keyMessage } from "../bootstrap/api";
+import { API } from "../bootstrap/api";
 import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import web3Salt from "../temp/web3-salt";
 import { range, binaryPermutations } from "../helpers/array";
@@ -43,6 +43,7 @@ export default function CaseDetailsCard({ ID }) {
   const [activeSubcourtID, setActiveSubcourtID] = useState();
   const [justification, setJustification] = useState();
   const [complexRuling, setComplexRuling] = useState();
+  const [justificationNotice, setJustificationNotice] = useState(null);
   const dispute = useCacheCall("KlerosLiquid", "disputes", ID);
   const disputeExtraInfo = useCacheCall("KlerosLiquid", "getDispute", ID);
   const draws = useCacheEvents(
@@ -194,23 +195,29 @@ export default function CaseDetailsCard({ ID }) {
     };
   }, [votesData, committedVote, metaEvidence, web3, account, ID, disputeExtraInfo, setCommittedVote]);
 
+  useEffect(() => {
+    if ((!justification || justification.trim().length === 0) && justificationNotice) {
+      setJustificationNotice(null);
+    }
+  }, [justificationNotice, setJustificationNotice, justification]);
+
   const sendOrRevealVote = useCallback(
     async (choice) => {
       if (justification && justification.trim().length > 0) {
         // await this in case user has to make a signature
+        // awaiting it entails the following: if something fails (the user doesn't sign, etc)
+        // the call won't end. there's no try catching this.
+        // you can't try "getting the status code and checking it's 200", it won't be returned
+        // plan is: put the justification notice message BEFORE entering the await
+        setJustificationNotice(
+          "If you haven't got your signing key, your wallet will prompt you to sign a message. This signature is used as a key to change your notification settings and post these justifications. Signing this message has no gas cost whatsoever. You won't be prompted to sign the vote transaction until the justification is properly sent. If you don't sign this message, you can still vote without justifying your decision. If you want to do that, please remove your justification."
+        );
         await API.putJustifications(web3, account, {
           appeal: disputeExtraInfo.votesLengths.length - 1,
           disputeID: ID,
           justification,
           voteIDs: votesData.voteIDs,
         });
-
-        if (localStorage.getItem(`${account}-${keyMessage}`) === null) {
-          // todo show an error so that the user knows that signing failed and vote is aborted.
-          // but don't redirect them, or crash the page, or they'll lose the text
-          // console.log("Signing key is not in storage, something went wrong. Aborting vote");
-          return;
-        }
       }
 
       sendVote(
@@ -475,11 +482,14 @@ export default function CaseDetailsCard({ ID }) {
                     )
                   ) : null}
                   {votesData.canVote && dispute.period === "2" && (
-                    <StyledInputTextArea
-                      onChange={onJustificationChange}
-                      placeholder="Justify your vote here..."
-                      value={justification}
-                    />
+                    <>
+                      <StyledInputTextArea
+                        onChange={onJustificationChange}
+                        placeholder="Justify your vote here..."
+                        value={justification}
+                      />
+                      {justificationNotice !== null && <StyledInnerCard>{justificationNotice}</StyledInnerCard>}
+                    </>
                   )}
                   {Number(dispute.period) < 3 && !votesData.voted && metaEvidence.metaEvidenceJSON.rulingOptions ? (
                     votesData.committed && committedVote !== undefined ? (
