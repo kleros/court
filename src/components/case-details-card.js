@@ -12,7 +12,7 @@ import { ReactComponent as Document } from "../assets/images/document.svg";
 import { ReactComponent as Folder } from "../assets/images/folder.svg";
 import { ReactComponent as Gavel } from "../assets/images/gavel.svg";
 import { ReactComponent as Scales } from "../assets/images/scales.svg";
-import { API } from "../bootstrap/api";
+import { API, keyMessage } from "../bootstrap/api";
 import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import web3Salt from "../temp/web3-salt";
 import { range, binaryPermutations } from "../helpers/array";
@@ -197,12 +197,20 @@ export default function CaseDetailsCard({ ID }) {
   const sendOrRevealVote = useCallback(
     async (choice) => {
       if (justification && justification.trim().length > 0) {
-        API.putJustifications(web3, account, {
+        // await this in case user has to make a signature
+        await API.putJustifications(web3, account, {
           appeal: disputeExtraInfo.votesLengths.length - 1,
           disputeID: ID,
           justification,
           voteIDs: votesData.voteIDs,
         });
+
+        if (localStorage.getItem(`${account}-${keyMessage}`) === null) {
+          // todo show an error so that the user knows that signing failed and vote is aborted.
+          // but don't redirect them, or crash the page, or they'll lose the text
+          // console.log("Signing key is not in storage, something went wrong. Aborting vote");
+          return;
+        }
       }
 
       sendVote(

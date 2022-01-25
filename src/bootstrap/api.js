@@ -41,16 +41,14 @@ const chainIdToNetwork = {
   100: "xdai",
 };
 
+export const keyMessage =
+  "To keep your data safe and to use certain features of Kleros, we ask that you sign these messages to create a secret key for your account. This key is unrelated from your main Ethereum account and will not be able to send any transactions.";
+
 export const API = funcs.reduce((acc, f) => {
   acc[f.name] = async (web3, account, payload) => {
     let derivedAccount;
     if (f.signingMethod === "derived")
-      derivedAccount = await web3DeriveAccount(
-        web3,
-        account,
-        "To keep your data safe and to use certain features of Kleros, we ask that you sign these messages to create a secret key for your account. This key is unrelated from your main Ethereum account and will not be able to send any transactions.",
-        f.createDerived
-      );
+      derivedAccount = await web3DeriveAccount(web3, account, keyMessage, f.createDerived);
 
     const chainId = await web3.eth.getChainId();
     const network = chainIdToNetwork[chainId];
