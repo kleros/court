@@ -1,11 +1,12 @@
-import { Card, Tooltip } from 'antd'
-import React, { Fragment } from 'react'
-import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
-import { ReactComponent as Question } from '../assets/images/question-circle.svg'
+import { Card, Tooltip } from "antd";
+import React, { Fragment } from "react";
+import { ReactComponent as Hexagon } from "../assets/images/hexagon.svg";
+import { ReactComponent as Question } from "../assets/images/question-circle.svg";
 
-import PropTypes from 'prop-types'
-import { ReactComponent as Underline } from '../assets/images/underline.svg'
-import styled from 'styled-components/macro'
+import PropTypes from "prop-types";
+import { ReactComponent as Underline } from "../assets/images/underline.svg";
+import styled from "styled-components/macro";
+import useChainId from "../hooks/use-chain-id";
 
 const StyledCard = styled(Card)`
   background: none;
@@ -39,7 +40,7 @@ const StyledCard = styled(Card)`
       }
     }
   }
-`
+`;
 const StyledPrefixDiv = styled.div`
   font-size: 21px;
   font-weight: bold;
@@ -47,7 +48,7 @@ const StyledPrefixDiv = styled.div`
   position: absolute;
   top: 51px;
   transform: translate(-50%, -50%);
-`
+`;
 const StyledTitleDiv = styled.div`
   font-size: 24px;
   font-weight: medium;
@@ -69,19 +70,19 @@ const StyledTitleDiv = styled.div`
   @media (max-width: 991px) {
     font-size: 24px;
   }
-`
+`;
 const StyledUnderline = styled(Underline)`
   height: 4px;
   left: 0;
   position: absolute;
   top: 103px;
   width: 100%;
-`
+`;
 const StyledDivider = styled.div`
   border-bottom: 1px solid #d09cff;
   margin: 0;
   width: 100%;
-`
+`;
 
 const StyledTooltipDiv = styled.span`
   position: absolute;
@@ -100,68 +101,74 @@ const StyledTooltipDiv = styled.span`
     padding: 16px;
     white-space: break-spaces;
   }
-`
+`;
 
-const TitledListCard = ({ children, loading, prefix, title, apy }) => (
-  <StyledCard
-    bordered={false}
-    hoverable
-    loading={loading}
-    title={
-      <>
-        {apy && (
-          <Tooltip
-            title="The current rate. Subject to change depending on total staked amount."
-            getPopupContainer={triggerNode => triggerNode}
-          >
-            <StyledTooltipDiv>
-              {`${((900000 / apy) * 12 * 100).toFixed(2)}% APY`}
-              <Question
-                style={{
-                  verticalAlign: 'text-bottom',
-                  marginLeft: '8px',
-                  height: '19px',
-                  width: 'auto'
-                }}
-              />
-            </StyledTooltipDiv>
-          </Tooltip>
-        )}
+const TitledListCard = ({ children, loading, prefix, title, apy }) => {
+  const chainId = useChainId();
+  const pnkPerMonth = { 1: 900000, 100: 100000 };
 
-        <Hexagon className="ternary-fill" />
-        <StyledPrefixDiv>{prefix}</StyledPrefixDiv>
-        <StyledTitleDiv>{title}</StyledTitleDiv>
-        <StyledUnderline className="primary-fill" />
-      </>
-    }
-  >
-    {children &&
-      (children.length === undefined
-        ? children
-        : children.map((c, i) =>
-            i < children.length - 2 ? (
-              <Fragment key={i}>
-                {c}
-                <StyledDivider />
-              </Fragment>
-            ) : (
-              c
-            )
-          ))}
-  </StyledCard>
-)
+  return (
+    <StyledCard
+      bordered={false}
+      hoverable
+      loading={loading}
+      title={
+        <>
+          {apy && pnkPerMonth[chainId] && (
+            <Tooltip
+              title="The current rate. Subject to change depending on total staked amount."
+              getPopupContainer={(triggerNode) => triggerNode}
+            >
+              <StyledTooltipDiv>
+                {`${((pnkPerMonth[chainId] / apy) * 12 * 100).toFixed(2)}% APY`}
+                <Question
+                  style={{
+                    verticalAlign: "text-bottom",
+                    marginLeft: "8px",
+                    height: "19px",
+                    width: "auto",
+                  }}
+                />
+              </StyledTooltipDiv>
+            </Tooltip>
+          )}
+
+          <Hexagon className="ternary-fill" />
+          <StyledPrefixDiv>{prefix}</StyledPrefixDiv>
+          <StyledTitleDiv>{title}</StyledTitleDiv>
+          <StyledUnderline className="primary-fill" />
+        </>
+      }
+    >
+      {children &&
+        (children.length === undefined
+          ? children
+          : children.map((c, i) =>
+              i < children.length - 2 ? (
+                <Fragment key={i}>
+                  {c}
+                  <StyledDivider />
+                </Fragment>
+              ) : (
+                c
+              )
+            ))}
+    </StyledCard>
+  );
+};
 
 TitledListCard.propTypes = {
   children: PropTypes.node,
   loading: PropTypes.bool,
   prefix: PropTypes.node,
-  title: PropTypes.node.isRequired
-}
+  title: PropTypes.node.isRequired,
+  apy: PropTypes.number,
+};
 
 TitledListCard.defaultProps = {
   children: null,
   loading: false,
-  prefix: null
-}
+  prefix: null,
+};
 
-export default TitledListCard
+export default TitledListCard;

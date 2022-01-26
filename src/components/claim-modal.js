@@ -25,8 +25,10 @@ const chainIdToParams = {
       "https://ipfs.kleros.io/ipfs/QmTJNeQ9mSyrKiPDaRxX9ektijkZXofra3wYwzbiej1ppB/snapshot-2021-09.json",
       "https://ipfs.kleros.io/ipfs/QmRPFBHemHrmGFQCvxtwA13VQs2dR9KujZCBYMXrpw6pHd/snapshot-2021-10.json",
       "https://ipfs.kleros.io/ipfs/QmRKxvfmskMboUcGb2jK6HMVDAPC7RtchxMbhaKH7aQFTm/snapshot-2021-11.json",
+      "https://ipfs.kleros.io/ipfs/QmVoSJv7TP3KZp71vbbm1ocHrt1RfYarZW8zEn7vR67Bj2/snapshot-2021-12.json",
     ],
     blockExplorerBaseUrl: "https://etherscan.io",
+    klerosboard: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard",
   },
   42: {
     contractAddress: "0x193353d006Ab015216D34419a845989e76612475",
@@ -41,8 +43,10 @@ const chainIdToParams = {
       "https://ipfs.kleros.io/ipfs/QmeqtF2wFoUd5uNDuXwPTwCyaF5ZjgKFLuqSQQQ2uM5qEP/xdai-snapshot-2021-09.json",
       "https://ipfs.kleros.io/ipfs/QmUtVwhcqhX3vm6rtzEKD9K5eCMFR6b7VjotTGKts2Njmm/xdai-snapshot-2021-10.json",
       "https://ipfs.kleros.io/ipfs/QmcotSzkVhxK4AAaEyv4n7hks9oX6z8AjEfCL1QcGH9mB5/xdai-snapshot-2021-11.json",
+      "https://ipfs.kleros.io/ipfs/QmSGLSzRNtDJ2Lt59muizuKrcpWs9KS9RdsEiBuDRsx7nR/xdai-snapshot-2021-12.json",
     ],
     blockExplorerBaseUrl: "https://blockscout.com/poa/xdai/",
+    klerosboard: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard-xdai",
   },
 };
 
@@ -92,7 +96,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       responses.map((promise) => promise.then((r) => r.json()).catch((e) => console.error(e)))
     );
 
-    fetch("https://api.thegraph.com/subgraphs/name/salgozino/klerosboard", {
+    fetch(airdropParams.klerosboard, {
       headers: {
         Accept: "*/*",
         "Content-Type": "application/json",

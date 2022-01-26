@@ -14,13 +14,12 @@ import RequiredChainIdModal from "../components/required-chain-id-modal";
 import StakeModal from "../components/stake-modal";
 import TokenSymbol from "../components/token-symbol";
 import TopBanner from "../components/top-banner";
-import GetSideChainPnkButton from "../components/side-chain/get-pnk-button";
 import SideChainPnkActions from "../components/side-chain/pnk-actions";
 import useChainId from "../hooks/use-chain-id";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
-const buyPnkChainIds = [1];
+const buyPnkChainIds = [1, 100];
 
 export default function Courts() {
   const { useCacheCall } = useDrizzle();
@@ -55,7 +54,6 @@ export default function Courts() {
                 Buy PNK
               </StyledButton>
             </Link>
-            <GetSideChainPnkButton />
             <StyledButton
               onClick={useCallback(() => setStakingID(null), [])}
               size="large"
