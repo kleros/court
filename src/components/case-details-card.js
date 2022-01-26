@@ -28,6 +28,40 @@ import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const { toBN, soliditySha3 } = Web3.utils;
 
+const JustificationBox = ({ web3, account, onChange, justification }) => {
+  const key =
+    "To keep your data safe and to use certain features of Kleros, we ask that you sign these messages to create a secret key for your account. This key is unrelated from your main Ethereum account and will not be able to send any transactions.";
+
+  const storageKey = `${account}-${key}`;
+  const secretSigningKey = localStorage.getItem(storageKey);
+  const placeholder = secretSigningKey
+    ? "Justify your vote here..."
+    : "You need a signing key to provide a justification. You can get your signing key by setting your Notifications Settings above, or by clicking the button below. Then reload the page.";
+
+  const makeAndStoreSigningKey = async () => {
+    const signingKey = await web3.eth.personal.sign(key, account);
+    localStorage.setItem(storageKey, signingKey);
+  };
+
+  return (
+    <>
+      <StyledInputTextArea
+        onChange={onChange}
+        placeholder={placeholder}
+        value={justification}
+        disabled={secretSigningKey === null}
+      />
+      {secretSigningKey === null && (
+        <StyledButtonsDiv>
+          <StyledButton onClick={makeAndStoreSigningKey} size="default" type="primary">
+            Create signing key
+          </StyledButton>
+        </StyledButtonsDiv>
+      )}
+    </>
+  );
+};
+
 export default function CaseDetailsCard({ ID }) {
   const { drizzle, useCacheCall, useCacheEvents, useCacheSend } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
@@ -467,10 +501,11 @@ export default function CaseDetailsCard({ ID }) {
                     )
                   ) : null}
                   {votesData.canVote && dispute.period === "2" && (
-                    <StyledInputTextArea
+                    <JustificationBox
+                      web3={web3}
+                      account={account}
                       onChange={onJustificationChange}
-                      placeholder="Justify your vote here..."
-                      value={justification}
+                      justification={justification}
                     />
                   )}
                   {Number(dispute.period) < 3 && !votesData.voted && metaEvidence.metaEvidenceJSON.rulingOptions ? (
@@ -770,6 +805,13 @@ export default function CaseDetailsCard({ ID }) {
 
 CaseDetailsCard.propTypes = {
   ID: PropTypes.string.isRequired,
+};
+
+JustificationBox.propTypes = {
+  web3: PropTypes.object,
+  account: PropTypes.string,
+  onChange: PropTypes.func,
+  justification: PropTypes.string,
 };
 
 realitioLibQuestionFormatter.minNumber = realitioLibQuestionFormatter.minNumber.bind({
