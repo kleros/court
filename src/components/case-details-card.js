@@ -759,7 +759,7 @@ export default function CaseDetailsCard({ ID }) {
         {activeSubcourtID !== undefined && <CourtDrawer ID={activeSubcourtID} onClose={setActiveSubcourtID} />}
       </StyledCard>
 
-      {dispute && !votesData.loading && !metaEvidence && (
+      {dispute && !votesData.loading && metaEvidence && (
         <div key={0} style={{ marginTop: "32px" }}>
           {votesData.voted && (
             <div>
