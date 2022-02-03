@@ -32,9 +32,18 @@ const chainIdToParams = {
     klerosboard: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard",
   },
   42: {
-    contractAddress: "0x193353d006Ab015216D34419a845989e76612475",
-    snapshots: [],
+    contractAddress: "0xd5052B32CD3921303B3B96452458A7C5b4Cc0947",
+    snapshots: [
+      "https://ipfs.kleros.io/ipfs/QmW21mhJnQCeigBSNvSE8VnYnR5P5zh7ew8wZEWUjf8JKM/kovan-snapshot-2022-01.json",
+    ],
     blockExplorerBaseUrl: "https://kovan.etherscan.io",
+  },
+  77: {
+    contractAddress: "0x29fCc6D88581CD4315969b69DD450fD89FE30C34",
+    snapshots: [
+      "https://ipfs.kleros.io/ipfs/QmVsUjonMuhNe6dVDJNgM4pw1adVvcipkvy7s61yd3w9hs/sokol-snapshot-2022-01.json",
+    ],
+    blockExplorerBaseUrl: "https://blockscout.com/poa/sokol/",
   },
   100: {
     contractAddress: "0xf1A9589880DbF393F32A5b2d5a0054Fa10385074",
