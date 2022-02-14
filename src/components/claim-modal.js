@@ -26,14 +26,24 @@ const chainIdToParams = {
       "https://ipfs.kleros.io/ipfs/QmRPFBHemHrmGFQCvxtwA13VQs2dR9KujZCBYMXrpw6pHd/snapshot-2021-10.json",
       "https://ipfs.kleros.io/ipfs/QmRKxvfmskMboUcGb2jK6HMVDAPC7RtchxMbhaKH7aQFTm/snapshot-2021-11.json",
       "https://ipfs.kleros.io/ipfs/QmVoSJv7TP3KZp71vbbm1ocHrt1RfYarZW8zEn7vR67Bj2/snapshot-2021-12.json",
+      "https://ipfs.kleros.io/ipfs/QmRARe8tM5wZwUmViqJFmMTMfm5XNUroLW4w8TPYfkDAR9/snapshot-2022-01.json",
     ],
     blockExplorerBaseUrl: "https://etherscan.io",
     klerosboard: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard",
   },
   42: {
-    contractAddress: "0x193353d006Ab015216D34419a845989e76612475",
-    snapshots: [],
+    contractAddress: "0xd5052B32CD3921303B3B96452458A7C5b4Cc0947",
+    snapshots: [
+      "https://ipfs.kleros.io/ipfs/QmW21mhJnQCeigBSNvSE8VnYnR5P5zh7ew8wZEWUjf8JKM/kovan-snapshot-2022-01.json",
+    ],
     blockExplorerBaseUrl: "https://kovan.etherscan.io",
+  },
+  77: {
+    contractAddress: "0x29fCc6D88581CD4315969b69DD450fD89FE30C34",
+    snapshots: [
+      "https://ipfs.kleros.io/ipfs/QmVsUjonMuhNe6dVDJNgM4pw1adVvcipkvy7s61yd3w9hs/sokol-snapshot-2022-01.json",
+    ],
+    blockExplorerBaseUrl: "https://blockscout.com/poa/sokol/",
   },
   100: {
     contractAddress: "0xf1A9589880DbF393F32A5b2d5a0054Fa10385074",
@@ -44,6 +54,7 @@ const chainIdToParams = {
       "https://ipfs.kleros.io/ipfs/QmUtVwhcqhX3vm6rtzEKD9K5eCMFR6b7VjotTGKts2Njmm/xdai-snapshot-2021-10.json",
       "https://ipfs.kleros.io/ipfs/QmcotSzkVhxK4AAaEyv4n7hks9oX6z8AjEfCL1QcGH9mB5/xdai-snapshot-2021-11.json",
       "https://ipfs.kleros.io/ipfs/QmSGLSzRNtDJ2Lt59muizuKrcpWs9KS9RdsEiBuDRsx7nR/xdai-snapshot-2021-12.json",
+      "https://ipfs.kleros.io/ipfs/QmQ4yZgoUopYbudnz88i7MSXcTY4NDB1P9KuAMUejtawup/xdai-snapshot-2022-01.json",
     ],
     blockExplorerBaseUrl: "https://blockscout.com/poa/xdai/",
     klerosboard: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard-xdai",
