@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import { Modal, Button, Spin } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import MerkleRedeem from "@kleros/pnk-merkle-drop-contracts/deployments/mainnet/MerkleRedeem.json";
-import Web3 from "../bootstrap/web3";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import { ReactComponent as Kleros } from "../assets/images/kleros.svg";
 import { ReactComponent as RightArrow } from "../assets/images/right-arrow.svg";
@@ -215,7 +214,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       return;
     }
 
-    const contract = new Web3.eth.Contract(MerkleRedeem.abi, airdropParams.contractAddress);
+    const contract = new drizzle.web3.eth.Contract(MerkleRedeem.abi, airdropParams.contractAddress);
     const args = claimObjects(claims).filter((_claim) => Boolean(claimStatus[_claim.week]) === false);
 
     setCurrentClaimValue(
