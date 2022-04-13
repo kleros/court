@@ -666,6 +666,7 @@ export default function CaseDetailsCard({ ID }) {
                   <ReactMarkdown source={metaEvidence.metaEvidenceJSON.description} />
                   {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
                     <iframe
+                      title="dispute details"
                       style={{ width: "1px", minWidth: "100%", height: "360px", border: "none" }}
                       src={evidenceDisplayInterfaceURL}
                     />
