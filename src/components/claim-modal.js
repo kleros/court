@@ -27,6 +27,7 @@ const chainIdToParams = {
       "https://ipfs.kleros.io/ipfs/QmVoSJv7TP3KZp71vbbm1ocHrt1RfYarZW8zEn7vR67Bj2/snapshot-2021-12.json",
       "https://ipfs.kleros.io/ipfs/QmRARe8tM5wZwUmViqJFmMTMfm5XNUroLW4w8TPYfkDAR9/snapshot-2022-01.json",
       "https://ipfs.kleros.io/ipfs/QmWY3uExz6kWtAkKq7hZuoZAPa4NYvUyk2FD7u4Xkp22da/snapshot-2022-02.json",
+      "https://ipfs.kleros.io/ipfs/Qmaz1f7ets65kCCYi5z2Feot3NLCKqQ8vn7zaLdm4Rbmqy/snapshot-2022-03.json",
     ],
     blockExplorerBaseUrl: "https://etherscan.io",
     klerosboard: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard",
@@ -36,6 +37,7 @@ const chainIdToParams = {
     snapshots: [
       "https://ipfs.kleros.io/ipfs/QmW21mhJnQCeigBSNvSE8VnYnR5P5zh7ew8wZEWUjf8JKM/kovan-snapshot-2022-01.json",
       "https://ipfs.kleros.io/ipfs/QmNm7Db4kxpGRY9HToAF1ofde9ZDC5eDRsR7cqDfrjfKSr/kovan-snapshot-2022-02.json",
+      "https://ipfs.kleros.io/ipfs/QmZTFHbjZ53LwQhGzRo6B7KY53z5cBcRnfLRZPbyQytito/kovan-snapshot-2022-03.json",
     ],
     blockExplorerBaseUrl: "https://kovan.etherscan.io",
   },
@@ -44,6 +46,7 @@ const chainIdToParams = {
     snapshots: [
       "https://ipfs.kleros.io/ipfs/QmVsUjonMuhNe6dVDJNgM4pw1adVvcipkvy7s61yd3w9hs/sokol-snapshot-2022-01.json",
       "https://ipfs.kleros.io/ipfs/QmdkZ9NYHYd4iTpUWTQw1dMFUkgbUWqLncTPQYyZCDErdD/sokol-snapshot-2022-02.json",
+      "https://ipfs.kleros.io/ipfs/QmUk8sgxLe3tG2x3Q952B3nRRxChAP8uiXiuMF3UBzvqrc/sokol-snapshot-2022-03.json",
     ],
     blockExplorerBaseUrl: "https://blockscout.com/poa/sokol/",
   },
@@ -58,6 +61,7 @@ const chainIdToParams = {
       "https://ipfs.kleros.io/ipfs/QmSGLSzRNtDJ2Lt59muizuKrcpWs9KS9RdsEiBuDRsx7nR/xdai-snapshot-2021-12.json",
       "https://ipfs.kleros.io/ipfs/QmQ4yZgoUopYbudnz88i7MSXcTY4NDB1P9KuAMUejtawup/xdai-snapshot-2022-01.json",
       "https://ipfs.kleros.io/ipfs/Qmd7EAFoEBDuJkALRsE6pPtqaYjPt543omZQGipupntGWy/xdai-snapshot-2022-02.json",
+      "https://ipfs.kleros.io/ipfs/QmUaWM1yjB9CdHohvTdTqaR8wDggLy4q3tDThS7kZV1p1M/xdai-snapshot-2022-03.json",
     ],
     blockExplorerBaseUrl: "https://blockscout.com/poa/xdai/",
     klerosboard: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard-xdai",
