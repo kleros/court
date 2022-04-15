@@ -81,7 +81,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
   const [txHash, setTxHash] = useState(null);
   const [claimStatus, setClaimStatus] = useState(0);
   const [modalState, setModalState] = useState(0);
-  const [currentClaimValue, setCurrentClaimValue] = useState(12);
+  const [currentClaimValue, setCurrentClaimValue] = useState(0);
 
   const claimObjects = (claims) => {
     if (claims.length > 0)
@@ -164,7 +164,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
     );
 
     const contract = new drizzle.web3.eth.Contract(MerkleRedeem.abi, airdropParams.contractAddress);
-    const claimStatus = contract.methods.claimStatus(account, 0, 12).call();
+    const claimStatus = contract.methods.claimStatus(account, 0, chainIdToParams[chainId].snapshots.length).call();
 
     claimStatus.then((r) => setClaimStatus(r));
   }, [account, chainId, drizzle.web3.utils, drizzle.web3.eth.Contract, modalState, apyCallback, displayButton]);
