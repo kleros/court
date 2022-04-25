@@ -10,7 +10,6 @@ import { BrowserRouter, NavLink, Route, Switch, useParams } from "react-router-d
 import { ReactComponent as Logo } from "../assets/images/kleros-logo-flat-light.svg";
 import AccountStatus from "../components/account-status";
 import Footer from "../components/footer";
-import NotificationSettings from "../components/notification-settings";
 import { ChainIdProvider } from "../hooks/use-chain-id";
 import { ArchonInitializer } from "./archon";
 import ChainChangeWatcher from "./chain-change-watcher";
@@ -60,7 +59,6 @@ export default function App() {
                           <StyledTrayCol lg={6} md={8} sm={12} xs={24}>
                             <StyledTray>
                               <AccountStatus />
-                              <NotificationSettings settings={settings} />
                             </StyledTray>
                           </StyledTrayCol>
                         </Row>
@@ -188,15 +186,6 @@ const MenuItems = [
     </a>
   </Menu.Item>,
 ];
-
-const settings = {
-  draw: "When I am drawn as a juror.",
-  appeal: "When a case I ruled is appealed.",
-  key: "court",
-  lose: "When I lose tokens.",
-  win: "When I win arbitration fees.",
-  stake: "When my stakes are changed.",
-};
 
 const StyledLayoutSider = styled(Layout.Sider)`
   height: 100%;
