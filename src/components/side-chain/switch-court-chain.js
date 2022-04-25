@@ -116,15 +116,7 @@ function SideChainCourtDecisionTree() {
       <AnnouncementBanner
         message={
           <>
-            Kleros Court is now available on{" "}
-            {
-              <CustomButton
-                as={StyledResponsiveBannerButton}
-                text={chainIdToNetworkName[destinationChainId]}
-                onClick={switchChain}
-              />
-            }
-            .
+            This is a fork of Kleros court, ALWAYS check contract address if you need to interact through this.
           </>
         }
       />
@@ -140,7 +132,7 @@ function SideChainCourtDecisionTree() {
       <AnnouncementBanner
         message={
           <>
-            Kleros Court is now available on{" "}
+            This is a fork of Kleros court, ALWAYS check contract address if you need to interact through this.
             {
               <SideChainCourtModal
                 balance={balance}

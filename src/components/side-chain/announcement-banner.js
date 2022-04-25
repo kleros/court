@@ -8,7 +8,7 @@ const useXDaiCourtAlert = createPersistedState("@kleros/court/alert/xdai-court")
 
 const bannerRoot = document.querySelector("#banner-root");
 
-export default function AnnouncementBanner({ message = "Kleros Court is now available on xDAI." }) {
+export default function AnnouncementBanner({ message = "This is a fork of Kleros court, ALWAYS check contract address if you need to interact through this." }) {
   const [isAlertVisible, setAlertVisible] = useXDaiCourtAlert(true);
 
   return isAlertVisible
@@ -20,7 +20,7 @@ export default function AnnouncementBanner({ message = "Kleros Court is now avai
 }
 
 const StyledAlert = styled(Alert)`
-  background-color: #9013fe;
+  background-color: #F44336;
 
   .ant-alert-message {
     display: block;
