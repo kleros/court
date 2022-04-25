@@ -9,7 +9,7 @@
     "kleros",
     "court"
   ],
-  "repository": "https://github.com/kleros/court",
+  "repository": "https://github.com/brainsale/court",
   "author": "Kleros",
   "license": "MIT",
   "private": true,
@@ -27,8 +27,7 @@
     "lint": "run-p -c lint:*",
     "lint:js": "eslint '**/*.{js,jsx}'",
     "lint:css": "stylelint '**/*.{less,css}'",
-    "lint:others": "prettier --check '**/*.{json,html,svg,md}'",
-    "prepare": "husky install"
+    "lint:others": "prettier --check '**/*.{json,html,svg,md}'"
   },
   "devDependencies": {
     "@babel/helper-builder-react-jsx": "^7.12.13",
@@ -46,7 +45,6 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.23.2",
     "eslint-plugin-react-hooks": "^4.2.0",
-    "husky": "^6.0.0",
     "less": "^3.8.1",
     "lint-staged": "^10.5.4",
     "npm-run-all": "^4.1.5",
@@ -63,8 +61,7 @@
     "@ant-design/icons": "^4.5.0",
     "@drizzle/react-plugin": "^1.5.3",
     "@drizzle/store": "^1.5.3",
-    "@kleros/archon": "^2.2.0",
-    "@kleros/pnk-merkle-drop-contracts": "^0.1.0",
+    "@brainsale/archon": "^2.2.2",
     "@loadable/component": "^5.5.0",
     "@reality.eth/reality-eth-lib": "^3.0.0",
     "@sentry/browser": "^4.6.4",
