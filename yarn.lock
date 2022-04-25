@@ -1256,6 +1256,18 @@
     "@babel/helper-validator-identifier" "^7.14.0"
     to-fast-properties "^2.0.0"
 
+"@brainsale/archon@^2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@brainsale/archon/-/archon-2.2.2.tgz#c03e47a8bbbfdc13218cc9c2670ddb553c17db91"
+  integrity sha512-1RsCvB4j9TRZxrcd9SPRskZWO1Nyw+cIZlQ3u0CjpEqoM0acCB7wyH87TOtcwm57gaMZPbtGxV75gDPR6sUfsQ==
+  dependencies:
+    "@babel/runtime" "^7.15.4"
+    axios "^0.21.0"
+    iframe "^1.0.0"
+    js-sha3 "^0.8.0"
+    multihashes "0.4.14"
+    v8-sandbox "^2.2.2"
+
 "@commitlint/cli@^12.1.1":
   version "12.1.4"
   resolved "https://registry.yarnpkg.com/@commitlint/cli/-/cli-12.1.4.tgz#af4d9dd3c0122c7b39a61fa1cd2abbad0422dbe0"
@@ -1974,25 +1986,6 @@
     "@ethersproject/properties" "^5.4.0"
     "@ethersproject/strings" "^5.4.0"
 
-"@kleros/archon@^2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@kleros/archon/-/archon-2.2.0.tgz#72a08566eb01882692658ef2d11aecd2c5b81e6b"
-  integrity sha512-dQGRcfpLdZIrfHHknGWf1uCjEB8xrdTPdCS0oS4r0n9j5HV2B2b/lCSfer8d6lzt/Q9PWuHmay/Mmh+M4ZAcIQ==
-  dependencies:
-    "@babel/runtime" "^7.15.4"
-    axios "^0.21.0"
-    iframe "^1.0.0"
-    js-sha3 "^0.8.0"
-    multihashes "0.4.14"
-    v8-sandbox "^2.2.2"
-
-"@kleros/pnk-merkle-drop-contracts@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@kleros/pnk-merkle-drop-contracts/-/pnk-merkle-drop-contracts-0.1.0.tgz#4428ba6748bcb07eed205d84a2758df29c4001b5"
-  integrity sha512-5krKY4cbRp7WOXDdghBB9mjGp5c+5WBK8Ueckc8t9qoSMp09LoIkMPd1NzsBnu2f0CgulhZ1bNLUeUN6DwKNJg==
-  dependencies:
-    "@openzeppelin/contracts" "^3.4.0"
-
 "@loadable/component@^5.5.0":
   version "5.15.0"
   resolved "https://registry.yarnpkg.com/@loadable/component/-/component-5.15.0.tgz#48b9524237be553f48b158f8c9152593f3f3fded"
@@ -2035,11 +2028,6 @@
   dependencies:
     "@nodelib/fs.scandir" "2.1.4"
     fastq "^1.6.0"
-
-"@openzeppelin/contracts@^3.4.0":
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-3.4.1.tgz#03c891fec7f93be0ae44ed74e57a122a38732ce7"
-  integrity sha512-cUriqMauq1ylzP2TxePNdPqkwI7Le3Annh4K9rrpvKfSBB/bdW+Iu1ihBaTIABTAAJ85LmKL5SSPPL9ry8d1gQ==
 
 "@prettier/plugin-xml@^0.13.1":
   version "0.13.1"
@@ -7884,11 +7872,6 @@ human-signals@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-1.1.1.tgz#c5b1cd14f50aeae09ab6c59fe63ba3395fe4dfa3"
   integrity sha512-SEQu7vl8KjNL2eoGBLF3+wAjpsNfA9XMlXAYj/3EdaNfAlxKthD1xjEQfGOUhllCGGJVNY34bRr6lPINhNjyZw==
-
-husky@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/husky/-/husky-6.0.0.tgz#810f11869adf51604c32ea577edbc377d7f9319e"
-  integrity sha512-SQS2gDTB7tBN486QSoKPKQItZw97BMOd+Kdb6ghfpBc0yXyzrddI0oDV5MkDAbuB4X2mO3/nj60TRMcYxwzZeQ==
 
 iconv-lite@0.4.24, iconv-lite@^0.4.24, iconv-lite@^0.4.4:
   version "0.4.24"
