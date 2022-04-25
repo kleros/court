@@ -46,7 +46,6 @@ const funcs = {
           ...options,
         }
       );
-
       return metaEvidence;
     } catch (err) {
       // handle error...
@@ -65,7 +64,7 @@ const funcs = {
     if (URI.startsWith("/ipfs/")) options.preValidated = true;
 
     return archon.utils
-      .validateFileFromURI(URI.replace(/^\/ipfs\//, "https://ipfs.kleros.io/ipfs/"), {
+      .validateFileFromURI(URI.replace(/^\/ipfs\//, "https://ipfs.fleek.co/ipfs/"), {
         ...options,
       })
       .then((res) => res.file)

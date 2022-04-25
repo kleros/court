@@ -346,7 +346,7 @@ export default function CaseDetailsCard({ ID }) {
   }, [metaEvidence]);
 
   const evidenceDisplayInterfaceURL = useMemo(() => {
-    const normalizeIPFSUri = (uri) => uri.replace(/^\/ipfs\//, "https://ipfs.kleros.io/ipfs/");
+    const normalizeIPFSUri = (uri) => uri.replace(/^\/ipfs\//, "https://ipfs.fleek.co/ipfs/");
     if (metaEvidence?.metaEvidenceJSON?.evidenceDisplayInterfaceURI) {
       const { evidenceDisplayInterfaceURI, _v = "0" } = metaEvidence.metaEvidenceJSON;
       const arbitratorChainID = metaEvidence.metaEvidenceJSON?.arbitratorChainID ?? chainId;
@@ -371,7 +371,7 @@ export default function CaseDetailsCard({ ID }) {
         const searchParams = new URLSearchParams(injectedParams);
         url += `?${searchParams.toString()}`;
       }
-
+      
       return url;
     }
   }, [metaEvidence, ID, dispute, chainId, KlerosLiquid.address]);
