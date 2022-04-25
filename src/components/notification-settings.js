@@ -6,7 +6,6 @@ import PropTypes from "prop-types";
 import styled from "styled-components/macro";
 import { useAPI } from "../bootstrap/api";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
-import { askPermission, subscribeUserToPush } from "../bootstrap/service-worker";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
