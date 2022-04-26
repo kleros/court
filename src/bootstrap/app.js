@@ -6,7 +6,7 @@ import loadable from "@loadable/component";
 import styled from "styled-components/macro";
 import { Col, Layout, Menu, Row, Spin } from "antd";
 import { Helmet } from "react-helmet";
-import { BrowserRouter, NavLink, Route, Switch, useParams } from "react-router-dom";
+import { HashRouter, NavLink, Route, Switch, useParams } from "react-router-dom";
 import { ReactComponent as Logo } from "../assets/images/kleros-logo-flat-light.svg";
 import AccountStatus from "../components/account-status";
 import Footer from "../components/footer";
@@ -33,7 +33,7 @@ export default function App() {
           <DrizzleChainIdProvider>
             <ChainChangeWatcher>
               <ArchonInitializer>
-                <BrowserRouter>
+                <HashRouter>
                   <Layout>
                     <StyledLayoutSider
                       breakpoint="md"
@@ -95,7 +95,7 @@ export default function App() {
                       />
                     </Layout>
                   </Layout>
-                </BrowserRouter>
+                </HashRouter>
               </ArchonInitializer>
             </ChainChangeWatcher>
           </DrizzleChainIdProvider>
