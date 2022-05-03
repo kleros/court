@@ -133,9 +133,7 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
               <JustificationsBox>
                 <Skeleton active loading={justifications[round].loading}>
                   <h2>Justification</h2>
-                  {!justifications[round].loading &&
-                  justifications[round].byChoice[rulingOption].length &&
-                  !(!ruling && round === justifications.length - 1 && dispute.period < 3) ? (
+                  {!justifications[round].loading && justifications[round].byChoice[rulingOption].length ? (
                     <JustificationText>
                       {justifications[round].byChoice[rulingOption][justificationIndex]}
                     </JustificationText>
