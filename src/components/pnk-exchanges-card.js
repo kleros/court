@@ -52,7 +52,7 @@ const Exchanges = [
   },
   {
     logo: <img src={KyberSwap} alt={"KyberSwap"} />,
-    link: "https://kyberswap.com/swap",
+    link: "https://kyberswap.com/#/swap",
   },
   {
     logo: <img src={DeversiFi} alt={"DeversiFi"} />,
