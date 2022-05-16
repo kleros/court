@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components/macro";
-import { Card } from "antd";
+import { Card, Button, Input } from "antd";
 import stPNKAbi from "../../assets/contracts/wrapped-pinakion.json";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../../bootstrap/dataloader";
@@ -47,6 +47,22 @@ const StyledCard = styled(Card)`
   }
 `;
 
+const StyledRow = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
+
+const StyledButton = styled(Button)`
+  border-radius: 3px;
+  width: 100%;
+`;
+
+const StyledExplainerText = styled.p`
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+  text-align: center;
+`;
+
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
 const WithdrawStPnk = () => {
@@ -55,24 +71,44 @@ const WithdrawStPnk = () => {
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
   const [amount, setAmount] = useState(0);
+  const [submitting, isSubmitting] = useState(false);
 
   const handleWithdraw = async () => {
+    isSubmitting(true);
     const stPNK = new drizzle.web3.eth.Contract(stPNKAbi.abi, process.env.REACT_APP_PINAKION_XDAI_ADDRESS);
     const { toWei, toBN } = drizzle.web3.utils;
     const actualAmount = toWei(toBN(amount));
-    await stPNK.methods.withdraw(actualAmount).send({ from: account });
+    try {
+      await stPNK.methods.withdraw(actualAmount).send({ from: account });
+    } finally {
+      isSubmitting(false);
+    }
   };
 
   return (
     <StyledCard title={<>Convert stPNK to xPNK</>} description={<></>}>
-      <input
-        type="number"
-        value={amount}
-        onChange={(e) => {
-          if (!isNaN(Number(e.target.value))) setAmount(Math.floor(Number(e.target.value)));
-        }}
-      />
-      <button onClick={handleWithdraw}>stPNK -{">"} xPNK</button>
+      <StyledExplainerText
+        css={`
+          margin-top: -1rem;
+        `}
+      >
+        Use this if you only want to obtain xPNK, for example, for usage in Gnosis Chain exchanges.
+      </StyledExplainerText>
+      <StyledRow>
+        <Input
+          size="large"
+          type="number"
+          value={amount}
+          onChange={(e) => {
+            const newAmount = Math.floor(Number(e.target.value));
+            if (!isNaN(newAmount)) setAmount(newAmount);
+          }}
+        />
+
+        <StyledButton size="large" block loading={submitting} disabled={submitting} onClick={handleWithdraw}>
+          Convert stPNK to xPNK
+        </StyledButton>
+      </StyledRow>
     </StyledCard>
   );
 };

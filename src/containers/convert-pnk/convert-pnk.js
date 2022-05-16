@@ -71,9 +71,9 @@ function ConvertPnk() {
         }
       />
       <StyledDivider />
-      <WithdrawStPnk />
-      <StyledDivider />
       <ConvertPnkCard />
+      <StyledDivider />
+      <WithdrawStPnk />
     </>
   );
 }
