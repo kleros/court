@@ -7,8 +7,10 @@ import stPNKAbi from "../../assets/contracts/wrapped-pinakion.json";
 import TokenSymbol from "../../components/token-symbol";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../../bootstrap/dataloader";
+import usePromise from "../../hooks/use-promise";
+import useAccount from "../../hooks/use-account";
 
-const { fromWei } = Web3.utils;
+const { fromWei, toWei, toBN } = Web3.utils;
 
 const StyledCard = styled(Card)`
   margin: 20px auto 0;
@@ -110,7 +112,7 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
   const { validateFieldsAndScroll, getFieldDecorator, setFieldsValue, getFieldsError } = form;
-  const maxAvailableNumeric = Math.trunc(Number(fromWei(maxAvailable ?? "0")));
+  const maxAvailableNumeric = Number(fromWei(maxAvailable ?? "0"));
 
   const amountDecorator = getFieldDecorator("amount", {
     rules: [
@@ -136,12 +138,15 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
           return;
         }
         const stPNK = new drizzle.web3.eth.Contract(stPNKAbi.abi, process.env.REACT_APP_PINAKION_XDAI_ADDRESS);
-        const { toWei, toBN } = drizzle.web3.utils;
-        const actualAmount = toWei(toBN(values.amount));
-        await stPNK.methods.withdraw(actualAmount).send({ from: account });
+        const amountInWei = toWei(String(values.amount));
+        try {
+          await stPNK.methods.withdraw(amountInWei).send({ from: account });
+        } catch (_) {
+          return;
+        }
       });
     },
-    [validateFieldsAndScroll, account]
+    [validateFieldsAndScroll, account, drizzle.web3.eth.Contract]
   );
 
   return (
@@ -178,6 +183,13 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
 });
 
 const WithdrawStPnk = () => {
+  const sideChainApi = useSideChainApi();
+  const account = useAccount();
+  const tokenStats = usePromise(
+    React.useCallback(() => sideChainApi.getTokenStats({ address: account }), [account, sideChainApi])
+  );
+
+  const hasAvailableTokens = toBN(tokenStats.value?.available ?? 0).gt(toBN(0));
   return (
     <StyledCard title={<>Convert stPNK to xPNK</>} description={<></>}>
       <StyledExplainerText
@@ -187,7 +199,7 @@ const WithdrawStPnk = () => {
       >
         Use this if you only want to obtain xPNK, for example, for usage in Gnosis Chain exchanges.
       </StyledExplainerText>
-      <WithdrawStPnkForm />
+      <WithdrawStPnkForm maxAvailable={hasAvailableTokens ? tokenStats.value.available : "0"} />
     </StyledCard>
   );
 };
