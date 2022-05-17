@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components/macro";
 import Web3 from "web3";
+import { useSideChainApi } from "../../api/side-chain";
 import { Card, Button, Form, InputNumber } from "antd";
 import stPNKAbi from "../../assets/contracts/wrapped-pinakion.json";
 import TokenSymbol from "../../components/token-symbol";
@@ -103,6 +104,7 @@ function hasErrors(fieldsError) {
 }
 
 const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, disabled }) => {
+  const { chainId } = useSideChainApi();
   const { drizzle } = useDrizzle();
   const { account } = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
@@ -150,7 +152,7 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
             hasFeedback
             label={
               <StyledCompositeLabel>
-                <TokenSymbol chainId={100} token="PNK" />
+                <TokenSymbol chainId={chainId} token="PNK" />
                 <StyledButtonLink onClick={handleUseMaxClick}>use max.</StyledButtonLink>
               </StyledCompositeLabel>
             }
