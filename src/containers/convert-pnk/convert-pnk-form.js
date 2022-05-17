@@ -305,7 +305,7 @@ const ConvertPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, disabl
           loading={isSubmitting}
           disabled={disabled || isSubmitting || hasErrors(getFieldsError())}
         >
-          Convert
+          Convert and send to Omnibridge
         </Button>
       </Form>
     </div>
