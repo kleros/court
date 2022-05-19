@@ -10,6 +10,7 @@ import { chainIdToNetworkName } from "../../helpers/networks";
 import useChainId from "../../hooks/use-chain-id";
 import C404 from "../404";
 import ConvertPnkCard from "./convert-pnk-card";
+import WithdrawStPnk from "./wihdraw-stpnk-card";
 
 const { useDrizzle } = drizzleReactHooks;
 
@@ -71,6 +72,8 @@ function ConvertPnk() {
       />
       <StyledDivider />
       <ConvertPnkCard />
+      <StyledDivider />
+      <WithdrawStPnk />
     </>
   );
 }

@@ -52,7 +52,7 @@ export default function ConvertPnkCard() {
         `}
       >
         Keep in mind that <TokenSymbol chainId={originChainId} token="PNK" /> that are staked or locked cannot be sent
-        to {chainIdToNetworkShortName[targetChainId]}.
+        to {chainIdToNetworkShortName[targetChainId]}. To just get xPNK, use the form below.
       </StyledExplainerText>
       <StyledDivider />
       <SteppedContent
