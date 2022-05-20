@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import IframeResizer from "iframe-resizer-react";
 import PropTypes from "prop-types";
 import styled from "styled-components/macro";
 import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, InputNumber, Row, Spin } from "antd";
@@ -436,9 +435,9 @@ export default function CaseDetailsCard({ ID }) {
                         "Waiting to reveal your vote."
                       ) : subcourts[subcourts.length - 1].hiddenVotes ? (
                         votesData.committed ? (
-                          "You did not reveal your vote."
+                          "You did not reveal your vote yet."
                         ) : (
-                          "You did not commit a vote."
+                          "You did not commit a vote in the previous period. You cannot vote anymore."
                         )
                       ) : (
                         "You did not cast a vote."
@@ -666,11 +665,10 @@ export default function CaseDetailsCard({ ID }) {
                 <StyledInnerCard actions={metaEvidenceActions}>
                   <ReactMarkdown source={metaEvidence.metaEvidenceJSON.description} />
                   {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
-                    <IframeResizer
-                      frameBorder="0"
-                      log
+                    <iframe
+                      title="dispute details"
+                      style={{ width: "1px", minWidth: "100%", height: "360px", border: "none" }}
                       src={evidenceDisplayInterfaceURL}
-                      style={{ width: "1px", minWidth: "100%" }}
                     />
                   )}
                   {metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI && (
