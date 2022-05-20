@@ -15,6 +15,12 @@ const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
 const MANUAL_PASS_DELAY = 3600;
 
+const periodToPhase = (period, hiddenVotes) => {
+  const phases = ["Evidence", "Commit", "Vote", "Appeal", "Execute"];
+  const phase = Number(period) === 2 && hiddenVotes ? "Reveal" : phases[period];
+  return phase;
+};
+
 export default function Case() {
   const { ID } = useParams();
   const { drizzle, useCacheCall, useCacheEvents, useCacheSend } = useDrizzle();
@@ -58,6 +64,7 @@ export default function Case() {
       );
       if (dispute && !dispute.ruled) {
         const subcourt = call("KlerosLiquid", "getSubcourt", dispute.subcourtID);
+        const court = call("KlerosLiquid", "courts", dispute.subcourtID);
         if (subcourt) {
           disputeData.deadline =
             dispute.period < 4
@@ -68,6 +75,9 @@ export default function Case() {
               ? parseInt(new Date().getTime() / 1000) - Number(dispute.lastPeriodChange) >
                 Number(subcourt.timesPerPeriod[dispute.period]) + MANUAL_PASS_DELAY
               : true;
+        }
+        if (court) {
+          disputeData.hiddenVotes = court.hiddenVotes;
         }
       }
     }
@@ -90,11 +100,9 @@ export default function Case() {
               <ResolvedTag>Resolved</ResolvedTag>
             ) : (
               <>
-                {disputeData.deadline && (
+                {disputeData.deadline && disputeData.hiddenVotes !== undefined && (
                   <Col lg={disputeData.showPassPeriod ? 12 : 24}>
-                    <StyledDiv>
-                      {["Evidence", "Commit", "Vote", "Appeal", "Execute"][dispute.period]} Period Over
-                    </StyledDiv>
+                    <StyledDiv>{periodToPhase(dispute.period, disputeData.hiddenVotes)} Period Over</StyledDiv>
                     <StyledBigTextDiv>
                       <TimeAgo className="primary-color theme-color">{disputeData.deadline}</TimeAgo>
                     </StyledBigTextDiv>
