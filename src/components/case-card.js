@@ -132,6 +132,19 @@ const StakeLocked = styled.div`
   text-align: right;
 `;
 
+const PeriodCard = ({ period, deadline, hiddenVotes }) => {
+  const phases = ["Evidence Submission", "Commit Deadline", "Voting Deadline", "Appeal Deadline", "Execute Deadline"];
+  const periodText = Number(period) === 2 && hiddenVotes ? "Reveal Deadline" : phases[period];
+  return (
+    <TimeoutDiv key="timeout">
+      <TimeoutText>{periodText}</TimeoutText>
+      <TimeoutTime>
+        <TimeAgo>{deadline}</TimeAgo>
+      </TimeoutTime>
+    </TimeoutDiv>
+  );
+};
+
 const CaseCard = ({ ID, draws }) => {
   const chainId = useChainId();
   const { drizzle, useCacheCall } = useDrizzle();
@@ -167,10 +180,14 @@ const CaseCard = ({ ID, draws }) => {
       );
       if (dispute && dispute.period !== "4" && votesByAppeal[votesLengths.length - 1]) {
         const subcourt = call("KlerosLiquid", "getSubcourt", dispute.subcourtID);
+        const court = call("KlerosLiquid", "courts", dispute.subcourtID);
         if (subcourt)
           disputeData.deadline = new Date(
             (Number(dispute.lastPeriodChange) + Number(subcourt.timesPerPeriod[dispute.period])) * 1000
           );
+        if (court) {
+          disputeData.hiddenVotes = court.hiddenVotes;
+        }
       }
     }
     return disputeData;
@@ -190,24 +207,13 @@ const CaseCard = ({ ID, draws }) => {
       actions={useMemo(
         () => [
           disputeData.deadline && (
-            <TimeoutDiv key="timeout">
-              <TimeoutText>
-                {
-                  ["Evidence Submission", "Commit Deadline", "Voting Deadline", "Appeal Deadline", "Execute Deadline"][
-                    dispute.period
-                  ]
-                }
-              </TimeoutText>
-              <TimeoutTime>
-                <TimeAgo>{disputeData.deadline}</TimeAgo>
-              </TimeoutTime>
-            </TimeoutDiv>
+            <PeriodCard period={dispute.period} deadline={disputeData.deadline} hiddenVotes={disputeData.hiddenVotes} />
           ),
           <Link key="details" to={`/cases/${ID}`}>
             <Button type="primary">See Details</Button>
           </Link>,
         ],
-        [disputeData.deadline, dispute.period, ID]
+        [disputeData.deadline, dispute.period, disputeData.hiddenVotes, ID]
       )}
       extra={<StyledHeaderText>Case #{ID}</StyledHeaderText>}
       hoverable
@@ -247,6 +253,12 @@ const CaseCard = ({ ID, draws }) => {
       </div>
     </StyledCard>
   );
+};
+
+PeriodCard.propTypes = {
+  period: PropTypes.number.isRequired,
+  deadline: PropTypes.number.isRequired,
+  hiddenVotes: PropTypes.bool.isRequired,
 };
 
 CaseCard.propTypes = {
