@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import IframeResizer from "iframe-resizer-react";
 import PropTypes from "prop-types";
 import styled from "styled-components/macro";
 import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, InputNumber, Row, Spin } from "antd";
@@ -27,6 +26,40 @@ import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const { toBN, soliditySha3 } = Web3.utils;
+
+const JustificationBox = ({ web3, account, onChange, justification }) => {
+  const key =
+    "To keep your data safe and to use certain features of Kleros, we ask that you sign these messages to create a secret key for your account. This key is unrelated from your main Ethereum account and will not be able to send any transactions.";
+
+  const storageKey = `${account}-${key}`;
+  const secretSigningKey = localStorage.getItem(storageKey);
+  const placeholder = secretSigningKey
+    ? "Justify your vote here..."
+    : "You need a signing key to provide a justification. You can get your signing key by setting your Notifications Settings above, or by clicking the button below. Then reload the page.";
+
+  const makeAndStoreSigningKey = async () => {
+    const signingKey = await web3.eth.personal.sign(key, account);
+    localStorage.setItem(storageKey, signingKey);
+  };
+
+  return (
+    <>
+      <StyledInputTextArea
+        onChange={onChange}
+        placeholder={placeholder}
+        value={justification}
+        disabled={secretSigningKey === null}
+      />
+      {secretSigningKey === null && (
+        <StyledButtonsDiv>
+          <StyledButton onClick={makeAndStoreSigningKey} size="default" type="primary">
+            Create signing key
+          </StyledButton>
+        </StyledButtonsDiv>
+      )}
+    </>
+  );
+};
 
 export default function CaseDetailsCard({ ID }) {
   const { drizzle, useCacheCall, useCacheEvents, useCacheSend } = useDrizzle();
@@ -402,9 +435,9 @@ export default function CaseDetailsCard({ ID }) {
                         "Waiting to reveal your vote."
                       ) : subcourts[subcourts.length - 1].hiddenVotes ? (
                         votesData.committed ? (
-                          "You did not reveal your vote."
+                          "You did not reveal your vote yet."
                         ) : (
-                          "You did not commit a vote."
+                          "You did not commit a vote in the previous period. You cannot vote anymore."
                         )
                       ) : (
                         "You did not cast a vote."
@@ -467,10 +500,11 @@ export default function CaseDetailsCard({ ID }) {
                     )
                   ) : null}
                   {votesData.canVote && dispute.period === "2" && (
-                    <StyledInputTextArea
+                    <JustificationBox
+                      web3={web3}
+                      account={account}
                       onChange={onJustificationChange}
-                      placeholder="Justify your vote here..."
-                      value={justification}
+                      justification={justification}
                     />
                   )}
                   {Number(dispute.period) < 3 && !votesData.voted && metaEvidence.metaEvidenceJSON.rulingOptions ? (
@@ -631,11 +665,10 @@ export default function CaseDetailsCard({ ID }) {
                 <StyledInnerCard actions={metaEvidenceActions}>
                   <ReactMarkdown source={metaEvidence.metaEvidenceJSON.description} />
                   {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
-                    <IframeResizer
-                      frameBorder="0"
-                      log
+                    <iframe
+                      title="dispute details"
+                      style={{ width: "1px", minWidth: "100%", height: "360px", border: "none" }}
                       src={evidenceDisplayInterfaceURL}
-                      style={{ width: "1px", minWidth: "100%" }}
                     />
                   )}
                   {metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI && (
@@ -724,7 +757,7 @@ export default function CaseDetailsCard({ ID }) {
         {activeSubcourtID !== undefined && <CourtDrawer ID={activeSubcourtID} onClose={setActiveSubcourtID} />}
       </StyledCard>
 
-      {dispute && !votesData.loading && !metaEvidence && (
+      {dispute && !votesData.loading && metaEvidence && (
         <div key={0} style={{ marginTop: "32px" }}>
           {votesData.voted && (
             <div>
@@ -770,6 +803,13 @@ export default function CaseDetailsCard({ ID }) {
 
 CaseDetailsCard.propTypes = {
   ID: PropTypes.string.isRequired,
+};
+
+JustificationBox.propTypes = {
+  web3: PropTypes.object,
+  account: PropTypes.string,
+  onChange: PropTypes.func,
+  justification: PropTypes.string,
 };
 
 realitioLibQuestionFormatter.minNumber = realitioLibQuestionFormatter.minNumber.bind({
