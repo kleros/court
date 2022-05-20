@@ -435,9 +435,9 @@ export default function CaseDetailsCard({ ID }) {
                         "Waiting to reveal your vote."
                       ) : subcourts[subcourts.length - 1].hiddenVotes ? (
                         votesData.committed ? (
-                          "You did not reveal your vote."
+                          "You did not reveal your vote yet."
                         ) : (
-                          "You did not commit a vote."
+                          "You did not commit a vote in the previous period. You cannot vote anymore."
                         )
                       ) : (
                         "You did not cast a vote."
