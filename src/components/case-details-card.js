@@ -432,7 +432,13 @@ export default function CaseDetailsCard({ ID }) {
                       ) : dispute.period === "0" ? (
                         "Waiting for evidence."
                       ) : dispute.period === "1" ? (
-                        "Waiting to reveal your vote."
+                        !votesData.committed ? (
+                          "You did not commit your vote yet."
+                        ) : (
+                          <small>
+                            You committed your vote. You will be able to reveal your vote when the period ends.
+                          </small>
+                        )
                       ) : subcourts[subcourts.length - 1].hiddenVotes ? (
                         votesData.committed ? (
                           "You did not reveal your vote yet."
