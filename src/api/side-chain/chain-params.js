@@ -16,8 +16,8 @@ const supportedSideChains = {
     nativeCurrency: { name: "xDAI", symbol: "xDAI", decimals: 18 },
     rpcUrls: [ensureEnv("REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL")],
     blockExplorerUrls: [getBaseUrl(100)],
-    bridgeAppUrl: `https://omni.xdaichain.com/bridge?from=1&to=100&token=${ensureEnv("REACT_APP_PINAKION_ADDRESS")}`,
-    bridgeAppHistoryUrl: "https://omni.xdaichain.com/history",
+    bridgeAppUrl: `https://omni.gnosischain.com/bridge?from=1&to=100&token=${ensureEnv("REACT_APP_PINAKION_ADDRESS")}`,
+    bridgeAppHistoryUrl: "https://omni.gnosischain.com/history",
     mainChainId: 1,
     tokens: {
       [Tokens.PNK]: {
