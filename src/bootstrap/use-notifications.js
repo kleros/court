@@ -44,7 +44,7 @@ const networkIDData = {
   },
   100: {
     name: "_XDAI",
-    provider: "https://rpc.xdaichain.com",
+    provider: "https://rpc.gnosischain.com",
     nativeToken: "xDAI",
     pnkToken: "stPNK",
   },
