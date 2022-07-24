@@ -114,7 +114,7 @@ export default function Home() {
       <RewardCard />
       <Row gutter={32}>
         <Col lg={8}>
-          <HarbergerAd collection="0x8de0cc5ef5b31d936cc6d066f9b68b052d40c7fd" tokenId="1" />
+          <HarbergerAd collection="0x0540c4d6b4414ee74e4b9821dca5915d527b2477" tokenId="1" />
           <CourtsListCard apy={apy > 1000000 ? apy : null} />
         </Col>
         <Col lg={8}>
@@ -125,7 +125,7 @@ export default function Home() {
         </Col>
       </Row>
       <OngoingCasesCard />
-      <HarbergerAd collection="0x8de0cc5ef5b31d936cc6d066f9b68b052d40c7fd" tokenId="2" />
+      <HarbergerAd collection="0x0540c4d6b4414ee74e4b9821dca5915d527b2477" tokenId="2" />
       <NotificationsCard />
       <SideChainPnkActions showGetSideChainPnkModal={false} />
     </>
@@ -140,7 +140,7 @@ export default function Home() {
         </>
       )}
     >
-      <HarbergerAd collection="0x8de0cc5ef5b31d936cc6d066f9b68b052d40c7fd" tokenId="0" />
+      <HarbergerAd collection="0x0540c4d6b4414ee74e4b9821dca5915d527b2477" tokenId="0" />
       {content}
     </RequiredChainIdGateway>
   );
