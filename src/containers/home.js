@@ -19,6 +19,7 @@ import RequiredChainIdModal from "../components/required-chain-id-modal";
 import SideChainPnkActions from "../components/side-chain/pnk-actions";
 import useChainId from "../hooks/use-chain-id";
 import { ReactComponent as Present } from "../assets/images/present.svg";
+import HarbergerAd from "../components/harberger-ad";
 
 const { useDrizzleState } = drizzleReactHooks;
 
@@ -113,6 +114,7 @@ export default function Home() {
       <RewardCard />
       <Row gutter={32}>
         <Col lg={8}>
+          <HarbergerAd collection="0x0540c4d6b4414ee74e4b9821dca5915d527b2477" tokenId="1" />
           <CourtsListCard apy={apy > 1000000 ? apy : null} />
         </Col>
         <Col lg={8}>
@@ -123,6 +125,7 @@ export default function Home() {
         </Col>
       </Row>
       <OngoingCasesCard />
+      <HarbergerAd collection="0x0540c4d6b4414ee74e4b9821dca5915d527b2477" tokenId="2" />
       <NotificationsCard />
       <SideChainPnkActions showGetSideChainPnkModal={false} />
     </>
@@ -137,6 +140,7 @@ export default function Home() {
         </>
       )}
     >
+      <HarbergerAd collection="0x0540c4d6b4414ee74e4b9821dca5915d527b2477" tokenId="0" />
       {content}
     </RequiredChainIdGateway>
   );
