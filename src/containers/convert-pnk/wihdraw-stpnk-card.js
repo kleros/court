@@ -101,6 +101,20 @@ const StyledCompositeLabel = styled.span`
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
+// hack because "useMax" was rounding up and causing a revert.
+const lowerize = (s) => {
+  const lastChar = s[s.length - 1];
+  if (lastChar === ".") {
+    return s;
+  } else {
+    const n = Number(lastChar);
+    if (n === 0) return s;
+    else {
+      return s.substring(0, s.length - 1) + String(n - 1);
+    }
+  }
+};
+
 function hasErrors(fieldsError) {
   return Object.keys(fieldsError).some((field) => fieldsError[field]);
 }
@@ -145,7 +159,8 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
             : false;
         if (stPNKaddress) {
           const stPNK = new drizzle.web3.eth.Contract(stPNKAbi.abi, stPNKaddress);
-          const amountInWei = toWei(String(values.amount));
+          const superamount = lowerize(String(values.amount));
+          const amountInWei = toWei(superamount);
           try {
             await stPNK.methods.withdraw(amountInWei).send({ from: account });
           } catch (_) {
