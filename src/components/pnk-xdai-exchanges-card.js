@@ -34,7 +34,7 @@ const Exchanges = [
   },
   {
     logo: <Swapr />,
-    link: "https://swapr.eth.link/#/swap?inputCurrency=0x37b60f4e9a31a64ccc0024dce7d0fd07eaa0f7b3&chainId=100",
+    link: "https://swapr.eth.limo/#/swap?inputCurrency=0x37b60f4e9a31a64ccc0024dce7d0fd07eaa0f7b3&chainId=100",
   },
 ];
 

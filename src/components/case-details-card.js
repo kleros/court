@@ -692,14 +692,14 @@ export default function CaseDetailsCard({ ID }) {
                   {ID === "302" ? (
                     <ArbitrableInterfaceDiv>
                       This realitio dispute has been created by Omen, we advise you to read the{" "}
-                      <a target="_blank" rel="noopener noreferrer" href={"https://omen.eth.link/rules.pdf"}>
+                      <a target="_blank" rel="noopener noreferrer" href={"https://omen.eth.limo/rules.pdf"}>
                         Omen Rules
                       </a>{" "}
                       and consult the evidence provided in the{" "}
                       <a
                         target="_blank"
                         rel="noopener noreferrer"
-                        href={"https://omen.eth.link/#/0xffbc624070cb014420a6f7547fd05dfe635e2db2"}
+                        href={"https://omen.eth.limo/#/0xffbc624070cb014420a6f7547fd05dfe635e2db2"}
                       >
                         Market Comments.
                       </a>
@@ -708,14 +708,14 @@ export default function CaseDetailsCard({ ID }) {
                   {ID === "532" ? (
                     <ArbitrableInterfaceDiv>
                       This realitio dispute has been created by Omen, we advise you to read the{" "}
-                      <a target="_blank" rel="noopener noreferrer" href={"https://omen.eth.link/rules.pdf"}>
+                      <a target="_blank" rel="noopener noreferrer" href={"https://omen.eth.limo/rules.pdf"}>
                         Omen Rules
                       </a>{" "}
                       and consult the evidence provided in the{" "}
                       <a
                         target="_blank"
                         rel="noopener noreferrer"
-                        href={"https://omen.eth.link/#/0x95b2271039b020aba31b933039e042b60b063800"}
+                        href={"https://omen.eth.limo/#/0x95b2271039b020aba31b933039e042b60b063800"}
                       >
                         Market Comments.
                       </a>
