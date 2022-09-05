@@ -30,11 +30,11 @@ const StyledExchangeSection = styled.div`
 const Exchanges = [
   {
     logo: <img src={Omnibridge} alt={"Omnibridge"} />,
-    link: "https://omni.xdaichain.com/bridge?from=1&to=100&token=0x93ed3fbe21207ec2e8f2d3c3de6e058cb73bc04d",
+    link: "https://omni.gnosischain.com/bridge?from=1&to=100&token=0x93ed3fbe21207ec2e8f2d3c3de6e058cb73bc04d",
   },
   {
     logo: <Swapr />,
-    link: "https://swapr.eth.link/#/swap?inputCurrency=0x37b60f4e9a31a64ccc0024dce7d0fd07eaa0f7b3&chainId=100",
+    link: "https://swapr.eth.limo/#/swap?inputCurrency=0x37b60f4e9a31a64ccc0024dce7d0fd07eaa0f7b3&chainId=100",
   },
 ];
 
