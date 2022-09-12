@@ -46,27 +46,50 @@ export default function SwitchChainFallback() {
 
 const StyledModal = styled(Modal)`
   .ant-modal-content {
-    border-radius: 1rem;
-    width: 30rem;
-    left: 2.5rem;
+    border-radius: 0.5rem;
+    width: 80%;
+    left: 50%;
+    transform: translateX(-50%);
   }
   .ant-modal-body {
-    border-radius: 4rem;
+    border-radius: 0.5rem;
   }
 
   h2 {
     margin: 0 0 5px 0;
+    font-size: 14px;
   }
 
   p {
     color: #3c424299;
+    font-size: 11px;
+  }
+  @media only screen and (min-width: 768px) {
+    .ant-modal-content {
+      width: 30rem;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    h2 {
+      margin: 0 0 5px 0;
+      font-size: 20px;
+    }
+
+    p {
+      color: #3c424299;
+      font-size: 14px;
+    }
   }
 `;
 
 const StyledButton = styled(Button)`
   width: 100%;
   height: 50px;
-  font-size: 20px;
+  font-size: 14px;
+  @media only screen and (min-width: 768px) {
+    font-size: 20px;
+  }
 `;
 
 const StyledWrapper = styled.ul`
@@ -86,7 +109,7 @@ const StyledWrapper = styled.ul`
 const StyledLine = styled.li`
   padding: 10px 14px;
   margin: 0 0 8px 0;
-  font-size: 18px;
+  font-size: 14px;
   border-radius: 10px;
   cursor: pointer;
   background: ${(props) => props.isActive && "#999cff"};
@@ -95,5 +118,20 @@ const StyledLine = styled.li`
   &:hover {
     background: ${(props) => !props.isActive && "#e3cfee"};
     color: ${(props) => !props.isActive && "#4d50b4"};
+  }
+
+  @media only screen and (min-width: 768px) {
+    padding: 10px 14px;
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    background: ${(props) => props.isActive && "#999cff"};
+    color: ${(props) => props.isActive && "white"};
+
+    &:hover {
+      background: ${(props) => !props.isActive && "#e3cfee"};
+      color: ${(props) => !props.isActive && "#4d50b4"};
+    }
   }
 `;
