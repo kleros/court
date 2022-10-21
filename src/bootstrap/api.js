@@ -36,6 +36,7 @@ const funcs = [
 
 const chainIdToNetwork = {
   1: "mainnet",
+  5: "goerli",
   42: "kovan",
   77: "sokol",
   100: "xdai",

@@ -41,8 +41,8 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
       let disabled = false;
       if (metaEvidence && _justifications && _justifications !== "pending") {
         // Disable round justifications if there are none to show
-        if (_justifications.payload.justifications.Items.length === 0) disabled = true;
-        justifications = _justifications.payload.justifications.Items.reduce(
+        if (_justifications?.payload?.justifications?.Items.length === 0) disabled = true;
+        justifications = _justifications?.payload?.justifications?.Items.reduce(
           (acc, j) => {
             const vote = call("KlerosLiquid", "getVote", ID, i, j.voteID.N);
             if (vote) {
@@ -93,9 +93,9 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
                 <h3>Round</h3>
                 <StyledRadioGroup buttonStyle="solid" name="round" onChange={handleChangeRound} value={round}>
                   <Row>
-                    {justifications.map((round, i) => (
+                    {justifications?.map((round, i) => (
                       <Col lg={12} md={24} key={i}>
-                        <Radio.Button disabled={round.disabled} key={i} value={i}>
+                        <Radio.Button disabled={round?.disabled} key={i} value={i}>
                           Round {i + 1}
                         </Radio.Button>
                       </Col>
@@ -131,20 +131,20 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
             </Col>
             <Col md={14} style={{ height: "100%" }}>
               <JustificationsBox>
-                <Skeleton active loading={justifications[round].loading}>
+                <Skeleton active loading={justifications[round]?.loading}>
                   <h2>Justification</h2>
-                  {!justifications[round].loading && justifications[round].byChoice[rulingOption].length ? (
+                  {!justifications[round]?.loading && justifications[round]?.byChoice[rulingOption].length ? (
                     <JustificationText>
-                      {justifications[round].byChoice[rulingOption][justificationIndex]}
+                      {justifications[round]?.byChoice[rulingOption][justificationIndex]}
                     </JustificationText>
                   ) : (
                     <div>No Justifications for this selection</div>
                   )}
-                  {!justifications[round].loading && justifications[round].byChoice[rulingOption].length > 0 && (
+                  {!justifications[round]?.loading && justifications[round]?.byChoice[rulingOption].length > 0 && (
                     <ScrollBarContainer>
                       <ScrollBar
                         currentOption={justificationIndex}
-                        numberOfOptions={justifications[round].byChoice[rulingOption].length - 1}
+                        numberOfOptions={justifications[round]?.byChoice[rulingOption].length - 1}
                         setOption={setJustificationIndex}
                       />
                     </ScrollBarContainer>
