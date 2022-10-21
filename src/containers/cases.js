@@ -25,8 +25,6 @@ export default function Cases() {
       [drizzleState.account]
     )
   );
-  // eslint-disable-next-line no-console
-  console.log(draws);
   const disputes = useCacheCall(["KlerosLiquid"], (call) =>
     draws
       ? Object.values(
