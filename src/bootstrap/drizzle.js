@@ -8,6 +8,9 @@ import PolicyRegistry from "../assets/contracts/policy-registry.json";
 import UniswapV2Factory from "../assets/contracts/uniswap-v2-factory.json";
 import UniswapV2Router02 from "../assets/contracts/uniswap-v2-router-02.json";
 
+// eslint-disable-next-line no-console
+console.log(process.env.REACT_APP_KLEROS_LIQUID_GOERLI_ADDRESS);
+
 const defaultOptions = {
   networkWhitelist: [
     1, // Mainnet
