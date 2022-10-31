@@ -21,6 +21,8 @@ const chainIdToRpcEndpoint = {
   42: process.env.REACT_APP_WEB3_FALLBACK_KOVAN_HTTPS_URL,
   77: process.env.REACT_APP_WEB3_FALLBACK_SOKOL_HTTPS_URL,
   100: process.env.REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL,
+  137: process.env.REACT_APP_WEB3_FALLBACK_POLYGON_HTTPS_URL,
+  80001: process.env.REACT_APP_WEB3_FALLBACK_MUMBAI_HTTPS_URL,
 };
 
 export function getReadOnlyRpcUrl({ chainId }) {
