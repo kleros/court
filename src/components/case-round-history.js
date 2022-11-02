@@ -1,25 +1,23 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
 import { Col, Radio, Row, Skeleton } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
-import { useAPI } from "../bootstrap/api";
-import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import { useDataloader } from "../bootstrap/dataloader";
 import useChainId from "../hooks/use-chain-id";
 import ScrollBar from "./scroll-bar";
+import KlerosLiquid from "../assets/contracts/kleros-liquid.json";
 
-const { useDrizzle, useDrizzleState } = drizzleReactHooks;
+const { useDrizzle } = drizzleReactHooks;
 
 export default function CaseRoundHistory({ ID, dispute, ruling }) {
-  const { drizzle, useCacheCall } = useDrizzle();
-  const drizzleState = useDrizzleState((drizzleState) => ({
-    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
-  }));
+  const { drizzle } = useDrizzle();
   const getMetaEvidence = useDataloader.getMetaEvidence();
   // const dispute = useCacheCall('KlerosLiquid', 'disputes', ID)
   const [round, setRound] = useState(dispute.votesLengths.length - 1);
   const [rulingOption, setRulingOption] = useState(Number(ruling) || 1);
   const [justificationIndex, setJustificationIndex] = useState(0);
+  const [justifications, setJustifications] = useState({ loading: false });
   const chainId = useChainId();
 
   let metaEvidence;
@@ -32,46 +30,45 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
       metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
     }
 
-  const justifications = dispute.votesLengths.map((_, i) => {
-    const _justifications = useAPI.getJustifications(drizzle.web3, drizzleState.account, { appeal: i, disputeID: ID });
-
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    return useCacheCall(["KlerosLiquid"], (call) => {
-      let justifications = { loading: true };
-      let disabled = false;
-      if (metaEvidence && _justifications && _justifications !== "pending") {
-        // Disable round justifications if there are none to show
-        if (_justifications?.payload?.justifications?.Items.length === 0) disabled = true;
-        justifications = _justifications?.payload?.justifications?.Items.reduce(
-          (acc, j) => {
-            const vote = call("KlerosLiquid", "getVote", ID, i, j.voteID.N);
-            if (vote) {
-              if (vote.voted)
-                acc.byChoice[acc.byChoice.length > vote.choice ? vote.choice : acc.byChoice.length - 1].push(
-                  j.justification.S
-                );
-            } else acc.loading = true;
-            return acc;
-          },
-          {
-            disabled,
-            byChoice: [
-              ...new Array(
-                2 +
-                  ((metaEvidence.metaEvidenceJSON.rulingOptions &&
-                    metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
-                    metaEvidence.metaEvidenceJSON.rulingOptions.titles.length) ||
-                    0)
-              ),
-            ].map(() => []),
-            loading: false,
-          }
-        );
-      }
-
-      return justifications;
-    });
-  });
+  useEffect(
+    () =>
+      (async () => {
+        setJustifications({ ...justifications, loading: true });
+        const klerosLiquid = new drizzle.web3.eth.Contract(KlerosLiquid.abi, drizzle.contracts.KlerosLiquid.address);
+        return await klerosLiquid
+          .getPastEvents("Justification", { filter: { _disputeID: ID }, fromBlock: 0 })
+          .then((_justifications) => {
+            let newJustifications;
+            let disabled = false;
+            if (metaEvidence && _justifications) {
+              if (_justifications.length === 0) disabled = true;
+              newJustifications = _justifications?.reduce(
+                (acc, j) => {
+                  acc.byChoice[
+                    acc.byChoice.length > j.returnValues._choice ? j.returnValues._choice : acc.byChoice.length - 1
+                  ].push(j.returnValues._justification);
+                  return acc;
+                },
+                {
+                  disabled,
+                  byChoice: [
+                    ...new Array(
+                      2 +
+                        ((metaEvidence.metaEvidenceJSON.rulingOptions &&
+                          metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
+                          metaEvidence.metaEvidenceJSON.rulingOptions.titles.length) ||
+                          0)
+                    ),
+                  ].map(() => []),
+                  loading: false,
+                }
+              );
+            }
+            setJustifications(newJustifications);
+          });
+      })(),
+    [ID, drizzle, metaEvidence]
+  );
 
   const handleChangeRound = useCallback((e) => {
     setRound(e.target.value);
@@ -84,8 +81,8 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
   }, []);
 
   return (
-    <Skeleton active loading={justifications && justifications.loading}>
-      {!justifications.loading && (
+    <Skeleton active loading={justifications?.loading}>
+      {!justifications?.loading && (
         <StyledCaseRoundHistory>
           <Row>
             <Col md={10}>
@@ -93,13 +90,11 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
                 <h3>Round</h3>
                 <StyledRadioGroup buttonStyle="solid" name="round" onChange={handleChangeRound} value={round}>
                   <Row>
-                    {justifications?.map((round, i) => (
-                      <Col lg={12} md={24} key={i}>
-                        <Radio.Button disabled={round?.disabled} key={i} value={i}>
-                          Round {i + 1}
-                        </Radio.Button>
-                      </Col>
-                    ))}
+                    <Col lg={12} md={24}>
+                      <Radio.Button disabled={justifications?.disabled} value={0}>
+                        Round 1
+                      </Radio.Button>
+                    </Col>
                   </Row>
                 </StyledRadioGroup>
               </RoundSelectBox>
@@ -131,20 +126,20 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
             </Col>
             <Col md={14} style={{ height: "100%" }}>
               <JustificationsBox>
-                <Skeleton active loading={justifications[round]?.loading}>
+                <Skeleton active loading={justifications?.loading}>
                   <h2>Justification</h2>
-                  {!justifications[round]?.loading && justifications[round]?.byChoice[rulingOption].length ? (
+                  {!justifications?.loading && justifications?.byChoice?.[rulingOption]?.length > 0 ? (
                     <JustificationText>
-                      {justifications[round]?.byChoice[rulingOption][justificationIndex]}
+                      <pre>{justifications.byChoice[rulingOption][justificationIndex]}</pre>
                     </JustificationText>
                   ) : (
                     <div>No Justifications for this selection</div>
                   )}
-                  {!justifications[round]?.loading && justifications[round]?.byChoice[rulingOption].length > 0 && (
+                  {justifications?.byChoice?.[rulingOption]?.length > 0 && (
                     <ScrollBarContainer>
                       <ScrollBar
                         currentOption={justificationIndex}
-                        numberOfOptions={justifications[round]?.byChoice[rulingOption].length - 1}
+                        numberOfOptions={justifications?.byChoice[rulingOption].length - 1}
                         setOption={setJustificationIndex}
                       />
                     </ScrollBarContainer>

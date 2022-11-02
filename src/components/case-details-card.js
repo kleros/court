@@ -11,7 +11,6 @@ import { ReactComponent as Document } from "../assets/images/document.svg";
 import { ReactComponent as Folder } from "../assets/images/folder.svg";
 import { ReactComponent as Gavel } from "../assets/images/gavel.svg";
 import { ReactComponent as Scales } from "../assets/images/scales.svg";
-import { API } from "../bootstrap/api";
 import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import web3Salt from "../temp/web3-salt";
 import { range, binaryPermutations } from "../helpers/array";
@@ -27,38 +26,9 @@ import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const { toBN, soliditySha3 } = Web3.utils;
 
-const JustificationBox = ({ web3, account, onChange, justification }) => {
-  const key =
-    "To keep your data safe and to use certain features of Kleros, we ask that you sign these messages to create a secret key for your account. This key is unrelated from your main Ethereum account and will not be able to send any transactions.";
-
-  const storageKey = `${account}-${key}`;
-  const secretSigningKey = localStorage.getItem(storageKey);
-  const placeholder = secretSigningKey
-    ? "Justify your vote here..."
-    : "You need a signing key to provide a justification. You can get your signing key by setting your Notifications Settings above, or by clicking the button below. Then reload the page.";
-
-  const makeAndStoreSigningKey = async () => {
-    const signingKey = await web3.eth.personal.sign(key, account);
-    localStorage.setItem(storageKey, signingKey);
-  };
-
-  return (
-    <>
-      <StyledInputTextArea
-        onChange={onChange}
-        placeholder={placeholder}
-        value={justification}
-        disabled={secretSigningKey === null}
-      />
-      {secretSigningKey === null && (
-        <StyledButtonsDiv>
-          <StyledButton onClick={makeAndStoreSigningKey} size="default" type="primary">
-            Create signing key
-          </StyledButton>
-        </StyledButtonsDiv>
-      )}
-    </>
-  );
+const JustificationBox = ({ onChange, justification }) => {
+  const placeholder = "Justify your vote here...";
+  return <StyledInputTextArea onChange={onChange} placeholder={placeholder} value={justification} />;
 };
 
 export default function CaseDetailsCard({ ID }) {
@@ -74,7 +44,7 @@ export default function CaseDetailsCard({ ID }) {
   const getMetaEvidence = useDataloader.getMetaEvidence();
   const getEvidence = useDataloader.getEvidence();
   const [activeSubcourtID, setActiveSubcourtID] = useState();
-  const [justification, setJustification] = useState();
+  const [justification, setJustification] = useState("");
   const [complexRuling, setComplexRuling] = useState();
   const dispute = useCacheCall("KlerosLiquid", "disputes", ID);
   const disputeExtraInfo = useCacheCall("KlerosLiquid", "getDispute", ID);
@@ -229,22 +199,14 @@ export default function CaseDetailsCard({ ID }) {
 
   const sendOrRevealVote = useCallback(
     async (choice) => {
-      if (justification && justification.trim().length > 0) {
-        API.putJustifications(web3, account, {
-          appeal: disputeExtraInfo.votesLengths.length - 1,
-          disputeID: ID,
-          justification,
-          voteIDs: votesData.voteIDs,
-        });
-      }
-
       sendVote(
         ID,
         votesData.voteIDs,
         choice,
         subcourts[subcourts.length - 1].hiddenVotes
           ? await web3Salt(web3, account, VOTE_COMMIT_SALT_KEY, ID, disputeExtraInfo.votesLengths.length - 1)
-          : 0
+          : 0,
+        justification.trim()
       );
     },
     [disputeExtraInfo, votesData, web3, account, subcourts, ID, justification, sendVote]
