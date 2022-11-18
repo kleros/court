@@ -186,6 +186,7 @@ const StyledRadioGroup = styled(Radio.Group)`
     margin-bottom: 15px;
     text-align: center;
     width: 95%;
+    height: auto;
 
     &:before {
       background-color: transparent;
