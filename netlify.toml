@@ -24,8 +24,8 @@
   REACT_APP_USER_SETTINGS_URL='https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/user-settings'
   REACT_APP_JUSTIFICATIONS_URL='https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/justifications'
   REACT_APP_APPLICATION_SERVER_KEY='BNqPp3phfZUqu4G1SCkqNuZ_FDL4YuSeAEV97U_G3UbrOuOsTeaI9jHE3QNRJ-O8EH3F2OUdnJJ4ZOhp80FthKU'
-  REACT_APP_WEB3_FALLBACK_URL='wss://mainnet.infura.io/ws/v3/54fb3d87cd07464591ad2be29a1db32f'
-  REACT_APP_WEB3_FALLBACK_HTTPS_URL='https://mainnet.infura.io/v3/54fb3d87cd07464591ad2be29a1db32f'
+  REACT_APP_WEB3_FALLBACK_URL='wss://eth-mainnet.g.alchemy.com/v2/uL6wnCNAu31Wh7c5P5NWPwD-ZYc2LTKh'
+  REACT_APP_WEB3_FALLBACK_HTTPS_URL='https://eth-mainnet.g.alchemy.com/v2/uL6wnCNAu31Wh7c5P5NWPwD-ZYc2LTKh'
 
   REACT_APP_KLEROS_LIQUID_ROPSTEN_ADDRESS='0xab942e7d2bff0bc5614c968ccc91198fd223c57e'
   REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_ROPSTEN_ADDRESS='0x469790510aAe3bc1CC8B989269cf837058f55aF6'
