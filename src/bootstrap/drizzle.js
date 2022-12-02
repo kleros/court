@@ -17,6 +17,7 @@ const defaultOptions = {
     42, // Kovan
     77, // Sokol
     100, // xDAI
+    10200, // Chiado
   ],
   contracts: [
     {
@@ -29,6 +30,7 @@ const defaultOptions = {
         42: { address: process.env.REACT_APP_KLEROS_KOVAN_ADDRESS },
         77: { address: process.env.REACT_APP_KLEROS_SOKOL_ADDRESS },
         100: { address: process.env.REACT_APP_KLEROS_XDAI_ADDRESS },
+        10200: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
       },
     },
     {
@@ -41,6 +43,7 @@ const defaultOptions = {
         42: { address: process.env.REACT_APP_KLEROS_LIQUID_KOVAN_ADDRESS },
         77: { address: process.env.REACT_APP_KLEROS_LIQUID_SOKOL_ADDRESS },
         100: { address: process.env.REACT_APP_KLEROS_LIQUID_XDAI_ADDRESS },
+        10200: { address: process.env.REACT_APP_KLEROS_LIQUID_CHIADO_ADDRESS },
       },
     },
     {
@@ -53,6 +56,7 @@ const defaultOptions = {
         42: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_KOVAN_ADDRESS },
         77: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_SOKOL_ADDRESS },
         100: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_XDAI_ADDRESS },
+        10200: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_CHIADO_ADDRESS },
       },
     },
     {
@@ -65,6 +69,7 @@ const defaultOptions = {
         42: { address: process.env.REACT_APP_PINAKION_KOVAN_ADDRESS },
         77: { address: process.env.REACT_APP_PINAKION_SOKOL_ADDRESS },
         100: { address: process.env.REACT_APP_PINAKION_XDAI_ADDRESS },
+        10200: { address: process.env.REACT_APP_PINAKION_CHIADO_ADDRESS },
       },
     },
     {
@@ -77,6 +82,7 @@ const defaultOptions = {
         42: { address: process.env.REACT_APP_POLICY_REGISTRY_KOVAN_ADDRESS },
         77: { address: process.env.REACT_APP_POLICY_REGISTRY_SOKOL_ADDRESS },
         100: { address: process.env.REACT_APP_POLICY_REGISTRY_XDAI_ADDRESS },
+        10200: { address: process.env.REACT_APP_POLICY_REGISTRY_CHIADO_ADDRESS },
       },
     },
     {
@@ -89,6 +95,7 @@ const defaultOptions = {
         42: { address: process.env.REACT_APP_UNISWAP_V2_FACTORY_KOVAN_ADDRESS },
         77: { address: process.env.REACT_APP_UNISWAP_V2_FACTORY_SOKOL_ADDRESS },
         100: { address: process.env.REACT_APP_UNISWAP_V2_FACTORY_XDAI_ADDRESS },
+        10200: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
       },
     },
     {
@@ -101,6 +108,7 @@ const defaultOptions = {
         42: { address: process.env.REACT_APP_UNISWAP_V2_ROUTER_02_KOVAN_ADDRESS },
         77: { address: process.env.REACT_APP_UNISWAP_V2_ROUTER_02_SOKOL_ADDRESS },
         100: { address: process.env.REACT_APP_UNISWAP_V2_ROUTER_02_XDAI_ADDRESS },
+        10200: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
       },
     },
   ],
@@ -118,6 +126,7 @@ const chainIdToFallbackUrl = {
   42: process.env.REACT_APP_WEB3_FALLBACK_KOVAN_URL,
   77: process.env.REACT_APP_WEB3_FALLBACK_SOKOL_URL,
   100: process.env.REACT_APP_WEB3_FALLBACK_XDAI_URL,
+  10200: process.env.REACT_APP_WEB3_FALLBACK_CHIADO_URL,
 };
 
 const { DrizzleProvider, Initializer, useDrizzle } = drizzleReactHooks;

@@ -6,6 +6,7 @@ export const chainIdToNetworkName = {
   42: "Ethereum Testnet Kovan",
   77: "POA Sokol",
   100: "xDAI Chain",
+  10200: "xDAI Testnet Chiado"
 };
 
 export const chainIdToNetworkShortName = {
@@ -16,4 +17,5 @@ export const chainIdToNetworkShortName = {
   42: "Kovan",
   77: "Sokol",
   100: "xDAI",
+  10200: "Chiado",
 };
