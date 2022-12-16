@@ -78,7 +78,7 @@
     "is-video": "^1.0.1",
     "javascript-time-ago": "^1.0.32",
     "polished": "^2.3.0",
-    "prop-types": "^15.6.2",
+    "prop-types": "^15.8.1",
     "react": "^17.0.2",
     "react-blockies": "^1.4.0",
     "react-circular-progressbar": "^2.0.1",
