@@ -48,6 +48,12 @@ const networkIDData = {
     nativeToken: "xDAI",
     pnkToken: "stPNK",
   },
+  10200: {
+    name: "_CHIADO",
+    provider: "https://rpc.chiadochain.net",
+    nativeToken: "xDAI",
+    pnkToken: "PNK",
+  },
 };
 
 const createHandlers = ({ nativeToken, pnkToken, fromBlock }) => ({

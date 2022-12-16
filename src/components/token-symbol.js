@@ -35,6 +35,7 @@ const chainIdToSuffix = {
   42: "ETH",
   77: "SPOA",
   100: "xDAI",
+  10200: "xDAI",
 };
 
 const chainIdToTokenSuffix = {
@@ -43,4 +44,5 @@ const chainIdToTokenSuffix = {
   42: { PNK: "PNK", xPNK: "<<Invalid>>" },
   77: { PNK: "stPNK", xPNK: "PNK" },
   100: { PNK: "stPNK", xPNK: "PNK" },
+  10200: { PNK: "stPNK", xPNK: "PNK" },
 };
