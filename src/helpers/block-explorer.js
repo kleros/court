@@ -5,6 +5,7 @@ const chainIdToBaseUrl = {
   42: "https://kovan.etherscan.io",
   77: "https://blockscout.com/poa/sokol",
   100: "https://blockscout.com/poa/xdai",
+  10200: "https://blockscout.chiadochain.net",
 };
 
 export const getBaseUrl = (chainId) => chainIdToBaseUrl[chainId] ?? chainIdToBaseUrl[1];
