@@ -9,9 +9,6 @@ export default class ErrorBoundary extends Component {
     this.state = { hasError: false, error: null, errorInfo: null };
   }
 
-  static getDerivedStateFromError = () => {
-    return { hasError: true };
-  };
   componentDidCatch(error, errorInfo) {
     withScope((scope) => {
       Object.keys(errorInfo).forEach((key) => {
