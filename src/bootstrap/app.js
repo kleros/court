@@ -15,8 +15,6 @@ import { ChainIdProvider } from "../hooks/use-chain-id";
 import { ArchonInitializer } from "./archon";
 import ChainChangeWatcher from "./chain-change-watcher";
 import drizzle, { DrizzleProvider, Initializer, useDrizzle } from "./drizzle";
-import ErrorBoundary from "../components/error-boundary";
-import SwitchChainFallback from "../components/error-fallback/switch-chain";
 
 export default function App() {
   const [isMenuClosed, setIsMenuClosed] = useState(true);
@@ -28,81 +26,75 @@ export default function App() {
         <link href="https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i,700,700i" rel="stylesheet" />
       </Helmet>
       <DrizzleProvider drizzle={drizzle}>
-        <Initializer
-          error={<C404 Web3 />}
-          loadingContractsAndAccounts={<C404 Web3 />}
-          loadingWeb3={<StyledSpin tip="Connecting to your Web3 provider." />}
-        >
+        <Initializer error={<C404 Web3 />} loadingWeb3={<StyledSpin tip="Connecting to your Web3 provider." />}>
           <DrizzleChainIdProvider>
             <ChainChangeWatcher>
-              <ErrorBoundary fallback={SwitchChainFallback}>
-                <ArchonInitializer>
-                  <BrowserRouter>
+              <ArchonInitializer>
+                <BrowserRouter>
+                  <Layout>
+                    <StyledLayoutSider
+                      breakpoint="md"
+                      collapsedWidth="0"
+                      collapsed={isMenuClosed}
+                      onClick={() => setIsMenuClosed((previousState) => !previousState)}
+                    >
+                      <Menu theme="dark">{MenuItems}</Menu>
+                    </StyledLayoutSider>
                     <Layout>
-                      <StyledLayoutSider
-                        breakpoint="md"
-                        collapsedWidth="0"
-                        collapsed={isMenuClosed}
-                        onClick={() => setIsMenuClosed((previousState) => !previousState)}
-                      >
-                        <Menu theme="dark">{MenuItems}</Menu>
-                      </StyledLayoutSider>
-                      <Layout>
-                        <StyledLayoutHeader>
-                          <Row>
-                            <StyledLogoCol lg={4} md={4} sm={12} xs={0}>
-                              <LogoNavLink to="/">
-                                <Logo />
-                              </LogoNavLink>
-                            </StyledLogoCol>
-                            <Col lg={14} md={12} xs={0} style={{ padding: "0 16px" }}>
-                              <StyledMenu mode="horizontal" theme="dark">
-                                {MenuItems}
-                              </StyledMenu>
-                            </Col>
-                            <StyledTrayCol lg={6} md={8} sm={12} xs={24}>
-                              <StyledTray>
-                                <AccountStatus />
-                                <NotificationSettings settings={settings} />
-                              </StyledTray>
-                            </StyledTrayCol>
-                          </Row>
-                        </StyledLayoutHeader>
-                        <StyledLayoutContent>
-                          <Switch>
-                            <Route exact path="/">
-                              <Home />
-                            </Route>
-                            <Route exact path="/courts">
-                              <Courts />
-                            </Route>
-                            <Route exact path="/cases">
-                              <Cases />
-                            </Route>
-                            <Route exact path="/cases/:ID">
-                              <Case />
-                            </Route>
-                            <Route exact path="/tokens">
-                              <Tokens />
-                            </Route>
-                            <Route exact path="/convert-pnk">
-                              <ConvertPnk />
-                            </Route>
-                            <Route path="*">
-                              <C404 />
-                            </Route>
-                          </Switch>
-                        </StyledLayoutContent>
-                        <Footer />
-                        <StyledClickaway
-                          isMenuClosed={isMenuClosed}
-                          onClick={isMenuClosed ? null : () => setIsMenuClosed(true)}
-                        />
-                      </Layout>
+                      <StyledLayoutHeader>
+                        <Row>
+                          <StyledLogoCol lg={4} md={4} sm={12} xs={0}>
+                            <LogoNavLink to="/">
+                              <Logo />
+                            </LogoNavLink>
+                          </StyledLogoCol>
+                          <Col lg={14} md={12} xs={0} style={{ padding: "0 16px" }}>
+                            <StyledMenu mode="horizontal" theme="dark">
+                              {MenuItems}
+                            </StyledMenu>
+                          </Col>
+                          <StyledTrayCol lg={6} md={8} sm={12} xs={24}>
+                            <StyledTray>
+                              <AccountStatus />
+                              <NotificationSettings settings={settings} />
+                            </StyledTray>
+                          </StyledTrayCol>
+                        </Row>
+                      </StyledLayoutHeader>
+                      <StyledLayoutContent>
+                        <Switch>
+                          <Route exact path="/">
+                            <Home />
+                          </Route>
+                          <Route exact path="/courts">
+                            <Courts />
+                          </Route>
+                          <Route exact path="/cases">
+                            <Cases />
+                          </Route>
+                          <Route exact path="/cases/:ID">
+                            <Case />
+                          </Route>
+                          <Route exact path="/tokens">
+                            <Tokens />
+                          </Route>
+                          <Route exact path="/convert-pnk">
+                            <ConvertPnk />
+                          </Route>
+                          <Route path="*">
+                            <C404 />
+                          </Route>
+                        </Switch>
+                      </StyledLayoutContent>
+                      <Footer />
+                      <StyledClickaway
+                        isMenuClosed={isMenuClosed}
+                        onClick={isMenuClosed ? null : () => setIsMenuClosed(true)}
+                      />
                     </Layout>
-                  </BrowserRouter>
-                </ArchonInitializer>
-              </ErrorBoundary>
+                  </Layout>
+                </BrowserRouter>
+              </ArchonInitializer>
             </ChainChangeWatcher>
           </DrizzleChainIdProvider>
         </Initializer>
