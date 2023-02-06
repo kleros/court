@@ -735,6 +735,7 @@ export default function CaseDetailsCard({ ID }) {
                 evidence={evidence}
                 metaEvidence={metaEvidence}
                 ruling={dispute.period === "4" ? votesData.currentRuling : null}
+                chainId={chainId}
               />
             </CollapsableCard>
             {disputeExtraInfo &&

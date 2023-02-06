@@ -46,7 +46,8 @@ const StyledEvidenceTimelineArea = styled.div`
 const EvidenceTimeline = ({
   evidence = [],
   metaEvidence = {},
-  ruling = null
+  ruling = null,
+  chainId = 1
 }) => {
   // Sort so most recent is first
   const sortedEvidence = evidence.sort((a, b) => {
@@ -95,6 +96,7 @@ const EvidenceTimeline = ({
           <EvidenceCard
             evidence={_evidence}
             metaEvidence={metaEvidence.metaEvidenceJSON}
+            chainId={chainId}
           />
         </div>
       ))}
