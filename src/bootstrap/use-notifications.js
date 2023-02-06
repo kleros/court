@@ -12,35 +12,11 @@ const networkIDData = {
       ? Number(process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER)
       : 0,
   },
-  3: {
-    name: "_ROPSTEN",
-    provider: "https://ropsten.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
-    nativeToken: "ETH",
-    pnkToken: "PNK",
-  },
-  4: {
-    name: "_RINKEBY",
-    provider: "https://rinkeby.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
-    nativeToken: "ETH",
-    pnkToken: "PNK",
-  },
   5: {
     name: "_GOERLI",
     provider: "https://goerli.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
     nativeToken: "ETH",
     pnkToken: "PNK",
-  },
-  42: {
-    name: "_KOVAN",
-    provider: "https://kovan.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
-    nativeToken: "ETH",
-    pnkToken: "PNK",
-  },
-  77: {
-    name: "_SOKOL",
-    provider: "https://sokol.poa.network",
-    nativeToken: "SPOA",
-    pnkToken: "stPNK",
   },
   100: {
     name: "_XDAI",

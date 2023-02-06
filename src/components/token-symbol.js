@@ -31,18 +31,14 @@ AutoDetectedTokenSymbol.propTypes = {
 
 const chainIdToSuffix = {
   1: "ETH",
-  3: "ETH",
-  42: "ETH",
-  77: "SPOA",
+  5: "gETH",
   100: "xDAI",
   10200: "xDAI",
 };
 
 const chainIdToTokenSuffix = {
   1: { PNK: "PNK", xPNK: "<<Invalid>>" },
-  3: { PNK: "PNK", xPNK: "<<Invalid>>" },
-  42: { PNK: "PNK", xPNK: "<<Invalid>>" },
-  77: { PNK: "stPNK", xPNK: "PNK" },
+  5: { PNK: "PNK", xPNK: "<<Invalid>>" },
   100: { PNK: "stPNK", xPNK: "PNK" },
   10200: { PNK: "stPNK", xPNK: "PNK" },
 };
