@@ -36,9 +36,9 @@ const funcs = [
 
 const chainIdToNetwork = {
   1: "mainnet",
-  42: "kovan",
-  77: "sokol",
+  5: "goerli",
   100: "xdai",
+  10200: "chiado",
 };
 
 export const API = funcs.reduce((acc, f) => {

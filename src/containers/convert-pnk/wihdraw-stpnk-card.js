@@ -137,12 +137,7 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
           console.debug("Form validation error:", err);
           return;
         }
-        const stPNKaddress =
-          chainId === 100
-            ? process.env.REACT_APP_PINAKION_XDAI_ADDRESS
-            : chainId === 77
-            ? process.env.REACT_APP_PINAKION_SOKOL_ADDRESS
-            : false;
+        const stPNKaddress = chainId === 100 && process.env.REACT_APP_PINAKION_XDAI_ADDRESS;
         if (stPNKaddress) {
           const stPNK = new drizzle.web3.eth.Contract(stPNKAbi.abi, stPNKaddress);
           const amountInWei = toWei(String(values.amount));
