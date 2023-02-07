@@ -19,6 +19,7 @@ import RequiredChainIdModal from "../components/required-chain-id-modal";
 import SideChainPnkActions from "../components/side-chain/pnk-actions";
 import useChainId from "../hooks/use-chain-id";
 import { ReactComponent as Present } from "../assets/images/present.svg";
+import CourtDrawer from "../components/court-drawer";
 
 const { useDrizzleState } = drizzleReactHooks;
 
@@ -38,6 +39,8 @@ export default function Home() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalButtonVisible, setIsModalButtonVisible] = useState(false);
   const [apy, setApy] = useState(0);
+
+  const [activeSubcourtID, setActiveSubcourtID] = useState();
 
   useEffect(() => {
     setIsModalButtonVisible(false);
@@ -113,7 +116,7 @@ export default function Home() {
       <RewardCard />
       <Row gutter={32}>
         <Col lg={8}>
-          <CourtsListCard apy={apy > 1000000 ? apy : null} />
+          <CourtsListCard apy={apy > 1000000 ? apy : null} setActiveSubcourtID={setActiveSubcourtID} />
         </Col>
         <Col lg={8}>
           <CasesListCard />
@@ -125,6 +128,7 @@ export default function Home() {
       <OngoingCasesCard />
       <NotificationsCard />
       <SideChainPnkActions showGetSideChainPnkModal={false} />
+      {activeSubcourtID !== undefined && <CourtDrawer ID={activeSubcourtID} onClose={setActiveSubcourtID} />}
     </>
   );
 

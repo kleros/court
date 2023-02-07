@@ -8,7 +8,7 @@ import ListItem from "./list-item";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
-const CourtListItem = ({ ID, name }) => {
+const CourtListItem = ({ ID, name, onClick }) => {
   const { useCacheCall } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
@@ -23,6 +23,7 @@ const CourtListItem = ({ ID, name }) => {
           <ETHAmount amount={stake} /> PNK
         </>
       }
+      onClick={onClick}
     >
       {name}
     </StyledListItem>
@@ -32,6 +33,7 @@ const CourtListItem = ({ ID, name }) => {
 CourtListItem.propTypes = {
   ID: t.number.isRequired,
   name: t.string.isRequired,
+  onClick: t.func.isRequired,
 };
 
 export default CourtListItem;
