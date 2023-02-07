@@ -1,6 +1,7 @@
 import { Card, Col, Row } from 'antd'
 import React from 'react'
 import styled from 'styled-components'
+import { getAddressUrl, getTransactionUrl } from '../helpers/block-explorer'
 import Attachment from './attachment'
 
 const StyledCard = styled(Card)`
@@ -84,7 +85,7 @@ export const displayDateUTC = dateString => {
   return `${date} ${months[month]} ${year} ${hours}:${minutes} UTC`
 }
 
-const EvidenceCard = ({ evidence, metaEvidence }) => {
+const EvidenceCard = ({ evidence, metaEvidence, chainId }) => {
   const submittedAtDate = new Date(evidence.submittedAt * 1000)
 
   return (
@@ -102,11 +103,17 @@ const EvidenceCard = ({ evidence, metaEvidence }) => {
             <Col lg={23}>
               <StyledSubmitter>
                 Submitted By:{' '}
-                {metaEvidence.aliases &&
-                metaEvidence.aliases[evidence.submittedBy]
-                  ? metaEvidence.aliases[evidence.submittedBy]
-                  : truncateAddress(evidence.submittedBy)}
-                <StyledTime>{displayDateUTC(submittedAtDate)}</StyledTime>
+                <a href={getAddressUrl(chainId, evidence.submittedBy)} rel="noopener noreferrer" target="_blank">
+                  {metaEvidence.aliases &&
+                  metaEvidence.aliases[evidence.submittedBy]
+                    ? metaEvidence.aliases[evidence.submittedBy]
+                    : truncateAddress(evidence.submittedBy)}
+                </a>
+                <StyledTime>
+                  <a href={getTransactionUrl(chainId, evidence.transactionHash)} rel="noopener noreferrer" target="_blank">
+                    {displayDateUTC(submittedAtDate)}
+                  </a>
+                </StyledTime>
               </StyledSubmitter>
             </Col>
             <Col lg={1}>
