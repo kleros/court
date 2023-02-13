@@ -67,7 +67,7 @@
     "@kleros/pnk-merkle-drop-contracts": "^0.1.0",
     "@loadable/component": "^5.5.0",
     "@reality.eth/reality-eth-lib": "^3.0.0",
-    "@sentry/browser": "^4.6.4",
+    "@sentry/browser": "^7.37.2",
     "antd": "^3.10.8",
     "clsx": "^1.1.1",
     "dataloader": "^1.4.0",
