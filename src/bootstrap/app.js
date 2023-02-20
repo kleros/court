@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import t from "prop-types";
 import loadable from "@loadable/component";
 import styled from "styled-components/macro";
-import { Col, Layout, Menu, Row, Spin } from "antd";
+import { Col, Layout, Row, Spin } from "antd";
 import { Helmet } from "react-helmet";
 import { BrowserRouter, NavLink, Route, Switch, useParams } from "react-router-dom";
 import { ReactComponent as Logo } from "../assets/images/kleros-logo-flat-light.svg";
@@ -17,6 +17,8 @@ import ChainChangeWatcher from "./chain-change-watcher";
 import drizzle, { DrizzleProvider, Initializer, useDrizzle } from "./drizzle";
 import ErrorBoundary from "../components/error-boundary";
 import SwitchChainFallback from "../components/error-fallback/switch-chain";
+import MenuMobile from "../components/menu/index";
+import MenuPc from "../components/menu/styledMenu";
 
 export default function App() {
   const [isMenuClosed, setIsMenuClosed] = useState(true);
@@ -45,7 +47,7 @@ export default function App() {
                         collapsed={isMenuClosed}
                         onClick={() => setIsMenuClosed((previousState) => !previousState)}
                       >
-                        <Menu theme="dark">{MenuItems}</Menu>
+                        <MenuMobile></MenuMobile>
                       </StyledLayoutSider>
                       <Layout>
                         <StyledLayoutHeader>
@@ -56,9 +58,7 @@ export default function App() {
                               </LogoNavLink>
                             </StyledLogoCol>
                             <Col lg={14} md={12} xs={0} style={{ padding: "0 16px" }}>
-                              <StyledMenu mode="horizontal" theme="dark">
-                                {MenuItems}
-                              </StyledMenu>
+                              <MenuPc></MenuPc>
                             </Col>
                             <StyledTrayCol lg={6} md={8} sm={12} xs={24}>
                               <StyledTray>
@@ -172,27 +172,6 @@ const ConvertPnk = loadable(() => import(/* webpackPrefetch: true */ "../contain
   fallback: <StyledSpin />,
 });
 
-const MenuItems = [
-  <Menu.Item key="home">
-    <NavLink to="/">Home</NavLink>
-  </Menu.Item>,
-  <Menu.Item key="courts">
-    <NavLink to="/courts">Courts</NavLink>
-  </Menu.Item>,
-  <Menu.Item key="cases">
-    <NavLink to="/cases">My Cases</NavLink>
-  </Menu.Item>,
-  <Menu.Item key="guide">
-    <a
-      href="https://blog.kleros.io/become-a-juror-blockchain-dispute-resolution-on-ethereum/"
-      rel="noopener noreferrer"
-      target="_blank"
-    >
-      Guide
-    </a>
-  </Menu.Item>,
-];
-
 const settings = {
   draw: "When I am drawn as a juror.",
   appeal: "When a case I ruled is appealed.",
@@ -245,35 +224,6 @@ const StyledTrayCol = styled(Col)`
   align-items: center;
   justify-content: flex-end;
   height: 64px;
-`;
-
-const StyledMenu = styled(Menu)`
-  font-weight: 500;
-  line-height: 64px !important;
-  text-align: center;
-
-  &.ant-menu-dark {
-    background-color: transparent;
-  }
-
-  && {
-    .ant-menu-item > a {
-      color: rgba(255, 255, 255, 0.85);
-
-      &.hover,
-      &.focus {
-        color: rgba(255, 255, 255, 1);
-      }
-    }
-
-    .ant-menu-item-selected {
-      background-color: transparent !important;
-
-      > a {
-        color: rgba(255, 255, 255, 1);
-      }
-    }
-  }
 `;
 
 const StyledLayoutContent = styled(Layout.Content)`
