@@ -180,7 +180,7 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
             <RewardCol md={16} xs={16}>
               <div>Coherence Reward</div>
               <h3>
-                <ETHAmount amount={subcourt && subcourt.feeForJuror} decimals={2} tokenSymbol={true} /> +
+                <ETHAmount amount={subcourt && subcourt.feeForJuror} decimals={3} tokenSymbol={true} />
               </h3>
             </RewardCol>
           </Row>

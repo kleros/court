@@ -182,7 +182,7 @@ const CourtCascaderModal = ({ onClick }) => {
                       <div>
                         For each coherent vote you will receive{" "}
                         <strong>
-                          <ETHAmount amount={feeForJuror || null} decimals={2} tokenSymbol={true} /> +
+                          <ETHAmount amount={feeForJuror || null} decimals={3} tokenSymbol={true} />
                         </strong>
                         .
                       </div>

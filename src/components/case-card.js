@@ -238,7 +238,7 @@ const CaseCard = ({ ID, draws }) => {
             <RewardCol md={16} xs={16}>
               <div>Coherence Reward</div>
               <h3>
-                <ETHAmount amount={disputeData && disputeData.coherenceReward} decimals={2} tokenSymbol={true} /> +
+                <ETHAmount amount={disputeData && disputeData.coherenceReward} decimals={3} tokenSymbol={true} />
               </h3>
             </RewardCol>
           </Row>
