@@ -211,7 +211,7 @@ const RewardCard = () => {
               <ETHOffset>
                 <StyledTopDiv>Total</StyledTopDiv>
                 <StyledCenterDiv>
-                  <ETHAmount amount={ethRewards} decimals={2} tokenSymbol={true} />
+                  <ETHAmount amount={ethRewards} decimals={3} tokenSymbol={true} />
                 </StyledCenterDiv>
               </ETHOffset>
             </AmountCol>
