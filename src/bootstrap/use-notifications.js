@@ -5,7 +5,7 @@ import Web3 from "web3";
 const networkIDData = {
   1: {
     name: "",
-    provider: "https://mainnet.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
+    provider: process.env.REACT_APP_WEB3_FALLBACK_HTTPS_URL,
     nativeToken: "ETH",
     pnkToken: "PNK",
     fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER
