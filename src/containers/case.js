@@ -1,9 +1,8 @@
 import React, { useMemo } from "react";
-import { Button, Row, Col, Tooltip } from "antd";
+import { Row, Col } from "antd";
 import { useParams } from "react-router-dom";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import CaseDetailsCard from "../components/case-details-card";
-import ETHAmount from "../components/eth-amount";
 import TimeAgo from "../components/time-ago";
 import TopBanner from "../components/top-banner";
 import RequiredChainIdGateway from "../components/required-chain-id-gateway";
@@ -16,19 +15,17 @@ const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const MANUAL_PASS_DELAY = 3600;
 
 const periodToPhase = (period, hiddenVotes) => {
-  const phases = ["Evidence", "Commit", "Vote", "Appeal", "Execute"];
+  const phases = ["Evidencia", "Commit", "Votación", "Apelación", "Ejecución"];
   const phase = Number(period) === 2 && hiddenVotes ? "Reveal" : phases[period];
   return phase;
 };
 
 export default function Case() {
   const { ID } = useParams();
-  const { drizzle, useCacheCall, useCacheEvents, useCacheSend } = useDrizzle();
+  const { drizzle, useCacheCall, useCacheEvents } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
-  const { send: sendPassPeriod } = useCacheSend("KlerosLiquid", "passPeriod");
-  const { send: sendExecuteRuling } = useCacheSend("KlerosLiquid", "executeRuling");
   const dispute = useCacheCall("KlerosLiquid", "disputes", ID);
   const dispute2 = useCacheCall("KlerosLiquid", "getDispute", ID);
   const draws = useCacheEvents(
@@ -89,59 +86,26 @@ export default function Case() {
       renderOnMismatch={({ requiredChainId }) => <RequiredChainIdModal requiredChainId={requiredChainId} />}
     >
       <TopBanner
-        description={
-          <>
-            Case #{ID} | <ETHAmount amount={disputeData.atStake} tokenSymbol="PNK" /> Locked
-          </>
-        }
+        description={<> Caso #{ID} </>}
         extra={
           <Row>
             {dispute && dispute.ruled ? (
-              <ResolvedTag>Resolved</ResolvedTag>
+              <ResolvedTag>Resuelto</ResolvedTag>
             ) : (
               <>
                 {disputeData.deadline && disputeData.hiddenVotes !== undefined && (
                   <Col lg={disputeData.showPassPeriod ? 12 : 24}>
-                    <StyledDiv>{periodToPhase(dispute.period, disputeData.hiddenVotes)} Period Over</StyledDiv>
+                    <StyledDiv>Fin del periodo de {periodToPhase(dispute.period, disputeData.hiddenVotes)}:</StyledDiv>
                     <StyledBigTextDiv>
                       <TimeAgo className="primary-color theme-color">{disputeData.deadline}</TimeAgo>
                     </StyledBigTextDiv>
                   </Col>
                 )}
-                {disputeData.showPassPeriod ? (
-                  <Col lg={12}>
-                    {Number(dispute.period) === 4 ? (
-                      <Tooltip title={"Enforce the ruling of this case"}>
-                        <StyledButton
-                          type="primary"
-                          onClick={() => {
-                            sendExecuteRuling(ID);
-                          }}
-                        >
-                          Execute Ruling
-                        </StyledButton>
-                      </Tooltip>
-                    ) : (
-                      <Tooltip title={"Advance this case to the next phase"}>
-                        <StyledButton
-                          type="primary"
-                          onClick={() => {
-                            sendPassPeriod(ID);
-                          }}
-                        >
-                          Pass Period
-                        </StyledButton>
-                      </Tooltip>
-                    )}
-                  </Col>
-                ) : (
-                  ""
-                )}
               </>
             )}
           </Row>
         }
-        title="Case Details"
+        title="Detalles del Caso"
       />
       <CaseDetailsCard ID={ID} />
     </RequiredChainIdGateway>
@@ -154,11 +118,6 @@ const StyledDiv = styled.div`
 
 const StyledBigTextDiv = styled(StyledDiv)`
   font-size: 20px;
-`;
-
-const StyledButton = styled(Button)`
-  flex: 0 0 35%;
-  margin: 15px 5px 0px;
 `;
 
 const ResolvedTag = styled.div`
