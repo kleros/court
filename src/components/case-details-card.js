@@ -735,7 +735,7 @@ export default function CaseDetailsCard({ ID }) {
             </Row>
             <div style={{ marginBottom: "2rem" }}>
               <DisputeTimeline
-                period={dispute.period}
+                period={Number(dispute.period)}
                 lastPeriodChange={dispute.lastPeriodChange}
                 subcourtID={dispute.subcourtID}
                 subcourt={subcourtObj}
