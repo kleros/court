@@ -1,0 +1,60 @@
+.disputeTimeline .period > div {
+  color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  font-weight: 600;
+}
+
+.disputeTimeline .period > div::before {
+  text-align: center;
+  color: #ccc;
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  display: inline-block;
+  margin-right: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 2;
+  margin-top: 0.15rem;
+  margin-bottom: auto;
+  vertical-align: baseline;
+}
+
+.disputeTimeline .evidence::before {
+  content: "1";
+}
+
+.disputeTimeline .voting::before {
+  content: "2";
+}
+
+.disputeTimeline .appeal::before {
+  content: "3";
+}
+
+.disputeTimeline .period > div:global(.past):not(.decoration)::before {
+  content: "✓";
+  border-color: #009aff;
+  color: #009aff;
+}
+
+.disputeTimeline .period > div:global(.current) {
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.disputeTimeline .period > div:global(.current)::before {
+  background-color: #009aff;
+  color: white;
+  border: none;
+}
+
+.disputeTimeline .decoration {
+  border: 1px #ccc solid;
+  height: 1px;
+  margin: auto 16px;
+}
+
+.disputeTimeline .decoration:global(.past) {
+  border: 1px #009aff solid;
+}

@@ -17,6 +17,7 @@ import web3Salt from "../temp/web3-salt";
 import { range, binaryPermutations } from "../helpers/array";
 import useChainId from "../hooks/use-chain-id";
 import Attachment from "./attachment";
+import DisputeTimeline from "./disputeTimeline";
 import Breadcrumbs from "./breadcrumbs";
 import CaseRoundHistory from "./case-round-history";
 import CollapsableCard from "./collapsable-card";
@@ -157,6 +158,14 @@ export default function CaseDetailsCard({ ID }) {
         subcourts.push(subcourt);
       }
       return subcourts.reverse();
+    }
+  });
+
+  //Added for DisputeTimeline
+  const subcourtObj = useCacheCall(["KlerosLiquid"], (call) => {
+    if (dispute) {
+      const subcourtObj = call("KlerosLiquid", "getSubcourt", dispute.subcourtID);
+      return subcourtObj;
     }
   });
   let metaEvidence;
@@ -724,6 +733,14 @@ export default function CaseDetailsCard({ ID }) {
                 </StyledInnerCard>
               </Col>
             </Row>
+            <div style={{ marginBottom: "2rem" }}>
+              <DisputeTimeline
+                period={dispute.period}
+                lastPeriodChange={dispute.lastPeriodChange}
+                subcourtID={dispute.subcourtID}
+                subcourt={subcourtObj}
+              />
+            </div>
             <CollapsableCard
               title={
                 <>
