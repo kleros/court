@@ -17,7 +17,7 @@ import web3Salt from "../temp/web3-salt";
 import { range, binaryPermutations } from "../helpers/array";
 import useChainId from "../hooks/use-chain-id";
 import Attachment from "./attachment";
-import DisputeTimeline from "./disputeTimeline";
+import DisputeTimeline from "./dispute-timeline";
 import Breadcrumbs from "./breadcrumbs";
 import CaseRoundHistory from "./case-round-history";
 import CollapsableCard from "./collapsable-card";
