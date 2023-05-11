@@ -102,7 +102,7 @@ const EvidenceCard = ({ evidence, metaEvidence, chainId }) => {
           <Row>
             <Col lg={23}>
               <StyledSubmitter>
-                Submitted By:{' '}
+                Enviado por:{' '}
                 <a href={getAddressUrl(chainId, evidence.submittedBy)} rel="noopener noreferrer" target="_blank">
                   {metaEvidence.aliases &&
                   metaEvidence.aliases[evidence.submittedBy]

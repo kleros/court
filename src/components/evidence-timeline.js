@@ -23,9 +23,9 @@ const EventDiv = styled.div`
   line-height: 14px;
   margin-left: auto;
   margin-right: auto;
-  padding: 10px 0;
+  padding: 10px 12px;
   text-align: center;
-  width: 135px;
+  width: fit-content;
 `
 const ScrollText = styled.div`
   color: #009aff;
@@ -54,27 +54,27 @@ const EvidenceTimeline = ({
     if (a.submittedAt > b.submittedAt) return -1
     else if (a.submittedAt < b.submittedAt) return 1
 
-    return 0
-  })
+    return 0;
+  });
 
   if (sortedEvidence.length === 0) return null
 
   return (
     <StyledEvidenceTimelineArea>
       <Row id="scroll-top">
-        <StyledHeaderCol lg={4}>Latest</StyledHeaderCol>
+        <StyledHeaderCol lg={4}>Último</StyledHeaderCol>
         <Col lg={16}>
           {ruling && (
-            <EventDiv style={{ width: '225px' }}>
+            <EventDiv>
               {ruling
-                ? `Jurors ruled: ${
+                ? `El jurado votó: ${
                     metaEvidence.metaEvidenceJSON.rulingOptions
                       ? metaEvidence.metaEvidenceJSON.rulingOptions.titles[
                           Number(ruling) - 1
                         ]
                       : ruling
                   }`
-                : 'Jurors refused to make a ruling'}
+                : 'El juradó rechazó responder.'}
             </EventDiv>
           )}
         </Col>
@@ -85,7 +85,7 @@ const EvidenceTimeline = ({
             _bottomRow.scrollIntoView()
           }}
         >
-          Scroll to Bottom <Icon type="arrow-down" />
+          Ir al final <Icon type="arrow-down" />
         </ScrollText>
       </Row>
       {sortedEvidence.map((_evidence, i) => (
@@ -93,20 +93,16 @@ const EvidenceTimeline = ({
           <Row>
             <StyledDividerCol lg={12} />
           </Row>
-          <EvidenceCard
-            evidence={_evidence}
-            metaEvidence={metaEvidence.metaEvidenceJSON}
-            chainId={chainId}
-          />
+          <EvidenceCard evidence={_evidence} metaEvidence={metaEvidence.metaEvidenceJSON} chainId={chainId} />
         </div>
       ))}
       <Row>
         <StyledDividerCol lg={12} />
       </Row>
       <Row id="scroll-bottom">
-        <StyledHeaderCol lg={4}>Start</StyledHeaderCol>
+        <StyledHeaderCol lg={4} />
         <Col lg={16}>
-          <EventDiv>Dispute Created</EventDiv>
+          <EventDiv>Disputa creada</EventDiv>
         </Col>
         <ScrollText
           lg={4}
@@ -115,7 +111,7 @@ const EvidenceTimeline = ({
             _bottomRow.scrollIntoView()
           }}
         >
-          Scroll to Top <Icon type="arrow-up" />
+          Ir arriba <Icon type="arrow-up" />
         </ScrollText>
       </Row>
     </StyledEvidenceTimelineArea>

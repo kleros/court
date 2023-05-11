@@ -89,7 +89,7 @@ export default function Case() {
         description={<> Caso #{ID} </>}
         extra={
           <Row>
-            {dispute && dispute.ruled ? (
+            {(dispute && dispute.ruled) || (dispute2 && dispute2.votesLengths.length > 1) ? (
               <ResolvedTag>Resuelto</ResolvedTag>
             ) : (
               <>

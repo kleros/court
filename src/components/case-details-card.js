@@ -49,11 +49,9 @@ export default function CaseDetailsCard({ ID }) {
   );
   const votesData = useCacheCall(["KlerosLiquid"], (call) => {
     let votesData = { loading: true };
-    const currentRuling = call("KlerosLiquid", "currentRuling", ID);
+    const voteCounter = call("KlerosLiquid", "getVoteCounter", ID, 0);
     if (dispute && disputeExtraInfo && draws) {
-      const drawnInCurrentRound =
-        draws.length > 0 &&
-        Number(draws[draws.length - 1].returnValues._appeal) === disputeExtraInfo.votesLengths.length - 1;
+      const drawnInCurrentRound = false;
       const vote =
         drawnInCurrentRound &&
         call(
@@ -80,9 +78,9 @@ export default function CaseDetailsCard({ ID }) {
                 (dispute.period === "2" && (!subcourt.hiddenVotes || committed) && !vote.voted)),
             committed,
             commit: vote.commit,
-            currentRuling,
+            currentRuling: voteCounter?.winningChoice,
             drawnInCurrentRound,
-            loading: !currentRuling,
+            loading: !voteCounter,
             voteIDs: [],
             voted: vote.voted && vote.choice,
           }
@@ -191,21 +189,15 @@ export default function CaseDetailsCard({ ID }) {
       <StyledCard
         actions={[
           <Spin key="main" spinning={votesData.loading || !subcourts || !metaEvidence}>
-            {!votesData.loading && subcourts && metaEvidence ? (
+            {!votesData.loading && subcourts && metaEvidence && disputeExtraInfo ? (
               <>
                 <StyledActionsDiv className="secondary-linear-background theme-linear-background">
-                  {new Set(["0", "1", "2", "3"]).has(dispute.period) ? <Hourglass /> : <Gavel />}
-                  {dispute.period === "0" && (
-                    <SecondaryActionText>
-                      Estamos en periodo de evidencia.{"\n"}La votación todavía no ha empezado.
-                    </SecondaryActionText>
+                  {new Set(["0", "1", "2", "3"]).has(dispute.period) && disputeExtraInfo.votesLengths.length <= 1 ? (
+                    <Hourglass />
+                  ) : (
+                    <Gavel />
                   )}
-                  {new Set(["1", "2"]).has(dispute.period) && (
-                    <SecondaryActionText>
-                      Estamos en periodo de votación.{"\n"}El jurado está votando.
-                    </SecondaryActionText>
-                  )}
-                  {new Set(["3", "4"]).has(dispute.period) && (
+                  {new Set(["3", "4"]).has(dispute.period) || disputeExtraInfo.votesLengths.length > 1 ? (
                     <SecondaryActionText>
                       Decisión Final{"\n"}El ganador de este caso fue:{"\n"}
                       {votesData.currentRuling === "0"
@@ -223,6 +215,19 @@ export default function CaseDetailsCard({ ID }) {
                             )) ||
                           "Unknown Choice"}
                     </SecondaryActionText>
+                  ) : (
+                    <>
+                      {dispute.period === "0" && (
+                        <SecondaryActionText>
+                          Estamos en periodo de evidencia.{"\n"}La votación todavía no ha empezado.
+                        </SecondaryActionText>
+                      )}
+                      {new Set(["1", "2"]).has(dispute.period) && (
+                        <SecondaryActionText>
+                          Estamos en periodo de votación.{"\n"}El jurado está votando.
+                        </SecondaryActionText>
+                      )}
+                    </>
                   )}
                 </StyledActionsDiv>
               </>
