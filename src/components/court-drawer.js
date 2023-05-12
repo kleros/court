@@ -102,29 +102,18 @@ const CourtDrawer = ({ ID, onClose }) => {
       height={350}
       onClose={useCallback(() => onClose(), [onClose])}
       placement="bottom"
-      title={
-        <Spin spinning={loading}>
-          Court Details
-          {!loading && (
-            <StyledBreadcrumbs
-              activeIndex={activeIndex}
-              breadcrumbs={subcourts.map(s => s.name)}
-              onClick={setActiveIndex}
-            />
-          )}
-        </Spin>
-      }
+      title={<Spin spinning={loading}> Detalles de la corte </Spin>}
       visible
     >
       <Skeleton active loading={loading}>
         {!loading && (
           <Row gutter={16}>
             <Col md={12}>
-              <StyledDiv>Description</StyledDiv>
+              <StyledDiv>Descripción</StyledDiv>
               <ReactMarkdown source={subcourts[activeIndex].description} />
             </Col>
             <Col md={12}>
-              <StyledDiv>Summary</StyledDiv>
+              <StyledDiv>Resumen</StyledDiv>
               <ReactMarkdown source={subcourts[activeIndex].summary} />
             </Col>
           </Row>

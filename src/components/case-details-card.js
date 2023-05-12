@@ -149,9 +149,9 @@ export default function CaseDetailsCard({ ID }) {
         actions.push(
           <Attachment
             URI={metaEvidence.metaEvidenceJSON.fileURI}
-            description="This is the primary file uploaded with the dispute."
+            description="Este es el documento principal de la disputa."
             extension={metaEvidence.metaEvidenceJSON.fileTypeExtension}
-            title="Main File"
+            title="Documento principal"
           />
         );
       actions.push(
@@ -259,13 +259,21 @@ export default function CaseDetailsCard({ ID }) {
         {metaEvidence && (
           <>
             <Row>
+              <div style={{ marginBottom: "2rem" }}>
+                <DisputeTimeline
+                  period={Number(dispute.period)}
+                  lastPeriodChange={dispute.lastPeriodChange}
+                  subcourtID={dispute.subcourtID}
+                  subcourt={subcourtObj}
+                />
+              </div>
               <Col span={24}>
                 <StyledInnerCard actions={metaEvidenceActions}>
                   <ReactMarkdown source={metaEvidence.metaEvidenceJSON.description} />
                   {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
                     <iframe
                       title="dispute details"
-                      style={{ width: "1px", minWidth: "100%", height: "360px", border: "none" }}
+                      style={{ width: "1px", minWidth: "100%", height: "auto", border: "none" }}
                       src={evidenceDisplayInterfaceURL}
                     />
                   )}
@@ -316,14 +324,6 @@ export default function CaseDetailsCard({ ID }) {
                 </StyledInnerCard>
               </Col>
             </Row>
-            <div style={{ marginBottom: "2rem" }}>
-              <DisputeTimeline
-                period={Number(dispute.period)}
-                lastPeriodChange={dispute.lastPeriodChange}
-                subcourtID={dispute.subcourtID}
-                subcourt={subcourtObj}
-              />
-            </div>
             <CollapsableCard
               title={
                 <>

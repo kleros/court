@@ -11,11 +11,11 @@ export default function C404({ Web3 }) {
         <Styled404Div className="primary-color theme-color">{Web3 ? "Web3 not found" : "404"}</Styled404Div>
         <StyledMessageLine1 className="ternary-color theme-color">Oops,</StyledMessageLine1>
         <StyledMessageLine2 className="ternary-color theme-color">
-          {Web3 ? "The gods are having trouble finding your Web3 provider." : "Something went wrong in Athens!"}
+          {Web3 ? "No pudimos conectar con tu wallet." : "Something went wrong in Athens!"}
         </StyledMessageLine2>
         <StyledMessageLine3 className="ternary-color theme-color">
           {Web3
-            ? "Please make sure you have your wallet unlocked on Mainnet or xDAI, Goerli or Chiado. If you don't have a wallet, we recommend you install MetaMask on desktop and Trust on mobile."
+            ? "Si tienes una wallet instalada en tu navegador, acepta la conexión con la página. O navega a esta página en incognito o un navegador sin wallet."
             : "The greek gods are not available at the moment."}
         </StyledMessageLine3>
       </StyledInfoDiv>

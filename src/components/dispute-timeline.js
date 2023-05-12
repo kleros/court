@@ -16,7 +16,7 @@ const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
     );
   }, [lastPeriodChange, period, subcourt.timesPerPeriod]);
 
-  const periods = ["Evidence", "Commit", "Voting", "Appeal"];
+  const periods = ["Evidencia", "Commit", "Votación", "Ejecución"];
 
   const getSubtext = (i) => {
     if (period === i) {
@@ -45,7 +45,7 @@ const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
                 >
                   <div>
                     <div>{periodName}</div>
-                    <small> {getSubtext(i)} </small>
+                    {i + 1 < periods.length && <small> {getSubtext(i)} </small>}
                   </div>
                 </Period>
 

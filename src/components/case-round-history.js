@@ -60,8 +60,7 @@ export default function CaseRoundHistory({ ID, dispute }) {
     <StyledCaseRoundHistory>
       <JustificationsBox>
         <Skeleton active loading={!votesInfo || votesInfo.loading || !metaEvidence}>
-          {votesInfo &&
-            metaEvidence &&
+          {votesInfo && metaEvidence && votesInfo.votes.length > 0 ? (
             votesInfo.votes.map(({ justification, choice }, i) => (
               <React.Fragment key={i}>
                 <JustificationCard
@@ -73,7 +72,10 @@ export default function CaseRoundHistory({ ID, dispute }) {
                 />
                 {i + 1 < votesInfo.votes.length && <Break />}
               </React.Fragment>
-            ))}
+            ))
+          ) : (
+            <h5>No se ha votado aún</h5>
+          )}
         </Skeleton>
       </JustificationsBox>
     </StyledCaseRoundHistory>

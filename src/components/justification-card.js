@@ -7,7 +7,7 @@ const Container = styled.div`
   text-align: left;
 `;
 
-const Title = styled.h3`
+const Title = styled.h5`
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
