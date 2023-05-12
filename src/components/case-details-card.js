@@ -14,6 +14,7 @@ import { ReactComponent as Scales } from "../assets/images/scales.svg";
 import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import useChainId from "../hooks/use-chain-id";
 import Attachment from "./attachment";
+import DisputeTimeline from "./dispute-timeline";
 import CaseRoundHistory from "./case-round-history";
 import CollapsableCard from "./collapsable-card";
 import CourtDrawer from "./court-drawer";
@@ -113,6 +114,15 @@ export default function CaseDetailsCard({ ID }) {
         subcourts.push(subcourt);
       }
       return subcourts.reverse();
+    }
+  });
+
+  //Added for DisputeTimeline
+  const subcourtObj = useCacheCall(["KlerosLiquid"], (call) => {
+    if (dispute) {
+      const subcourt = call("KlerosLiquid", "courts", dispute.subcourtID);
+      const subcourtObj = call("KlerosLiquid", "getSubcourt", dispute.subcourtID);
+      return { ...subcourt, ...subcourtObj };
     }
   });
   let metaEvidence;
@@ -306,6 +316,14 @@ export default function CaseDetailsCard({ ID }) {
                 </StyledInnerCard>
               </Col>
             </Row>
+            <div style={{ marginBottom: "2rem" }}>
+              <DisputeTimeline
+                period={Number(dispute.period)}
+                lastPeriodChange={dispute.lastPeriodChange}
+                subcourtID={dispute.subcourtID}
+                subcourt={subcourtObj}
+              />
+            </div>
             <CollapsableCard
               title={
                 <>
