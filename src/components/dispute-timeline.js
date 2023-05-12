@@ -18,6 +18,16 @@ const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
 
   const periods = ["Evidence", "Commit", "Voting", "Appeal"];
 
+  const getSubtext = (i) => {
+    if (period === i) {
+      return renderCountdown;
+    } else if (period > i) {
+      return "Concluded";
+    } else {
+      return convertToHumanReadableTime(subcourt.timesPerPeriod[i]);
+    }
+  };
+
   return (
     <StyledDisputeTimeline>
       <Row>
@@ -35,13 +45,7 @@ const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
                 >
                   <div>
                     <div>{periodName}</div>
-                    <small>
-                      {period === i
-                        ? renderCountdown
-                        : period > i
-                        ? "Concluded"
-                        : convertToHumanReadableTime(subcourt.timesPerPeriod[i])}
-                    </small>
+                    <small> {getSubtext(i)} </small>
                   </div>
                 </Period>
 
