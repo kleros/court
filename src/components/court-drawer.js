@@ -1,14 +1,13 @@
-import { Col, Drawer, Row, Skeleton, Spin } from 'antd'
-import React, { useCallback, useState } from 'react'
-import Breadcrumbs from './breadcrumbs'
-import PropTypes from 'prop-types'
-import ReactMarkdown from 'react-markdown'
-import styled from 'styled-components/macro'
-import { triangle } from 'polished'
-import { useDataloader } from '../bootstrap/dataloader'
-import { drizzleReactHooks } from '@drizzle/react-plugin'
+import { Col, Drawer, Row, Skeleton, Spin } from "antd";
+import React, { useCallback, useState } from "react";
+import PropTypes from "prop-types";
+import ReactMarkdown from "react-markdown";
+import styled from "styled-components/macro";
+import { triangle } from "polished";
+import { useDataloader } from "../bootstrap/dataloader";
+import { drizzleReactHooks } from "@drizzle/react-plugin";
 
-const { useDrizzle } = drizzleReactHooks
+const { useDrizzle } = drizzleReactHooks;
 
 const StyledDrawer = styled(Drawer)`
   .ant-drawer {
@@ -20,13 +19,13 @@ const StyledDrawer = styled(Drawer)`
       padding: 0 0 45px;
 
       ::after {
-        content: '';
+        content: "";
         left: 50%;
         ${triangle({
-          foregroundColor: 'gainsboro',
-          height: '19px',
-          pointingDirection: 'top',
-          width: '38px'
+          foregroundColor: "gainsboro",
+          height: "19px",
+          pointingDirection: "top",
+          width: "38px",
         })}
         position: absolute;
         top: 24px;
@@ -34,10 +33,10 @@ const StyledDrawer = styled(Drawer)`
 
         @media (max-width: 575px) {
           ${triangle({
-            foregroundColor: 'gainsboro',
-            height: '10px',
-            pointingDirection: 'top',
-            width: '20px'
+            foregroundColor: "gainsboro",
+            height: "10px",
+            pointingDirection: "top",
+            width: "20px",
           })}
           top: 12px;
         }
@@ -53,49 +52,44 @@ const StyledDrawer = styled(Drawer)`
       overflow-y: scroll;
     }
   }
-`
-const StyledBreadcrumbs = styled(Breadcrumbs)`
-  left: 0;
-  position: absolute;
-  top: 48px;
-`
+`;
 const StyledDiv = styled.div`
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 20px;
-`
+`;
 const CourtDrawer = ({ ID, onClose }) => {
-  const { useCacheCall } = useDrizzle()
-  const loadPolicy = useDataloader.loadPolicy()
-  const [activeIndex, setActiveIndex] = useState()
-  const subcourts = useCacheCall(['PolicyRegistry', 'KlerosLiquid'], call => {
-    const subcourts = []
-    let nextID = ID
+  const { useCacheCall } = useDrizzle();
+  const loadPolicy = useDataloader.loadPolicy();
+  const [activeIndex, setActiveIndex] = useState();
+  const subcourts = useCacheCall(["PolicyRegistry", "KlerosLiquid"], (call) => {
+    const subcourts = [];
+    let nextID = ID;
     while (!subcourts.length || subcourts[subcourts.length - 1].ID !== nextID) {
       const subcourt = {
         ID: nextID,
         description: undefined,
         name: undefined,
-        summary: undefined
-      }
-      const policy = call('PolicyRegistry', 'policies', subcourt.ID)
+        summary: undefined,
+      };
+      const policy = call("PolicyRegistry", "policies", subcourt.ID);
       if (policy !== undefined) {
-        const policyJSON = loadPolicy(policy)
+        const policyJSON = loadPolicy(policy);
         if (policyJSON) {
-          subcourt.description = policyJSON.description
-          subcourt.name = policyJSON.name
-          subcourt.summary = policyJSON.summary
+          subcourt.description = policyJSON.description;
+          subcourt.name = policyJSON.name;
+          subcourt.summary = policyJSON.summary;
         }
       }
-      const _subcourt = call('KlerosLiquid', 'courts', subcourt.ID)
-      if (_subcourt) nextID = _subcourt.parent
-      if (subcourt.name === undefined || !_subcourt) return undefined
-      subcourts.push(subcourt)
+      const _subcourt = call("KlerosLiquid", "courts", subcourt.ID);
+      if (_subcourt) nextID = _subcourt.parent;
+      if (subcourt.name === undefined || !_subcourt) return undefined;
+      subcourts.push(subcourt);
     }
-    if (activeIndex === undefined) setActiveIndex(subcourts.length - 1)
-    return subcourts.reverse()
-  })
-  const loading = subcourts === undefined || activeIndex === undefined
+    if (activeIndex === undefined) setActiveIndex(subcourts.length - 1);
+    return subcourts.reverse();
+  });
+  const loading = subcourts === undefined || activeIndex === undefined;
   return (
     <StyledDrawer
       closable={false}
@@ -120,12 +114,12 @@ const CourtDrawer = ({ ID, onClose }) => {
         )}
       </Skeleton>
     </StyledDrawer>
-  )
-}
+  );
+};
 
 CourtDrawer.propTypes = {
   ID: PropTypes.string.isRequired,
-  onClose: PropTypes.func.isRequired
-}
+  onClose: PropTypes.func.isRequired,
+};
 
-export default CourtDrawer
+export default CourtDrawer;
