@@ -4,14 +4,92 @@ import Countdown, { zeroPad, calcTimeDelta } from "react-countdown";
 import PropTypes from "prop-types";
 import styled from "styled-components/macro";
 
-const StyledDisputeTimeline = styled.div`
-  .period > div {
-    color: rgba(0, 0, 0, 0.45);
-    display: flex;
-    font-weight: 600;
-  }
+const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
+  const renderCountdown = useMemo(() => {
+    return (
+      <Countdown
+        date={(parseInt(lastPeriodChange) + parseInt(subcourt.timesPerPeriod[period])) * 1000}
+        renderer={(props) => (
+          <span>{`${zeroPad(props.days, 2)}d ${zeroPad(props.hours, 2)}h ${zeroPad(props.minutes, 2)}m`}</span>
+        )}
+      />
+    );
+  }, [lastPeriodChange, period, subcourt.timesPerPeriod]);
 
-  .period > div::before {
+  const periods = ["Evidence", "Commit", "Voting", "Appeal"];
+
+  return (
+    <StyledDisputeTimeline>
+      <Row>
+        {subcourt &&
+          periods.map((periodName, i) =>
+            i !== 1 || subcourt.hiddenVotes ? (
+              <React.Fragment key={periodName}>
+                <Period
+                  md="auto"
+                  s={24}
+                  current={period === i}
+                  past={period > i}
+                  content={i > 1 && !subcourt.hiddenVotes ? i : i + 1}
+                  className={i + 1 === periods.length ? "mb-2 mb-md-0" : "justify-content-md-end"}
+                >
+                  <div>
+                    <div>{periodName}</div>
+                    <small>
+                      {period === i
+                        ? renderCountdown
+                        : period > i
+                        ? "Concluded"
+                        : convertToHumanReadableTime(subcourt.timesPerPeriod[i])}
+                    </small>
+                  </div>
+                </Period>
+
+                {i + 1 < periods.length && <Separator past={period > i} className="d-none d-md-block" />}
+              </React.Fragment>
+            ) : (
+              <></>
+            )
+          )}
+      </Row>
+    </StyledDisputeTimeline>
+  );
+};
+
+DisputeTimeline.propTypes = {
+  period: PropTypes.number.isRequired,
+  lastPeriodChange: PropTypes.number.isRequired,
+  subcourt: PropTypes.shape({
+    timesPerPeriod: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
+    hiddenVotes: PropTypes.bool.isRequired,
+  }).isRequired,
+  days: PropTypes.number.isRequired,
+  hours: PropTypes.number.isRequired,
+  minutes: PropTypes.number.isRequired,
+};
+
+const StyledDisputeTimeline = styled.div``;
+
+const Period = styled(Col)`
+  ${({ past, current }) => {
+    if (past) {
+      return `
+        color: rgba(0, 0, 0, 0.45);
+      `;
+    } else if (current) {
+      return `
+        color: rgba(0, 0, 0, 0.85);
+      `;
+    } else {
+      return `
+        color: rgba(0, 0, 0, 0.25);
+      `;
+    }
+  }}
+  display: flex;
+  font-weight: 600;
+
+  &::before {
     text-align: center;
     color: #ccc;
     height: 1.5rem;
@@ -26,138 +104,39 @@ const StyledDisputeTimeline = styled.div`
     margin-top: 0.15rem;
     margin-bottom: auto;
     vertical-align: baseline;
-  }
-
-  .evidence::before {
-    content: "1";
-  }
-
-  .voting::before {
-    content: "2";
-  }
-
-  .appeal::before {
-    content: "3";
-  }
-
-  .period > div.past:not(.decoration)::before {
-    content: "✓";
-    border-color: #009aff;
-    color: #009aff;
-  }
-
-  .period > div.current {
-    color: rgba(0, 0, 0, 0.85);
-  }
-
-  .period > div.current::before {
-    background-color: #009aff;
-    color: white;
-    border: none;
-  }
-
-  .decoration {
-    border: 1px #ccc solid;
-    height: 1px;
-    margin: auto 16px;
-  }
-
-  .period > div.past.decoration::before {
-    content: "";
-    border: none;
-  }
-
-  .period > div.upcoming::before {
-    content: "";
-    border: none;
-  }
-
-  .period > div.upcoming:not(.decoration) {
-    color: rgba(0, 0, 0, 0.25);
+    ${({ past, current, content }) => {
+      if (past) {
+        return `
+          content: "✓";
+          border-color: #009aff;
+          color: #009aff;
+        `;
+      } else if (current) {
+        return `
+          content: "${content.toString()}";
+          background-color: #009aff;
+          color: white;
+          border: none;
+        `;
+      } else {
+        return `
+          content: "${content}";
+        `;
+      }
+    }}
   }
 `;
 
-const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
-  const convertToHumanReadiableTime = (timeInMillis) => {
-    const time = calcTimeDelta(parseInt(timeInMillis) * 1000, { now: () => 0 });
+const Separator = styled(Col)`
+  ${({ past }) => `border: 1px ${past ? "#009aff" : "#ccc"} solid;`}
+  height: 1px;
+  margin: auto 16px;
+`;
 
-    return `${zeroPad(time.days, 2)}d ${zeroPad(time.hours, 2)}h ${zeroPad(time.minutes, 2)}m`;
-  };
+const convertToHumanReadableTime = (timeInMillis) => {
+  const time = calcTimeDelta(parseInt(timeInMillis) * 1000, { now: () => 0 });
 
-  const renderCountdown = useMemo(() => {
-    return (
-      <Countdown
-        date={(parseInt(lastPeriodChange) + parseInt(subcourt.timesPerPeriod[period])) * 1000}
-        renderer={(props) => (
-          <span>{`${zeroPad(props.days, 2)}d ${zeroPad(props.hours, 2)}h ${zeroPad(props.minutes, 2)}m`}</span>
-        )}
-      />
-    );
-  }, [lastPeriodChange, period, subcourt.timesPerPeriod]);
-
-  return (
-    <StyledDisputeTimeline>
-      <Row className={` period`}>
-        <Col className={`mb-2 mb-md-0 ${period === 0 ? "current" : "past"} evidence`} xs={24} md="auto">
-          <div>
-            <div className="name">Evidence</div>
-            <small className="time">{period === 0 ? renderCountdown : "Concluded"}</small>
-          </div>
-        </Col>
-
-        <Col className={`${period < 2 ? "upcoming" : "past"}  d-none d-md-block  decoration`} />
-
-        <Col
-          className={`mb-2 mb-md-0 ${period < 2 && "upcoming"} ${
-            period === 2 ? "current" : "past"
-          } justify-content-md-center voting`}
-          xs={24}
-          md="auto"
-        >
-          <div>
-            <div className="name">Voting</div>
-            <small className="time">
-              {period === 2
-                ? renderCountdown
-                : period > 2
-                ? "Concluded"
-                : convertToHumanReadiableTime(subcourt.timesPerPeriod[2])}
-            </small>
-          </div>
-        </Col>
-
-        <Col className={`${period < 3 ? "upcoming" : "past"}  d-none d-md-block decoration`} />
-
-        <Col
-          className={`${period < 3 && "upcoming"} ${period === 3 ? "current" : "past"}  justify-content-md-end appeal`}
-          xs={24}
-          md="auto"
-        >
-          <div>
-            <div className="name">Appeal</div>
-            <small className="time">
-              {period === 3
-                ? renderCountdown
-                : period > 3
-                ? "Concluded"
-                : convertToHumanReadiableTime(subcourt.timesPerPeriod[3])}
-            </small>
-          </div>
-        </Col>
-      </Row>
-    </StyledDisputeTimeline>
-  );
-};
-
-DisputeTimeline.propTypes = {
-  period: PropTypes.number.isRequired,
-  lastPeriodChange: PropTypes.number.isRequired,
-  subcourt: PropTypes.shape({
-    timesPerPeriod: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
-  }).isRequired,
-  days: PropTypes.number.isRequired,
-  hours: PropTypes.number.isRequired,
-  minutes: PropTypes.number.isRequired,
+  return `${zeroPad(time.days, 2)}d ${zeroPad(time.hours, 2)}h ${zeroPad(time.minutes, 2)}m`;
 };
 
 export default DisputeTimeline;

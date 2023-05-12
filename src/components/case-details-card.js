@@ -164,8 +164,9 @@ export default function CaseDetailsCard({ ID }) {
   //Added for DisputeTimeline
   const subcourtObj = useCacheCall(["KlerosLiquid"], (call) => {
     if (dispute) {
+      const subcourt = call("KlerosLiquid", "courts", dispute.subcourtID);
       const subcourtObj = call("KlerosLiquid", "getSubcourt", dispute.subcourtID);
-      return subcourtObj;
+      return { ...subcourt, ...subcourtObj };
     }
   });
   let metaEvidence;
