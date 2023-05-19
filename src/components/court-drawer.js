@@ -1,11 +1,10 @@
+import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { Col, Drawer, Row, Skeleton, Spin } from "antd";
-import React, { useCallback, useState } from "react";
+import { triangle } from "polished";
 import PropTypes from "prop-types";
+import React, { useCallback, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import styled from "styled-components/macro";
-import { triangle } from "polished";
-import { useDataloader } from "../bootstrap/dataloader";
-import { drizzleReactHooks } from "@drizzle/react-plugin";
 
 const { useDrizzle } = drizzleReactHooks;
 
@@ -58,38 +57,37 @@ const StyledDiv = styled.div`
   font-weight: bold;
   margin-bottom: 20px;
 `;
-const CourtDrawer = ({ ID, onClose }) => {
-  const { useCacheCall } = useDrizzle();
-  const loadPolicy = useDataloader.loadPolicy();
+const CourtDrawer = ({ ID, onClose, subcourts }) => {
   const [activeIndex, setActiveIndex] = useState();
-  const subcourts = useCacheCall(["PolicyRegistry", "KlerosLiquid"], (call) => {
-    const subcourts = [];
-    let nextID = ID;
-    while (!subcourts.length || subcourts[subcourts.length - 1].ID !== nextID) {
-      const subcourt = {
-        ID: nextID,
-        description: undefined,
-        name: undefined,
-        summary: undefined,
-      };
-      const policy = call("PolicyRegistry", "policies", subcourt.ID);
-      if (policy !== undefined) {
-        const policyJSON = loadPolicy(policy);
-        if (policyJSON) {
-          subcourt.description = policyJSON.description;
-          subcourt.name = policyJSON.name;
-          subcourt.summary = policyJSON.summary;
-        }
-      }
-      const _subcourt = call("KlerosLiquid", "courts", subcourt.ID);
-      if (_subcourt) nextID = _subcourt.parent;
-      if (subcourt.name === undefined || !_subcourt) return undefined;
-      subcourts.push(subcourt);
-    }
-    if (activeIndex === undefined) setActiveIndex(subcourts.length - 1);
-    return subcourts.reverse();
-  });
-  const loading = subcourts === undefined || activeIndex === undefined;
+  console.log("subcourts within drawer", ID);
+  // const subcourts = useCacheCall(["PolicyRegistry", "KlerosLiquid"], (call) => {
+  //   const subcourts = [];
+  //   let nextID = ID;
+  //   while (!subcourts.length || subcourts[subcourts.length - 1].ID !== nextID) {
+  //     const subcourt = {
+  //       ID: nextID,
+  //       description: undefined,
+  //       name: undefined,
+  //       summary: undefined,
+  //     };
+  //     const policy = call("PolicyRegistry", "policies", subcourt.ID);
+  //     if (policy !== undefined) {
+  //       const policyJSON = loadPolicy(policy);
+  //       if (policyJSON) {
+  //         subcourt.description = policyJSON.description;
+  //         subcourt.name = policyJSON.name;
+  //         subcourt.summary = policyJSON.summary;
+  //       }
+  //     }
+  //     const _subcourt = call("KlerosLiquid", "courts", subcourt.ID);
+  //     if (_subcourt) nextID = _subcourt.parent;
+  //     if (subcourt.name === undefined || !_subcourt) return undefined;
+  //     subcourts.push(subcourt);
+  //   }
+  //   return subcourts.reverse();
+  // });
+  if (activeIndex === undefined) setActiveIndex(subcourts?.length - 1);
+  const loading = false;
   return (
     <StyledDrawer
       closable={false}
@@ -104,11 +102,11 @@ const CourtDrawer = ({ ID, onClose }) => {
           <Row gutter={16}>
             <Col md={12}>
               <StyledDiv>Descripción</StyledDiv>
-              <ReactMarkdown source={subcourts[activeIndex].description} />
+              <ReactMarkdown source={subcourts[activeIndex]?.description} />
             </Col>
             <Col md={12}>
               <StyledDiv>Resumen</StyledDiv>
-              <ReactMarkdown source={subcourts[activeIndex].summary} />
+              <ReactMarkdown source={subcourts[activeIndex]?.summary} />
             </Col>
           </Row>
         )}

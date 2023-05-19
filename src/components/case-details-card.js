@@ -2,7 +2,7 @@ import * as realitioLibQuestionFormatter from "@reality.eth/reality-eth-lib/form
 import { Button, Card, Col, Icon, Row, Spin } from "antd";
 import { BigNumber } from "ethers";
 import PropTypes from "prop-types";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import styled from "styled-components/macro";
 import { ReactComponent as Document } from "../assets/images/document.svg";
@@ -67,12 +67,14 @@ export default function CaseDetailsCard({ ID }) {
   const { klerosLiquid, policyRegistry } = useContract({ chainID: 1 });
   const [isLoading, setIsLoading] = useState(false);
   const [votesDataObject, setVotesDataObject] = useState();
+  const [subcourtData, setSubcourtData] = useState();
+  const [disputeData, setDisputeData] = useState();
   // const { provider } = getReadOnlyWeb3({ chainId: 5 });
 
   // const loadPolicy = useDataloader.loadPolicy();
   // const getMetaEvidence = useDataloader.getMetaEvidence();
   const getEvidence = useDataloader.getEvidence();
-  const [activeSubcourtID, setActiveSubcourtID] = useState();
+  const [activeSubcourtID, setActiveSubcourtID] = useState("0");
 
   // const policyJSON = loadPolicy("/ipfs/QmXvtokEk3qPiB2WPXXUpd4xCoAr5xeceS1n4BHHqNpP7p");
   // console.log("line 62 policy", policyJSON);
@@ -86,7 +88,7 @@ export default function CaseDetailsCard({ ID }) {
       dispute = await klerosLiquid.disputes(ID);
       console.log("🚀 ~ file: case-details-card.js:75 ~ getDisputeData ~ dispute:", dispute);
       disputeExtraInfo = await klerosLiquid.getDispute(ID);
-      // setDispute(disputeData)
+      setDisputeData(dispute);
       // disputeExtraInfo(disputeExtraInfo)
     } catch (err) {
       console.error(err);
@@ -239,7 +241,11 @@ export default function CaseDetailsCard({ ID }) {
             console.log("🚀 ~ file: case-details-card.js:191 ~ getSubcourts ~ policy:", policy);
             const policyJSON = await getPolicyDocument(policy);
             console.log("🚀 ~ file: case-details-card.js:193 ~ getSubcourts ~ policyJSON:", policyJSON);
-            if (policyJSON) subcourt.name = policyJSON.name;
+            if (policyJSON) {
+              subcourt.name = policyJSON.name;
+              subcourt.description = policyJSON.description;
+              subcourt.summary = policyJSON.summary;
+            }
           }
           console.log("subcourt name", subcourt.name);
           const _subcourt = await klerosLiquid.courts(subcourt.ID);
@@ -252,9 +258,10 @@ export default function CaseDetailsCard({ ID }) {
           console.log("subcourts 233", subcourts);
         }
 
+        console.log("259", subcourts);
+        setSubcourtData(subcourts);
         return subcourts.reverse();
       }
-
       // console.log("policy", policy);
 
       // console.log("nextID", nextID);
@@ -517,6 +524,8 @@ export default function CaseDetailsCard({ ID }) {
     }
   };
 
+  console.log("activesubcourtid", activeSubcourtID);
+
   const evidenceDisplayInterfaceURL = useMemo(() => {
     const normalizeIPFSUri = (uri) => uri.replace(/^\/ipfs\//, "https://ipfs.kleros.io/ipfs/");
     if (metaEvidence?.metaEvidenceJSON?.evidenceDisplayInterfaceURI) {
@@ -602,7 +611,10 @@ export default function CaseDetailsCard({ ID }) {
         ]}
         extra={
           <StyledPoliciesButton
-            onClick={useCallback(() => dispute && setActiveSubcourtID(dispute.subcourtID), [dispute])}
+            onClick={() => {
+              disputeData && console.log("609", disputeData?.subcourtID.toString());
+              disputeData && setActiveSubcourtID(disputeData?.subcourtID.toString());
+            }}
           >
             <StyledDocument /> Politicas
           </StyledPoliciesButton>
@@ -715,8 +727,10 @@ export default function CaseDetailsCard({ ID }) {
               )}
           </>
         )}
-        {activeSubcourtID !== undefined && <CourtDrawer ID={activeSubcourtID} onClose={setActiveSubcourtID} />}
       </StyledCard>
+      {activeSubcourtID !== undefined && subcourtData && (
+        <CourtDrawer ID={activeSubcourtID} subcourts={subcourtData} onClose={setActiveSubcourtID} />
+      )}
     </>
   );
 }
