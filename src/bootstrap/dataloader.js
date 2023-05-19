@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
 import Dataloader from "dataloader";
+import { useEffect, useRef, useState } from "react";
 import archon from "./archon";
 import { getReadOnlyRpcUrl } from "./web3";
 
@@ -61,6 +61,7 @@ const funcs = {
     }
   },
   loadPolicy: (URI, options) => {
+    console.log("URI", URI);
     if (!options) options = {};
     if (URI.startsWith("/ipfs/")) options.preValidated = true;
 
