@@ -30,23 +30,30 @@ export default function CaseDetailsCard({ ID }) {
   const [activeSubcourtID, setActiveSubcourtID] = useState();
 
   useEffect(() => {
-    (async () => {
-      const dispute = await getDisputeData();
-      console.log("dispute completed");
-      getSubcourts(dispute);
-      console.log("subcourts completed");
-      getSubcourtObject(dispute);
-      console.log("subcourtObject completed");
-      getMetaEvidenceData(dispute);
-      console.log("metaEvidence completed");
-      getEvidence(dispute.arbitrated, klerosLiquid.address, ID);
-      console.log("evidence completed");
-      const disputeExtraInfo = await getDisputeExtraInfoData();
-      console.log("disputeExtraInfo completed");
-      setIsLoading(false);
-      getVoteData(dispute, disputeExtraInfo);
-      console.log("voteData completed");
-    })();
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+
+        const dispute = await getDisputeData();
+
+        // Run these in parallel
+        const [subcourts, subcourtObject, metaEvidenceData, evidence, disputeExtraInfo] = await Promise.all([
+          getSubcourts(dispute),
+          getSubcourtObject(dispute),
+          getMetaEvidenceData(dispute),
+          getEvidence(dispute.arbitrated, klerosLiquid.address, ID),
+          getDisputeExtraInfoData(),
+        ]);
+
+        await getVoteData(dispute, disputeExtraInfo);
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
   }, [ID]);
 
   let draws;
@@ -284,7 +291,8 @@ export default function CaseDetailsCard({ ID }) {
                       Decisión Final{"\n"}El ganador de este caso fue:{"\n"}
                       {caseData.votesDataObject?.currentRuling.toString() === "0"
                         ? "No arbitrar"
-                        : (caseData.metaEvidence?.metaEvidenceJSON?.rulingOptions &&
+                        : (caseData?.votesDataObject?.currentRuling &&
+                            caseData.metaEvidence?.metaEvidenceJSON?.rulingOptions &&
                             realitioLibQuestionFormatter.getAnswerString(
                               {
                                 decimals: caseData.metaEvidence.metaEvidenceJSON.rulingOptions.precision,
@@ -292,7 +300,7 @@ export default function CaseDetailsCard({ ID }) {
                                 type: caseData.metaEvidence.metaEvidenceJSON.rulingOptions.type,
                               },
                               realitioLibQuestionFormatter.padToBytes32(
-                                BigNumber.from(caseData.votesDataObject?.currentRuling)
+                                BigNumber.from(caseData.votesDataObject.currentRuling)
                                   .sub(BigNumber.from(1))
                                   .toHexString()
                               )

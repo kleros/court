@@ -22,10 +22,14 @@ export default function Case() {
   const [caseData, setCaseData] = useState({});
 
   useEffect(() => {
-    getDispute();
-    getDisputeExtraInfo();
-    getDraws();
-    getDisputeData();
+    const fetchData = async () => {
+      const dispute = await getDispute();
+      const disputeExtraInfo = await getDisputeExtraInfo();
+      const draws = await getDraws();
+      const disputeData = await getDisputeData(dispute, disputeExtraInfo, draws);
+    };
+
+    fetchData();
   }, [ID]);
 
   const getDispute = async () => {
