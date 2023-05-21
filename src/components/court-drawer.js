@@ -1,12 +1,9 @@
-import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { Col, Drawer, Row, Skeleton, Spin } from "antd";
 import { triangle } from "polished";
 import PropTypes from "prop-types";
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import styled from "styled-components/macro";
-
-const { useDrizzle } = drizzleReactHooks;
 
 const StyledDrawer = styled(Drawer)`
   .ant-drawer {
@@ -58,8 +55,6 @@ const StyledDiv = styled.div`
   margin-bottom: 20px;
 `;
 const CourtDrawer = ({ ID, onClose, subcourts }) => {
-  const [activeIndex, setActiveIndex] = useState();
-  console.log("subcourts within drawer", ID);
   // const subcourts = useCacheCall(["PolicyRegistry", "KlerosLiquid"], (call) => {
   //   const subcourts = [];
   //   let nextID = ID;
@@ -86,7 +81,6 @@ const CourtDrawer = ({ ID, onClose, subcourts }) => {
   //   }
   //   return subcourts.reverse();
   // });
-  if (activeIndex === undefined) setActiveIndex(subcourts?.length - 1);
   const loading = false;
   return (
     <StyledDrawer
@@ -102,11 +96,11 @@ const CourtDrawer = ({ ID, onClose, subcourts }) => {
           <Row gutter={16}>
             <Col md={12}>
               <StyledDiv>Descripción</StyledDiv>
-              <ReactMarkdown source={subcourts[activeIndex]?.description} />
+              <ReactMarkdown source={subcourts[0]?.description} />
             </Col>
             <Col md={12}>
               <StyledDiv>Resumen</StyledDiv>
-              <ReactMarkdown source={subcourts[activeIndex]?.summary} />
+              <ReactMarkdown source={subcourts[0]?.summary} />
             </Col>
           </Row>
         )}

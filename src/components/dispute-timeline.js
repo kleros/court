@@ -6,14 +6,16 @@ import styled from "styled-components/macro";
 
 const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
   const renderCountdown = useMemo(() => {
-    return (
-      <Countdown
-        date={(parseInt(lastPeriodChange) + parseInt(subcourt.timesPerPeriod[period])) * 1000}
-        renderer={(props) => (
-          <span>{`${zeroPad(props.days, 2)}d ${zeroPad(props.hours, 2)}h ${zeroPad(props.minutes, 2)}m`}</span>
-        )}
-      />
-    );
+    if (period && lastPeriodChange && subcourt) {
+      return (
+        <Countdown
+          date={(parseInt(lastPeriodChange) + parseInt(subcourt.timesPerPeriod[period])) * 1000}
+          renderer={(props) => (
+            <span>{`${zeroPad(props.days, 2)}d ${zeroPad(props.hours, 2)}h ${zeroPad(props.minutes, 2)}m`}</span>
+          )}
+        />
+      );
+    } else return null;
   }, [lastPeriodChange, period, subcourt.timesPerPeriod]);
 
   const periods = ["Evidencia", "Commit", "Votación", "Ejecución"];
