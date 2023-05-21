@@ -5,9 +5,11 @@ import { Skeleton } from "antd";
 import JustificationCard from "./justification-card";
 import { useAPI } from "../bootstrap/api";
 import useContract from "../hooks/use-contract";
+import { useConfig } from "@usedapp/core";
 
 export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
-  // const { klerosLiquid } = useContract({ chainID: 1 });
+  const config = useConfig();
+  // const { klerosLiquid } = useContract({ chainID: config.readOnlyChainId });
   // const [votesInfo, setVotesInfo] = useState();
 
   // useEffect(() => {

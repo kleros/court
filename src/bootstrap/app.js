@@ -1,5 +1,5 @@
 import loadable from "@loadable/component";
-import { DAppProvider, Goerli, Mainnet } from "@usedapp/core";
+import { DAppProvider, xDai } from "@usedapp/core";
 import { Col, Layout, Row, Spin } from "antd";
 import React, { useState } from "react";
 import { Helmet } from "react-helmet";
@@ -7,20 +7,16 @@ import { BrowserRouter, NavLink, Route, Switch, useParams } from "react-router-d
 import styled from "styled-components/macro";
 import { ReactComponent as Logo } from "../assets/images/kleros-logo-flat-light.svg";
 import ErrorBoundary from "../components/error-boundary";
-import SwitchChainFallback from "../components/error-fallback/switch-chain";
 import Footer from "../components/footer";
 import "../components/theme.css";
 import "./app.css";
 import { ArchonInitializer } from "./archon";
-import ChainChangeWatcher from "./chain-change-watcher";
 
 const config = {
   multicallVersion: 2,
-  readOnlyChainId: [Mainnet.chainId, Goerli.chainId],
+  readOnlyChainId: xDai.chainId,
   readOnlyUrls: {
-    [Mainnet.chainId]: process.env.REACT_APP_WEB3_FALLBACK_HTTPS_URL,
-    [Goerli.chainId]: process.env.REACT_APP_WEB3_FALLBACK_GOERLI_HTTPS_URL,
-    // [xDai.chainId]: process.env.REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL,
+    [xDai.chainId]: process.env.REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL,
   },
 };
 
@@ -34,40 +30,38 @@ export default function App() {
         <link href="https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i,700,700i" rel="stylesheet" />
       </Helmet>
       <DAppProvider config={config}>
-        <ChainChangeWatcher>
-          <ErrorBoundary fallback={SwitchChainFallback}>
-            <ArchonInitializer>
-              <BrowserRouter>
-                <Layout>
-                  <StyledLayoutHeader>
-                    <Row>
-                      <StyledLogoCol lg={4} md={4} sm={12} xs={0}>
-                        <LogoNavLink to="/">
-                          <Logo />
-                        </LogoNavLink>
-                      </StyledLogoCol>
-                    </Row>
-                  </StyledLayoutHeader>
-                  <StyledLayoutContent>
-                    <Switch>
-                      <Route exact path="/cases/:ID">
-                        <Case />
-                      </Route>
-                      <Route path="*">
-                        <C404 />
-                      </Route>
-                    </Switch>
-                  </StyledLayoutContent>
-                  <Footer />
-                  <StyledClickaway
-                    isMenuClosed={isMenuClosed}
-                    onClick={isMenuClosed ? null : () => setIsMenuClosed(true)}
-                  />
-                </Layout>
-              </BrowserRouter>
-            </ArchonInitializer>
-          </ErrorBoundary>
-        </ChainChangeWatcher>
+        <ErrorBoundary>
+          <ArchonInitializer>
+            <BrowserRouter>
+              <Layout>
+                <StyledLayoutHeader>
+                  <Row>
+                    <StyledLogoCol lg={4} md={4} sm={12} xs={0}>
+                      <LogoNavLink to="/">
+                        <Logo />
+                      </LogoNavLink>
+                    </StyledLogoCol>
+                  </Row>
+                </StyledLayoutHeader>
+                <StyledLayoutContent>
+                  <Switch>
+                    <Route exact path="/cases/:ID">
+                      <Case />
+                    </Route>
+                    <Route path="*">
+                      <C404 />
+                    </Route>
+                  </Switch>
+                </StyledLayoutContent>
+                <Footer />
+                <StyledClickaway
+                  isMenuClosed={isMenuClosed}
+                  onClick={isMenuClosed ? null : () => setIsMenuClosed(true)}
+                />
+              </Layout>
+            </BrowserRouter>
+          </ArchonInitializer>
+        </ErrorBoundary>
       </DAppProvider>
     </>
   );

@@ -7,6 +7,7 @@ import TimeAgo from "../components/time-ago";
 import styled from "styled-components/macro";
 import useContract from "../hooks/use-contract";
 import { BigNumber } from "ethers";
+import { useConfig } from "@usedapp/core";
 
 const MANUAL_PASS_DELAY = 3600;
 
@@ -17,8 +18,9 @@ const periodToPhase = (period, hiddenVotes) => {
 };
 
 export default function Case() {
+  const config = useConfig();
   const { ID } = useParams();
-  const { klerosLiquid } = useContract({ chainID: 1 });
+  const { klerosLiquid } = useContract({ chainID: config.readOnlyChainId });
   const [caseData, setCaseData] = useState({});
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export default function Case() {
       const dispute = await getDispute();
       const disputeExtraInfo = await getDisputeExtraInfo();
       const draws = await getDraws();
-      const disputeData = await getDisputeData(dispute, disputeExtraInfo, draws);
+      await getDisputeData(dispute, disputeExtraInfo, draws);
     };
 
     fetchData();

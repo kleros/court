@@ -21,11 +21,12 @@ import EvidenceTimeline from "./evidence-timeline";
 import { getMetaEvidence } from "../helpers/get-meta-evidence";
 import archon from "../bootstrap/archon";
 import { getPolicyDocument } from "../helpers/get-policy-document";
+import { useConfig } from "@usedapp/core";
 
 export default function CaseDetailsCard({ ID }) {
-  const { klerosLiquid, policyRegistry } = useContract({ chainID: 1 });
+  const config = useConfig();
+  const { klerosLiquid, policyRegistry } = useContract({ chainID: config.readOnlyChainId });
   const [isLoading, setIsLoading] = useState(true);
-  const [drawerOpened, setDrawerOpened] = useState(false);
   const [caseData, setCaseData] = useState({});
   const [activeSubcourtID, setActiveSubcourtID] = useState();
 
@@ -35,15 +36,16 @@ export default function CaseDetailsCard({ ID }) {
         setIsLoading(true);
 
         const dispute = await getDisputeData();
-
+        console.log("disputa conseguida");
         // Run these in parallel
         const [subcourts, subcourtObject, metaEvidenceData, evidence, disputeExtraInfo] = await Promise.all([
+          getMetaEvidenceData(dispute),
           getSubcourts(dispute),
           getSubcourtObject(dispute),
-          getMetaEvidenceData(dispute),
           getEvidence(dispute.arbitrated, klerosLiquid.address, ID),
           getDisputeExtraInfoData(),
         ]);
+        console.log("promesa terminada");
 
         await getVoteData(dispute, disputeExtraInfo);
 
@@ -157,6 +159,7 @@ export default function CaseDetailsCard({ ID }) {
           subcourts.push(subcourt);
         }
         setCaseData((oldData) => ({ ...oldData, subcourts: subcourts.reverse() }));
+        console.log("subcourts conseguida");
         return subcourts.reverse();
       }
     } catch (err) {
@@ -189,6 +192,7 @@ export default function CaseDetailsCard({ ID }) {
     try {
       const subcourtObject = await klerosLiquid.getSubcourt(dispute.subcourtID);
       setCaseData((oldData) => ({ ...oldData, currentSubcourtObject: subcourtObject }));
+      console.log("currentSubcourtObject conseguida");
       return subcourtObject;
     } catch (err) {
       console.error(err);
@@ -209,6 +213,7 @@ export default function CaseDetailsCard({ ID }) {
     try {
       const disputeExtraInfo = await klerosLiquid.getDispute(ID);
       setCaseData((oldData) => ({ ...oldData, disputeExtraInfo: disputeExtraInfo }));
+      console.log("disputeextrainfo conseguida");
       return disputeExtraInfo;
     } catch (err) {
       console.error(err);
@@ -217,14 +222,16 @@ export default function CaseDetailsCard({ ID }) {
 
   const getMetaEvidenceData = async (dispute) => {
     if (dispute.ruled) {
-      const metaEvidence = await getMetaEvidence(1, dispute.arbitrated, klerosLiquid.address, ID, {
+      const metaEvidence = await getMetaEvidence(100, dispute.arbitrated, klerosLiquid.address, ID, {
         strict: false,
       });
       setCaseData((oldData) => ({ ...oldData, metaEvidence: metaEvidence }));
+      console.log("metaevidence conseguida");
       return metaEvidence;
     } else {
-      const metaEvidence = await getMetaEvidence(1, dispute.arbitrated, klerosLiquid.address, ID);
+      const metaEvidence = await getMetaEvidence(100, dispute.arbitrated, klerosLiquid.address, ID);
       setCaseData((oldData) => ({ ...oldData, metaEvidence: metaEvidence }));
+      console.log("metaevidence conseguida");
       return metaEvidence;
     }
   };
@@ -233,14 +240,14 @@ export default function CaseDetailsCard({ ID }) {
     const normalizeIPFSUri = (uri) => uri.replace(/^\/ipfs\//, "https://ipfs.kleros.io/ipfs/");
     if (caseData?.metaEvidence?.metaEvidenceJSON?.evidenceDisplayInterfaceURI) {
       const { evidenceDisplayInterfaceURI, _v = "0" } = caseData.metaEvidence.metaEvidenceJSON;
-      const arbitratorChainID = caseData.metaEvidence.metaEvidenceJSON?.arbitratorChainID ?? 1;
+      const arbitratorChainID = caseData.metaEvidence.metaEvidenceJSON?.arbitratorChainID ?? config.readOnlyChainId;
       const arbitrableChainID = caseData.metaEvidence.metaEvidenceJSON?.arbitrableChainID ?? arbitratorChainID;
 
       let url = normalizeIPFSUri(evidenceDisplayInterfaceURI);
 
       const injectedParams = {
         disputeID: ID,
-        chainID: 1, // Deprecated. Use arbitratorChainID and arbitrableChainID instead.
+        chainID: config.readOnlyChainId, // Deprecated. Use arbitratorChainID and arbitrableChainID instead.
         arbitratorContractAddress: klerosLiquid.address,
         arbitratorJsonRpcUrl: getReadOnlyRpcUrl({ chainId: arbitratorChainID }),
         arbitratorChainID,
