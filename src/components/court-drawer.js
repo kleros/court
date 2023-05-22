@@ -55,32 +55,6 @@ const StyledDiv = styled.div`
   margin-bottom: 20px;
 `;
 const CourtDrawer = ({ ID, onClose, subcourts }) => {
-  // const subcourts = useCacheCall(["PolicyRegistry", "KlerosLiquid"], (call) => {
-  //   const subcourts = [];
-  //   let nextID = ID;
-  //   while (!subcourts.length || subcourts[subcourts.length - 1].ID !== nextID) {
-  //     const subcourt = {
-  //       ID: nextID,
-  //       description: undefined,
-  //       name: undefined,
-  //       summary: undefined,
-  //     };
-  //     const policy = call("PolicyRegistry", "policies", subcourt.ID);
-  //     if (policy !== undefined) {
-  //       const policyJSON = loadPolicy(policy);
-  //       if (policyJSON) {
-  //         subcourt.description = policyJSON.description;
-  //         subcourt.name = policyJSON.name;
-  //         subcourt.summary = policyJSON.summary;
-  //       }
-  //     }
-  //     const _subcourt = call("KlerosLiquid", "courts", subcourt.ID);
-  //     if (_subcourt) nextID = _subcourt.parent;
-  //     if (subcourt.name === undefined || !_subcourt) return undefined;
-  //     subcourts.push(subcourt);
-  //   }
-  //   return subcourts.reverse();
-  // });
   const loading = false;
   return (
     <StyledDrawer

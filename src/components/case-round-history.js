@@ -70,7 +70,7 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
       await getJustificationsData();
     };
 
-    fetchData();
+    fetchData().catch(console.error);
   }, []);
 
   return (

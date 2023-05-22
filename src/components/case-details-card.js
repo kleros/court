@@ -53,7 +53,7 @@ export default function CaseDetailsCard({ ID }) {
       }
     };
 
-    fetchData();
+    fetchData().catch(console.error);
   }, [ID]);
 
   const getVoteData = async (dispute, disputeExtraInfo) => {
@@ -153,8 +153,9 @@ export default function CaseDetailsCard({ ID }) {
           if (subcourt.name === undefined || !_subcourt) return undefined;
           subcourts.push(subcourt);
         }
-        setCaseData((oldData) => ({ ...oldData, subcourts: subcourts.reverse() }));
-        return subcourts.reverse();
+        const subcourtsReversed = subcourts.reverse();
+        setCaseData((oldData) => ({ ...oldData, subcourts: subcourtsReversed }));
+        return subcourtsReversed;
       }
     } catch (err) {
       console.error(err);
@@ -318,7 +319,7 @@ export default function CaseDetailsCard({ ID }) {
         extra={
           <StyledPoliciesButton
             onClick={() => {
-              caseData && caseData?.dispute && setActiveSubcourtID(caseData?.dispute.subcourtID.toString());
+              caseData?.dispute && setActiveSubcourtID(caseData?.dispute.subcourtID.toString());
             }}
           >
             <StyledDocument /> Politicas
@@ -326,11 +327,7 @@ export default function CaseDetailsCard({ ID }) {
         }
         loading={!caseData?.metaEvidence}
         title={
-          caseData?.metaEvidence?.metaEvidenceJSON ? (
-            <> {caseData.metaEvidence && caseData.metaEvidence.metaEvidenceJSON.title} </>
-          ) : (
-            <></>
-          )
+          caseData?.metaEvidence?.metaEvidenceJSON ? <> {caseData?.metaEvidence?.metaEvidenceJSON?.title} </> : <></>
         }
       >
         {caseData?.metaEvidence && caseData?.subcourtObject && caseData?.dispute && (

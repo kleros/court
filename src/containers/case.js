@@ -31,7 +31,7 @@ export default function Case() {
       await getDisputeData();
     };
 
-    fetchData();
+    fetchData().catch(console.error);
   }, [ID]);
 
   const getDispute = async () => {

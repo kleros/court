@@ -82,9 +82,6 @@ const C404 = loadable(() => import(/* webpackPrefetch: true */ "../containers/40
 const CasePage = loadable(
   async ({ ID }) => {
     try {
-      // await drizzle.contracts.KlerosLiquid.methods.disputes(ID).call();
-      // const klerosLiquid = new Contract("0x988b3a538b618c7a603e1c11ab82cd16dbe28069", KLEROS_LIQUID_ABI.abi, provider);
-      // const disputes = await klerosLiquid.disputes(ID);
     } catch (err) {
       console.error(err);
       return C404;
