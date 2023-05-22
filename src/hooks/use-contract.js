@@ -26,7 +26,6 @@ const chainIdToPolicyContractAddress = {
 
 export default function useContract({ chainID }) {
   const url = chainIdToRpcEndpoint[chainID];
-  console.log("🚀 ~ file: use-contract.js:25 ~ useContract ~ url:", url);
   const klerosLiquidContractAddress = chainIdToLiquidContractAddress[chainID];
   const policyRegistryContractAddress = chainIdToPolicyContractAddress[chainID];
   const provider = new ethers.providers.JsonRpcProvider(url);

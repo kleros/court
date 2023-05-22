@@ -1,5 +1,5 @@
 import loadable from "@loadable/component";
-import { DAppProvider, Mainnet, xDai } from "@usedapp/core";
+import { DAppProvider, Mainnet } from "@usedapp/core";
 import { Col, Layout, Row, Spin } from "antd";
 import React, { useState } from "react";
 import { Helmet } from "react-helmet";
@@ -16,7 +16,7 @@ const config = {
   multicallVersion: 2,
   readOnlyChainId: Mainnet.chainId,
   readOnlyUrls: {
-    [xDai.chainId]: process.env.REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL,
+    // [xDai.chainId]: process.env.REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL,
     [Mainnet.chainId]: process.env.REACT_APP_WEB3_FALLBACK_HTTPS_URL,
     // [xDai.chainId]: process.env.REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL,
   },

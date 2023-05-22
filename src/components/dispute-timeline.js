@@ -5,7 +5,6 @@ import Countdown, { calcTimeDelta, zeroPad } from "react-countdown";
 import styled from "styled-components/macro";
 
 const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
-  console.log("subcourt dispute", subcourt);
   const renderCountdown = useMemo(() => {
     if (period && lastPeriodChange && subcourt) {
       return (

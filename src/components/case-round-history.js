@@ -5,44 +5,11 @@ import React, { useEffect, useState } from "react";
 import JustificationCard from "./justification-card";
 
 import styled from "styled-components/macro";
-import { getReadOnlyWeb3 } from "../bootstrap/web3";
 import useContract from "../hooks/use-contract";
 export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
   const config = useConfig();
-  console.log("chain,d 11", config.readOnlyChainId);
-  const { provider } = getReadOnlyWeb3({ chainId: config.readOnlyChainId });
   const { klerosLiquid } = useContract({ chainID: config.readOnlyChainId });
   const [votesInfoData, setVotesInfoData] = useState();
-
-  // useEffect(() => {
-  //   getVotesInfo();
-  // }, [ID]);
-  // const votesInfo = useCacheCall(["KlerosLiquid"], (call) => {
-  //   const dispute2 = call("KlerosLiquid", "getDispute", ID);
-  //   const _justifications = useAPI.getJustifications({ appeal: 0, disputeID: ID });
-  //   let votesInfo = {
-  //     votes: [],
-  //     loading: true,
-  //   };
-  //   if (metaEvidence && dispute2 && _justifications && _justifications !== "pending") {
-  //     const justificationsList = _justifications.payload.justifications.Items;
-  //     votesInfo.loading = false;
-  //     for (let i = 0; i < dispute2.votesLengths.length; i++) {
-  //       const vote = call("KlerosLiquid", "getVote", ID, 0, i.toString());
-  //       if (vote) {
-  //         if (vote.voted) {
-  //           votesInfo.votes.push({
-  //             choice: vote.choice,
-  //             justification: justificationsList.find((j) => j.voteID.N === i.toString())?.justification.S,
-  //           });
-  //         }
-  //       } else {
-  //         votesInfo.loading = true;
-  //       }
-  //     }
-  //   }
-  //   return votesInfo;
-  // });
 
   const getJustificationsData = async () => {
     try {
@@ -60,8 +27,6 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
         method: "POST",
       }).then((res) => res.json());
 
-      console.log("justification data", data);
-
       let votesInfo = {
         votes: [],
         loading: true,
@@ -70,16 +35,11 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
         const justificationsList = data.payload.justifications.Items;
         votesInfo.loading = false;
         for (let i = 0; i < dispute.votesLengths.length; i++) {
-          console.log("dispute.votesLengths.length", dispute);
           const vote = await klerosLiquid.getVote(ID, 0, i.toString());
-          console.log("🚀 ~ file: case-round-history.js:75 ~ getJustificationsData ~ vote:", vote);
           if (vote) {
-            console.log("justificationsList", justificationsList);
             if (vote.voted) {
-              console.log("vote.choice.toString()", vote.choice.toString());
               votesInfo.votes.push({
                 choice: vote.choice.toString(),
-                // justification: justificationsList[i].justification.S,
                 justification: justificationsList.find((j) => j.voteID.N === i.toString())?.justification.S,
               });
             }
@@ -88,7 +48,6 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
           }
         }
       }
-      console.log("votesInfo", votesInfo);
       setVotesInfoData(votesInfo);
       return votesInfo;
     } catch (err) {
@@ -96,37 +55,13 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
     }
   };
 
-  useEffect(async () => {
-    await getJustificationsData();
-  }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      await getJustificationsData();
+    };
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  // const getVotesInfo = async () => {
-  //   const _justifications = await useAPI.getJustifications({ appeal: 0, disputeID: ID });
-  //   let votesInfo = {
-  //     votes: [],
-  //     loading: true,
-  //   };
-  //   if (metaEvidence && dispute && _justifications && _justifications !== "pending") {
-  //     const justificationsList = _justifications.payload.justifications.Items;
-  //     votesInfo.loading = false;
-  //     for (let i = 0; i < dispute.votesLengths.length; i++) {
-  //       const vote = await klerosLiquid.getVote(ID, 0, i.toString());
-  //       if (vote) {
-  //         if (vote.voted) {
-  //           votesInfo.votes.push({
-  //             choice: vote.choice,
-  //             justification: justificationsList.find((j) => j.voteID.N === i.toString())?.justification.S,
-  //           });
-  //         }
-  //       } else {
-  //         votesInfo.loading = true;
-  //       }
-  //     }
-  //   }
-  //   setVotesInfo(votesInfo);
-  //   return votesInfo;
-  // };
+    fetchData();
+  }, []);
 
   return (
     <StyledCaseRoundHistory>
@@ -153,16 +88,6 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
     </StyledCaseRoundHistory>
   );
 }
-//   return (
-//     <StyledCaseRoundHistory>
-//       <JustificationsBox>
-//         <Skeleton>
-//           <h5>No se ha votado aún</h5>
-//         </Skeleton>
-//       </JustificationsBox>
-//     </StyledCaseRoundHistory>
-//   );
-// }
 
 const Break = styled.hr`
   border-top: 1px solid #d09cff;

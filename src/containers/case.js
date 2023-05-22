@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { Row, Col } from "antd";
-import { useParams } from "react-router-dom";
-import CaseDetailsCard from "../components/case-details-card";
-import TopBanner from "../components/top-banner";
-import TimeAgo from "../components/time-ago";
-import styled from "styled-components/macro";
-import useContract from "../hooks/use-contract";
-import { BigNumber } from "ethers";
 import { useConfig } from "@usedapp/core";
+import { Col, Row } from "antd";
+import { BigNumber } from "ethers";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import styled from "styled-components/macro";
+import CaseDetailsCard from "../components/case-details-card";
+import TimeAgo from "../components/time-ago";
+import TopBanner from "../components/top-banner";
+import useContract from "../hooks/use-contract";
 
 const MANUAL_PASS_DELAY = 3600;
 
@@ -113,53 +113,6 @@ export default function Case() {
     setCaseData((oldData) => ({ ...oldData, disputeData: disputeData }));
     return disputeData;
   };
-
-  // const disputeData = useCacheCall(["KlerosLiquid"], (call) => {
-  //   let disputeData = {};
-  //   if (dispute2 && draws) {
-  //     const tokensAtStakePerJuror = dispute2.tokensAtStakePerJuror.map(drizzle.web3.utils.toBN);
-  //     const votesByAppeal = draws.reduce((acc, d) => {
-  //       acc[d.returnValues._appeal] = acc[d.returnValues._appeal]
-  //         ? acc[d.returnValues._appeal].add(drizzle.web3.utils.toBN(1))
-  //         : drizzle.web3.utils.toBN(1);
-  //       return acc;
-  //     }, {});
-  //     disputeData = Object.keys(votesByAppeal).reduce(
-  //       (acc, a) => {
-  //         acc.atStake = acc.atStake.add(votesByAppeal[a].mul(tokensAtStakePerJuror[a]));
-  //         return acc;
-  //       },
-  //       {
-  //         atStake: drizzle.web3.utils.toBN(0),
-  //         deadline: undefined,
-  //       }
-  //     );
-  //     if (dispute && !dispute.ruled) {
-  //       const subcourt = call("KlerosLiquid", "getSubcourt", dispute.subcourtID);
-  //       const court = call("KlerosLiquid", "courts", dispute.subcourtID);
-  //       if (subcourt) {
-  //         disputeData.deadline =
-  //           dispute.period < 4
-  //             ? new Date((Number(dispute.lastPeriodChange) + Number(subcourt.timesPerPeriod[dispute.period])) * 1000)
-  //             : null;
-  //         disputeData.showPassPeriod =
-  //           dispute.period < 4
-  //             ? parseInt(new Date().getTime() / 1000) - Number(dispute.lastPeriodChange) >
-  //               Number(subcourt.timesPerPeriod[dispute.period]) + MANUAL_PASS_DELAY
-  //             : true;
-  //       }
-  //       if (court) {
-  //         disputeData.hiddenVotes = court.hiddenVotes;
-  //       }
-  //     }
-  //   }
-  //   return disputeData;
-  // });
-
-  console.log("dispute on case linea 87", caseData?.dispute);
-  console.log("dispute2 on case linea 88", caseData?.dispute2);
-  console.log("draws on case linea 89", caseData?.draws);
-  console.log("disputedata", caseData?.disputeData);
 
   return (
     <>

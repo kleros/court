@@ -36,16 +36,14 @@ export default function CaseDetailsCard({ ID }) {
         setIsLoading(true);
 
         const dispute = await getDisputeData();
-        console.log("disputa conseguida");
-        // Run these in parallel
-        const [subcourts, subcourtObject, metaEvidenceData, evidence, disputeExtraInfo] = await Promise.all([
-          getMetaEvidenceData(dispute),
-          getSubcourts(dispute),
+
+        const [disputeExtraInfo] = await Promise.all([
+          getSubcourtsData(dispute),
           getSubcourtObject(dispute),
-          getEvidence(dispute.arbitrated, klerosLiquid.address, ID),
+          getMetaEvidenceData(dispute),
+          getEvidenceData(dispute.arbitrated, klerosLiquid.address, ID),
           getDisputeExtraInfoData(),
         ]);
-        console.log("promesa terminada");
 
         await getVoteData(dispute, disputeExtraInfo);
 
@@ -58,12 +56,10 @@ export default function CaseDetailsCard({ ID }) {
     fetchData();
   }, [ID]);
 
-  let draws;
-
   const getVoteData = async (dispute, disputeExtraInfo) => {
     try {
       const filter = klerosLiquid.filters.Draw(null, ID);
-      draws = await klerosLiquid
+      klerosLiquid
         .queryFilter(filter, parseInt(process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER))
         .then(async (result) => {
           let votesData = { loading: true };
@@ -112,7 +108,7 @@ export default function CaseDetailsCard({ ID }) {
     }
   };
 
-  const getEvidence = async (contractAddress, arbitratorAddress, disputeID, options) => {
+  const getEvidenceData = async (contractAddress, arbitratorAddress, disputeID, options) => {
     const dispute = await archon.arbitrable.getDispute(contractAddress, arbitratorAddress, disputeID, {
       ...options,
     });
@@ -123,13 +119,11 @@ export default function CaseDetailsCard({ ID }) {
 
     const filteredEvidence = evidence.filter((e) => e.evidenceJSONValid && (!e.evidenceJSON.fileURI || e.fileValid));
 
-    console.log("evidence line 489", filteredEvidence);
-
     setCaseData((oldData) => ({ ...oldData, evidence: filteredEvidence }));
-    return filteredEvidence; // return the result directly
+    return filteredEvidence;
   };
 
-  const getSubcourts = async (dispute) => {
+  const getSubcourtsData = async (dispute) => {
     const subcourts = [];
     try {
       if (dispute) {
@@ -159,7 +153,6 @@ export default function CaseDetailsCard({ ID }) {
           subcourts.push(subcourt);
         }
         setCaseData((oldData) => ({ ...oldData, subcourts: subcourts.reverse() }));
-        console.log("subcourts conseguida");
         return subcourts.reverse();
       }
     } catch (err) {
@@ -191,8 +184,7 @@ export default function CaseDetailsCard({ ID }) {
   const getSubcourtObject = async (dispute) => {
     try {
       const subcourtObject = await klerosLiquid.getSubcourt(dispute.subcourtID);
-      setCaseData((oldData) => ({ ...oldData, currentSubcourtObject: subcourtObject }));
-      console.log("currentSubcourtObject conseguida");
+      setCaseData((oldData) => ({ ...oldData, subcourtObject: subcourtObject }));
       return subcourtObject;
     } catch (err) {
       console.error(err);
@@ -213,7 +205,6 @@ export default function CaseDetailsCard({ ID }) {
     try {
       const disputeExtraInfo = await klerosLiquid.getDispute(ID);
       setCaseData((oldData) => ({ ...oldData, disputeExtraInfo: disputeExtraInfo }));
-      console.log("disputeextrainfo conseguida");
       return disputeExtraInfo;
     } catch (err) {
       console.error(err);
@@ -226,12 +217,10 @@ export default function CaseDetailsCard({ ID }) {
         strict: false,
       });
       setCaseData((oldData) => ({ ...oldData, metaEvidence: metaEvidence }));
-      console.log("metaevidence conseguida");
       return metaEvidence;
     } else {
       const metaEvidence = await getMetaEvidence(100, dispute.arbitrated, klerosLiquid.address, ID);
       setCaseData((oldData) => ({ ...oldData, metaEvidence: metaEvidence }));
-      console.log("metaevidence conseguida");
       return metaEvidence;
     }
   };
@@ -266,14 +255,6 @@ export default function CaseDetailsCard({ ID }) {
       return url;
     }
   }, [caseData?.metaEvidence, ID, caseData?.dispute, klerosLiquid.address]);
-
-  console.log("currentsubcourtobject", caseData?.currentSubcourtObject);
-  console.log("casedata", caseData);
-  console.log("metaevidence", caseData?.metaEvidence);
-  console.log("metaevidence json", caseData?.metaEvidence?.metaEvidenceJSON);
-  console.log("disputeextrainfo", caseData?.disputeExtraInfo);
-  console.log("isloading", isLoading);
-  console.log("votesdataobject", caseData?.votesDataObject);
 
   return (
     <>
@@ -351,7 +332,7 @@ export default function CaseDetailsCard({ ID }) {
           )
         }
       >
-        {caseData?.metaEvidence && caseData?.currentSubcourtObject && caseData?.dispute && (
+        {caseData?.metaEvidence && caseData?.subcourtObject && caseData?.dispute && (
           <>
             <Row>
               <div style={{ marginBottom: "2rem" }}>
@@ -359,7 +340,7 @@ export default function CaseDetailsCard({ ID }) {
                   period={Number(caseData.dispute.period)}
                   lastPeriodChange={Number(caseData.dispute.lastPeriodChange)}
                   subcourtID={caseData.dispute.subcourtID}
-                  subcourt={caseData.currentSubcourtObject}
+                  subcourt={caseData.subcourtObject}
                 />
               </div>
               {caseData.metaEvidence?.metaEvidenceJSON && (

@@ -1,7 +1,6 @@
 import archon from "../bootstrap/archon";
 
 export const getPolicyDocument = async (URI, options) => {
-  console.log("URI", URI);
   if (!options) options = {};
   if (URI.startsWith("/ipfs/")) options.preValidated = true;
 
