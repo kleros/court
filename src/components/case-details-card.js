@@ -1,4 +1,5 @@
 import * as realitioLibQuestionFormatter from "@reality.eth/reality-eth-lib/formatters/question";
+import { useConfig } from "@usedapp/core";
 import { Button, Card, Col, Icon, Row, Spin } from "antd";
 import { BigNumber } from "ethers";
 import PropTypes from "prop-types";
@@ -10,7 +11,10 @@ import { ReactComponent as Folder } from "../assets/images/folder.svg";
 import { ReactComponent as Gavel } from "../assets/images/gavel.svg";
 import { ReactComponent as Hourglass } from "../assets/images/hourglass.svg";
 import { ReactComponent as Scales } from "../assets/images/scales.svg";
+import archon from "../bootstrap/archon";
 import { getReadOnlyRpcUrl } from "../bootstrap/web3";
+import { getMetaEvidence } from "../helpers/get-meta-evidence";
+import { getPolicyDocument } from "../helpers/get-policy-document";
 import useContract from "../hooks/use-contract";
 import Attachment from "./attachment";
 import CaseRoundHistory from "./case-round-history";
@@ -18,10 +22,6 @@ import CollapsableCard from "./collapsable-card";
 import CourtDrawer from "./court-drawer";
 import DisputeTimeline from "./dispute-timeline";
 import EvidenceTimeline from "./evidence-timeline";
-import { getMetaEvidence } from "../helpers/get-meta-evidence";
-import archon from "../bootstrap/archon";
-import { getPolicyDocument } from "../helpers/get-policy-document";
-import { useConfig } from "@usedapp/core";
 
 export default function CaseDetailsCard({ ID }) {
   const config = useConfig();
@@ -268,7 +268,7 @@ export default function CaseDetailsCard({ ID }) {
   }, [caseData?.metaEvidence, ID, caseData?.dispute, klerosLiquid.address]);
 
   console.log("currentsubcourtobject", caseData?.currentSubcourtObject);
-  console.log("subcourts", caseData?.subcourts);
+  console.log("casedata", caseData);
   console.log("metaevidence", caseData?.metaEvidence);
   console.log("metaevidence json", caseData?.metaEvidence?.metaEvidenceJSON);
   console.log("disputeextrainfo", caseData?.disputeExtraInfo);
@@ -307,9 +307,7 @@ export default function CaseDetailsCard({ ID }) {
                                 type: caseData.metaEvidence.metaEvidenceJSON.rulingOptions.type,
                               },
                               realitioLibQuestionFormatter.padToBytes32(
-                                BigNumber.from(caseData.votesDataObject.currentRuling)
-                                  .sub(BigNumber.from(1))
-                                  .toHexString()
+                                BigNumber.from(caseData.votesDataObject.currentRuling).sub(BigNumber.from(1))
                               )
                             )) ||
                           "Unknown Choice"}
@@ -359,7 +357,7 @@ export default function CaseDetailsCard({ ID }) {
               <div style={{ marginBottom: "2rem" }}>
                 <DisputeTimeline
                   period={Number(caseData.dispute.period)}
-                  lastPeriodChange={caseData.dispute.lastPeriodChange}
+                  lastPeriodChange={Number(caseData.dispute.lastPeriodChange)}
                   subcourtID={caseData.dispute.subcourtID}
                   subcourt={caseData.currentSubcourtObject}
                 />

@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from "react";
-import t from "prop-types";
-import styled from "styled-components/macro";
-import { Skeleton } from "antd";
-import JustificationCard from "./justification-card";
-import { useAPI } from "../bootstrap/api";
-import useContract from "../hooks/use-contract";
 import { useConfig } from "@usedapp/core";
+import { Skeleton } from "antd";
+import t from "prop-types";
+import React, { useEffect, useState } from "react";
+import JustificationCard from "./justification-card";
 
+import styled from "styled-components/macro";
+import { getReadOnlyWeb3 } from "../bootstrap/web3";
+import useContract from "../hooks/use-contract";
 export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
   const config = useConfig();
-  // const { klerosLiquid } = useContract({ chainID: config.readOnlyChainId });
-  // const [votesInfo, setVotesInfo] = useState();
+  console.log("chain,d 11", config.readOnlyChainId);
+  const { provider } = getReadOnlyWeb3({ chainId: config.readOnlyChainId });
+  const { klerosLiquid } = useContract({ chainID: config.readOnlyChainId });
+  const [votesInfoData, setVotesInfoData] = useState();
 
   // useEffect(() => {
   //   getVotesInfo();
@@ -42,6 +44,62 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
   //   return votesInfo;
   // });
 
+  const getJustificationsData = async () => {
+    try {
+      const data = await fetch(process.env.REACT_APP_JUSTIFICATIONS_URL, {
+        body: JSON.stringify({
+          payload: {
+            address: "0x0000000000000000000000000000000000000000",
+            network: "mainnet",
+            payload: "justification",
+            disputeID: ID,
+            appeal: 0,
+          },
+        }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+      }).then((res) => res.json());
+
+      console.log("justification data", data);
+
+      let votesInfo = {
+        votes: [],
+        loading: true,
+      };
+      if (metaEvidence && dispute && data && data !== "pending") {
+        const justificationsList = data.payload.justifications.Items;
+        votesInfo.loading = false;
+        for (let i = 0; i < dispute.votesLengths.length; i++) {
+          console.log("dispute.votesLengths.length", dispute);
+          const vote = await klerosLiquid.getVote(ID, 0, i.toString());
+          console.log("🚀 ~ file: case-round-history.js:75 ~ getJustificationsData ~ vote:", vote);
+          if (vote) {
+            console.log("justificationsList", justificationsList);
+            if (vote.voted) {
+              console.log("vote.choice.toString()", vote.choice.toString());
+              votesInfo.votes.push({
+                choice: vote.choice.toString(),
+                // justification: justificationsList[i].justification.S,
+                justification: justificationsList.find((j) => j.voteID.N === i.toString())?.justification.S,
+              });
+            }
+          } else {
+            votesInfo.loading = true;
+          }
+        }
+      }
+      console.log("votesInfo", votesInfo);
+      setVotesInfoData(votesInfo);
+      return votesInfo;
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(async () => {
+    await getJustificationsData();
+  }, []);
+
   // eslint-disable-next-line react-hooks/rules-of-hooks
   // const getVotesInfo = async () => {
   //   const _justifications = await useAPI.getJustifications({ appeal: 0, disputeID: ID });
@@ -70,40 +128,41 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
   //   return votesInfo;
   // };
 
-  // return (
-  //   <StyledCaseRoundHistory>
-  //     <JustificationsBox>
-  //       <Skeleton active loading={!votesInfo || !metaEvidence}>
-  //         {votesInfo && metaEvidence && votesInfo.votes.length > 0 ? (
-  //           votesInfo.votes.map(({ justification, choice }, i) => (
-  //             <React.Fragment key={i}>
-  //               <JustificationCard
-  //                 {...{
-  //                   justification,
-  //                   choiceTitle: metaEvidence.metaEvidenceJSON.rulingOptions.titles[choice - 1],
-  //                   index: i,
-  //                 }}
-  //               />
-  //               {i + 1 < votesInfo.votes.length && <Break />}
-  //             </React.Fragment>
-  //           ))
-  //         ) : (
-  //           <h5>No se ha votado aún</h5>
-  //         )}
-  //       </Skeleton>
-  //     </JustificationsBox>
-  //   </StyledCaseRoundHistory>
-  // );
   return (
     <StyledCaseRoundHistory>
       <JustificationsBox>
-        <Skeleton>
-          <h5>No se ha votado aún</h5>
+        <Skeleton active loading={!votesInfoData || !metaEvidence}>
+          {votesInfoData && metaEvidence && votesInfoData.votes.length > 0 ? (
+            votesInfoData.votes.map(({ justification, choice }, i) => (
+              <React.Fragment key={i}>
+                <JustificationCard
+                  {...{
+                    justification,
+                    choiceTitle: metaEvidence.metaEvidenceJSON.rulingOptions.titles[choice - 1],
+                    index: i,
+                  }}
+                />
+                {i + 1 < votesInfoData.votes.length && <Break />}
+              </React.Fragment>
+            ))
+          ) : (
+            <h5>No se ha votado aún</h5>
+          )}
         </Skeleton>
       </JustificationsBox>
     </StyledCaseRoundHistory>
   );
 }
+//   return (
+//     <StyledCaseRoundHistory>
+//       <JustificationsBox>
+//         <Skeleton>
+//           <h5>No se ha votado aún</h5>
+//         </Skeleton>
+//       </JustificationsBox>
+//     </StyledCaseRoundHistory>
+//   );
+// }
 
 const Break = styled.hr`
   border-top: 1px solid #d09cff;

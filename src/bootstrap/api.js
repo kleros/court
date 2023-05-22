@@ -42,7 +42,10 @@ const chainIdToNetwork = {
 };
 
 export const API = funcs.reduce((acc, f) => {
+  console.log("acc 45", acc);
+  console.log("f 46", f);
   acc[f.name] = async (web3, account, payload) => {
+    console.log("payload", payload);
     let derivedAccount;
     if (f.signingMethod === "derived")
       derivedAccount = await web3DeriveAccount(

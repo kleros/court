@@ -1,10 +1,11 @@
-import { Row, Col } from "react-bootstrap";
-import React, { useMemo } from "react";
-import Countdown, { zeroPad, calcTimeDelta } from "react-countdown";
 import PropTypes from "prop-types";
+import React, { useMemo } from "react";
+import { Col, Row } from "react-bootstrap";
+import Countdown, { calcTimeDelta, zeroPad } from "react-countdown";
 import styled from "styled-components/macro";
 
 const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
+  console.log("subcourt dispute", subcourt);
   const renderCountdown = useMemo(() => {
     if (period && lastPeriodChange && subcourt) {
       return (
@@ -40,8 +41,8 @@ const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
                 <Period
                   md="auto"
                   s={24}
-                  current={period === i}
-                  past={period > i}
+                  current={(period === i).toString()}
+                  past={(period > i).toString()}
                   content={i > 1 && !subcourt.hiddenVotes ? i : i + 1}
                   className={i + 1 === periods.length ? "mb-2 mb-md-0" : "justify-content-md-end"}
                 >
@@ -51,10 +52,10 @@ const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
                   </div>
                 </Period>
 
-                {i + 1 < periods.length && <Separator past={period > i} className="d-none d-md-block" />}
+                {i + 1 < periods.length && <Separator past={(period > i).toString()} className="d-none d-md-block" />}
               </React.Fragment>
             ) : (
-              <></>
+              <React.Fragment key={periodName}></React.Fragment>
             )
           )}
       </Row>
@@ -65,24 +66,26 @@ const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
 DisputeTimeline.propTypes = {
   period: PropTypes.number.isRequired,
   lastPeriodChange: PropTypes.number.isRequired,
-  subcourt: PropTypes.shape({
-    timesPerPeriod: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
-    hiddenVotes: PropTypes.bool.isRequired,
-  }).isRequired,
-  days: PropTypes.number.isRequired,
-  hours: PropTypes.number.isRequired,
-  minutes: PropTypes.number.isRequired,
+  subcourt: PropTypes.arrayOf(
+    PropTypes.shape({
+      timesPerPeriod: PropTypes.arrayOf(PropTypes.number.isRequired),
+      hiddenVotes: PropTypes.bool,
+    })
+  ).isRequired,
+  days: PropTypes.number,
+  hours: PropTypes.number,
+  minutes: PropTypes.number,
 };
 
 const StyledDisputeTimeline = styled.div``;
 
 const Period = styled(Col)`
   ${({ past, current }) => {
-    if (past) {
+    if (past === "true") {
       return `
         color: rgba(0, 0, 0, 0.45);
       `;
-    } else if (current) {
+    } else if (current === "true") {
       return `
         color: rgba(0, 0, 0, 0.85);
       `;
