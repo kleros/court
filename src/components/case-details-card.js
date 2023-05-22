@@ -59,7 +59,7 @@ export default function CaseDetailsCard({ ID }) {
   const getVoteData = async (dispute, disputeExtraInfo) => {
     try {
       const filter = klerosLiquid.filters.Draw(null, ID);
-      klerosLiquid
+      await klerosLiquid
         .queryFilter(filter, parseInt(process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER))
         .then(async (result) => {
           let votesData = { loading: true };
@@ -102,7 +102,8 @@ export default function CaseDetailsCard({ ID }) {
           }
           setCaseData((oldData) => ({ ...oldData, votesDataObject: votesData }));
           return votesData;
-        });
+        })
+        .catch((err) => console.error(err));
     } catch (err) {
       console.error(err);
     }

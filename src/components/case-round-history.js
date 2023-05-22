@@ -6,6 +6,14 @@ import JustificationCard from "./justification-card";
 
 import styled from "styled-components/macro";
 import useContract from "../hooks/use-contract";
+
+const chainIdToNetwork = {
+  1: "mainnet",
+  5: "goerli",
+  100: "xdai",
+  10200: "chiado",
+};
+
 export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
   const config = useConfig();
   const { klerosLiquid } = useContract({ chainID: config.readOnlyChainId });
@@ -17,7 +25,7 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
         body: JSON.stringify({
           payload: {
             address: "0x0000000000000000000000000000000000000000",
-            network: "mainnet",
+            network: chainIdToNetwork[config.readOnlyChainId],
             payload: "justification",
             disputeID: ID,
             appeal: 0,
@@ -25,7 +33,9 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
         }),
         headers: { "Content-Type": "application/json" },
         method: "POST",
-      }).then((res) => res.json());
+      })
+        .then((res) => res.json())
+        .catch((err) => console.error(err));
 
       let votesInfo = {
         votes: [],

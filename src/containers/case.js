@@ -25,10 +25,10 @@ export default function Case() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const dispute = await getDispute();
-      const disputeExtraInfo = await getDisputeExtraInfo();
-      const draws = await getDraws();
-      await getDisputeData(dispute, disputeExtraInfo, draws);
+      await getDispute();
+      await getDisputeExtraInfo();
+      await getDraws();
+      await getDisputeData();
     };
 
     fetchData();
