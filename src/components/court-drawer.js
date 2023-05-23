@@ -1,7 +1,7 @@
-import { Col, Drawer, Row, Skeleton, Spin } from "antd";
+import { Col, Drawer, Row, Skeleton } from "antd";
 import { triangle } from "polished";
 import PropTypes from "prop-types";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import styled from "styled-components/macro";
 
