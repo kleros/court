@@ -65,7 +65,16 @@ export default function CaseDetailsCard({ ID }) {
 
     if (!drawnInCurrentRound || (vote && subcourt)) {
       const committed = isCommitted(drawnInCurrentRound, vote);
-      return getResult(result, disputeVoteLength, dispute, committed, subcourt, vote, voteCounter, drawnInCurrentRound);
+      return getResult({
+        result,
+        disputeVoteLength,
+        dispute,
+        committed,
+        subcourt,
+        vote,
+        voteCounter,
+        drawnInCurrentRound,
+      });
     }
 
     return { loading: true };
@@ -84,7 +93,7 @@ export default function CaseDetailsCard({ ID }) {
     return drawnInCurrentRound && vote.commit !== "0x0000000000000000000000000000000000000000000000000000000000000000";
   };
 
-  const getResult = (
+  const getResult = ({
     result,
     disputeVoteLength,
     dispute,
@@ -92,8 +101,8 @@ export default function CaseDetailsCard({ ID }) {
     subcourt,
     vote,
     voteCounter,
-    drawnInCurrentRound
-  ) => {
+    drawnInCurrentRound,
+  }) => {
     return result.reduce(
       (acc, d) => {
         if (d.args._appeal.toString() === disputeVoteLength - 1) acc.voteIDs.push(d.args._voteIDs.toString());
