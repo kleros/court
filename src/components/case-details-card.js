@@ -153,7 +153,7 @@ export default function CaseDetailsCard({ ID }) {
           if (subcourt.name === undefined || !_subcourt) return undefined;
           subcourts.push(subcourt);
         }
-        const subcourtsReversed = subcourts.reverse();
+        const subcourtsReversed = [...subcourts].reverse();
         setCaseData((oldData) => ({ ...oldData, subcourts: subcourtsReversed }));
         return subcourtsReversed;
       }
