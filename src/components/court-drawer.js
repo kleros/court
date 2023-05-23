@@ -1,7 +1,7 @@
 import { Col, Drawer, Row, Skeleton, Spin } from "antd";
 import { triangle } from "polished";
 import PropTypes from "prop-types";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import styled from "styled-components/macro";
 
@@ -55,29 +55,26 @@ const StyledDiv = styled.div`
   margin-bottom: 20px;
 `;
 const CourtDrawer = ({ ID, onClose, subcourts }) => {
-  const loading = false;
   return (
     <StyledDrawer
       closable={false}
       height={350}
       onClose={useCallback(() => onClose(), [onClose])}
       placement="bottom"
-      title={<Spin spinning={loading}> Detalles de la corte </Spin>}
+      title={<div> Detalles de la corte </div>}
       visible
     >
-      <Skeleton active loading={loading}>
-        {!loading && (
-          <Row gutter={16}>
-            <Col md={12}>
-              <StyledDiv>Descripción</StyledDiv>
-              <ReactMarkdown source={subcourts[0]?.description} />
-            </Col>
-            <Col md={12}>
-              <StyledDiv>Resumen</StyledDiv>
-              <ReactMarkdown source={subcourts[0]?.summary} />
-            </Col>
-          </Row>
-        )}
+      <Skeleton active loading={false}>
+        <Row gutter={16}>
+          <Col md={12}>
+            <StyledDiv>Descripción</StyledDiv>
+            <ReactMarkdown source={subcourts[subcourts.length - 1]?.description} />
+          </Col>
+          <Col md={12}>
+            <StyledDiv>Resumen</StyledDiv>
+            <ReactMarkdown source={subcourts[subcourts.length - 1]?.summary} />
+          </Col>
+        </Row>
       </Skeleton>
     </StyledDrawer>
   );
