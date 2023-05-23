@@ -269,14 +269,15 @@ export default function CaseDetailsCard({ ID }) {
             caseData.metaEvidence?.metaEvidenceJSON ? (
               <>
                 <StyledActionsDiv className="secondary-linear-background theme-linear-background">
-                  {new Set(["0", "1", "2", "3"]).has(caseData.dispute.period) &&
+                  {new Set([0, 1, 2, 3]).has(caseData.dispute.period) &&
                   caseData.disputeExtraInfo.votesLengths.length <= 1 ? (
                     <Hourglass />
                   ) : (
                     <Gavel />
                   )}
-                  {new Set(["3", "4"]).has(caseData.dispute.period) ||
-                  caseData.disputeExtraInfo.votesLengths.length > 1 ? (
+                  {caseData?.votesDataObject?.currentRuling &&
+                  (new Set([3, 4]).has(caseData.dispute.period) ||
+                    caseData.disputeExtraInfo.votesLengths.length > 1) ? (
                     <SecondaryActionText>
                       Decisión Final{"\n"}El ganador de este caso fue:{"\n"}
                       {caseData.votesDataObject?.currentRuling.toString() === "0"
