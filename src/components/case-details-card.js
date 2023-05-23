@@ -56,50 +56,77 @@ export default function CaseDetailsCard({ ID }) {
     fetchData().catch(console.error);
   }, [ID]);
 
+  const getVotesDataObject = async (result, dispute, disputeExtraInfo) => {
+    const drawnInCurrentRound = false;
+    const vote = drawnInCurrentRound && (await getVote(result));
+    const subcourt = drawnInCurrentRound && (await getCourt(dispute.subcourtID));
+    const disputeVoteLength = disputeExtraInfo.value?.votesLengths[0].toString();
+    const voteCounter = await klerosLiquid.getVoteCounter(ID, 0);
+
+    if (!drawnInCurrentRound || (vote && subcourt)) {
+      const committed = isCommitted(drawnInCurrentRound, vote);
+      return getResult(result, disputeVoteLength, dispute, committed, subcourt, vote, voteCounter, drawnInCurrentRound);
+    }
+
+    return { loading: true };
+  };
+
+  const getVote = async (result) => {
+    const lastResult = result[result.length - 1];
+    return await klerosLiquid.getVote(ID, lastResult.args._appeal, lastResult.args._voteID);
+  };
+
+  const getCourt = async (disputeSubcourtID) => {
+    return await klerosLiquid.courts(disputeSubcourtID);
+  };
+
+  const isCommitted = (drawnInCurrentRound, vote) => {
+    return drawnInCurrentRound && vote.commit !== "0x0000000000000000000000000000000000000000000000000000000000000000";
+  };
+
+  const getResult = (
+    result,
+    disputeVoteLength,
+    dispute,
+    committed,
+    subcourt,
+    vote,
+    voteCounter,
+    drawnInCurrentRound
+  ) => {
+    return result.reduce(
+      (acc, d) => {
+        if (d.args._appeal.toString() === disputeVoteLength - 1) acc.voteIDs.push(d.args._voteIDs.toString());
+        return acc;
+      },
+      {
+        canVote: canVote(drawnInCurrentRound, dispute, committed, subcourt, vote),
+        committed,
+        commit: vote.commit,
+        currentRuling: voteCounter?.winningChoice,
+        drawnInCurrentRound,
+        loading: !voteCounter,
+        voteIDs: [],
+        voted: vote.voted && vote.choice,
+      }
+    );
+  };
+
+  const canVote = (drawnInCurrentRound, dispute, committed, subcourt, vote) => {
+    return (
+      drawnInCurrentRound &&
+      ((dispute.period === "1" && !committed) ||
+        (dispute.period === "2" && (!subcourt.hiddenVotes || committed) && !vote.voted))
+    );
+  };
+
   const getVoteData = async (dispute, disputeExtraInfo) => {
     try {
       const filter = klerosLiquid.filters.Draw(null, ID);
       await klerosLiquid
         .queryFilter(filter, parseInt(process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER))
         .then(async (result) => {
-          let votesData = { loading: true };
-          const voteCounter = await klerosLiquid.getVoteCounter(ID, 0);
-          if (dispute && disputeExtraInfo && result) {
-            const drawnInCurrentRound = false;
-            const vote =
-              drawnInCurrentRound &&
-              (await klerosLiquid.getVote(
-                ID,
-                result[result.length - 1].args._appeal,
-                result[result.length - 1].args._voteID
-              ));
-            const subcourt = drawnInCurrentRound && (await klerosLiquid.courts(dispute.subcourtID));
-            const disputeVoteLength = disputeExtraInfo.value?.votesLengths[0].toString();
-            if (!drawnInCurrentRound || (vote && subcourt)) {
-              const committed =
-                drawnInCurrentRound &&
-                vote.commit !== "0x0000000000000000000000000000000000000000000000000000000000000000";
-              votesData = result.reduce(
-                (acc, d) => {
-                  if (d.args._appeal.toString() === disputeVoteLength - 1) acc.voteIDs.push(d.args._voteIDs.toString());
-                  return acc;
-                },
-                {
-                  canVote:
-                    drawnInCurrentRound &&
-                    ((dispute.period === "1" && !committed) ||
-                      (dispute.period === "2" && (!subcourt.hiddenVotes || committed) && !vote.voted)),
-                  committed,
-                  commit: vote.commit,
-                  currentRuling: voteCounter?.winningChoice,
-                  drawnInCurrentRound,
-                  loading: !voteCounter,
-                  voteIDs: [],
-                  voted: vote.voted && vote.choice,
-                }
-              );
-            }
-          }
+          const votesData = await getVotesDataObject(result, dispute, disputeExtraInfo);
           setCaseData((oldData) => ({ ...oldData, votesDataObject: votesData }));
           return votesData;
         })
@@ -124,33 +151,40 @@ export default function CaseDetailsCard({ ID }) {
     return filteredEvidence;
   };
 
+  const createSubcourtObject = async (nextID) => {
+    const subcourt = {
+      ID: nextID,
+      hiddenVotes: undefined,
+      name: undefined,
+    };
+    const policy = await policyRegistry.policies(subcourt.ID);
+
+    if (policy !== undefined) {
+      const policyJSON = await getPolicyDocument(policy);
+      if (policyJSON) {
+        subcourt.name = policyJSON.name;
+        subcourt.description = policyJSON.description;
+        subcourt.summary = policyJSON.summary;
+      }
+    }
+    const _subcourt = await getCourt(subcourt.ID);
+    if (_subcourt) {
+      nextID = _subcourt.parent;
+      subcourt.hiddenVotes = _subcourt.hiddenVotes;
+    }
+    if (subcourt.name === undefined || !_subcourt) return undefined;
+
+    return subcourt;
+  };
+
   const getSubcourtsData = async (dispute) => {
     const subcourts = [];
     try {
       if (dispute) {
         let nextID = dispute.subcourtID;
         while (!subcourts.length || subcourts[subcourts.length - 1].ID.toString() !== nextID.toString()) {
-          const subcourt = {
-            ID: nextID,
-            hiddenVotes: undefined,
-            name: undefined,
-          };
-          const policy = await policyRegistry.policies(subcourt.ID);
-
-          if (policy !== undefined) {
-            const policyJSON = await getPolicyDocument(policy);
-            if (policyJSON) {
-              subcourt.name = policyJSON.name;
-              subcourt.description = policyJSON.description;
-              subcourt.summary = policyJSON.summary;
-            }
-          }
-          const _subcourt = await klerosLiquid.courts(subcourt.ID);
-          if (_subcourt) {
-            nextID = _subcourt.parent;
-            subcourt.hiddenVotes = _subcourt.hiddenVotes;
-          }
-          if (subcourt.name === undefined || !_subcourt) return undefined;
+          const subcourt = await createSubcourtObject(nextID);
+          if (!subcourt) return undefined;
           subcourts.push(subcourt);
         }
         const subcourtsReversed = [...subcourts].reverse();

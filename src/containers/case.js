@@ -65,46 +65,60 @@ export default function Case() {
     }
   };
 
+  const getTokensAtStakePerJuror = (disputeExtraInfo) => {
+    return disputeExtraInfo.tokensAtStakePerJuror.map((juror) => {
+      return juror;
+    });
+  };
+
+  const getVotesByAppeal = (draws) => {
+    return draws.reduce((acc, d) => {
+      acc[d.returnValues._appeal] = acc[d.returnValues._appeal]
+        ? acc[d.returnValues._appeal].add(BigNumber.from(1))
+        : BigNumber.from(1);
+      return acc;
+    }, {});
+  };
+
+  const shouldShowPassPeriod = (dispute, subcourt) => {
+    return dispute.period < 4
+      ? parseInt(new Date().getTime() / 1000) - Number(dispute.lastPeriodChange) >
+          Number(subcourt.timesPerPeriod[dispute.period]) + MANUAL_PASS_DELAY
+      : true;
+  };
+
+  const getDisputeDeadline = (dispute, subcourt) => {
+    return dispute.period < 4
+      ? new Date((Number(dispute.lastPeriodChange) + Number(subcourt.timesPerPeriod[dispute.period])) * 1000)
+      : null;
+  };
+
+  const calculateAtStake = (votesByAppeal, tokensAtStakePerJuror) => {
+    return Object.keys(votesByAppeal).reduce(
+      (acc, a) => {
+        acc.atStake = acc.atStake.add(votesByAppeal[a].mul(tokensAtStakePerJuror[a]));
+        return acc;
+      },
+      {
+        atStake: BigNumber.from(0),
+        deadline: undefined,
+      }
+    );
+  };
+
   const getDisputeData = async () => {
     let disputeData = {};
     if (caseData.disputeExtraInfo && caseData.draws) {
-      const tokensAtStakePerJuror = caseData.disputeExtraInfo.tokensAtStakePerJuror.map((juror) => {
-        return juror;
-      });
-      const votesByAppeal = caseData.draws.reduce((acc, d) => {
-        acc[d.returnValues._appeal] = acc[d.returnValues._appeal]
-          ? acc[d.returnValues._appeal].add(BigNumber.from(1))
-          : BigNumber.from(1);
-        return acc;
-      }, {});
-      disputeData = Object.keys(votesByAppeal).reduce(
-        (acc, a) => {
-          acc.atStake = acc.atStake.add(votesByAppeal[a].mul(tokensAtStakePerJuror[a]));
-          return acc;
-        },
-        {
-          atStake: BigNumber.from(0),
-          deadline: undefined,
-        }
-      );
+      const tokensAtStakePerJuror = getTokensAtStakePerJuror(caseData.disputeExtraInfo);
+      const votesByAppeal = getVotesByAppeal(caseData.draws);
+      disputeData = calculateAtStake(votesByAppeal, tokensAtStakePerJuror);
+
       if (caseData.dispute && !caseData.dispute.ruled) {
         const subcourt = await klerosLiquid.getSubcourt(caseData.dispute.subcourtID);
         const court = await klerosLiquid.courts(caseData.dispute.subcourtID);
-        if (subcourt) {
-          disputeData.deadline =
-            caseData.dispute.period < 4
-              ? new Date(
-                  (Number(caseData.dispute.lastPeriodChange) +
-                    Number(subcourt.timesPerPeriod[caseData.dispute.period])) *
-                    1000
-                )
-              : null;
-          disputeData.showPassPeriod =
-            caseData.dispute.period < 4
-              ? parseInt(new Date().getTime() / 1000) - Number(caseData.dispute.lastPeriodChange) >
-                Number(subcourt.timesPerPeriod[caseData.dispute.period]) + MANUAL_PASS_DELAY
-              : true;
-        }
+
+        disputeData.deadline = getDisputeDeadline(caseData.dispute, subcourt);
+        disputeData.showPassPeriod = shouldShowPassPeriod(caseData.dispute, subcourt);
         if (court) {
           disputeData.hiddenVotes = court.hiddenVotes;
         }
