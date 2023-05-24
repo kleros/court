@@ -160,7 +160,7 @@ export default function CaseDetailsCard({ ID }) {
     return filteredEvidence;
   };
 
-  const createSubcourtObject = async (nextID) => {
+  const createSubcourtsList = async (nextID) => {
     const subcourt = {
       ID: nextID,
       hiddenVotes: undefined,
@@ -192,7 +192,7 @@ export default function CaseDetailsCard({ ID }) {
       if (dispute) {
         let nextID = dispute.subcourtID;
         while (!subcourts.length || subcourts[subcourts.length - 1].ID.toString() !== nextID.toString()) {
-          const subcourt = await createSubcourtObject(nextID);
+          const subcourt = await createSubcourtsList(nextID);
           if (!subcourt) return undefined;
           subcourts.push(subcourt);
         }
