@@ -64,12 +64,10 @@ const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
 DisputeTimeline.propTypes = {
   period: PropTypes.number.isRequired,
   lastPeriodChange: PropTypes.number.isRequired,
-  subcourt: PropTypes.arrayOf(
-    PropTypes.shape({
-      timesPerPeriod: PropTypes.arrayOf(PropTypes.number.isRequired),
-      hiddenVotes: PropTypes.bool,
-    })
-  ).isRequired,
+  subcourt: PropTypes.shape({
+    timesPerPeriod: PropTypes.arrayOf(PropTypes.object.isRequired).isRequired,
+    hiddenVotes: PropTypes.bool,
+  }).isRequired,
   days: PropTypes.number,
   hours: PropTypes.number,
   minutes: PropTypes.number,

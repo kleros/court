@@ -229,7 +229,13 @@ export default function CaseDetailsCard({ ID }) {
   const getSubcourtObject = async (dispute) => {
     try {
       const subcourtObject = await klerosLiquid.getSubcourt(dispute.subcourtID);
-      setCaseData((oldData) => ({ ...oldData, subcourtObject: subcourtObject }));
+      setCaseData((oldData) => ({
+        ...oldData,
+        subcourtObject: {
+          timesPerPeriod: subcourtObject.timesPerPeriod,
+          hiddenVotes: subcourtObject.hiddenVotes,
+        },
+      }));
       return subcourtObject;
     } catch (err) {
       console.error(err);
