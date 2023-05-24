@@ -341,12 +341,12 @@ export default function CaseDetailsCard({ ID }) {
                     </SecondaryActionText>
                   ) : (
                     <>
-                      {caseData.dispute.period === "0" && (
+                      {caseData.dispute.period === 0 && (
                         <SecondaryActionText>
                           Estamos en periodo de evidencia.{"\n"}La votación todavía no ha empezado.
                         </SecondaryActionText>
                       )}
-                      {new Set(["1", "2"]).has(caseData.dispute.period) && (
+                      {new Set([1, 2]).has(caseData.dispute.period) && (
                         <SecondaryActionText>
                           Estamos en periodo de votación.{"\n"}El jurado está votando.
                         </SecondaryActionText>
