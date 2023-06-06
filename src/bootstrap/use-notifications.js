@@ -30,6 +30,12 @@ const networkIDData = {
     nativeToken: "xDAI",
     pnkToken: "PNK",
   },
+  11155111: {
+    name: "_SEPOLIA",
+    provider: "https://sepolia.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
+    nativeToken: "ETH",
+    pnkToken: "PNK",
+  },
 };
 
 const createHandlers = ({ nativeToken, pnkToken, fromBlock }) => ({

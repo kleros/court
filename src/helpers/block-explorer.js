@@ -3,6 +3,7 @@ const chainIdToBaseUrl = {
   5: "https://goerli.etherscan.io",
   100: "https://blockscout.com/poa/xdai",
   10200: "https://blockscout.chiadochain.net",
+  11155111: "https://sepolia.etherscan.io",
 };
 
 export const getBaseUrl = (chainId) => chainIdToBaseUrl[chainId] ?? chainIdToBaseUrl[1];
