@@ -286,7 +286,7 @@ export default function CaseDetailsCard({ ID }) {
             caseData.metaEvidence?.metaEvidenceJSON ? (
               <>
                 <StyledActionsDiv className="secondary-linear-background theme-linear-background">
-                  {new Set([0, 1, 2, 3]).has(caseData.dispute.period) &&
+                  {new Set([0, 1, 2]).has(caseData.dispute.period) &&
                   caseData.disputeExtraInfo.votesLengths.length <= 1 ? (
                     <Hourglass />
                   ) : (

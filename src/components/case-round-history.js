@@ -45,7 +45,7 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
       if (metaEvidence && dispute && data && data !== "pending") {
         const justificationsList = data.payload.justifications.Items;
         votesInfo.loading = false;
-        for (let i = 0; i < parseInt(dispute.votesLengths[0]); i++) {
+        for (let i = 0; i < dispute.votesLengths[0].toNumber(); i++) {
           const vote = await klerosLiquid.getVote(ID, 0, i.toString());
           if (vote) {
             const juror = vote.account;
