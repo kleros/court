@@ -1,6 +1,6 @@
 import * as realitioLibQuestionFormatter from "@reality.eth/reality-eth-lib/formatters/question";
 import { useConfig } from "@usedapp/core";
-import { Button, Card, Col, Icon, Row, Spin } from "antd";
+import { Button, Card, Col, Row, Spin } from "antd";
 import { BigNumber } from "ethers";
 import PropTypes from "prop-types";
 import React, { useEffect, useMemo, useState } from "react";
@@ -12,7 +12,6 @@ import { ReactComponent as Gavel } from "../assets/images/gavel.svg";
 import { ReactComponent as Hourglass } from "../assets/images/hourglass.svg";
 import { ReactComponent as Scales } from "../assets/images/scales.svg";
 import archon from "../bootstrap/archon";
-import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 import { getMetaEvidence } from "../helpers/get-meta-evidence";
 import { getPolicyDocument } from "../helpers/get-policy-document";
 import useContract from "../hooks/use-contract";
