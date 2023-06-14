@@ -24,9 +24,7 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
       const data = await fetch(process.env.REACT_APP_JUSTIFICATIONS_URL, {
         body: JSON.stringify({
           payload: {
-            address: "0x0000000000000000000000000000000000000000",
             network: chainIdToNetwork[config.readOnlyChainId],
-            payload: "justification",
             disputeID: ID,
             appeal: 0,
           },
