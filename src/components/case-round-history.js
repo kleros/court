@@ -1,70 +1,85 @@
-import React from "react";
-import t from "prop-types";
-import styled from "styled-components/macro";
+import { useConfig } from "@usedapp/core";
 import { Skeleton } from "antd";
+import t from "prop-types";
+import React, { useEffect, useState } from "react";
 import JustificationCard from "./justification-card";
-import { drizzleReactHooks } from "@drizzle/react-plugin";
-import { useAPI } from "../bootstrap/api";
-import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
-import useChainId from "../hooks/use-chain-id";
 
-const { useDrizzle, useDrizzleState } = drizzleReactHooks;
+import styled from "styled-components/macro";
+import useContract from "../hooks/use-contract";
 
-export default function CaseRoundHistory({ ID, dispute }) {
-  const { drizzle, useCacheCall } = useDrizzle();
-  const drizzleState = useDrizzleState((drizzleState) => ({
-    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
-  }));
-  const getMetaEvidence = useDataloader.getMetaEvidence();
-  const chainId = useChainId();
+const chainIdToNetwork = {
+  1: "mainnet",
+  5: "goerli",
+  100: "xdai",
+  10200: "chiado",
+};
 
-  let metaEvidence;
-  if (dispute)
-    if (dispute.ruled) {
-      metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID, {
-        strict: false,
-      });
-    } else {
-      metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
-    }
+export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
+  const config = useConfig();
+  const { klerosLiquid } = useContract({ chainID: config.readOnlyChainId });
+  const [votesInfoData, setVotesInfoData] = useState();
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const votesInfo = useCacheCall(["KlerosLiquid"], (call) => {
-    const dispute2 = call("KlerosLiquid", "getDispute", ID);
-    const _justifications = useAPI.getJustifications(drizzle.web3, drizzleState.account, { appeal: 0, disputeID: ID });
-    let votesInfo = {
-      jurorSet: new Set(),
-      votes: [],
-      loading: true,
-    };
-    if (metaEvidence && dispute2 && _justifications && _justifications !== "pending") {
-      const justificationsList = _justifications.payload.justifications.Items;
-      votesInfo.loading = false;
-      for (let i = 0; i < parseInt(dispute2.votesLengths[0]); i++) {
-        const vote = call("KlerosLiquid", "getVote", ID, 0, i.toString());
-        if (vote) {
-          const juror = vote.account;
-          if (vote.voted && !votesInfo.jurorSet.has(juror)) {
-            votesInfo.jurorSet.add(juror);
-            votesInfo.votes.push({
-              choice: vote.choice,
-              justification: justificationsList.find((j) => j.voteID.N === i.toString())?.justification.S,
-            });
+  const getJustificationsData = async () => {
+    try {
+      const data = await fetch(process.env.REACT_APP_JUSTIFICATIONS_URL, {
+        body: JSON.stringify({
+          payload: {
+            network: chainIdToNetwork[config.readOnlyChainId],
+            disputeID: ID,
+            appeal: 0,
+          },
+        }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+      })
+        .then((res) => res.json())
+        .catch((err) => console.error(err));
+
+      let votesInfo = {
+        jurorSet: new Set(),
+        votes: [],
+        loading: true,
+      };
+      if (metaEvidence && dispute && data && data !== "pending") {
+        const justificationsList = data.payload.justifications.Items;
+        votesInfo.loading = false;
+        for (let i = 0; i < dispute.votesLengths[0].toNumber(); i++) {
+          const vote = await klerosLiquid.getVote(ID, 0, i.toString());
+          if (vote) {
+            const juror = vote.account;
+            if (vote.voted && !votesInfo.jurorSet.has(juror)) {
+              votesInfo.jurorSet.add(juror);
+              votesInfo.votes.push({
+                choice: vote.choice.toString(),
+                justification: justificationsList.find((j) => j.voteID.N === i.toString())?.justification.S,
+              });
+            }
+          } else {
+            votesInfo.loading = true;
           }
-        } else {
-          votesInfo.loading = true;
         }
       }
+      setVotesInfoData(votesInfo);
+      return votesInfo;
+    } catch (err) {
+      console.error(err);
     }
-    return votesInfo;
-  });
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await getJustificationsData();
+    };
+
+    fetchData().catch(console.error);
+  }, []);
 
   return (
     <StyledCaseRoundHistory>
       <JustificationsBox>
-        <Skeleton active loading={!votesInfo || votesInfo.loading || !metaEvidence}>
-          {votesInfo && metaEvidence && votesInfo.votes.length > 0 ? (
-            votesInfo.votes.map(({ justification, choice }, i) => (
+        <Skeleton active loading={!votesInfoData || !metaEvidence}>
+          {votesInfoData && metaEvidence && votesInfoData.votes.length > 0 ? (
+            votesInfoData.votes.map(({ justification, choice }, i) => (
               <React.Fragment key={i}>
                 <JustificationCard
                   {...{
@@ -73,7 +88,7 @@ export default function CaseRoundHistory({ ID, dispute }) {
                     index: i + 1,
                   }}
                 />
-                {i + 1 < votesInfo.votes.length && <Break />}
+                {i + 1 < votesInfoData.votes.length && <Break />}
               </React.Fragment>
             ))
           ) : (
@@ -95,6 +110,7 @@ CaseRoundHistory.propTypes = {
   ID: t.string.isRequired,
   dispute: t.object.isRequired,
   ruling: t.oneOfType([t.number, t.string]),
+  metaEvidence: t.any,
 };
 
 CaseRoundHistory.defaultProps = {

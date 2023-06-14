@@ -1,16 +1,13 @@
-import React, { useMemo } from "react";
-import { Row, Col } from "antd";
+import { useConfig } from "@usedapp/core";
+import { Col, Row } from "antd";
+import { BigNumber } from "ethers";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { drizzleReactHooks } from "@drizzle/react-plugin";
+import styled from "styled-components/macro";
 import CaseDetailsCard from "../components/case-details-card";
 import TimeAgo from "../components/time-ago";
 import TopBanner from "../components/top-banner";
-import RequiredChainIdGateway from "../components/required-chain-id-gateway";
-import RequiredChainIdModal from "../components/required-chain-id-modal";
-import styled from "styled-components/macro";
-import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
-
-const { useDrizzle, useDrizzleState } = drizzleReactHooks;
+import useContract from "../hooks/use-contract";
 
 const MANUAL_PASS_DELAY = 3600;
 
@@ -21,83 +18,134 @@ const periodToPhase = (period, hiddenVotes) => {
 };
 
 export default function Case() {
+  const config = useConfig();
   const { ID } = useParams();
-  const { drizzle, useCacheCall, useCacheEvents } = useDrizzle();
-  const drizzleState = useDrizzleState((drizzleState) => ({
-    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
-  }));
-  const dispute = useCacheCall("KlerosLiquid", "disputes", ID);
-  const dispute2 = useCacheCall("KlerosLiquid", "getDispute", ID);
-  const draws = useCacheEvents(
-    "KlerosLiquid",
-    "Draw",
-    useMemo(
-      () => ({
-        filter: { _address: drizzleState.account, _disputeID: ID },
-        fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER,
-      }),
-      [drizzleState.account, ID]
-    )
-  );
-  const disputeData = useCacheCall(["KlerosLiquid"], (call) => {
-    let disputeData = {};
-    if (dispute2 && draws) {
-      const tokensAtStakePerJuror = dispute2.tokensAtStakePerJuror.map(drizzle.web3.utils.toBN);
-      const votesByAppeal = draws.reduce((acc, d) => {
-        acc[d.returnValues._appeal] = acc[d.returnValues._appeal]
-          ? acc[d.returnValues._appeal].add(drizzle.web3.utils.toBN(1))
-          : drizzle.web3.utils.toBN(1);
+  const { klerosLiquid } = useContract({ chainID: config.readOnlyChainId });
+  const [caseData, setCaseData] = useState({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await getDispute();
+      await getDisputeExtraInfo();
+      await getDraws();
+      await getDisputeData();
+    };
+
+    fetchData().catch(console.error);
+  }, [ID]);
+
+  const getDispute = async () => {
+    try {
+      const dispute = await klerosLiquid.disputes(ID);
+      setCaseData((oldData) => ({ ...oldData, dispute: dispute }));
+      return dispute;
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const getDisputeExtraInfo = async () => {
+    try {
+      const disputeExtraInfo = await klerosLiquid.getDispute(ID);
+      setCaseData((oldData) => ({ ...oldData, disputeExtraInfo: disputeExtraInfo }));
+      return disputeExtraInfo;
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const getDraws = async () => {
+    const filter = klerosLiquid.filters.Draw();
+    try {
+      const draws = await klerosLiquid.queryFilter(filter, parseInt(process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER));
+      setCaseData((oldData) => ({ ...oldData, draws: draws }));
+      return draws;
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const getTokensAtStakePerJuror = (disputeExtraInfo) => {
+    return disputeExtraInfo.tokensAtStakePerJuror.map((juror) => {
+      return juror;
+    });
+  };
+
+  const getVotesByAppeal = (draws) => {
+    return draws.reduce((acc, d) => {
+      acc[d.returnValues._appeal] = acc[d.returnValues._appeal]
+        ? acc[d.returnValues._appeal].add(BigNumber.from(1))
+        : BigNumber.from(1);
+      return acc;
+    }, {});
+  };
+
+  const shouldShowPassPeriod = (dispute, subcourt) => {
+    return dispute.period < 4
+      ? parseInt(new Date().getTime() / 1000) - Number(dispute.lastPeriodChange) >
+          Number(subcourt.timesPerPeriod[dispute.period]) + MANUAL_PASS_DELAY
+      : true;
+  };
+
+  const getDisputeDeadline = (dispute, subcourt) => {
+    return dispute.period < 4
+      ? new Date((Number(dispute.lastPeriodChange) + Number(subcourt.timesPerPeriod[dispute.period])) * 1000)
+      : null;
+  };
+
+  const calculateAtStake = (votesByAppeal, tokensAtStakePerJuror) => {
+    return Object.keys(votesByAppeal).reduce(
+      (acc, a) => {
+        acc.atStake = acc.atStake.add(votesByAppeal[a].mul(tokensAtStakePerJuror[a]));
         return acc;
-      }, {});
-      disputeData = Object.keys(votesByAppeal).reduce(
-        (acc, a) => {
-          acc.atStake = acc.atStake.add(votesByAppeal[a].mul(tokensAtStakePerJuror[a]));
-          return acc;
-        },
-        {
-          atStake: drizzle.web3.utils.toBN(0),
-          deadline: undefined,
-        }
-      );
-      if (dispute && !dispute.ruled) {
-        const subcourt = call("KlerosLiquid", "getSubcourt", dispute.subcourtID);
-        const court = call("KlerosLiquid", "courts", dispute.subcourtID);
-        if (subcourt) {
-          disputeData.deadline =
-            dispute.period < 4
-              ? new Date((Number(dispute.lastPeriodChange) + Number(subcourt.timesPerPeriod[dispute.period])) * 1000)
-              : null;
-          disputeData.showPassPeriod =
-            dispute.period < 4
-              ? parseInt(new Date().getTime() / 1000) - Number(dispute.lastPeriodChange) >
-                Number(subcourt.timesPerPeriod[dispute.period]) + MANUAL_PASS_DELAY
-              : true;
-        }
+      },
+      {
+        atStake: BigNumber.from(0),
+        deadline: undefined,
+      }
+    );
+  };
+
+  const getDisputeData = async () => {
+    let disputeData = {};
+    if (caseData.disputeExtraInfo && caseData.draws) {
+      const tokensAtStakePerJuror = getTokensAtStakePerJuror(caseData.disputeExtraInfo);
+      const votesByAppeal = getVotesByAppeal(caseData.draws);
+      disputeData = calculateAtStake(votesByAppeal, tokensAtStakePerJuror);
+
+      if (caseData.dispute && !caseData.dispute.ruled) {
+        const subcourt = await klerosLiquid.getSubcourt(caseData.dispute.subcourtID);
+        const court = await klerosLiquid.courts(caseData.dispute.subcourtID);
+
+        disputeData.deadline = getDisputeDeadline(caseData.dispute, subcourt);
+        disputeData.showPassPeriod = shouldShowPassPeriod(caseData.dispute, subcourt);
         if (court) {
           disputeData.hiddenVotes = court.hiddenVotes;
         }
       }
     }
+    setCaseData((oldData) => ({ ...oldData, disputeData: disputeData }));
     return disputeData;
-  });
+  };
 
   return (
-    <RequiredChainIdGateway
-      renderOnMismatch={({ requiredChainId }) => <RequiredChainIdModal requiredChainId={requiredChainId} />}
-    >
+    <>
       <TopBanner
         description={<> Caso #{ID} </>}
         extra={
           <Row>
-            {(dispute && dispute.period > 2) || (dispute2 && dispute2.votesLengths.length > 1) ? (
+            {(caseData.dispute && caseData.dispute.period > 2) ||
+            (caseData.dispute2 && caseData.dispute2.votesLengths?.length > 1) ? (
               <ResolvedTag>Resuelto</ResolvedTag>
             ) : (
               <>
-                {disputeData.deadline && disputeData.hiddenVotes !== undefined && (
-                  <Col lg={disputeData.showPassPeriod ? 12 : 24}>
-                    <StyledDiv>Fin del periodo de {periodToPhase(dispute.period, disputeData.hiddenVotes)}:</StyledDiv>
+                {caseData.disputeData?.deadline && caseData.disputeData?.hiddenVotes !== undefined && (
+                  <Col lg={caseData.disputeData.showPassPeriod ? 12 : 24}>
+                    <StyledDiv>
+                      Fin del periodo de {periodToPhase(caseData.dispute.period, caseData.disputeData.hiddenVotes)}:
+                    </StyledDiv>
                     <StyledBigTextDiv>
-                      <TimeAgo className="primary-color theme-color">{disputeData.deadline}</TimeAgo>
+                      <TimeAgo className="primary-color theme-color">{caseData.disputeData.deadline}</TimeAgo>
                     </StyledBigTextDiv>
                   </Col>
                 )}
@@ -108,7 +156,7 @@ export default function Case() {
         title="Detalles del Caso"
       />
       <CaseDetailsCard ID={ID} />
-    </RequiredChainIdGateway>
+    </>
   );
 }
 

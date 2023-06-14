@@ -1,20 +1,25 @@
-import "../components/theme.css";
-import "./app.css";
-import React, { useState } from "react";
-import t from "prop-types";
 import loadable from "@loadable/component";
-import styled from "styled-components/macro";
+import { DAppProvider, Mainnet, xDai } from "@usedapp/core";
 import { Col, Layout, Row, Spin } from "antd";
+import React, { useState } from "react";
 import { Helmet } from "react-helmet";
 import { BrowserRouter, NavLink, Route, Switch, useParams } from "react-router-dom";
+import styled from "styled-components/macro";
 import { ReactComponent as Logo } from "../assets/images/kleros-logo-flat-light.svg";
-import Footer from "../components/footer";
-import { ChainIdProvider } from "../hooks/use-chain-id";
-import { ArchonInitializer } from "./archon";
-import ChainChangeWatcher from "./chain-change-watcher";
-import drizzle, { DrizzleProvider, Initializer, useDrizzle } from "./drizzle";
 import ErrorBoundary from "../components/error-boundary";
-import SwitchChainFallback from "../components/error-fallback/switch-chain";
+import Footer from "../components/footer";
+import "../components/theme.css";
+import "./app.css";
+import { ArchonInitializer } from "./archon";
+
+const config = {
+  multicallVersion: 2,
+  readOnlyChainId: xDai.chainId,
+  readOnlyUrls: {
+    [xDai.chainId]: process.env.REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL,
+    [Mainnet.chainId]: process.env.REACT_APP_WEB3_FALLBACK_HTTPS_URL,
+  },
+};
 
 export default function App() {
   const [isMenuClosed, setIsMenuClosed] = useState(true);
@@ -25,63 +30,43 @@ export default function App() {
         <title>Kleros · Court</title>
         <link href="https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i,700,700i" rel="stylesheet" />
       </Helmet>
-      <DrizzleProvider drizzle={drizzle}>
-        <Initializer
-          error={<C404 Web3 />}
-          loadingContractsAndAccounts={<C404 Web3 />}
-          loadingWeb3={<StyledSpin tip="Connecting to your Web3 provider." />}
-        >
-          <DrizzleChainIdProvider>
-            <ChainChangeWatcher>
-              <ErrorBoundary fallback={SwitchChainFallback}>
-                <ArchonInitializer>
-                  <BrowserRouter>
-                    <Layout>
-                      <StyledLayoutHeader>
-                        <Row>
-                          <StyledLogoCol lg={4} md={4} sm={12} xs={0}>
-                            <LogoNavLink to="/">
-                              <Logo />
-                            </LogoNavLink>
-                          </StyledLogoCol>
-                        </Row>
-                      </StyledLayoutHeader>
-                      <StyledLayoutContent>
-                        <Switch>
-                          <Route exact path="/cases/:ID">
-                            <Case />
-                          </Route>
-                          <Route path="*">
-                            <C404 />
-                          </Route>
-                        </Switch>
-                      </StyledLayoutContent>
-                      <Footer />
-                      <StyledClickaway
-                        isMenuClosed={isMenuClosed}
-                        onClick={isMenuClosed ? null : () => setIsMenuClosed(true)}
-                      />
-                    </Layout>
-                  </BrowserRouter>
-                </ArchonInitializer>
-              </ErrorBoundary>
-            </ChainChangeWatcher>
-          </DrizzleChainIdProvider>
-        </Initializer>
-      </DrizzleProvider>
+      <DAppProvider config={config}>
+        <ErrorBoundary>
+          <ArchonInitializer>
+            <BrowserRouter>
+              <Layout>
+                <StyledLayoutHeader>
+                  <Row>
+                    <StyledLogoCol lg={4} md={4} sm={12} xs={0}>
+                      <LogoNavLink to="/">
+                        <Logo />
+                      </LogoNavLink>
+                    </StyledLogoCol>
+                  </Row>
+                </StyledLayoutHeader>
+                <StyledLayoutContent>
+                  <Switch>
+                    <Route exact path="/cases/:ID">
+                      <Case />
+                    </Route>
+                    <Route path="*">
+                      <C404 />
+                    </Route>
+                  </Switch>
+                </StyledLayoutContent>
+                <Footer />
+                <StyledClickaway
+                  isMenuClosed={isMenuClosed}
+                  onClick={isMenuClosed ? null : () => setIsMenuClosed(true)}
+                />
+              </Layout>
+            </BrowserRouter>
+          </ArchonInitializer>
+        </ErrorBoundary>
+      </DAppProvider>
     </>
   );
 }
-
-function DrizzleChainIdProvider({ children }) {
-  const { drizzle } = useDrizzle();
-
-  return drizzle.web3 ? <ChainIdProvider web3={drizzle.web3}>{children}</ChainIdProvider> : <C404 Web3 />;
-}
-
-DrizzleChainIdProvider.propTypes = {
-  children: t.node,
-};
 
 const StyledSpin = styled(Spin)`
   left: 50%;
@@ -97,7 +82,6 @@ const C404 = loadable(() => import(/* webpackPrefetch: true */ "../containers/40
 const CasePage = loadable(
   async ({ ID }) => {
     try {
-      await drizzle.contracts.KlerosLiquid.methods.disputes(ID).call();
     } catch (err) {
       console.error(err);
       return C404;

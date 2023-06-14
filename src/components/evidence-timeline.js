@@ -1,19 +1,20 @@
-import { Col, Icon, Row } from 'antd'
-import React from 'react'
-import styled from 'styled-components'
-import EvidenceCard from './evidence-card'
+import { Col, Icon, Row } from "antd";
+import React from "react";
+import styled from "styled-components";
+import EvidenceCard from "./evidence-card";
+import { useConfig } from "@usedapp/core";
 
 const StyledHeaderCol = styled(Col)`
   color: #4d00b4;
   font-size: 18px;
   font-weight: 500;
   line-height: 21px;
-`
+`;
 const StyledDividerCol = styled(Col)`
   border-right: 1px solid #4d00b4;
   height: 30px;
   width: 50%;
-`
+`;
 const EventDiv = styled.div`
   background: #4d00b4;
   border-radius: 300px;
@@ -26,7 +27,7 @@ const EventDiv = styled.div`
   padding: 10px 12px;
   text-align: center;
   width: fit-content;
-`
+`;
 const ScrollText = styled.div`
   color: #009aff;
   cursor: pointer;
@@ -38,26 +39,22 @@ const ScrollText = styled.div`
   @media (max-width: 500px) {
     text-align: center;
   }
-`
+`;
 const StyledEvidenceTimelineArea = styled.div`
   padding: 35px 10%;
-`
+`;
 
-const EvidenceTimeline = ({
-  evidence = [],
-  metaEvidence = {},
-  ruling = null,
-  chainId = 1
-}) => {
+const EvidenceTimeline = ({ evidence = [], metaEvidence = {}, ruling = null, chainId }) => {
+  const config = useConfig();
   // Sort so most recent is first
   const sortedEvidence = evidence.sort((a, b) => {
-    if (a.submittedAt > b.submittedAt) return -1
-    else if (a.submittedAt < b.submittedAt) return 1
+    if (a.submittedAt > b.submittedAt) return -1;
+    else if (a.submittedAt < b.submittedAt) return 1;
 
     return 0;
   });
 
-  if (sortedEvidence.length === 0) return null
+  if (sortedEvidence.length === 0) return null;
 
   return (
     <StyledEvidenceTimelineArea>
@@ -69,20 +66,18 @@ const EvidenceTimeline = ({
               {ruling
                 ? `El jurado votó: ${
                     metaEvidence.metaEvidenceJSON.rulingOptions
-                      ? metaEvidence.metaEvidenceJSON.rulingOptions.titles[
-                          Number(ruling) - 1
-                        ]
+                      ? metaEvidence.metaEvidenceJSON.rulingOptions.titles[Number(ruling) - 1]
                       : ruling
                   }`
-                : 'El juradó rechazó responder.'}
+                : "El juradó rechazó responder."}
             </EventDiv>
           )}
         </Col>
         <ScrollText
           lg={4}
           onClick={() => {
-            const _bottomRow = document.getElementById('scroll-bottom')
-            _bottomRow.scrollIntoView()
+            const _bottomRow = document.getElementById("scroll-bottom");
+            _bottomRow.scrollIntoView();
           }}
         >
           Ir al final <Icon type="arrow-down" />
@@ -93,7 +88,11 @@ const EvidenceTimeline = ({
           <Row>
             <StyledDividerCol lg={12} />
           </Row>
-          <EvidenceCard evidence={_evidence} metaEvidence={metaEvidence.metaEvidenceJSON} chainId={chainId} />
+          <EvidenceCard
+            evidence={_evidence}
+            metaEvidence={metaEvidence.metaEvidenceJSON}
+            chainId={config.readOnlyChainId}
+          />
         </div>
       ))}
       <Row>
@@ -107,15 +106,15 @@ const EvidenceTimeline = ({
         <ScrollText
           lg={4}
           onClick={() => {
-            const _bottomRow = document.getElementById('scroll-top')
-            _bottomRow.scrollIntoView()
+            const _bottomRow = document.getElementById("scroll-top");
+            _bottomRow.scrollIntoView();
           }}
         >
           Ir arriba <Icon type="arrow-up" />
         </ScrollText>
       </Row>
     </StyledEvidenceTimelineArea>
-  )
-}
+  );
+};
 
-export default EvidenceTimeline
+export default EvidenceTimeline;

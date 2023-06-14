@@ -1,155 +1,218 @@
-import React, { useCallback, useMemo, useState } from "react";
-import PropTypes from "prop-types";
-import styled from "styled-components/macro";
-import { Button, Card, Col, Row, Spin } from "antd";
-import { drizzleReactHooks } from "@drizzle/react-plugin";
 import * as realitioLibQuestionFormatter from "@reality.eth/reality-eth-lib/formatters/question";
+import { useConfig } from "@usedapp/core";
+import { Button, Card, Col, Row, Spin } from "antd";
+import { BigNumber } from "ethers";
+import PropTypes from "prop-types";
+import React, { useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import Web3 from "web3";
+import styled from "styled-components/macro";
 import { ReactComponent as Document } from "../assets/images/document.svg";
 import { ReactComponent as Folder } from "../assets/images/folder.svg";
 import { ReactComponent as Gavel } from "../assets/images/gavel.svg";
 import { ReactComponent as Hourglass } from "../assets/images/hourglass.svg";
 import { ReactComponent as Scales } from "../assets/images/scales.svg";
-import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
-import useChainId from "../hooks/use-chain-id";
+import archon from "../bootstrap/archon";
+import { getMetaEvidence } from "../helpers/get-meta-evidence";
+import { getPolicyDocument } from "../helpers/get-policy-document";
+import useContract from "../hooks/use-contract";
 import Attachment from "./attachment";
-import DisputeTimeline from "./dispute-timeline";
 import CaseRoundHistory from "./case-round-history";
 import CollapsableCard from "./collapsable-card";
 import CourtDrawer from "./court-drawer";
+import DisputeTimeline from "./dispute-timeline";
 import EvidenceTimeline from "./evidence-timeline";
 
-const { useDrizzle, useDrizzleState } = drizzleReactHooks;
-const { toBN } = Web3.utils;
-
 export default function CaseDetailsCard({ ID }) {
-  const { drizzle, useCacheCall, useCacheEvents } = useDrizzle();
-  const drizzleState = useDrizzleState((drizzleState) => ({
-    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
-  }));
-  const { KlerosLiquid } = drizzle.contracts;
-
-  const loadPolicy = useDataloader.loadPolicy();
-  const getMetaEvidence = useDataloader.getMetaEvidence();
-  const getEvidence = useDataloader.getEvidence();
+  const config = useConfig();
+  const { klerosLiquid, policyRegistry } = useContract({ chainID: config.readOnlyChainId });
+  const [isLoading, setIsLoading] = useState(true);
+  const [caseData, setCaseData] = useState({});
   const [activeSubcourtID, setActiveSubcourtID] = useState();
-  const dispute = useCacheCall("KlerosLiquid", "disputes", ID);
-  const disputeExtraInfo = useCacheCall("KlerosLiquid", "getDispute", ID);
-  const draws = useCacheEvents(
-    "KlerosLiquid",
-    "Draw",
-    useMemo(
-      () => ({
-        filter: { _address: drizzleState.account, _disputeID: ID },
-        fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER,
-      }),
-      [drizzleState.account, ID]
-    )
-  );
-  const votesData = useCacheCall(["KlerosLiquid"], (call) => {
-    let votesData = { loading: true };
-    const voteCounter = call("KlerosLiquid", "getVoteCounter", ID, 0);
-    if (dispute && disputeExtraInfo && draws) {
-      const drawnInCurrentRound = false;
-      const vote =
-        drawnInCurrentRound &&
-        call(
-          "KlerosLiquid",
-          "getVote",
-          ID,
-          draws[draws.length - 1].returnValues._appeal,
-          draws[draws.length - 1].returnValues._voteID
-        );
-      const subcourt = drawnInCurrentRound && call("KlerosLiquid", "courts", dispute.subcourtID);
-      if (!drawnInCurrentRound || (vote && subcourt)) {
-        const committed =
-          drawnInCurrentRound && vote.commit !== "0x0000000000000000000000000000000000000000000000000000000000000000";
-        votesData = draws.reduce(
-          (acc, d) => {
-            if (Number(d.returnValues._appeal) === disputeExtraInfo.votesLengths.length - 1)
-              acc.voteIDs.push(d.returnValues._voteID);
-            return acc;
-          },
-          {
-            canVote:
-              drawnInCurrentRound &&
-              ((dispute.period === "1" && !committed) ||
-                (dispute.period === "2" && (!subcourt.hiddenVotes || committed) && !vote.voted)),
-            committed,
-            commit: vote.commit,
-            currentRuling: voteCounter?.winningChoice,
-            drawnInCurrentRound,
-            loading: !voteCounter,
-            voteIDs: [],
-            voted: vote.voted && vote.choice,
-          }
-        );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+
+        const dispute = await getDisputeData();
+
+        const [disputeExtraInfo] = await Promise.all([
+          getSubcourtsData(dispute),
+          getSubcourtObject(dispute),
+          getMetaEvidenceData(dispute),
+          getEvidenceData(dispute.arbitrated, klerosLiquid.address, ID),
+          getDisputeExtraInfoData(),
+        ]);
+
+        await getVoteData(dispute, disputeExtraInfo);
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error(error);
       }
-    }
-    return votesData;
-  });
-  const subcourts = useCacheCall(["PolicyRegistry", "KlerosLiquid"], (call) => {
-    if (dispute) {
-      const subcourts = [];
-      let nextID = dispute.subcourtID;
-      while (!subcourts.length || subcourts[subcourts.length - 1].ID !== nextID) {
-        const subcourt = {
-          ID: nextID,
-          hiddenVotes: undefined,
-          name: undefined,
-        };
-        const policy = call("PolicyRegistry", "policies", subcourt.ID);
-        if (policy !== undefined) {
-          const policyJSON = loadPolicy(policy);
-          if (policyJSON) subcourt.name = policyJSON.name;
-        }
-        const _subcourt = call("KlerosLiquid", "courts", subcourt.ID);
-        if (_subcourt) {
-          nextID = _subcourt.parent;
-          subcourt.hiddenVotes = _subcourt.hiddenVotes;
-        }
-        if (subcourt.name === undefined || !_subcourt) return undefined;
-        subcourts.push(subcourt);
-      }
-      return subcourts.reverse();
-    }
-  });
+    };
 
-  //Added for DisputeTimeline
-  const subcourtObj = useCacheCall(["KlerosLiquid"], (call) => {
-    if (dispute) {
-      const subcourt = call("KlerosLiquid", "courts", dispute.subcourtID);
-      const subcourtObj = call("KlerosLiquid", "getSubcourt", dispute.subcourtID);
-      return { ...subcourt, ...subcourtObj };
-    }
-  });
-  let metaEvidence;
-  let evidence;
+    fetchData().catch(console.error);
+  }, [ID]);
 
-  const chainId = useChainId();
+  const getVotesDataObject = async (result, dispute, disputeExtraInfo) => {
+    const drawnInCurrentRound = false;
+    const vote = drawnInCurrentRound && (await getVote(result));
+    const subcourt = drawnInCurrentRound && (await getCourt(dispute.subcourtID));
+    const disputeVoteLength = disputeExtraInfo.value?.votesLengths[0].toString();
+    const voteCounter = await klerosLiquid.getVoteCounter(ID, 0);
 
-  if (dispute) {
-    if (dispute.ruled) {
-      metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, KlerosLiquid.address, ID, {
-        strict: false,
+    if (!drawnInCurrentRound || (vote && subcourt)) {
+      const committed = isCommitted(drawnInCurrentRound, vote);
+      return getResult({
+        result,
+        disputeVoteLength,
+        dispute,
+        committed,
+        subcourt,
+        vote,
+        voteCounter,
+        drawnInCurrentRound,
       });
-    } else {
-      metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, KlerosLiquid.address, ID);
     }
 
-    evidence = getEvidence(dispute.arbitrated, KlerosLiquid.address, ID);
-  }
+    return { loading: true };
+  };
+
+  const getVote = async (result) => {
+    const lastResult = result[result.length - 1];
+    return await klerosLiquid.getVote(ID, lastResult.args._appeal, lastResult.args._voteID);
+  };
+
+  const getCourt = async (disputeSubcourtID) => {
+    return await klerosLiquid.courts(disputeSubcourtID);
+  };
+
+  const isCommitted = (drawnInCurrentRound, vote) => {
+    return drawnInCurrentRound && vote.commit !== "0x0000000000000000000000000000000000000000000000000000000000000000";
+  };
+
+  const getResult = ({
+    result,
+    disputeVoteLength,
+    dispute,
+    committed,
+    subcourt,
+    vote,
+    voteCounter,
+    drawnInCurrentRound,
+  }) => {
+    return result.reduce(
+      (acc, d) => {
+        if (d.args._appeal.toString() === disputeVoteLength - 1) acc.voteIDs.push(d.args._voteIDs.toString());
+        return acc;
+      },
+      {
+        canVote: canVote(drawnInCurrentRound, dispute, committed, subcourt, vote),
+        committed,
+        commit: vote.commit,
+        currentRuling: voteCounter?.winningChoice,
+        drawnInCurrentRound,
+        loading: !voteCounter,
+        voteIDs: [],
+        voted: vote.voted && vote.choice,
+      }
+    );
+  };
+
+  const canVote = (drawnInCurrentRound, dispute, committed, subcourt, vote) => {
+    return (
+      drawnInCurrentRound &&
+      ((dispute.period === "1" && !committed) ||
+        (dispute.period === "2" && (!subcourt.hiddenVotes || committed) && !vote.voted))
+    );
+  };
+
+  const getVoteData = async (dispute, disputeExtraInfo) => {
+    try {
+      const filter = klerosLiquid.filters.Draw(null, ID);
+      await klerosLiquid
+        .queryFilter(filter, parseInt(process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER))
+        .then(async (result) => {
+          const votesData = await getVotesDataObject(result, dispute, disputeExtraInfo);
+          setCaseData((oldData) => ({ ...oldData, votesDataObject: votesData }));
+          return votesData;
+        })
+        .catch((err) => console.error(err));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const getEvidenceData = async (contractAddress, arbitratorAddress, disputeID, options) => {
+    const dispute = await archon.arbitrable.getDispute(contractAddress, arbitratorAddress, disputeID, {
+      ...options,
+    });
+
+    const evidence = await archon.arbitrable.getEvidence(contractAddress, arbitratorAddress, dispute.evidenceGroupID, {
+      ...options,
+    });
+
+    const filteredEvidence = evidence.filter((e) => e.evidenceJSONValid && (!e.evidenceJSON.fileURI || e.fileValid));
+
+    setCaseData((oldData) => ({ ...oldData, evidence: filteredEvidence }));
+    return filteredEvidence;
+  };
+
+  const createSubcourtsList = async (nextID) => {
+    const subcourt = {
+      ID: nextID,
+      hiddenVotes: undefined,
+      name: undefined,
+    };
+    const policy = await policyRegistry.policies(subcourt.ID);
+
+    if (policy !== undefined) {
+      const policyJSON = await getPolicyDocument(policy);
+      if (policyJSON) {
+        subcourt.name = policyJSON.name;
+        subcourt.description = policyJSON.description;
+        subcourt.summary = policyJSON.summary;
+      }
+    }
+    const _subcourt = await getCourt(subcourt.ID);
+    if (_subcourt) {
+      nextID = _subcourt.parent;
+      subcourt.hiddenVotes = _subcourt.hiddenVotes;
+    }
+    if (subcourt.name === undefined || !_subcourt) return undefined;
+
+    return subcourt;
+  };
+
+  const getSubcourtsData = async (dispute) => {
+    const subcourts = [];
+    try {
+      if (dispute) {
+        let nextID = dispute.subcourtID;
+        while (!subcourts.length || subcourts[subcourts.length - 1].ID.toString() !== nextID.toString()) {
+          const subcourt = await createSubcourtsList(nextID);
+          if (!subcourt) return undefined;
+          subcourts.push(subcourt);
+        }
+        const subcourtsReversed = [...subcourts].reverse();
+        setCaseData((oldData) => ({ ...oldData, subcourts: subcourtsReversed }));
+        return subcourtsReversed;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const metaEvidenceActions = useMemo(() => {
-    if (metaEvidence) {
+    if (caseData?.metaEvidence) {
       const actions = [];
-      if (metaEvidence.metaEvidenceJSON.fileURI)
+      if (caseData.metaEvidence.metaEvidenceJSON?.fileURI)
         actions.push(
           <Attachment
-            URI={metaEvidence.metaEvidenceJSON.fileURI}
+            URI={caseData.metaEvidence.metaEvidenceJSON.fileURI}
             description="Este es el documento principal de la disputa."
-            extension={metaEvidence.metaEvidenceJSON.fileTypeExtension}
+            extension={caseData.metaEvidence.metaEvidenceJSON.fileTypeExtension}
             title="Documento principal"
           />
         );
@@ -160,47 +223,104 @@ export default function CaseDetailsCard({ ID }) {
       );
       return actions;
     }
-  }, [metaEvidence]);
+  }, [caseData?.metaEvidence]);
+
+  const getSubcourtObject = async (dispute) => {
+    try {
+      const subcourtObject = await klerosLiquid.getSubcourt(dispute.subcourtID);
+      setCaseData((oldData) => ({
+        ...oldData,
+        subcourtObject: {
+          timesPerPeriod: subcourtObject.timesPerPeriod,
+          hiddenVotes: subcourtObject.hiddenVotes,
+        },
+      }));
+      return subcourtObject;
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const getDisputeData = async () => {
+    try {
+      const dispute = await klerosLiquid.disputes(ID);
+      setCaseData((oldData) => ({ ...oldData, dispute: dispute }));
+      return dispute;
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const getDisputeExtraInfoData = async () => {
+    try {
+      const disputeExtraInfo = await klerosLiquid.getDispute(ID);
+      setCaseData((oldData) => ({ ...oldData, disputeExtraInfo: disputeExtraInfo }));
+      return disputeExtraInfo;
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const getMetaEvidenceData = async (dispute) => {
+    if (dispute.ruled) {
+      const metaEvidence = await getMetaEvidence(100, dispute.arbitrated, klerosLiquid.address, ID, {
+        strict: false,
+      });
+      setCaseData((oldData) => ({ ...oldData, metaEvidence: metaEvidence }));
+      return metaEvidence;
+    } else {
+      const metaEvidence = await getMetaEvidence(100, dispute.arbitrated, klerosLiquid.address, ID);
+      setCaseData((oldData) => ({ ...oldData, metaEvidence: metaEvidence }));
+      return metaEvidence;
+    }
+  };
 
   return (
     <>
       <StyledCard
         actions={[
-          <Spin key="main" spinning={votesData.loading || !subcourts || !metaEvidence}>
-            {!votesData.loading && subcourts && metaEvidence && disputeExtraInfo ? (
+          <Spin key="main" spinning={isLoading || !caseData.subcourts || !caseData.metaEvidence}>
+            {caseData.subcourts &&
+            caseData.metaEvidence &&
+            caseData.disputeExtraInfo &&
+            caseData.metaEvidence?.metaEvidenceJSON ? (
               <>
                 <StyledActionsDiv className="secondary-linear-background theme-linear-background">
-                  {new Set(["0", "1", "2", "3"]).has(dispute.period) && disputeExtraInfo.votesLengths.length <= 1 ? (
+                  {new Set([0, 1, 2]).has(caseData.dispute.period) &&
+                  caseData.disputeExtraInfo.votesLengths.length <= 1 ? (
                     <Hourglass />
                   ) : (
                     <Gavel />
                   )}
-                  {new Set(["3", "4"]).has(dispute.period) || disputeExtraInfo.votesLengths.length > 1 ? (
+                  {caseData?.votesDataObject?.currentRuling &&
+                  (new Set([3, 4]).has(caseData.dispute.period) ||
+                    caseData.disputeExtraInfo.votesLengths.length > 1) ? (
                     <SecondaryActionText>
                       Decisión Final{"\n"}El ganador de este caso fue:{"\n"}
-                      {votesData.currentRuling === "0"
+                      {caseData.votesDataObject?.currentRuling.toString() === "0"
                         ? "No arbitrar"
-                        : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                        : (caseData?.votesDataObject?.currentRuling &&
+                            caseData.metaEvidence?.metaEvidenceJSON?.rulingOptions &&
                             realitioLibQuestionFormatter.getAnswerString(
                               {
-                                decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-                                outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
-                                type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+                                decimals: caseData.metaEvidence.metaEvidenceJSON.rulingOptions.precision,
+                                outcomes: caseData.metaEvidence.metaEvidenceJSON.rulingOptions.titles,
+                                type: caseData.metaEvidence.metaEvidenceJSON.rulingOptions.type,
                               },
                               realitioLibQuestionFormatter.padToBytes32(
-                                toBN(votesData.currentRuling).sub(toBN("1")).toString(16)
+                                BigNumber.from(caseData.votesDataObject.currentRuling).sub(BigNumber.from(1))
                               )
                             )) ||
                           "Unknown Choice"}
                     </SecondaryActionText>
                   ) : (
                     <>
-                      {dispute.period === "0" && (
+                      {caseData.dispute.period === 0 && (
                         <SecondaryActionText>
                           Estamos en periodo de evidencia.{"\n"}La votación todavía no ha empezado.
                         </SecondaryActionText>
                       )}
-                      {new Set(["1", "2"]).has(dispute.period) && (
+                      {new Set([1, 2]).has(caseData.dispute.period) && (
                         <SecondaryActionText>
                           Estamos en periodo de votación.{"\n"}El jurado está votando.
                         </SecondaryActionText>
@@ -216,49 +336,55 @@ export default function CaseDetailsCard({ ID }) {
         ]}
         extra={
           <StyledPoliciesButton
-            onClick={useCallback(() => dispute && setActiveSubcourtID(dispute.subcourtID), [dispute])}
+            onClick={() => {
+              caseData?.dispute && setActiveSubcourtID(caseData?.dispute.subcourtID.toString());
+            }}
           >
             <StyledDocument /> Politicas
           </StyledPoliciesButton>
         }
-        loading={!metaEvidence}
-        title={<> {metaEvidence && metaEvidence.metaEvidenceJSON.title} </>}
+        loading={!caseData?.metaEvidence}
+        title={
+          caseData?.metaEvidence?.metaEvidenceJSON ? <> {caseData?.metaEvidence?.metaEvidenceJSON?.title} </> : <></>
+        }
       >
-        {metaEvidence && (
+        {caseData?.metaEvidence && caseData?.subcourtObject && caseData?.dispute && (
           <>
             <Row>
               <div style={{ marginBottom: "2rem" }}>
                 <DisputeTimeline
-                  period={Number(dispute.period)}
-                  lastPeriodChange={dispute.lastPeriodChange}
-                  subcourtID={dispute.subcourtID}
-                  subcourt={subcourtObj}
+                  period={Number(caseData.dispute.period)}
+                  lastPeriodChange={Number(caseData.dispute.lastPeriodChange)}
+                  subcourtID={caseData.dispute.subcourtID}
+                  subcourt={caseData.subcourtObject}
                 />
               </div>
-              <Col span={24}>
-                <StyledInnerCard actions={metaEvidenceActions}>
-                  <ReactMarkdown source={metaEvidence.metaEvidenceJSON.description} />
-                </StyledInnerCard>
-              </Col>
+              {caseData.metaEvidence?.metaEvidenceJSON && (
+                <Col span={24}>
+                  <StyledInnerCard actions={metaEvidenceActions}>
+                    <ReactMarkdown source={caseData.metaEvidence.metaEvidenceJSON.description} />
+                  </StyledInnerCard>
+                </Col>
+              )}
             </Row>
             <CollapsableCard
               title={
                 <>
-                  <Folder /> {`Evidencias (${evidence ? evidence.length : 0})`}
+                  <Folder /> {`Evidencias (${caseData.evidence ? caseData.evidence.length : 0})`}
                 </>
               }
             >
               <EvidenceTimeline
-                evidence={evidence}
-                metaEvidence={metaEvidence}
-                ruling={dispute.period === "4" ? votesData.currentRuling : null}
-                chainId={chainId}
+                evidence={caseData.evidence}
+                metaEvidence={caseData.metaEvidence}
+                ruling={caseData.dispute.period === "4" ? caseData.votesDataObject.currentRuling.toString() : null}
+                chainId={1}
               />
             </CollapsableCard>
-            {disputeExtraInfo &&
-              metaEvidence &&
-              metaEvidence.metaEvidenceJSON.rulingOptions &&
-              metaEvidence.metaEvidenceJSON.rulingOptions.type === "single-select" && (
+            {caseData.disputeExtraInfo &&
+              caseData.metaEvidence &&
+              caseData.metaEvidence.metaEvidenceJSON?.rulingOptions &&
+              caseData.metaEvidence.metaEvidenceJSON?.rulingOptions.type === "single-select" && (
                 <CollapsableCard
                   title={
                     <>
@@ -269,17 +395,20 @@ export default function CaseDetailsCard({ ID }) {
                   <CaseRoundHistory
                     ID={ID}
                     dispute={{
-                      ...disputeExtraInfo,
-                      ...dispute,
+                      ...caseData.disputeExtraInfo,
+                      ...caseData.dispute,
                     }}
-                    ruling={dispute.period === "4" ? votesData.currentRuling : null}
+                    ruling={caseData.dispute.period === "4" ? caseData.votesDataObject.currentRuling.toString() : null}
+                    metaEvidence={caseData.metaEvidence}
                   />
                 </CollapsableCard>
               )}
           </>
         )}
-        {activeSubcourtID !== undefined && <CourtDrawer ID={activeSubcourtID} onClose={setActiveSubcourtID} />}
       </StyledCard>
+      {activeSubcourtID !== undefined && caseData?.subcourts && (
+        <CourtDrawer ID={activeSubcourtID} subcourts={caseData?.subcourts} onClose={setActiveSubcourtID} />
+      )}
     </>
   );
 }

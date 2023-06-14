@@ -1,23 +1,20 @@
-import Archon from '@kleros/archon'
-import PropTypes from 'prop-types'
-import { drizzleReactHooks } from '@drizzle/react-plugin'
-import { useEffect } from 'react'
+import Archon from "@kleros/archon";
+import PropTypes from "prop-types";
+import { useEffect } from "react";
+import { getReadOnlyRpcUrl } from "./web3";
+import { useConfig } from "@usedapp/core";
 
-const { useDrizzle } = drizzleReactHooks
-
-const archon = new Archon(undefined, 'https://ipfs.kleros.io')
-export default archon
+const archon = new Archon(undefined, "https://ipfs.kleros.io");
+export default archon;
 
 export const ArchonInitializer = ({ children }) => {
-  const { drizzle } = useDrizzle()
+  const config = useConfig();
   useEffect(() => {
-    drizzle.web3 && archon.setProvider(drizzle.web3.currentProvider)
-  }, [
-    drizzle.web3
-  ])
-  return children
-}
+    archon.setProvider(getReadOnlyRpcUrl({ chainId: config.readOnlyChainId }));
+  }, []);
+  return children;
+};
 
 ArchonInitializer.propTypes = {
-  children: PropTypes.node.isRequired
-}
+  children: PropTypes.node.isRequired,
+};
