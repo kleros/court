@@ -22,7 +22,7 @@ const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
     if (period === i) {
       return renderCountdown;
     } else if (period > i) {
-      return "Concluded";
+      return "Concluida";
     } else {
       return convertToHumanReadableTime(subcourt.timesPerPeriod[i]);
     }

@@ -33,16 +33,19 @@ export default function CaseRoundHistory({ ID, dispute }) {
     const dispute2 = call("KlerosLiquid", "getDispute", ID);
     const _justifications = useAPI.getJustifications(drizzle.web3, drizzleState.account, { appeal: 0, disputeID: ID });
     let votesInfo = {
+      jurorSet: new Set(),
       votes: [],
       loading: true,
     };
     if (metaEvidence && dispute2 && _justifications && _justifications !== "pending") {
       const justificationsList = _justifications.payload.justifications.Items;
       votesInfo.loading = false;
-      for (let i = 0; i < dispute2.votesLengths.length; i++) {
+      for (let i = 0; i < parseInt(dispute2.votesLengths[0]); i++) {
         const vote = call("KlerosLiquid", "getVote", ID, 0, i.toString());
         if (vote) {
-          if (vote.voted) {
+          const juror = vote.account;
+          if (vote.voted && !votesInfo.jurorSet.has(juror)) {
+            votesInfo.jurorSet.add(juror);
             votesInfo.votes.push({
               choice: vote.choice,
               justification: justificationsList.find((j) => j.voteID.N === i.toString())?.justification.S,
@@ -67,7 +70,7 @@ export default function CaseRoundHistory({ ID, dispute }) {
                   {...{
                     justification,
                     choiceTitle: metaEvidence.metaEvidenceJSON.rulingOptions.titles[choice - 1],
-                    index: i,
+                    index: i + 1,
                   }}
                 />
                 {i + 1 < votesInfo.votes.length && <Break />}
