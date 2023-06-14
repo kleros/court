@@ -38,16 +38,19 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
         .catch((err) => console.error(err));
 
       let votesInfo = {
+        jurorSet: new Set(),
         votes: [],
         loading: true,
       };
       if (metaEvidence && dispute && data && data !== "pending") {
         const justificationsList = data.payload.justifications.Items;
         votesInfo.loading = false;
-        for (let i = 0; i < dispute.votesLengths.length; i++) {
+        for (let i = 0; i < parseInt(dispute.votesLengths[0]); i++) {
           const vote = await klerosLiquid.getVote(ID, 0, i.toString());
           if (vote) {
-            if (vote.voted) {
+            const juror = vote.account;
+            if (vote.voted && !votesInfo.jurorSet.has(juror)) {
+              votesInfo.jurorSet.add(juror);
               votesInfo.votes.push({
                 choice: vote.choice.toString(),
                 justification: justificationsList.find((j) => j.voteID.N === i.toString())?.justification.S,
@@ -84,7 +87,7 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
                   {...{
                     justification,
                     choiceTitle: metaEvidence.metaEvidenceJSON.rulingOptions.titles[choice - 1],
-                    index: i,
+                    index: i + 1,
                   }}
                 />
                 {i + 1 < votesInfoData.votes.length && <Break />}

@@ -276,37 +276,6 @@ export default function CaseDetailsCard({ ID }) {
     }
   };
 
-  const evidenceDisplayInterfaceURL = useMemo(() => {
-    const normalizeIPFSUri = (uri) => uri.replace(/^\/ipfs\//, "https://ipfs.kleros.io/ipfs/");
-    if (caseData?.metaEvidence?.metaEvidenceJSON?.evidenceDisplayInterfaceURI) {
-      const { evidenceDisplayInterfaceURI, _v = "0" } = caseData.metaEvidence.metaEvidenceJSON;
-      const arbitratorChainID = caseData.metaEvidence.metaEvidenceJSON?.arbitratorChainID ?? config.readOnlyChainId;
-      const arbitrableChainID = caseData.metaEvidence.metaEvidenceJSON?.arbitrableChainID ?? arbitratorChainID;
-
-      let url = normalizeIPFSUri(evidenceDisplayInterfaceURI);
-
-      const injectedParams = {
-        disputeID: ID,
-        chainID: config.readOnlyChainId, // Deprecated. Use arbitratorChainID and arbitrableChainID instead.
-        arbitratorContractAddress: klerosLiquid.address,
-        arbitratorJsonRpcUrl: getReadOnlyRpcUrl({ chainId: arbitratorChainID }),
-        arbitratorChainID,
-        arbitrableContractAddress: caseData.dispute.arbitrated,
-        arbitrableChainID,
-        arbitrableJsonRpcUrl: getReadOnlyRpcUrl({ chainId: arbitrableChainID }),
-      };
-
-      if (_v === "0") {
-        url += `?${encodeURIComponent(JSON.stringify(injectedParams))}`;
-      } else {
-        const searchParams = new URLSearchParams(injectedParams);
-        url += `?${searchParams.toString()}`;
-      }
-
-      return url;
-    }
-  }, [caseData?.metaEvidence, ID, caseData?.dispute, klerosLiquid.address]);
-
   return (
     <>
       <StyledCard
@@ -395,57 +364,6 @@ export default function CaseDetailsCard({ ID }) {
                 <Col span={24}>
                   <StyledInnerCard actions={metaEvidenceActions}>
                     <ReactMarkdown source={caseData.metaEvidence.metaEvidenceJSON.description} />
-                    {caseData.metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
-                      <iframe
-                        title="dispute details"
-                        style={{ width: "1px", minWidth: "100%", height: "auto", border: "none" }}
-                        src={evidenceDisplayInterfaceURL}
-                      />
-                    )}
-                    {caseData.metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI && (
-                      <ArbitrableInterfaceDiv>
-                        <a
-                          href={caseData.metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <Icon type="double-right" style={{ marginRight: "5px" }} />
-                          Go to the Arbitrable Application
-                        </a>
-                      </ArbitrableInterfaceDiv>
-                    )}
-                    {ID === "302" ? (
-                      <ArbitrableInterfaceDiv>
-                        This realitio dispute has been created by Omen, we advise you to read the{" "}
-                        <a target="_blank" rel="noopener noreferrer" href={"https://omen.eth.limo/rules.pdf"}>
-                          Omen Rules
-                        </a>{" "}
-                        and consult the evidence provided in the{" "}
-                        <a
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          href={"https://omen.eth.limo/#/0xffbc624070cb014420a6f7547fd05dfe635e2db2"}
-                        >
-                          Market Comments.
-                        </a>
-                      </ArbitrableInterfaceDiv>
-                    ) : null}
-                    {ID === "532" ? (
-                      <ArbitrableInterfaceDiv>
-                        This realitio dispute has been created by Omen, we advise you to read the{" "}
-                        <a target="_blank" rel="noopener noreferrer" href={"https://omen.eth.limo/rules.pdf"}>
-                          Omen Rules
-                        </a>{" "}
-                        and consult the evidence provided in the{" "}
-                        <a
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          href={"https://omen.eth.limo/#/0x95b2271039b020aba31b933039e042b60b063800"}
-                        >
-                          Market Comments.
-                        </a>
-                      </ArbitrableInterfaceDiv>
-                    ) : null}
                   </StyledInnerCard>
                 </Col>
               )}
@@ -674,14 +592,4 @@ const StyledInnerCardActionsTitleDiv = styled.div`
   background: linear-gradient(204.14deg, #ffffff -6.48%, #f5f1fd 45.52%);
   border-radius: 6px 6px 0 0;
   text-align: center;
-`;
-
-const ArbitrableInterfaceDiv = styled.div`
-  border-top: 1px solid #d09cff;
-  font-size: 18px;
-  padding: 20px 0px 5px 0px;
-
-  a {
-    color: #4d00b4;
-  }
 `;
