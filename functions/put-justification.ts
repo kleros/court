@@ -1,9 +1,8 @@
 import { Handler } from '@netlify/functions';
 import { Client } from '@supabase/supabase-js';
 import Web3 from 'web3';
-import KlerosLiquid from '../assets/contracts/KlerosLiquid.json';
 import { Logtail } from '@logtail/node';
-const { KlerosLiquid } = require(`abi/KlerosLiquid.json'`);
+const { KlerosLiquid } = require(`../src/assets/contracts/kleros-liquid.json`);
 
 const logtail = new Logtail(process.env.LOGTAIL_SOURCE_TOKEN);
 
@@ -14,15 +13,15 @@ const supabase = new Client(supabaseUrl, supabaseAnonKey);
 const networks = {
   'gnosischain': {
     infuraUrl: process.env.GNOSIS_RPC,
-    klerosAddress: process.env.LIQUID_GNOSIS
+    klerosAddress: process.env.GNOSIS_LIQUID
   },
   'ethereum': {
     infuraUrl: process.env.ETHEREUM_RPC,
-    klerosAddress: process.env.LIQUID_ETHEREUM
+    klerosAddress: process.env.ETHEREUM_LIQUID
   },
-  'chiado': {
-    infuraUrl: process.env.CHIADO_RPC,
-    klerosAddress: process.env.LIQUID_CHIADO
+  'sepolia': {
+    infuraUrl: process.env.SEPOLIA_RPC,
+    klerosAddress: process.env.SEPOLIA_LIQUID
   }
 };
 
