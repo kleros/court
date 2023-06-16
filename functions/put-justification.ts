@@ -1,14 +1,13 @@
 import { Handler } from '@netlify/functions';
-import { Client } from '@supabase/supabase-js';
 import Web3 from 'web3';
 import { Logtail } from '@logtail/node';
 const { KlerosLiquid } = require(`../src/assets/contracts/kleros-liquid.json`);
-
+const { createClient } = require('@supabase/supabase-js');
 const logtail = new Logtail(process.env.LOGTAIL_SOURCE_TOKEN);
 
-const supabaseUrl = process.env.SUPABASE_URL
-const supabaseAnonKey = process.env.SUPABASE_KEY;
-const supabase = new Client(supabaseUrl, supabaseAnonKey);
+const supabaseUrl = process.env.COURT_DB_URL;
+const supabaseKey = process.env.COURT_DB_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const networks = {
   'gnosischain': {
@@ -27,15 +26,27 @@ const networks = {
 
 export const handler: Handler = async (event) => {
   try {
-    const payload = JSON.parse(event.body).payload;
-    const network = networks[payload.network];
+    if (event.httpMethod !== "PUT") {
+      throw new Error("Invalid request method, expected PUT");
+    }
 
+    // Parse signature and payload from event
+    const { payload, signature } = JSON.parse(event.body);
+
+    const network = networks[payload.network];
     if (!network) {
       throw new Error(`No Kleros Liquid address found for network ${payload.network}`);
     }
 
     const web3 = new Web3(new Web3.providers.HttpProvider(network.infuraUrl));
     const klerosLiquid = new web3.eth.Contract(KlerosLiquid.abi, network.klerosAddress);
+
+    // Verify the sender's address
+    const msg = web3.utils.soliditySha3(JSON.stringify(payload));
+    const sender = web3.eth.accounts.recover(msg, signature);
+    if (sender !== payload.address) {
+      throw new Error(`The sender address does not match the address in the payload`);
+    }
 
     for (const voteID of payload.justification.voteIDs) {
       const vote = await klerosLiquid.methods
@@ -91,4 +102,3 @@ export const handler: Handler = async (event) => {
     };
   }
 };
-

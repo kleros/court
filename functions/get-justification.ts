@@ -1,10 +1,8 @@
 import { Handler } from '@netlify/functions';
-import { Client } from '@supabase/supabase-js';
-
-
-const supabaseUrl = process.env.SUPABASE_URL
-const supabaseAnonKey = process.env.SUPABASE_KEY;
-const supabase = new Client(supabaseUrl, supabaseAnonKey);
+const { createClient } = require('@supabase/supabase-js');
+const supabaseUrl = process.env.COURT_DB_URL;
+const supabaseKey = process.env.COURT_DB_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 const allowedNetworks = ['gnosischain', 'ethereum', 'chiado'];
 
 export const handler: Handler = async (event) => {
@@ -12,11 +10,12 @@ export const handler: Handler = async (event) => {
   const disputeID = parseInt(payload.disputeID);
   const appeal = parseInt(payload.appeal);
 
-  if (!allowedNetworks.includes(payload.network) || !Number.isInteger(disputeID) || !Number.isInteger(appeal)) {
+
+  if (!allowedNetworks.includes(payload.network) || isNaN(disputeID) || isNaN(appeal) || event.httpMethod !== "GET") {
     return {
       statusCode: 400,
       headers: { 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ error: 'Invalid inputs. Network must be gnosischain, and both disputeID and appeal must be integers.' }),
+      body: JSON.stringify({ error: 'Invalid inputs. Network must be gnosischain, ethereum or chiado, and both disputeID and appeal must be valid numbers.' }),
     };
   }
 
