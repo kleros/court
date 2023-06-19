@@ -21,7 +21,7 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
 
   const getJustificationsData = async () => {
     try {
-      const url = new URL(process.env.REACT_APP_JUSTIFICATIONS_URL);
+      const url = new URL("/.netlify/functions/get-justifications");
       url.search = new URLSearchParams({
         network: chainIdToNetwork[config.readOnlyChainId],
         disputeID: ID.toString(),
