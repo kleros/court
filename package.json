@@ -70,6 +70,7 @@
     "@reality.eth/reality-eth-lib": "^3.0.0",
     "@sentry/react": "^7.37.2",
     "@sentry/tracing": "^7.37.2",
+    "@supabase/supabase-js": "^2.25.0",
     "@usedapp/core": "^1.2.9",
     "antd": "^3.10.8",
     "bootstrap": "^5.2.3",
