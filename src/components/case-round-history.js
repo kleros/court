@@ -10,7 +10,7 @@ import useContract from "../hooks/use-contract";
 const chainIdToNetwork = {
   1: "mainnet",
   5: "goerli",
-  100: "xdai",
+  100: "gnosischain",
   10200: "chiado",
 };
 
@@ -21,19 +21,20 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
 
   const getJustificationsData = async () => {
     try {
-      const data = await fetch(process.env.REACT_APP_JUSTIFICATIONS_URL, {
-        body: JSON.stringify({
-          payload: {
-            network: chainIdToNetwork[config.readOnlyChainId],
-            disputeID: ID,
-            appeal: 0,
-          },
-        }),
+      const url = new URL(process.env.REACT_APP_JUSTIFICATIONS_URL);
+      url.search = new URLSearchParams({
+        network: chainIdToNetwork[config.readOnlyChainId],
+        disputeID: ID.toString(),
+        appeal: "0",
+      });
+      const data = await fetch(url, {
+        mode: "no-cors",
         headers: { "Content-Type": "application/json" },
-        method: "POST",
+        method: "GET",
       })
         .then((res) => res.json())
         .catch((err) => console.error(err));
+      console.log(data);
 
       let votesInfo = {
         jurorSet: new Set(),
