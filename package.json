@@ -66,6 +66,7 @@
     "@kleros/archon": "^2.2.0",
     "@kleros/pnk-merkle-drop-contracts": "^0.1.0",
     "@loadable/component": "^5.5.0",
+    "@netlify/functions": "^1.6.0",
     "@reality.eth/contracts": "3.0.0",
     "@reality.eth/reality-eth-lib": "^3.0.0",
     "@sentry/react": "^7.37.2",
