@@ -42,7 +42,6 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
       };
       if (metaEvidence && dispute && data && data !== "pending") {
         const justifications = data.payload.justifications;
-        console.log("justifications", justifications)
         votesInfo.loading = false;
         for (let i = 0; i < dispute.votesLengths[0].toNumber(); i++) {
           const vote = await klerosLiquid.getVote(ID, 0, i.toString());
@@ -52,7 +51,7 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
               votesInfo.jurorSet.add(juror);
               votesInfo.votes.push({
                 choice: vote.choice.toString(),
-                justification: justifications.find((j) => j.voteID.N === i.toString())?.justification.S,
+                justification: justifications.find((j) => j.voteID.N === i)?.justification,
               });
             }
           } else {
