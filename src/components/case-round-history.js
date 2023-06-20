@@ -1,7 +1,7 @@
 import { useConfig } from "@usedapp/core";
 import { Skeleton } from "antd";
 import t from "prop-types";
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import JustificationCard from "./justification-card";
 
 import styled from "styled-components/macro";
@@ -19,7 +19,7 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
   const { klerosLiquid } = useContract({ chainID: config.readOnlyChainId });
   const [votesInfoData, setVotesInfoData] = useState();
 
-  const getJustificationsData = async () => {
+  const getJustificationsData = useMemo(async () => {
     try {
       const url = new URL("/.netlify/functions/get-justifications", window.location.origin);
       url.search = new URLSearchParams({
@@ -64,7 +64,7 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
