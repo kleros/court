@@ -12,7 +12,7 @@
   REACT_APP_TOKEN_BRIDGE_ADDRESS='0x88ad09518695c6c3712AC10a214bE5109a655671'
   REACT_APP_DRAW_EVENT_LISTENER_BLOCK_NUMBER='7303699'
   REACT_APP_USER_SETTINGS_URL='https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/user-settings'
-  REACT_APP_JUSTIFICATIONS_URL='https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/justifications'
+  REACT_APP_JUSTIFICATIONS_URL='https://lambent-cajeta-7c1e10.netlify.app/.netlify/functions/get-justification'
   REACT_APP_APPLICATION_SERVER_KEY='BNqPp3phfZUqu4G1SCkqNuZ_FDL4YuSeAEV97U_G3UbrOuOsTeaI9jHE3QNRJ-O8EH3F2OUdnJJ4ZOhp80FthKU'
   REACT_APP_WEB3_FALLBACK_URL='wss://mainnet.infura.io/ws/v3/54fb3d87cd07464591ad2be29a1db32f'
   REACT_APP_WEB3_FALLBACK_HTTPS_URL='https://mainnet.infura.io/v3/54fb3d87cd07464591ad2be29a1db32f'
@@ -51,7 +51,6 @@
 [context.production.environment]
   REACT_APP_CONTEXT='production'
   REACT_APP_USER_SETTINGS_URL='https://hgyxlve79a.execute-api.us-east-2.amazonaws.com/production/user-settings'
-  REACT_APP_JUSTIFICATIONS_URL='https://hgyxlve79a.execute-api.us-east-2.amazonaws.com/production/justifications'
 
 [[redirects]]
   from = "/*"

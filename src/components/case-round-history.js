@@ -10,7 +10,7 @@ import useContract from "../hooks/use-contract";
 const chainIdToNetwork = {
   1: "mainnet",
   5: "goerli",
-  100: "xdai",
+  100: "gnosischain",
   10200: "chiado",
 };
 
@@ -21,16 +21,16 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
 
   const getJustificationsData = async () => {
     try {
-      const data = await fetch(process.env.REACT_APP_JUSTIFICATIONS_URL, {
-        body: JSON.stringify({
-          payload: {
-            network: chainIdToNetwork[config.readOnlyChainId],
-            disputeID: ID,
-            appeal: 0,
-          },
-        }),
+      const url = new URL("/.netlify/functions/get-justifications", window.location.origin);
+      url.search = new URLSearchParams({
+        network: chainIdToNetwork[config.readOnlyChainId],
+        disputeID: ID.toString(),
+        appeal: "0",
+      });
+      const data = await fetch(url, {
+        mode: "no-cors",
         headers: { "Content-Type": "application/json" },
-        method: "POST",
+        method: "GET",
       })
         .then((res) => res.json())
         .catch((err) => console.error(err));
@@ -41,9 +41,9 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
         loading: true,
       };
       if (metaEvidence && dispute && data && data !== "pending") {
-        const justificationsList = data.payload.justifications.Items;
+        const justifications = data.payload.justifications;
         votesInfo.loading = false;
-        for (let i = 0; i < dispute.votesLengths[0].toNumber(); i++) {
+        for (let i = dispute.votesLengths[0].toNumber() - 1; i >= 0; i--) {
           const vote = await klerosLiquid.getVote(ID, 0, i.toString());
           if (vote) {
             const juror = vote.account;
@@ -51,7 +51,7 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
               votesInfo.jurorSet.add(juror);
               votesInfo.votes.push({
                 choice: vote.choice.toString(),
-                justification: justificationsList.find((j) => j.voteID.N === i.toString())?.justification.S,
+                justification: justifications.find((j) => j.voteID === i)?.justification,
               });
             }
           } else {
