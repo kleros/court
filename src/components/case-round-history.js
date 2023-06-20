@@ -51,7 +51,7 @@ export default function CaseRoundHistory({ ID, dispute, metaEvidence }) {
               votesInfo.jurorSet.add(juror);
               votesInfo.votes.push({
                 choice: vote.choice.toString(),
-                justification: justifications.find((j) => j.voteID.N === i)?.justification,
+                justification: justifications.find((j) => j.voteID === i)?.justification,
               });
             }
           } else {
