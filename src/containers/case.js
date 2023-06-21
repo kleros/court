@@ -10,6 +10,8 @@ import RequiredChainIdGateway from "../components/required-chain-id-gateway";
 import RequiredChainIdModal from "../components/required-chain-id-modal";
 import styled from "styled-components/macro";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import useChainId from "../hooks/use-chain-id";
+import { getKlerosLiquidBlockNumber } from "../helpers/block-numbers";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -31,15 +33,16 @@ export default function Case() {
   const { send: sendExecuteRuling } = useCacheSend("KlerosLiquid", "executeRuling");
   const dispute = useCacheCall("KlerosLiquid", "disputes", ID);
   const dispute2 = useCacheCall("KlerosLiquid", "getDispute", ID);
+  const chainId = useChainId();
   const draws = useCacheEvents(
     "KlerosLiquid",
     "Draw",
     useMemo(
       () => ({
         filter: { _address: drizzleState.account, _disputeID: ID },
-        fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER,
+        fromBlock: getKlerosLiquidBlockNumber(chainId),
       }),
-      [drizzleState.account, ID]
+      [drizzleState.account, ID, chainId]
     )
   );
   const disputeData = useCacheCall(["KlerosLiquid"], (call) => {

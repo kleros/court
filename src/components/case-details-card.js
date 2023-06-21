@@ -24,6 +24,7 @@ import CollapsableCard from "./collapsable-card";
 import CourtDrawer from "./court-drawer";
 import EvidenceTimeline from "./evidence-timeline";
 import { getReadOnlyRpcUrl } from "../bootstrap/web3";
+import { getKlerosLiquidBlockNumber } from "../helpers/block-numbers";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const { toBN, soliditySha3 } = Web3.utils;
@@ -79,15 +80,16 @@ export default function CaseDetailsCard({ ID }) {
   const [complexRuling, setComplexRuling] = useState();
   const dispute = useCacheCall("KlerosLiquid", "disputes", ID);
   const disputeExtraInfo = useCacheCall("KlerosLiquid", "getDispute", ID);
+  const chainId = useChainId();
   const draws = useCacheEvents(
     "KlerosLiquid",
     "Draw",
     useMemo(
       () => ({
         filter: { _address: drizzleState.account, _disputeID: ID },
-        fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER,
+        fromBlock: getKlerosLiquidBlockNumber(chainId),
       }),
-      [drizzleState.account, ID]
+      [drizzleState.account, ID, chainId]
     )
   );
   const votesData = useCacheCall(["KlerosLiquid"], (call) => {
@@ -171,8 +173,6 @@ export default function CaseDetailsCard({ ID }) {
   });
   let metaEvidence;
   let evidence;
-
-  const chainId = useChainId();
 
   if (dispute) {
     if (dispute.ruled) {
@@ -738,7 +738,6 @@ export default function CaseDetailsCard({ ID }) {
               <DisputeTimeline
                 period={Number(dispute.period)}
                 lastPeriodChange={dispute.lastPeriodChange}
-                subcourtID={dispute.subcourtID}
                 subcourt={subcourtObj}
               />
             </div>

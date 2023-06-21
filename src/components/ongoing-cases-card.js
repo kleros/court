@@ -9,6 +9,7 @@ import useChainId from "../hooks/use-chain-id";
 import CaseSummaryCard from "./case-summary-card";
 import TitledListCard from "./titled-list-card";
 import ListItem from "./list-item";
+import { getKlerosLiquidBlockNumber } from "../helpers/block-numbers";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -77,11 +78,12 @@ const OngoingCasesCard = () => {
     useMemo(
       () => ({
         filter: { _address: drizzleState.account },
-        fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER,
+        fromBlock: getKlerosLiquidBlockNumber(chainId),
       }),
       [drizzleState.account]
     )
   );
+
   const disputes = useCacheCall(["KlerosLiquid"], (call) =>
     draws
       ? Object.values(

@@ -5,6 +5,8 @@ import CaseCard from "../components/case-card";
 import TopBanner from "../components/top-banner";
 import styled from "styled-components/macro";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import useChainId from "../hooks/use-chain-id";
+import { getKlerosLiquidBlockNumber } from "../helpers/block-numbers";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -14,15 +16,16 @@ export default function Cases() {
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
   const [filter, setFilter] = useState(0);
+  const chainId = useChainId();
   const draws = useCacheEvents(
     "KlerosLiquid",
     "Draw",
     useMemo(
       () => ({
         filter: { _address: drizzleState.account },
-        fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER,
+        fromBlock: getKlerosLiquidBlockNumber(chainId),
       }),
-      [drizzleState.account]
+      [drizzleState.account, chainId]
     )
   );
   const disputes = useCacheCall(["KlerosLiquid"], (call) =>
