@@ -7,12 +7,14 @@ import styled from "styled-components/macro";
 const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
   const renderCountdown = useMemo(() => {
     return (
-      <Countdown
-        date={(parseInt(lastPeriodChange) + parseInt(subcourt.timesPerPeriod[period])) * 1000}
-        renderer={(props) => (
-          <span>{`${zeroPad(props.days, 2)}d ${zeroPad(props.hours, 2)}h ${zeroPad(props.minutes, 2)}m`}</span>
-        )}
-      />
+      subcourt?.timesPerPeriod && (
+        <Countdown
+          date={(parseInt(lastPeriodChange) + parseInt(subcourt.timesPerPeriod[period])) * 1000}
+          renderer={(props) => (
+            <span>{`${zeroPad(props.days, 2)}d ${zeroPad(props.hours, 2)}h ${zeroPad(props.minutes, 2)}m`}</span>
+          )}
+        />
+      )
     );
   }, [lastPeriodChange, period, subcourt.timesPerPeriod]);
 
@@ -31,7 +33,7 @@ const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
   return (
     <StyledDisputeTimeline>
       <Row>
-        {subcourt &&
+        {typeof subcourt?.timesPerPeriod !== "undefined" &&
           periods.map((periodName, i) =>
             i !== 1 || subcourt.hiddenVotes ? (
               <React.Fragment key={periodName}>
@@ -62,7 +64,7 @@ const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
 
 DisputeTimeline.propTypes = {
   period: PropTypes.number.isRequired,
-  lastPeriodChange: PropTypes.number.isRequired,
+  lastPeriodChange: PropTypes.string.isRequired,
   subcourt: PropTypes.shape({
     timesPerPeriod: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
     hiddenVotes: PropTypes.bool.isRequired,
