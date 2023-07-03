@@ -17,18 +17,36 @@ const networkIDData = {
     provider: "https://goerli.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
     nativeToken: "ETH",
     pnkToken: "PNK",
+    fromBlock: process.env.REACT_APP_KLEROS_LIQUID_GOERLI_BLOCK_NUMBER
+      ? Number(process.env.REACT_APP_KLEROS_LIQUID_GOERLI_BLOCK_NUMBER)
+      : 0,
   },
   100: {
     name: "_XDAI",
     provider: "https://rpc.gnosischain.com",
     nativeToken: "xDAI",
     pnkToken: "stPNK",
+    fromBlock: process.env.REACT_APP_KLEROS_LIQUID_XDAI_BLOCK_NUMBER
+      ? Number(process.env.REACT_APP_KLEROS_LIQUID_XDAI_BLOCK_NUMBER)
+      : 0,
   },
   10200: {
     name: "_CHIADO",
     provider: "https://rpc.chiadochain.net",
     nativeToken: "xDAI",
     pnkToken: "PNK",
+    fromBlock: process.env.REACT_APP_KLEROS_LIQUID_CHIADO_BLOCK_NUMBER
+      ? Number(process.env.REACT_APP_KLEROS_LIQUID_CHIADO_BLOCK_NUMBER)
+      : 0,
+  },
+  11155111: {
+    name: "_SEPOLIA",
+    provider: "https://sepolia.infura.io/v3/498250ed13a94a6bbdd646ee97e9f64c",
+    nativeToken: "ETH",
+    pnkToken: "PNK",
+    fromBlock: process.env.REACT_APP_KLEROS_LIQUID_SEPOLIA_BLOCK_NUMBER
+      ? Number(process.env.REACT_APP_KLEROS_LIQUID_SEPOLIA_BLOCK_NUMBER)
+      : 0,
   },
 };
 

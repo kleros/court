@@ -14,6 +14,7 @@ const defaultOptions = {
     5, // Görli
     100, // xDAI
     10200, // Chiado
+    11155111, // Sepolia
   ],
   contracts: [
     {
@@ -23,6 +24,7 @@ const defaultOptions = {
         5: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
         100: { address: process.env.REACT_APP_KLEROS_XDAI_ADDRESS },
         10200: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
+        11155111: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
       },
     },
     {
@@ -32,6 +34,7 @@ const defaultOptions = {
         5: { address: process.env.REACT_APP_KLEROS_LIQUID_GOERLI_ADDRESS },
         100: { address: process.env.REACT_APP_KLEROS_LIQUID_XDAI_ADDRESS },
         10200: { address: process.env.REACT_APP_KLEROS_LIQUID_CHIADO_ADDRESS },
+        11155111: { address: process.env.REACT_APP_KLEROS_LIQUID_SEPOLIA_ADDRESS },
       },
     },
     {
@@ -41,6 +44,7 @@ const defaultOptions = {
         5: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_GOERLI_ADDRESS },
         100: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_XDAI_ADDRESS },
         10200: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_CHIADO_ADDRESS },
+        11155111: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_SEPOLIA_ADDRESS },
       },
     },
     {
@@ -50,6 +54,7 @@ const defaultOptions = {
         5: { address: process.env.REACT_APP_PINAKION_GOERLI_ADDRESS },
         100: { address: process.env.REACT_APP_PINAKION_XDAI_ADDRESS },
         10200: { address: process.env.REACT_APP_PINAKION_CHIADO_ADDRESS },
+        11155111: { address: process.env.REACT_APP_PINAKION_SEPOLIA_ADDRESS },
       },
     },
     {
@@ -59,6 +64,7 @@ const defaultOptions = {
         5: { address: process.env.REACT_APP_POLICY_REGISTRY_GOERLI_ADDRESS },
         100: { address: process.env.REACT_APP_POLICY_REGISTRY_XDAI_ADDRESS },
         10200: { address: process.env.REACT_APP_POLICY_REGISTRY_CHIADO_ADDRESS },
+        11155111: { address: process.env.REACT_APP_POLICY_REGISTRY_SEPOLIA_ADDRESS },
       },
     },
     {
@@ -68,6 +74,7 @@ const defaultOptions = {
         5: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
         100: { address: process.env.REACT_APP_UNISWAP_V2_FACTORY_XDAI_ADDRESS },
         10200: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
+        11155111: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
       },
     },
     {
@@ -77,6 +84,7 @@ const defaultOptions = {
         5: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
         100: { address: process.env.REACT_APP_UNISWAP_V2_ROUTER_02_XDAI_ADDRESS },
         10200: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
+        11155111: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
       },
     },
   ],
@@ -91,6 +99,7 @@ const chainIdToFallbackUrl = {
   5: process.env.REACT_APP_WEB3_FALLBACK_GOERLI_URL,
   100: process.env.REACT_APP_WEB3_FALLBACK_XDAI_URL,
   10200: process.env.REACT_APP_WEB3_FALLBACK_CHIADO_URL,
+  11155111: process.env.REACT_APP_WEB3_FALLBACK_SEPOLIA_URL,
 };
 
 const { DrizzleProvider, Initializer, useDrizzle } = drizzleReactHooks;

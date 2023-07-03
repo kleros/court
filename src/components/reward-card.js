@@ -7,6 +7,8 @@ import { ReactComponent as PurpleArrowBackground } from "../assets/images/purple
 import { ReactComponent as LightPurpleArrowBackground } from "../assets/images/light-purple-arrow.svg";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import ETHAmount from "./eth-amount";
+import useChainId from "../hooks/use-chain-id";
+import { getKlerosLiquidBlockNumber } from "../helpers/block-numbers";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -174,12 +176,13 @@ const RewardCard = () => {
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
     balance: drizzleState.accounts[0] ? drizzleState.accountBalances[drizzleState.accounts[0]] : 0,
   }));
+  const chainId = useChainId();
   const rewards = useCacheEvents(
     "KlerosLiquid",
     "TokenAndETHShift",
     {
       filter: { _address: drizzleState.account },
-      fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER,
+      fromBlock: getKlerosLiquidBlockNumber(chainId),
     },
     [drizzleState.account]
   );
