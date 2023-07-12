@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const fetchShifts = async (chainId, where, lastId) => {
+const fetchShifts = async (chainId, where, lastId, first) => {
   const subgraphEndpoints = {
     1: "https://api.thegraph.com/subgraphs/name/greenlucid/kleros-display-mainnet",
     100: "https://api.thegraph.com/subgraphs/name/greenlucid/kleros-display",
@@ -9,11 +9,12 @@ const fetchShifts = async (chainId, where, lastId) => {
   const subgraphQuery = {
     query: `
     {
-      tokenAndETHShifts(where: {${where}, id_gt: "${lastId}"}, first: 1000) {
-          ETHAmount
-          address
-          disputeID
-          tokenAmount
+      tokenAndETHShifts(where: {${where}, id_gt: "${lastId}"}, first: ${first}) {
+        id
+        ETHAmount
+        address
+        disputeID
+        tokenAmount
       }
     }
     `,
@@ -31,12 +32,13 @@ const fetchShifts = async (chainId, where, lastId) => {
 const getBatch = async (chainId, where) => {
   const batches = [];
   let lastId = "";
+  const BATCH_SIZE = 1000;
   // eslint-disable-next-line no-constant-condition
   while (true) {
-    const entities = await fetchShifts(chainId, where, lastId);
+    const entities = await fetchShifts(chainId, where, lastId, BATCH_SIZE);
     batches.push(entities);
-    if (entities.length < 1000) break;
-    lastId = entities[999];
+    if (entities.length < BATCH_SIZE) break;
+    lastId = entities[BATCH_SIZE - 1].id;
   }
   return batches.flat(1);
 };
