@@ -8,7 +8,7 @@ import { ReactComponent as LightPurpleArrowBackground } from "../assets/images/l
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import ETHAmount from "./eth-amount";
 import useChainId from "../hooks/use-chain-id";
-import { getKlerosLiquidBlockNumber } from "../helpers/block-numbers";
+import useGetShifts from "../hooks/use-get-shifts";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -171,28 +171,20 @@ const ETHOffset = styled.div``;
 const PNKOffset = styled.div``;
 
 const RewardCard = () => {
-  const { drizzle, useCacheEvents } = useDrizzle();
+  const { drizzle } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
     balance: drizzleState.accounts[0] ? drizzleState.accountBalances[drizzleState.accounts[0]] : 0,
   }));
   const chainId = useChainId();
-  const rewards = useCacheEvents(
-    "KlerosLiquid",
-    "TokenAndETHShift",
-    {
-      filter: { _address: drizzleState.account },
-      fromBlock: getKlerosLiquidBlockNumber(chainId),
-    },
-    [drizzleState.account]
-  );
+  const rewards = useGetShifts(chainId, `address: "${drizzleState.account}"`);
 
   let ethRewards = drizzle.web3.utils.toBN("0");
   let pnkRewards = drizzle.web3.utils.toBN("0");
   if (rewards)
     for (const reward of rewards) {
-      ethRewards = ethRewards.add(drizzle.web3.utils.toBN(reward.returnValues._ETHAmount));
-      pnkRewards = pnkRewards.add(drizzle.web3.utils.toBN(reward.returnValues._tokenAmount));
+      ethRewards = ethRewards.add(drizzle.web3.utils.toBN(reward.ETHAmount));
+      pnkRewards = pnkRewards.add(drizzle.web3.utils.toBN(reward.tokenAmount));
     }
 
   return (

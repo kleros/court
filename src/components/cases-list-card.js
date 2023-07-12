@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { ReactComponent as Hourglass } from "../assets/images/hourglass.svg";
 import ListItem from "./list-item";
@@ -7,7 +7,7 @@ import TitledListCard from "./titled-list-card";
 import styled from "styled-components/macro";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import useChainId from "../hooks/use-chain-id";
-import { getKlerosLiquidBlockNumber } from "../helpers/block-numbers";
+import useGetDraws from "../hooks/use-get-draws";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -30,45 +30,30 @@ const StyledHourglass = styled(Hourglass)`
   top: 13px;
 `;
 const CasesListCard = () => {
-  const { useCacheCall, useCacheEvents } = useDrizzle();
+  const { useCacheCall } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
   const chainId = useChainId();
-  const draws = useCacheEvents(
-    "KlerosLiquid",
-    "Draw",
-    useMemo(
-      () => ({
-        filter: { _address: drizzleState.account },
-        fromBlock: getKlerosLiquidBlockNumber(chainId),
-      }),
-      [drizzleState.account]
-    )
-  );
+  const draws = useGetDraws(chainId, `address: "${drizzleState.account}"`);
+
   const disputes = useCacheCall(["KlerosLiquid"], (call) =>
     draws
       ? Object.values(
           draws.reduce((acc, d) => {
-            acc[d.returnValues._disputeID] = d;
+            acc[d.disputeID] = d;
             return acc;
           }, {})
         ).reduce(
           (acc, d) => {
             acc.total++;
-            const dispute = call("KlerosLiquid", "disputes", d.returnValues._disputeID);
+            const dispute = call("KlerosLiquid", "disputes", d.disputeID);
             if (dispute)
               if (dispute.period === "1" || dispute.period === "2") {
-                const dispute2 = call("KlerosLiquid", "getDispute", d.returnValues._disputeID);
+                const dispute2 = call("KlerosLiquid", "getDispute", d.disputeID);
                 if (dispute2)
-                  if (Number(d.returnValues._appeal) === dispute2.votesLengths.length - 1) {
-                    const vote = call(
-                      "KlerosLiquid",
-                      "getVote",
-                      d.returnValues._disputeID,
-                      d.returnValues._appeal,
-                      d.returnValues._voteID
-                    );
+                  if (Number(d.appeal) === dispute2.votesLengths.length - 1) {
+                    const vote = call("KlerosLiquid", "getVote", d.disputeID, d.appeal, d.voteID);
                     if (vote)
                       if (vote.voted) acc.active++;
                       else {
@@ -92,6 +77,7 @@ const CasesListCard = () => {
         )
       : { loading: true }
   );
+
   return (
     <TitledListCard loading={disputes.loading} prefix={disputes.total} title="Cases">
       <ListItem extra={String(disputes.votePending)}>Vote Pending</ListItem>

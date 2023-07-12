@@ -24,7 +24,7 @@ import CollapsableCard from "./collapsable-card";
 import CourtDrawer from "./court-drawer";
 import EvidenceTimeline from "./evidence-timeline";
 import { getReadOnlyRpcUrl } from "../bootstrap/web3";
-import { getKlerosLiquidBlockNumber } from "../helpers/block-numbers";
+import useGetDraws from "../hooks/use-get-draws";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const { toBN, soliditySha3 } = Web3.utils;
@@ -64,7 +64,7 @@ const JustificationBox = ({ web3, account, onChange, justification }) => {
 };
 
 export default function CaseDetailsCard({ ID }) {
-  const { drizzle, useCacheCall, useCacheEvents, useCacheSend } = useDrizzle();
+  const { drizzle, useCacheCall, useCacheSend } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
@@ -81,41 +81,23 @@ export default function CaseDetailsCard({ ID }) {
   const dispute = useCacheCall("KlerosLiquid", "disputes", ID);
   const disputeExtraInfo = useCacheCall("KlerosLiquid", "getDispute", ID);
   const chainId = useChainId();
-  const draws = useCacheEvents(
-    "KlerosLiquid",
-    "Draw",
-    useMemo(
-      () => ({
-        filter: { _address: drizzleState.account, _disputeID: ID },
-        fromBlock: getKlerosLiquidBlockNumber(chainId),
-      }),
-      [drizzleState.account, ID, chainId]
-    )
-  );
+  const draws = useGetDraws(chainId, `address: "${drizzleState.account}", disputeID: ${ID}`);
   const votesData = useCacheCall(["KlerosLiquid"], (call) => {
     let votesData = { loading: true };
     const currentRuling = call("KlerosLiquid", "currentRuling", ID);
     if (dispute && disputeExtraInfo && draws) {
       const drawnInCurrentRound =
-        draws.length > 0 &&
-        Number(draws[draws.length - 1].returnValues._appeal) === disputeExtraInfo.votesLengths.length - 1;
+        draws.length > 0 && Number(draws[draws.length - 1].appeal) === disputeExtraInfo.votesLengths.length - 1;
       const vote =
         drawnInCurrentRound &&
-        call(
-          "KlerosLiquid",
-          "getVote",
-          ID,
-          draws[draws.length - 1].returnValues._appeal,
-          draws[draws.length - 1].returnValues._voteID
-        );
+        call("KlerosLiquid", "getVote", ID, draws[draws.length - 1].appeal, draws[draws.length - 1].voteID);
       const subcourt = drawnInCurrentRound && call("KlerosLiquid", "courts", dispute.subcourtID);
       if (!drawnInCurrentRound || (vote && subcourt)) {
         const committed =
           drawnInCurrentRound && vote.commit !== "0x0000000000000000000000000000000000000000000000000000000000000000";
         votesData = draws.reduce(
           (acc, d) => {
-            if (Number(d.returnValues._appeal) === disputeExtraInfo.votesLengths.length - 1)
-              acc.voteIDs.push(d.returnValues._voteID);
+            if (Number(d.appeal) === disputeExtraInfo.votesLengths.length - 1) acc.voteIDs.push(d.voteID);
             return acc;
           },
           {

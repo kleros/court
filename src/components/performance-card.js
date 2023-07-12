@@ -6,9 +6,9 @@ import TitledListCard from "./titled-list-card";
 import styled from "styled-components/macro";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import useChainId from "../hooks/use-chain-id";
-import { getKlerosLiquidBlockNumber } from "../helpers/block-numbers";
+import useGetShifts from "../hooks/use-get-shifts";
 
-const { useDrizzle, useDrizzleState } = drizzleReactHooks;
+const { useDrizzleState } = drizzleReactHooks;
 
 const StyledDiv = styled.div`
   align-items: center;
@@ -33,22 +33,13 @@ const StyledGraphContainer = styled.div`
 `;
 
 const PNKStatsListCard = () => {
-  const { useCacheEvents } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
 
   let loadingData = true;
   const chainId = useChainId();
-  const rewards = useCacheEvents(
-    "KlerosLiquid",
-    "TokenAndETHShift",
-    {
-      filter: { _address: drizzleState.account },
-      fromBlock: getKlerosLiquidBlockNumber(chainId),
-    },
-    [drizzleState.account]
-  );
+  const rewards = useGetShifts(chainId, `address: "${drizzleState.account}"`);
 
   if (rewards) loadingData = false;
 
@@ -57,10 +48,10 @@ const PNKStatsListCard = () => {
   let lastSeenDispute = -1;
   if (!loadingData)
     for (const reward of rewards)
-      if (Number(reward.returnValues._disputeID) !== lastSeenDispute) {
+      if (Number(reward.disputeID) !== lastSeenDispute) {
         totalCases++;
-        lastSeenDispute = Number(reward.returnValues._disputeID);
-        if (Number(reward.returnValues._ETHAmount) > 0) coherentVote++;
+        lastSeenDispute = Number(reward.disputeID);
+        if (Number(reward.ETHAmount) > 0) coherentVote++;
       }
 
   const percent = !loadingData && rewards.length ? (coherentVote / totalCases).toFixed(2) * 100 : 0;
