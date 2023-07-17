@@ -1,3 +1,4 @@
+import { Spin } from "antd";
 import { ReactComponent as Acropolis } from "../assets/images/acropolis.svg";
 import PropTypes from "prop-types";
 import React from "react";
@@ -8,11 +9,11 @@ export default function C404({ Web3 }) {
     <StyledDiv Web3={Web3}>
       <StyledAcropolis />
       <StyledInfoDiv className="quaternary-background theme-background">
-        <Styled404Div className="primary-color theme-color">{Web3 ? "Web3 not found" : "404"}</Styled404Div>
-        <StyledMessageLine1 className="ternary-color theme-color">Oops,</StyledMessageLine1>
+        <Styled404Div className="primary-color theme-color">{Web3 ? "Loading Court" : "404"}</Styled404Div>
         <StyledMessageLine2 className="ternary-color theme-color">
-          {Web3 ? "The gods are having trouble finding your Web3 provider." : "Something went wrong in Athens!"}
+          {Web3 ? "Fetching information about the Court, please wait." : "Something went wrong in Athens!"}
         </StyledMessageLine2>
+        {Web3 && <Spin spinning={true}></Spin>}
         <StyledMessageLine3 className="ternary-color theme-color">
           {Web3
             ? "Please make sure you have your wallet unlocked on Mainnet or xDAI, Goerli or Chiado. If you don't have a wallet, we recommend you install MetaMask on desktop and Trust on mobile."
@@ -53,11 +54,6 @@ const Styled404Div = styled.div`
   font-size: 88px;
   font-weight: bold;
   line-height: 112px;
-`;
-
-const StyledMessageLine1 = styled.div`
-  font-size: 28px;
-  font-weight: bold;
 `;
 
 const StyledMessageLine2 = styled.div`
