@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Button, Row, Col, Tooltip } from "antd";
 import { useParams } from "react-router-dom";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
@@ -11,7 +11,7 @@ import RequiredChainIdModal from "../components/required-chain-id-modal";
 import styled from "styled-components/macro";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import useChainId from "../hooks/use-chain-id";
-import { getKlerosLiquidBlockNumber } from "../helpers/block-numbers";
+import useGetDraws from "../hooks/use-get-draws";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -25,7 +25,7 @@ const periodToPhase = (period, hiddenVotes) => {
 
 export default function Case() {
   const { ID } = useParams();
-  const { drizzle, useCacheCall, useCacheEvents, useCacheSend } = useDrizzle();
+  const { drizzle, useCacheCall, useCacheSend } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
@@ -34,25 +34,14 @@ export default function Case() {
   const dispute = useCacheCall("KlerosLiquid", "disputes", ID);
   const dispute2 = useCacheCall("KlerosLiquid", "getDispute", ID);
   const chainId = useChainId();
-  const draws = useCacheEvents(
-    "KlerosLiquid",
-    "Draw",
-    useMemo(
-      () => ({
-        filter: { _address: drizzleState.account, _disputeID: ID },
-        fromBlock: getKlerosLiquidBlockNumber(chainId),
-      }),
-      [drizzleState.account, ID, chainId]
-    )
-  );
+  const draws = useGetDraws(chainId, `address: "${drizzleState.account}", disputeID: ${ID}`);
+
   const disputeData = useCacheCall(["KlerosLiquid"], (call) => {
     let disputeData = {};
     if (dispute2 && draws) {
       const tokensAtStakePerJuror = dispute2.tokensAtStakePerJuror.map(drizzle.web3.utils.toBN);
       const votesByAppeal = draws.reduce((acc, d) => {
-        acc[d.returnValues._appeal] = acc[d.returnValues._appeal]
-          ? acc[d.returnValues._appeal].add(drizzle.web3.utils.toBN(1))
-          : drizzle.web3.utils.toBN(1);
+        acc[d.appeal] = acc[d.appeal] ? acc[d.appeal].add(drizzle.web3.utils.toBN(1)) : drizzle.web3.utils.toBN(1);
         return acc;
       }, {});
       disputeData = Object.keys(votesByAppeal).reduce(

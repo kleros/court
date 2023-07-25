@@ -159,9 +159,7 @@ const CaseCard = ({ ID, draws }) => {
       const tokensAtStakePerJuror = dispute2.tokensAtStakePerJuror.map(drizzle.web3.utils.toBN);
       const totalFeesForJurors = dispute2.totalFeesForJurors.map(drizzle.web3.utils.toBN);
       const votesByAppeal = draws.reduce((acc, d) => {
-        acc[d.returnValues._appeal] = acc[d.returnValues._appeal]
-          ? acc[d.returnValues._appeal].add(drizzle.web3.utils.toBN(1))
-          : drizzle.web3.utils.toBN(1);
+        acc[d.appeal] = acc[d.appeal] ? acc[d.appeal].add(drizzle.web3.utils.toBN(1)) : drizzle.web3.utils.toBN(1);
         return acc;
       }, {});
       disputeData = Object.keys(votesByAppeal).reduce(

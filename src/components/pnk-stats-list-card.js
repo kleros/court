@@ -1,6 +1,5 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
-import { getKlerosLiquidBlockNumber } from "../helpers/block-numbers";
 import useChainId from "../hooks/use-chain-id";
 import ETHAmount from "./eth-amount";
 import PieChart from "./pie-chart";
@@ -8,6 +7,7 @@ import { Spin } from "antd";
 import TitledListCard from "./titled-list-card";
 import styled from "styled-components/macro";
 import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import useGetDraws from "../hooks/use-get-draws";
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
 const loadingPieChartData = [{ tooltip: "Loading...", value: 1 }];
@@ -28,7 +28,7 @@ const StyledTitleSpan = styled.span`
   font-style: italic;
 `;
 const PNKStatsListCard = () => {
-  const { drizzle, useCacheCall, useCacheEvents } = useDrizzle();
+  const { drizzle, useCacheCall } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
@@ -54,37 +54,27 @@ const PNKStatsListCard = () => {
   );
   const loadingSubcourts = !subcourts || subcourts.some((s) => !s.stake);
   const chainId = useChainId();
-  const draws = useCacheEvents(
-    "KlerosLiquid",
-    "Draw",
-    useMemo(
-      () => ({
-        filter: { _address: drizzleState.account },
-        fromBlock: getKlerosLiquidBlockNumber(chainId),
-      }),
-      [drizzleState.account]
-    )
-  );
+  const draws = useGetDraws(chainId, `address: "${drizzleState.account}"`);
   const disputes = useCacheCall(["KlerosLiquid"], (call) =>
     draws
       ? draws.reduce(
           (acc, d) => {
-            if (acc.tokensAtStakePerJurorByID[d.returnValues._disputeID] === undefined) {
-              acc.tokensAtStakePerJurorByID[d.returnValues._disputeID] = null;
-              const dispute = call("KlerosLiquid", "disputes", d.returnValues._disputeID);
-              const dispute2 = call("KlerosLiquid", "getDispute", d.returnValues._disputeID);
+            if (acc.tokensAtStakePerJurorByID[d.disputeID] === undefined) {
+              acc.tokensAtStakePerJurorByID[d.disputeID] = null;
+              const dispute = call("KlerosLiquid", "disputes", d.disputeID);
+              const dispute2 = call("KlerosLiquid", "getDispute", d.disputeID);
               if (dispute && dispute2) {
                 if (dispute.period !== "4") {
-                  acc.tokensAtStakePerJurorByID[d.returnValues._disputeID] = dispute2.tokensAtStakePerJuror.map(
+                  acc.tokensAtStakePerJurorByID[d.disputeID] = dispute2.tokensAtStakePerJuror.map(
                     drizzle.web3.utils.toBN
                   );
-                  acc.atStakeByID[d.returnValues._disputeID] = drizzle.web3.utils.toBN(0);
+                  acc.atStakeByID[d.disputeID] = drizzle.web3.utils.toBN(0);
                 }
               } else acc.loading = true;
             }
-            if (acc.tokensAtStakePerJurorByID[d.returnValues._disputeID] !== null)
-              acc.atStakeByID[d.returnValues._disputeID] = acc.atStakeByID[d.returnValues._disputeID].add(
-                acc.tokensAtStakePerJurorByID[d.returnValues._disputeID][d.returnValues._appeal]
+            if (acc.tokensAtStakePerJurorByID[d.disputeID] !== null)
+              acc.atStakeByID[d.disputeID] = acc.atStakeByID[d.disputeID].add(
+                acc.tokensAtStakePerJurorByID[d.disputeID][d.appeal]
               );
             return acc;
           },
