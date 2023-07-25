@@ -15,7 +15,7 @@ export default function C404({ Web3 }) {
         </StyledMessageLine2>
         <StyledMessageLine3 className="ternary-color theme-color">
           {Web3
-            ? "Please make sure you have your wallet unlocked on Mainnet or xDAI, Goerli or Chiado. If you don't have a wallet, we recommend you install MetaMask on desktop and Trust on mobile."
+            ? "Please make sure you have your wallet unlocked on Mainnet, Gnosis Chain, Goerli or Chiado. If you don't have a wallet, we recommend you install MetaMask on desktop and Trust on mobile."
             : "The greek gods are not available at the moment."}
         </StyledMessageLine3>
       </StyledInfoDiv>

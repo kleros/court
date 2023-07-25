@@ -1,7 +1,7 @@
 export const chainIdToNetworkName = {
   1: "Ethereum Mainnet",
   5: "Ethereum Testnet Görli",
-  100: "xDAI Chain",
+  100: "Gnosis Chain",
   10200: "xDAI Testnet Chiado",
   11155111: "Ethereum Testnet Sepolia",
 };

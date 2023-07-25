@@ -12,7 +12,7 @@ const supportedSideChains = {
   // xDai
   100: {
     chainId: 100,
-    chainName: "xDAI Chain",
+    chainName: "Gnosis Chain",
     nativeCurrency: { name: "xDAI", symbol: "xDAI", decimals: 18 },
     rpcUrls: [ensureEnv("REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL")],
     blockExplorerUrls: [getBaseUrl(100)],
