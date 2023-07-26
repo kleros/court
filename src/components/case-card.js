@@ -190,16 +190,10 @@ const CaseCard = ({ ID, draws }) => {
     }
     return disputeData;
   });
-  let metaEvidence;
-  if (dispute) {
-    if (dispute.ruled) {
-      metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID, {
-        strict: false,
-      });
-    } else {
-      metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
-    }
-  }
+
+  const metaEvidence =
+    dispute && getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
+
   return (
     <StyledCard
       actions={useMemo(

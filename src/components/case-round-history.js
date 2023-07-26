@@ -22,15 +22,7 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
   const [justificationIndex, setJustificationIndex] = useState(0);
   const chainId = useChainId();
 
-  let metaEvidence;
-  if (dispute)
-    if (dispute.ruled) {
-      metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID, {
-        strict: false,
-      });
-    } else {
-      metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
-    }
+  const metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
 
   const justifications = dispute.votesLengths.map((_, i) => {
     const _justifications = useAPI.getJustifications(drizzle.web3, drizzleState.account, { appeal: i, disputeID: ID });
@@ -58,9 +50,9 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
             byChoice: [
               ...new Array(
                 2 +
-                  ((metaEvidence.metaEvidenceJSON.rulingOptions &&
-                    metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
-                    metaEvidence.metaEvidenceJSON.rulingOptions.titles.length) ||
+                  ((metaEvidence.rulingOptions &&
+                    metaEvidence.rulingOptions.titles &&
+                    metaEvidence.rulingOptions.titles.length) ||
                     0)
               ),
             ].map(() => []),
@@ -118,7 +110,7 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
                       </Radio.Button>
                     </Col>
                     {metaEvidence &&
-                      metaEvidence.metaEvidenceJSON.rulingOptions.titles.map((option, i) => (
+                      metaEvidence.rulingOptions.titles.map((option, i) => (
                         <Col lg={24} key={i}>
                           <Radio.Button size="large" value={i + 1}>
                             {option}

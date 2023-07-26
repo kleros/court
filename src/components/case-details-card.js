@@ -12,7 +12,7 @@ import { ReactComponent as Folder } from "../assets/images/folder.svg";
 import { ReactComponent as Gavel } from "../assets/images/gavel.svg";
 import { ReactComponent as Scales } from "../assets/images/scales.svg";
 import { API } from "../bootstrap/api";
-import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import { useDataloader, useEvidence, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import web3Salt from "../temp/web3-salt";
 import { range, binaryPermutations } from "../helpers/array";
 import useChainId from "../hooks/use-chain-id";
@@ -74,7 +74,6 @@ export default function CaseDetailsCard({ ID }) {
 
   const loadPolicy = useDataloader.loadPolicy();
   const getMetaEvidence = useDataloader.getMetaEvidence();
-  const getEvidence = useDataloader.getEvidence();
   const [activeSubcourtID, setActiveSubcourtID] = useState();
   const [justification, setJustification] = useState();
   const [complexRuling, setComplexRuling] = useState();
@@ -153,20 +152,9 @@ export default function CaseDetailsCard({ ID }) {
       return { ...subcourt, ...subcourtObj };
     }
   });
-  let metaEvidence;
-  let evidence;
 
-  if (dispute) {
-    if (dispute.ruled) {
-      metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, KlerosLiquid.address, ID, {
-        strict: false,
-      });
-    } else {
-      metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, KlerosLiquid.address, ID);
-    }
-
-    evidence = getEvidence(dispute.arbitrated, KlerosLiquid.address, ID);
-  }
+  const metaEvidence = dispute && getMetaEvidence(chainId, dispute.arbitrated, KlerosLiquid.address, ID);
+  const evidence = useEvidence(chainId, ID);
 
   const { send: sendCommit, status: sendCommitStatus } = useCacheSend("KlerosLiquid", "castCommit");
   const { send: sendVote, status: sendVoteStatus } = useCacheSend("KlerosLiquid", "castVote");
@@ -175,8 +163,8 @@ export default function CaseDetailsCard({ ID }) {
     (date) =>
       realitioLibQuestionFormatter
         .maxNumber({
-          decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-          type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+          decimals: metaEvidence.rulingOptions.precision,
+          type: metaEvidence.rulingOptions.type,
         })
         .lte(date.unix() + 1),
     [metaEvidence]
@@ -192,7 +180,7 @@ export default function CaseDetailsCard({ ID }) {
     let mounted = true;
 
     async function deriveCommitedVote() {
-      const { rulingOptions } = metaEvidence.metaEvidenceJSON;
+      const { rulingOptions } = metaEvidence;
       const salt = await web3Salt(web3, account, VOTE_COMMIT_SALT_KEY, ID, disputeExtraInfo.votesLengths.length - 1);
       return deriveVoteFromCommitThroughBruteForce({
         salt,
@@ -252,16 +240,14 @@ export default function CaseDetailsCard({ ID }) {
       const typeSwitch =
         id !== "0" &&
         !Object.keys(
-          metaEvidence.metaEvidenceJSON.rulingOptions && metaEvidence.metaEvidenceJSON.rulingOptions.reserved
-            ? metaEvidence.metaEvidenceJSON.rulingOptions.reserved
-            : {}
+          metaEvidence.rulingOptions && metaEvidence.rulingOptions.reserved ? metaEvidence.rulingOptions.reserved : {}
         ).includes(id) &&
-        metaEvidence.metaEvidenceJSON.rulingOptions &&
-        metaEvidence.metaEvidenceJSON.rulingOptions.type;
+        metaEvidence.rulingOptions &&
+        metaEvidence.rulingOptions.type;
       switch (typeSwitch) {
         case "multiple-select":
-          choice = metaEvidence.metaEvidenceJSON.rulingOptions.titles
-            ? metaEvidence.metaEvidenceJSON.rulingOptions.titles.map((t) => complexRuling.includes(t))
+          choice = metaEvidence.rulingOptions.titles
+            ? metaEvidence.rulingOptions.titles.map((t) => complexRuling.includes(t))
             : [];
           break;
         case "datetime":
@@ -279,8 +265,8 @@ export default function CaseDetailsCard({ ID }) {
         case "datetime":
         case "uint":
           choice = realitioLibQuestionFormatter.answerToBytes32(choice, {
-            decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-            type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+            decimals: metaEvidence.rulingOptions.precision,
+            type: metaEvidence.rulingOptions.type,
           });
           choice = realitioLibQuestionFormatter.padToBytes32(toBN(choice).add(toBN("1")).toString(16));
           break;
@@ -319,12 +305,12 @@ export default function CaseDetailsCard({ ID }) {
   const metaEvidenceActions = useMemo(() => {
     if (metaEvidence) {
       const actions = [];
-      if (metaEvidence.metaEvidenceJSON.fileURI)
+      if (metaEvidence.fileURI)
         actions.push(
           <Attachment
-            URI={metaEvidence.metaEvidenceJSON.fileURI}
+            URI={metaEvidence.fileURI}
             description="This is the primary file uploaded with the dispute."
-            extension={metaEvidence.metaEvidenceJSON.fileTypeExtension}
+            extension={metaEvidence.fileTypeExtension}
             title="Main File"
           />
         );
@@ -339,10 +325,10 @@ export default function CaseDetailsCard({ ID }) {
 
   const evidenceDisplayInterfaceURL = useMemo(() => {
     const normalizeIPFSUri = (uri) => uri.replace(/^\/ipfs\//, "https://ipfs.kleros.io/ipfs/");
-    if (metaEvidence?.metaEvidenceJSON?.evidenceDisplayInterfaceURI) {
-      const { evidenceDisplayInterfaceURI, _v = "0" } = metaEvidence.metaEvidenceJSON;
-      const arbitratorChainID = metaEvidence.metaEvidenceJSON?.arbitratorChainID ?? chainId;
-      const arbitrableChainID = metaEvidence.metaEvidenceJSON?.arbitrableChainID ?? arbitratorChainID;
+    if (metaEvidence?.evidenceDisplayInterfaceURI) {
+      const { evidenceDisplayInterfaceURI, _v = "0" } = metaEvidence;
+      const arbitratorChainID = metaEvidence?.arbitratorChainID ?? chainId;
+      const arbitrableChainID = metaEvidence?.arbitrableChainID ?? arbitratorChainID;
 
       let url = normalizeIPFSUri(evidenceDisplayInterfaceURI);
 
@@ -350,11 +336,11 @@ export default function CaseDetailsCard({ ID }) {
         disputeID: ID,
         chainID: chainId, // Deprecated. Use arbitratorChainID and arbitrableChainID instead.
         arbitratorContractAddress: KlerosLiquid.address,
-        arbitratorJsonRpcUrl: getReadOnlyRpcUrl({ chainId: arbitratorChainID }),
+        arbitratorJsonRpcUrl: getReadOnlyRpcUrl(arbitratorChainID),
         arbitratorChainID,
         arbitrableContractAddress: dispute.arbitrated,
         arbitrableChainID,
-        arbitrableJsonRpcUrl: getReadOnlyRpcUrl({ chainId: arbitrableChainID }),
+        arbitrableJsonRpcUrl: getReadOnlyRpcUrl(arbitrableChainID),
       };
 
       if (_v === "0") {
@@ -393,9 +379,7 @@ export default function CaseDetailsCard({ ID }) {
                           margin-bottom: 20px;
                         `}
                       >
-                        {metaEvidence.metaEvidenceJSON.question
-                          ? metaEvidence.metaEvidenceJSON.question
-                          : "What is your decision?"}
+                        {metaEvidence.question ? metaEvidence.question : "What is your decision?"}
                       </div>
                       {votesData.voted ? (
                         <>
@@ -403,12 +387,12 @@ export default function CaseDetailsCard({ ID }) {
                             You voted for: &ldquo;
                             {votesData.voted === "0"
                               ? "Refuse to Arbitrate"
-                              : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                              : (metaEvidence.rulingOptions &&
                                   realitioLibQuestionFormatter.getAnswerString(
                                     {
-                                      decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-                                      outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
-                                      type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+                                      decimals: metaEvidence.rulingOptions.precision,
+                                      outcomes: metaEvidence.rulingOptions.titles,
+                                      type: metaEvidence.rulingOptions.type,
                                     },
                                     realitioLibQuestionFormatter.padToBytes32(
                                       toBN(votesData.voted).sub(toBN("1")).toString(16)
@@ -449,12 +433,12 @@ export default function CaseDetailsCard({ ID }) {
                       The winner in this case was: &ldquo;
                       {votesData.currentRuling === "0"
                         ? "Refuse to Arbitrate"
-                        : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                        : (metaEvidence.rulingOptions &&
                             realitioLibQuestionFormatter.getAnswerString(
                               {
-                                decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-                                outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
-                                type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+                                decimals: metaEvidence.rulingOptions.precision,
+                                outcomes: metaEvidence.rulingOptions.titles,
+                                type: metaEvidence.rulingOptions.type,
                               },
                               realitioLibQuestionFormatter.padToBytes32(
                                 toBN(votesData.currentRuling).sub(toBN("1")).toString(16)
@@ -470,12 +454,12 @@ export default function CaseDetailsCard({ ID }) {
                         You committed to:{" "}
                         {votesData.voted === "0"
                           ? "Refuse to Arbitrate"
-                          : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                          : (metaEvidence.rulingOptions &&
                               realitioLibQuestionFormatter.getAnswerString(
                                 {
-                                  decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-                                  outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
-                                  type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+                                  decimals: metaEvidence.rulingOptions.precision,
+                                  outcomes: metaEvidence.rulingOptions.titles,
+                                  type: metaEvidence.rulingOptions.type,
                                 },
                                 realitioLibQuestionFormatter.padToBytes32(
                                   toBN(committedVote).sub(toBN("1")).toString(16)
@@ -505,7 +489,7 @@ export default function CaseDetailsCard({ ID }) {
                       justification={justification}
                     />
                   )}
-                  {Number(dispute.period) < 3 && !votesData.voted && metaEvidence.metaEvidenceJSON.rulingOptions ? (
+                  {Number(dispute.period) < 3 && !votesData.voted && metaEvidence.rulingOptions ? (
                     votesData.committed && committedVote !== undefined ? (
                       <StyledButtonsDiv>
                         <StyledButton
@@ -519,9 +503,9 @@ export default function CaseDetailsCard({ ID }) {
                       </StyledButtonsDiv>
                     ) : (
                       <>
-                        {metaEvidence.metaEvidenceJSON.rulingOptions.type !== "single-select" && (
+                        {metaEvidence.rulingOptions.type !== "single-select" && (
                           <StyledButtonsDiv>
-                            {metaEvidence.metaEvidenceJSON.rulingOptions.type === "multiple-select" ? (
+                            {metaEvidence.rulingOptions.type === "multiple-select" ? (
                               <div
                                 css={`
                                   padding-top: 1rem;
@@ -532,13 +516,12 @@ export default function CaseDetailsCard({ ID }) {
                                   name="ruling"
                                   onChange={setComplexRuling}
                                   options={
-                                    metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
-                                    metaEvidence.metaEvidenceJSON.rulingOptions.titles.slice(0, 255)
+                                    metaEvidence.rulingOptions.titles && metaEvidence.rulingOptions.titles.slice(0, 255)
                                   }
                                   value={complexRuling}
                                 />
                               </div>
-                            ) : metaEvidence.metaEvidenceJSON.rulingOptions.type === "datetime" ? (
+                            ) : metaEvidence.rulingOptions.type === "datetime" ? (
                               <DatePicker
                                 disabled={!votesData.canVote}
                                 disabledDate={disabledDate}
@@ -553,19 +536,19 @@ export default function CaseDetailsCard({ ID }) {
                                 max={Number(
                                   realitioLibQuestionFormatter
                                     .maxNumber({
-                                      decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-                                      type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+                                      decimals: metaEvidence.rulingOptions.precision,
+                                      type: metaEvidence.rulingOptions.type,
                                     })
                                     .minus(1)
                                 )}
                                 min={Number(
                                   realitioLibQuestionFormatter.minNumber({
-                                    decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-                                    type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+                                    decimals: metaEvidence.rulingOptions.precision,
+                                    type: metaEvidence.rulingOptions.type,
                                   })
                                 )}
                                 onChange={setComplexRuling}
-                                precision={metaEvidence.metaEvidenceJSON.rulingOptions.precision}
+                                precision={metaEvidence.rulingOptions.precision}
                                 size="large"
                                 value={complexRuling}
                               />
@@ -573,9 +556,9 @@ export default function CaseDetailsCard({ ID }) {
                           </StyledButtonsDiv>
                         )}
                         <StyledButtonsDiv>
-                          {metaEvidence.metaEvidenceJSON.rulingOptions.type === "single-select" ? (
-                            metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
-                            metaEvidence.metaEvidenceJSON.rulingOptions.titles.slice(0, 2 ** 256 - 1).map((t, i) => (
+                          {metaEvidence.rulingOptions.type === "single-select" ? (
+                            metaEvidence.rulingOptions.titles &&
+                            metaEvidence.rulingOptions.titles.slice(0, 2 ** 256 - 1).map((t, i) => (
                               <StyledButton
                                 disabled={!votesData.canVote}
                                 id={i + 1}
@@ -617,9 +600,9 @@ export default function CaseDetailsCard({ ID }) {
                     ) : null}
                   </div>
 
-                  {metaEvidence.metaEvidenceJSON.rulingOptions &&
-                    metaEvidence.metaEvidenceJSON.rulingOptions.reserved &&
-                    Object.entries(metaEvidence.metaEvidenceJSON.rulingOptions.reserved).map(([ruling, title]) => (
+                  {metaEvidence.rulingOptions &&
+                    metaEvidence.rulingOptions.reserved &&
+                    Object.entries(metaEvidence.rulingOptions.reserved).map(([ruling, title]) => (
                       <div key={ruling} style={{ marginTop: "32px" }}>
                         {Number(dispute.period) < "3" && !votesData.voted ? (
                           <Button
@@ -651,7 +634,7 @@ export default function CaseDetailsCard({ ID }) {
         loading={!metaEvidence}
         title={
           <>
-            {metaEvidence && metaEvidence.metaEvidenceJSON.title}
+            {metaEvidence && metaEvidence.title}
             {subcourts && <StyledBreadcrumbs breadcrumbs={subcourts.map((s) => s.name)} />}
           </>
         }
@@ -661,21 +644,17 @@ export default function CaseDetailsCard({ ID }) {
             <Row>
               <Col span={24}>
                 <StyledInnerCard actions={metaEvidenceActions}>
-                  <ReactMarkdown source={metaEvidence.metaEvidenceJSON.description} />
-                  {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
+                  <ReactMarkdown source={metaEvidence.description} />
+                  {metaEvidence.evidenceDisplayInterfaceURI && (
                     <iframe
                       title="dispute details"
                       style={{ width: "1px", minWidth: "100%", height: "360px", border: "none" }}
                       src={evidenceDisplayInterfaceURL}
                     />
                   )}
-                  {metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI && (
+                  {metaEvidence.arbitrableInterfaceURI && (
                     <ArbitrableInterfaceDiv>
-                      <a
-                        href={metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
+                      <a href={metaEvidence.arbitrableInterfaceURI} target="_blank" rel="noopener noreferrer">
                         <Icon type="double-right" style={{ marginRight: "5px" }} />
                         Go to the Arbitrable Application
                       </a>
@@ -739,8 +718,8 @@ export default function CaseDetailsCard({ ID }) {
             </CollapsableCard>
             {disputeExtraInfo &&
               metaEvidence &&
-              metaEvidence.metaEvidenceJSON.rulingOptions &&
-              metaEvidence.metaEvidenceJSON.rulingOptions.type === "single-select" && (
+              metaEvidence.rulingOptions &&
+              metaEvidence.rulingOptions.type === "single-select" && (
                 <CollapsableCard
                   title={
                     <>
@@ -770,12 +749,12 @@ export default function CaseDetailsCard({ ID }) {
               You successfully voted for{" "}
               {votesData.voted === "0"
                 ? "Refuse to Arbitrate"
-                : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                : (metaEvidence.rulingOptions &&
                     realitioLibQuestionFormatter.getAnswerString(
                       {
-                        decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-                        outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
-                        type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+                        decimals: metaEvidence.rulingOptions.precision,
+                        outcomes: metaEvidence.rulingOptions.titles,
+                        type: metaEvidence.rulingOptions.type,
                       },
                       realitioLibQuestionFormatter.padToBytes32(toBN(votesData.voted).sub(toBN("1")).toString(16))
                     )) ||
