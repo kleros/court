@@ -5,8 +5,8 @@ const { KlerosLiquid } = require(`../src/assets/contracts/kleros-liquid.json`);
 const { createClient } = require('@supabase/supabase-js');
 const logtail = new Logtail(process.env.LOGTAIL_SOURCE_TOKEN);
 
-const supabaseUrl = process.env.COURT_DB_URL;
-const supabaseKey = process.env.COURT_DB_KEY;
+const supabaseUrl = process.env.DATALAKE_URL;
+const supabaseKey = process.env.DATALAKE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const networks = {
