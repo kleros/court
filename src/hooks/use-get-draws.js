@@ -17,7 +17,7 @@ const fetchDraws = async (chainId, where, lastId, first) => {
   `,
   });
 
-  return res.data.draws;
+  return res.data.data.draws;
 };
 
 const getBatch = async (chainId, where) => {

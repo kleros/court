@@ -42,7 +42,7 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
 
   const justificationsChoices = useCacheCall(["KlerosLiquid"], (call) =>
     dispute.votesLengths.map((_, i) => {
-      if (!justificationsByRound || !metaEvidence) return;
+      if (!justificationsByRound || !metaEvidence) return [];
       const justs = justificationsByRound[i];
       return justs.reduce(
         (acc, j) => {

@@ -122,7 +122,7 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
           >
             <Divider>I wish to be notified when:</Divider>
             <Skeleton active loading={loadingUserSettings} title={false}>
-              {!loadingUserSettings && (
+              {!loadingUserSettings && userSettings && (
                 <>
                   {Object.keys(settings).map((s) => (
                     <Form.Item key={s}>

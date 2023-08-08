@@ -17,7 +17,7 @@ const fetchShifts = async (chainId, where, lastId, first) => {
     `,
   });
 
-  return res.data.tokenAndETHShifts;
+  return res.data.data.tokenAndETHShifts;
 };
 
 const getBatch = async (chainId, where) => {
