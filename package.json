@@ -65,6 +65,8 @@
     "@drizzle/store": "^1.5.3",
     "@kleros/pnk-merkle-drop-contracts": "^0.1.0",
     "@loadable/component": "^5.5.0",
+    "@logtail/node": "^0.4.5",
+    "@netlify/functions": "^1.6.0",
     "@reality.eth/contracts": "3.0.0",
     "@reality.eth/reality-eth-lib": "^3.0.0",
     "@sentry/react": "^7.37.2",
