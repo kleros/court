@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
 import { Col, Radio, Row, Skeleton } from "antd";
@@ -7,6 +7,7 @@ import { useDataloader } from "../bootstrap/dataloader";
 import useChainId from "../hooks/use-chain-id";
 import ScrollBar from "./scroll-bar";
 import axios from "axios";
+import useSWR from "swr";
 
 const { useDrizzle } = drizzleReactHooks;
 
@@ -20,25 +21,20 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
 
   const metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
 
-  const [justificationsByRound, setJustificationsByRound] = useState(null);
-
-  useEffect(() => {
-    if (!dispute || !ID || !chainId) return;
-    (async () => {
-      setJustificationsByRound(
-        await Promise.all(
-          dispute.votesLengths.map((_, i) =>
-            axios
-              .get(
-                `${process.env.REACT_APP_JUSTIFICATIONS_URL}/get-justifications?chainId=${chainId}&disputeId=${ID}&round=${i}`
-              )
-              .then((res) => res.data.payload.justifications)
-              .catch(() => [])
-          )
+  const { data: justificationsByRound, loading: justificationsLoading } = useSWR(
+    dispute && ID && chainId && [chainId, ID, dispute.votesLengths],
+    async ([chain, disputeId, nbRounds]) =>
+      await Promise.all(
+        nbRounds.map((_, i) =>
+          axios
+            .get(
+              `${process.env.REACT_APP_JUSTIFICATIONS_URL}/get-justifications?chainId=${chain}&disputeId=${disputeId}&round=${i}`
+            )
+            .then((res) => res.data.payload.justifications)
+            .catch(() => [])
         )
-      );
-    })();
-  }, [chainId, ID, dispute]);
+      )
+  );
 
   const justificationsChoices = useCacheCall(["KlerosLiquid"], (call) =>
     dispute.votesLengths.map((_, i) => {
@@ -66,7 +62,7 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
   }, []);
 
   return (
-    <Skeleton active loading={!justificationsByRound}>
+    <Skeleton active loading={justificationsLoading}>
       {justificationsByRound && (
         <StyledCaseRoundHistory>
           <Row>
@@ -113,7 +109,7 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
             </Col>
             <Col md={14} style={{ height: "100%" }}>
               <JustificationsBox>
-                <Skeleton active loading={!justificationsByRound[round]}>
+                <Skeleton active loading={!justificationsChoices[round]}>
                   <h2>Justification</h2>
                   {justificationsChoices[round] && justificationsChoices[round][rulingOption].length > 0 ? (
                     <>
