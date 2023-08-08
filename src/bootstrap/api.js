@@ -5,6 +5,7 @@ const chainIdToNetwork = {
   1: "mainnet",
   5: "goerli",
   100: "xdai",
+  11155111: "sepolia",
 };
 
 export const API = async ({ url, method, createDerived, web3, account, payload }) => {
