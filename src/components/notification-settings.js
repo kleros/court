@@ -1,10 +1,10 @@
 import { Alert, Button, Checkbox, Divider, Form, Icon, Input, Popover, Skeleton, Tooltip } from "antd";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { ReactComponent as Mail } from "../assets/images/mail.svg";
 import PropTypes from "prop-types";
 import styled from "styled-components/macro";
-import { useAPI } from "../bootstrap/api";
+import { API } from "../bootstrap/api";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import { askPermission, subscribeUserToPush } from "../bootstrap/service-worker";
 
@@ -23,18 +23,61 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
-  const userSettings = useAPI.getUserSettings(drizzle.web3, drizzleState.account, {
-    email: true,
-    fullName: true,
-    phone: true,
-    pushNotifications: true,
-    ...Object.keys(settings).reduce((acc, v) => {
-      acc[`${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`] = true;
-      return acc;
-    }, {}),
+  const [userSettings, setUserSettings] = useState(null);
+  const [loadingUserSettings, setLoadingUserSettings] = useState(false);
+  const [loadingUserSettingsPatch, setLoadingUserSettingsPatch] = useState(false);
+  const [userSettingsPatchError, setUserSettingsPatchError] = useState(false);
+  const [userSettingsPatchState, setUserSettingsPatchState] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      setLoadingUserSettings(true);
+      setUserSettings(
+        await API({
+          URL: process.env.REACT_APP_USER_SETTINGS_URL,
+          method: "POST",
+          web3: drizzle.web3,
+          account: drizzleState.account,
+          payload: {
+            settings: {
+              email: true,
+              fullName: true,
+              phone: true,
+              pushNotifications: true,
+              ...Object.keys(settings).reduce(
+                (acc, v) => ({ ...acc, [`${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`]: true }),
+                {}
+              ),
+            },
+          },
+        })
+      );
+      setLoadingUserSettings(false);
+    })();
   });
-  const loading = userSettings === "pending";
-  const { send, state } = useAPI.patchUserSettings(drizzle.web3, drizzleState.account);
+
+  const send = useCallback(
+    async (payload) => {
+      setLoadingUserSettingsPatch(true);
+      try {
+        await API({
+          URL: process.env.REACT_APP_USER_SETTINGS_URL,
+          createDerived: true,
+          method: "PATCH",
+          web3: drizzle.web3,
+          account: drizzleState.account,
+          payload: { settings: payload },
+        });
+      } catch (err) {
+        console.error(err);
+        setUserSettingsPatchError("Failed to save settings.");
+      } finally {
+        setLoadingUserSettingsPatch(false);
+      }
+    },
+    [drizzle.web3, drizzleState.account]
+  );
+
   return (
     <Popover
       arrowPointAtCenter
@@ -51,20 +94,26 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
                     if (pushNotifications) {
                       pushNotificationsData = await subscribeUserToPush();
                     }
-
-                    send({
-                      email: { S: email },
-                      fullName: { S: fullName },
-                      phone: { S: phone || " " },
-                      pushNotifications: { BOOL: pushNotifications || false },
-                      pushNotificationsData: { S: pushNotificationsData ? JSON.stringify(pushNotificationsData) : " " },
-                      ...Object.keys(rest).reduce((acc, v) => {
-                        acc[`${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`] = {
-                          BOOL: rest[v] || false,
-                        };
-                        return acc;
-                      }, {}),
-                    });
+                    setUserSettingsPatchState(
+                      await send({
+                        email: { S: email },
+                        fullName: { S: fullName },
+                        phone: { S: phone || " " },
+                        pushNotifications: { BOOL: pushNotifications || false },
+                        pushNotificationsData: {
+                          S: pushNotificationsData ? JSON.stringify(pushNotificationsData) : " ",
+                        },
+                        ...Object.keys(rest).reduce(
+                          (acc, v) => ({
+                            ...acc,
+                            [`${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`]: {
+                              BOOL: rest[v] || false,
+                            },
+                          }),
+                          {}
+                        ),
+                      })
+                    );
                   }
                 });
               },
@@ -72,8 +121,8 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
             )}
           >
             <Divider>I wish to be notified when:</Divider>
-            <Skeleton active loading={loading} title={false}>
-              {!loading && (
+            <Skeleton active loading={loadingUserSettings} title={false}>
+              {!loadingUserSettings && (
                 <>
                   {Object.keys(settings).map((s) => (
                     <Form.Item key={s}>
@@ -141,7 +190,7 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
                   <Button
                     disabled={Object.values(form.getFieldsError()).some((v) => v)}
                     htmlType="submit"
-                    loading={state === "pending"}
+                    loading={loadingUserSettingsPatch}
                     type="primary"
                   >
                     Save
@@ -150,11 +199,11 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
               )}
             </Skeleton>
             <Divider />
-            {state && state !== "pending" && (
+            {(userSettingsPatchState || userSettingsPatchError) && !loadingUserSettingsPatch && (
               <Alert
                 closable
-                message={state.error ? "Failed to save settings." : "Saved settings."}
-                type={state.error ? "error" : "success"}
+                message={userSettingsPatchError || "Saved settings."}
+                type={userSettingsPatchError ? "error" : "success"}
               />
             )}
           </StyledForm>

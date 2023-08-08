@@ -3,13 +3,7 @@ import Dataloader from "dataloader";
 import { getReadOnlyRpcUrl } from "./web3";
 import axios from "axios";
 import useSWR from "swr";
-
-const subgraphURL = "https://api.thegraph.com/subgraphs/name";
-
-const displaySubgraph = {
-  1: "andreimvp/kleros-display-mainnet",
-  100: "andreimvp/kleros-display",
-};
+import { displaySubgraph } from "./subgraph";
 
 const getURIProtocol = (uri) => {
   const uriParts = uri.replace(":", "").split("/");
@@ -94,7 +88,7 @@ const funcs = {
   async getMetaEvidence(chainID, arbitrated, arbitrator, disputeId) {
     try {
       const metaEvidenceUriData = await axios.get(
-        `https://lemon.kleros.io/.netlify/functions/get-metaevidence?chainId=${chainID}&disputeId=${disputeId}`
+        `${process.env.REACT_APP_METAEVIDENCE_URL}?chainId=${chainID}&disputeId=${disputeId}`
       );
 
       const uri = metaEvidenceUriData.data?.metaEvidenceUri;
@@ -128,6 +122,7 @@ const funcs = {
         const injectedParameters = {
           arbitratorChainID: metaEvidenceJSON.arbitratorChainID || chainID,
           arbitrableChainID: metaEvidenceJSON.arbitrableChainID || chainID,
+          disputeID: disputeId,
         };
 
         injectedParameters.arbitrableContractAddress = injectedParameters.arbitrableContractAddress || arbitrated;
@@ -233,7 +228,7 @@ export const useDataloader = Object.keys(dataloaders).reduce((acc, f) => {
 const evidenceFetcher = async ([subgraph, disputeId]) => {
   const evidence = await axios
     .post(
-      `${subgraphURL}/${subgraph}`,
+      subgraph,
       {
         query: `
         query getDispute($id: String!) {
