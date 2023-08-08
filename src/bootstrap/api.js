@@ -9,34 +9,25 @@ const chainIdToNetwork = {
 };
 
 export const API = async ({ url, method, createDerived, web3, account, payload }) => {
-  let derivedAccount;
-  derivedAccount = await web3DeriveAccount(
-    web3,
-    account,
-    "To keep your data safe and to use certain features of Kleros, we ask that you sign these messages to create a secret key for your account. This key is unrelated from your main Ethereum account and will not be able to send any transactions.",
-    createDerived
-  );
+  try {
+    const derivedAccount = await web3DeriveAccount(
+      web3,
+      account,
+      "To keep your data safe and to use certain features of Kleros, we ask that you sign these messages to create a secret key for your account. This key is unrelated from your main Ethereum account and will not be able to send any transactions.",
+      createDerived
+    );
+    const chainId = await web3.eth.getChainId();
+    const network = chainIdToNetwork[chainId] === "main" ? "mainnet" : chainIdToNetwork[chainId];
+    if (!payload) payload["network"] = network;
 
-  const network = chainIdToNetwork[await web3.eth.getChainId()];
-  if (!payload) payload["network"] = network === "main" ? "mainnet" : network;
+    const signature = derivedAccount?.sign(JSON.stringify(payload)).signature;
 
-  const signature = derivedAccount
-    ? derivedAccount.sign(JSON.stringify(payload)).signature
-    : await web3.eth.sign(JSON.stringify(payload), account);
-
-  const func = () =>
-    axios[method.toLocaleLowerCase()](url, {
-      payload: {
-        address: account,
-        network: network === "main" ? "mainnet" : network,
-        signature,
-        ...payload,
-      },
+    const res = await axios[method.toLowerCase()](url, {
+      payload: { address: account, network, signature, ...payload },
     });
 
-  const res = func();
+    if (res.ok || !derivedAccount) return res;
 
-  if (!res.ok && derivedAccount) {
     const settings = { derivedAccountAddress: { S: derivedAccount.address } };
     await axios.patch(process.env.REACT_APP_USER_SETTINGS_URL, {
       payload: {
@@ -45,9 +36,11 @@ export const API = async ({ url, method, createDerived, web3, account, payload }
         signature: await web3.eth.personal.sign(JSON.stringify(settings), account),
       },
     });
-
-    return func();
+    return await axios[method.toLocaleLowerCase()](url, {
+      payload: { address: account, network, signature, ...payload },
+    });
+  } catch (err) {
+    console.error(err);
+    return { error: "An unexpected error occurred." };
   }
-
-  return res;
 };

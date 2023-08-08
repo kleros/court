@@ -32,7 +32,7 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
     drizzleState.account && key && ["user-settings", drizzleState.account, key],
     async ([_, account, key]) =>
       await API({
-        URL: process.env.REACT_APP_USER_SETTINGS_URL,
+        url: process.env.REACT_APP_USER_SETTINGS_URL,
         method: "POST",
         web3: drizzle.web3,
         account,
@@ -56,7 +56,7 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
       setLoadingUserSettingsPatch(true);
       try {
         await API({
-          URL: process.env.REACT_APP_USER_SETTINGS_URL,
+          url: process.env.REACT_APP_USER_SETTINGS_URL,
           createDerived: true,
           method: "PATCH",
           web3: drizzle.web3,
@@ -117,54 +117,46 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
           >
             <Divider>I wish to be notified when:</Divider>
             <Skeleton active loading={loadingUserSettings} title={false}>
-              {!loadingUserSettings && userSettings && (
+              {!loadingUserSettings && (
                 <>
                   {Object.keys(settings).map((s) => (
                     <Form.Item key={s}>
                       {form.getFieldDecorator(s, {
-                        initialValue:
-                          userSettings.payload &&
-                          userSettings.payload.settings.Item[
-                            `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(1)}`}`
-                          ]
-                            ? userSettings.payload.settings.Item[
-                                `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(1)}`}`
-                              ].BOOL
-                            : false,
+                        initialValue: userSettings?.payload?.settings.Item[
+                          `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(1)}`}`
+                        ]
+                          ? userSettings.payload.settings.Item[
+                              `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(1)}`}`
+                            ].BOOL
+                          : false,
                         valuePropName: "checked",
                       })(<Checkbox>{settings[s]}</Checkbox>)}
                     </Form.Item>
                   ))}
                   <Form.Item hasFeedback>
                     {form.getFieldDecorator("fullName", {
-                      initialValue:
-                        userSettings.payload && userSettings.payload.settings.Item.fullName
-                          ? userSettings.payload.settings.Item.fullName.S
-                          : "",
+                      initialValue: userSettings?.payload?.settings.Item.fullName
+                        ? userSettings.payload.settings.Item.fullName.S
+                        : "",
                       rules: [{ message: "Please enter your name.", required: true }],
                     })(<Input placeholder="Name" />)}
                   </Form.Item>
                   <Form.Item hasFeedback>
                     {form.getFieldDecorator("email", {
-                      initialValue:
-                        userSettings.payload && userSettings.payload.settings.Item.email
-                          ? userSettings.payload.settings.Item.email.S
-                          : "",
+                      initialValue: userSettings?.payload?.settings.Item.email
+                        ? userSettings.payload.settings.Item.email.S
+                        : "",
                       rules: [
                         { message: "Please enter your email.", required: true },
-                        {
-                          message: "Please enter a valid email.",
-                          type: "email",
-                        },
+                        { message: "Please enter a valid email.", type: "email" },
                       ],
                     })(<Input placeholder="Email" />)}
                   </Form.Item>
                   <Form.Item>
                     {form.getFieldDecorator("pushNotifications", {
-                      initialValue:
-                        userSettings.payload && userSettings.payload.settings.Item.pushNotifications
-                          ? userSettings.payload.settings.Item.pushNotifications.BOOL
-                          : false,
+                      initialValue: userSettings?.payload?.settings.Item.pushNotifications
+                        ? userSettings.payload.settings.Item.pushNotifications.BOOL
+                        : false,
                       valuePropName: "checked",
                     })(
                       <Checkbox

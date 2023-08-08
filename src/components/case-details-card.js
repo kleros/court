@@ -210,11 +210,11 @@ export default function CaseDetailsCard({ ID }) {
   const sendOrRevealVote = useCallback(
     async (choice) => {
       if (justification && justification.trim().length > 0)
-        API({
+        await API({
           account,
           web3,
           method: "PUT",
-          URL: `${process.env.REACT_APP_JUSTIFICATIONS_URL}/put-justification`,
+          url: `${process.env.REACT_APP_JUSTIFICATIONS_URL}/put-justification`,
           createDerived: true,
           payload: {
             justification: {

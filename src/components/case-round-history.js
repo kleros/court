@@ -21,8 +21,8 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
 
   const metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
 
-  const { data: justificationsByRound, isLoading: justificationsLoading } = useSWR(
-    dispute && ID && chainId && ["justifications", chainId, ID, dispute.votesLengths],
+  const { data: justificationsByRound, isLoading } = useSWR(
+    metaEvidence && dispute && ID && chainId && ["justifications", chainId, ID, dispute.votesLengths],
     async ([_, chain, disputeId, nbRounds]) =>
       await Promise.all(
         nbRounds.map((_, i) =>
@@ -62,7 +62,7 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
   }, []);
 
   return (
-    <Skeleton active loading={justificationsLoading}>
+    <Skeleton active loading={isLoading}>
       {justificationsByRound && (
         <StyledCaseRoundHistory>
           <Row>
@@ -71,7 +71,7 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
                 <h3>Round</h3>
                 <StyledRadioGroup buttonStyle="solid" name="round" onChange={handleChangeRound} value={round}>
                   <Row>
-                    {justificationsByRound?.map((justs, i) => (
+                    {justificationsByRound.map((justs, i) => (
                       <Col lg={12} md={24} key={i}>
                         <Radio.Button disabled={!justs.length} key={i} value={i}>
                           Round {i + 1}
