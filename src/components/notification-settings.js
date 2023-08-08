@@ -1,5 +1,5 @@
 import { Alert, Button, Checkbox, Divider, Form, Icon, Input, Popover, Skeleton, Tooltip } from "antd";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { ReactComponent as Mail } from "../assets/images/mail.svg";
 import PropTypes from "prop-types";
@@ -7,6 +7,7 @@ import styled from "styled-components/macro";
 import { API } from "../bootstrap/api";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import { askPermission, subscribeUserToPush } from "../bootstrap/service-worker";
+import useSWR from "swr";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -23,38 +24,32 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
-  const [userSettings, setUserSettings] = useState(null);
-  const [loadingUserSettings, setLoadingUserSettings] = useState(false);
   const [loadingUserSettingsPatch, setLoadingUserSettingsPatch] = useState(false);
   const [userSettingsPatchError, setUserSettingsPatchError] = useState(false);
   const [userSettingsPatchState, setUserSettingsPatchState] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      setLoadingUserSettings(true);
-      setUserSettings(
-        await API({
-          URL: process.env.REACT_APP_USER_SETTINGS_URL,
-          method: "POST",
-          web3: drizzle.web3,
-          account: drizzleState.account,
-          payload: {
-            settings: {
-              email: true,
-              fullName: true,
-              phone: true,
-              pushNotifications: true,
-              ...Object.keys(settings).reduce(
-                (acc, v) => ({ ...acc, [`${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`]: true }),
-                {}
-              ),
-            },
+  const { data: userSettings, isLoading: loadingUserSettings } = useSWR(
+    drizzleState.account && key && ["user-settings", drizzleState.account, key],
+    async ([_, account, key]) =>
+      await API({
+        URL: process.env.REACT_APP_USER_SETTINGS_URL,
+        method: "POST",
+        web3: drizzle.web3,
+        account,
+        payload: {
+          settings: {
+            email: true,
+            fullName: true,
+            phone: true,
+            pushNotifications: true,
+            ...Object.keys(settings).reduce(
+              (acc, v) => ({ ...acc, [`${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`]: true }),
+              {}
+            ),
           },
-        })
-      );
-      setLoadingUserSettings(false);
-    })();
-  });
+        },
+      })
+  );
 
   const send = useCallback(
     async (payload) => {

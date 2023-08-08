@@ -21,9 +21,9 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
 
   const metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
 
-  const { data: justificationsByRound, loading: justificationsLoading } = useSWR(
-    dispute && ID && chainId && [chainId, ID, dispute.votesLengths],
-    async ([chain, disputeId, nbRounds]) =>
+  const { data: justificationsByRound, isLoading: justificationsLoading } = useSWR(
+    dispute && ID && chainId && ["justifications", chainId, ID, dispute.votesLengths],
+    async ([_, chain, disputeId, nbRounds]) =>
       await Promise.all(
         nbRounds.map((_, i) =>
           axios
