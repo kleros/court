@@ -1,46 +1,37 @@
 import web3DeriveAccount from "../temp/web3-derive-account";
 import axios from "axios";
 
-const chainIdToNetwork = {
-  1: "mainnet",
-  5: "goerli",
-  100: "xdai",
-  11155111: "sepolia",
-};
+export const API = async ({ url, method, createDerived, web3, account: address, payload, payloadName }) => {
+  const derivedAccount = await web3DeriveAccount(web3, address, createDerived);
 
-export const API = async ({ url, method, createDerived, web3, account, payload }) => {
+  console;
+  const chainId = await web3.eth.getChainId();
+
+  const signature = derivedAccount?.sign(JSON.stringify(payload)).signature;
+
   try {
-    const derivedAccount = await web3DeriveAccount(
-      web3,
-      account,
-      "To keep your data safe and to use certain features of Kleros, we ask that you sign these messages to create a secret key for your account. This key is unrelated from your main Ethereum account and will not be able to send any transactions.",
-      createDerived
-    );
-    const chainId = await web3.eth.getChainId();
-    const network = chainIdToNetwork[chainId] === "main" ? "mainnet" : chainIdToNetwork[chainId];
-    if (!payload) payload["network"] = network;
-
-    const signature = derivedAccount?.sign(JSON.stringify(payload)).signature;
-
     const res = await axios[method.toLowerCase()](url, {
-      payload: { address: account, network, signature, ...payload },
+      payload: { address, chainId, signature, [payloadName]: payload },
     });
+    return res.data;
+  } catch (err) {
+    console.error(err.message);
 
-    if (res.ok || !derivedAccount) return res;
+    if (!derivedAccount) return { error: "An unexpected error occurred." };
+  }
 
+  try {
     const settings = { derivedAccountAddress: { S: derivedAccount.address } };
     await axios.patch(process.env.REACT_APP_USER_SETTINGS_URL, {
-      payload: {
-        address: account,
-        settings,
-        signature: await web3.eth.personal.sign(JSON.stringify(settings), account),
-      },
+      payload: { address, settings, signature: await web3.eth.personal.sign(JSON.stringify(settings), address) },
     });
-    return await axios[method.toLocaleLowerCase()](url, {
-      payload: { address: account, network, signature, ...payload },
-    });
+    return (
+      await axios[method.toLocaleLowerCase()](url, {
+        payload: { address, chainId, signature, [payloadName]: payload },
+      })
+    ).data;
   } catch (err) {
-    console.error(err);
+    console.error(err.message);
     return { error: "An unexpected error occurred." };
   }
 };

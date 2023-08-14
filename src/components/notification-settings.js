@@ -36,41 +36,19 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
         method: "POST",
         web3: drizzle.web3,
         account,
+        payloadName: "settings",
         payload: {
-          settings: {
-            email: true,
-            fullName: true,
-            phone: true,
-            pushNotifications: true,
-            ...Object.keys(settings).reduce(
-              (acc, v) => ({ ...acc, [`${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`]: true }),
-              {}
-            ),
-          },
+          email: true,
+          fullName: true,
+          phone: true,
+          pushNotifications: true,
+          ...Object.keys(settings).reduce(
+            (acc, v) => ({ ...acc, [`${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`]: true }),
+            {}
+          ),
         },
-      })
-  );
-
-  const send = useCallback(
-    async (payload) => {
-      setLoadingUserSettingsPatch(true);
-      try {
-        await API({
-          url: process.env.REACT_APP_USER_SETTINGS_URL,
-          createDerived: true,
-          method: "PATCH",
-          web3: drizzle.web3,
-          account: drizzleState.account,
-          payload: { settings: payload },
-        });
-      } catch (err) {
-        console.error(err);
-        setUserSettingsPatchError("Failed to save settings.");
-      } finally {
-        setLoadingUserSettingsPatch(false);
-      }
-    },
-    [drizzle.web3, drizzleState.account]
+      }),
+    { errorRetryCount: 0, revalidateOnFocus: false }
   );
 
   return (
@@ -89,30 +67,46 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
                     if (pushNotifications) {
                       pushNotificationsData = await subscribeUserToPush();
                     }
-                    setUserSettingsPatchState(
-                      await send({
-                        email: { S: email },
-                        fullName: { S: fullName },
-                        phone: { S: phone || " " },
-                        pushNotifications: { BOOL: pushNotifications || false },
-                        pushNotificationsData: {
-                          S: pushNotificationsData ? JSON.stringify(pushNotificationsData) : " ",
-                        },
-                        ...Object.keys(rest).reduce(
-                          (acc, v) => ({
-                            ...acc,
-                            [`${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`]: {
-                              BOOL: rest[v] || false,
+                    setLoadingUserSettingsPatch(true);
+                    try {
+                      setUserSettingsPatchState(
+                        await API({
+                          url: process.env.REACT_APP_USER_SETTINGS_URL,
+                          createDerived: true,
+                          method: "PATCH",
+                          web3: drizzle.web3,
+                          account: drizzleState.account,
+                          payloadName: "settings",
+                          payload: {
+                            email: { S: email },
+                            fullName: { S: fullName },
+                            phone: { S: phone || " " },
+                            pushNotifications: { BOOL: pushNotifications || false },
+                            pushNotificationsData: {
+                              S: pushNotificationsData ? JSON.stringify(pushNotificationsData) : " ",
                             },
-                          }),
-                          {}
-                        ),
-                      })
-                    );
+                            ...Object.keys(rest).reduce(
+                              (acc, v) => ({
+                                ...acc,
+                                [`${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`]: {
+                                  BOOL: rest[v] || false,
+                                },
+                              }),
+                              {}
+                            ),
+                          },
+                        })
+                      );
+                    } catch (err) {
+                      console.error(err);
+                      setUserSettingsPatchError("Failed to save settings.");
+                    } finally {
+                      setLoadingUserSettingsPatch(false);
+                    }
                   }
                 });
               },
-              [form, key, send]
+              [form, key, drizzle.web3, drizzleState.account]
             )}
           >
             <Divider>I wish to be notified when:</Divider>

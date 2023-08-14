@@ -213,16 +213,15 @@ export default function CaseDetailsCard({ ID }) {
         await API({
           account,
           web3,
-          method: "PUT",
+          method: "POST",
           url: `${process.env.REACT_APP_JUSTIFICATIONS_URL}/put-justification`,
           createDerived: true,
+          payloadName: "justification",
           payload: {
-            justification: {
-              appeal: disputeExtraInfo.votesLengths.length - 1,
-              disputeID: ID,
-              justification,
-              voteIDs: votesData.voteIDs,
-            },
+            appeal: disputeExtraInfo.votesLengths.length - 1,
+            disputeID: ID,
+            justification,
+            voteIDs: votesData.voteIDs,
           },
         });
 
