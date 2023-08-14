@@ -11,7 +11,7 @@ import { ReactComponent as Document } from "../assets/images/document.svg";
 import { ReactComponent as Folder } from "../assets/images/folder.svg";
 import { ReactComponent as Gavel } from "../assets/images/gavel.svg";
 import { ReactComponent as Scales } from "../assets/images/scales.svg";
-import { API } from "../bootstrap/api";
+import { postJustification } from "../bootstrap/api";
 import { useDataloader, useEvidence, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import web3Salt from "../temp/web3-salt";
 import { range, binaryPermutations } from "../helpers/array";
@@ -210,14 +210,10 @@ export default function CaseDetailsCard({ ID }) {
   const sendOrRevealVote = useCallback(
     async (choice) => {
       if (justification && justification.trim().length > 0)
-        await API({
+        await postJustification({
           account,
           web3,
-          method: "POST",
-          url: `${process.env.REACT_APP_JUSTIFICATIONS_URL}/put-justification`,
-          createDerived: true,
-          payloadName: "justification",
-          payload: {
+          justification: {
             appeal: disputeExtraInfo.votesLengths.length - 1,
             disputeID: ID,
             justification,

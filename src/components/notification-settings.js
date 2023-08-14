@@ -4,7 +4,7 @@ import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { ReactComponent as Mail } from "../assets/images/mail.svg";
 import PropTypes from "prop-types";
 import styled from "styled-components/macro";
-import { API } from "../bootstrap/api";
+import { accessSettings } from "../bootstrap/api";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import { askPermission, subscribeUserToPush } from "../bootstrap/service-worker";
 import useSWR from "swr";
@@ -25,19 +25,15 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
   const [loadingUserSettingsPatch, setLoadingUserSettingsPatch] = useState(false);
-  const [userSettingsPatchError, setUserSettingsPatchError] = useState(false);
   const [userSettingsPatchState, setUserSettingsPatchState] = useState(false);
 
   const { data: userSettings, isLoading: loadingUserSettings } = useSWR(
     drizzleState.account && key && ["user-settings", drizzleState.account, key],
-    async ([_, account, key]) =>
-      await API({
-        url: process.env.REACT_APP_USER_SETTINGS_URL,
-        method: "POST",
+    async ([_, address, key]) =>
+      await accessSettings({
         web3: drizzle.web3,
-        account,
-        payloadName: "settings",
-        payload: {
+        address,
+        settings: {
           email: true,
           fullName: true,
           phone: true,
@@ -70,14 +66,11 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
                     setLoadingUserSettingsPatch(true);
                     try {
                       setUserSettingsPatchState(
-                        await API({
-                          url: process.env.REACT_APP_USER_SETTINGS_URL,
-                          createDerived: true,
-                          method: "PATCH",
+                        await accessSettings({
+                          patch: true,
                           web3: drizzle.web3,
-                          account: drizzleState.account,
-                          payloadName: "settings",
-                          payload: {
+                          address: drizzleState.account,
+                          settings: {
                             email: { S: email },
                             fullName: { S: fullName },
                             phone: { S: phone || " " },
@@ -99,7 +92,6 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
                       );
                     } catch (err) {
                       console.error(err);
-                      setUserSettingsPatchError("Failed to save settings.");
                     } finally {
                       setLoadingUserSettingsPatch(false);
                     }
@@ -180,11 +172,11 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
               )}
             </Skeleton>
             <Divider />
-            {(userSettingsPatchState || userSettingsPatchError) && !loadingUserSettingsPatch && (
+            {userSettingsPatchState && !loadingUserSettingsPatch && (
               <Alert
                 closable
-                message={userSettingsPatchError || "Saved settings."}
-                type={userSettingsPatchError ? "error" : "success"}
+                message={userSettingsPatchState.error || "Saved settings."}
+                type={userSettingsPatchState.error ? "error" : "success"}
               />
             )}
           </StyledForm>
