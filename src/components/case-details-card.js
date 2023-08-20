@@ -25,22 +25,20 @@ import CourtDrawer from "./court-drawer";
 import EvidenceTimeline from "./evidence-timeline";
 import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 import useGetDraws from "../hooks/use-get-draws";
+import { derivedAccountKey } from "../temp/web3-derive-account";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const { toBN, soliditySha3 } = Web3.utils;
 
 const JustificationBox = ({ web3, account, onChange, justification }) => {
-  const key =
-    "To keep your data safe and to use certain features of Kleros, we ask that you sign these messages to create a secret key for your account. This key is unrelated from your main Ethereum account and will not be able to send any transactions.";
-
-  const storageKey = `${account}-${key}`;
+  const storageKey = `${account}-${derivedAccountKey}`;
   const secretSigningKey = localStorage.getItem(storageKey);
   const placeholder = secretSigningKey
     ? "Justify your vote here..."
     : "You need a signing key to provide a justification. You can get your signing key by setting your Notifications Settings above, or by clicking the button below. Then reload the page.";
 
   const makeAndStoreSigningKey = async () => {
-    const signingKey = await web3.eth.personal.sign(key, account);
+    const signingKey = await web3.eth.personal.sign(derivedAccountKey, account);
     localStorage.setItem(storageKey, signingKey);
   };
 
