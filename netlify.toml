@@ -56,7 +56,7 @@
   REACT_APP_WEB3_FALLBACK_XDAI_URL='wss://rpc.gnosischain.com/wss'
   REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL='https://rpc.gnosischain.com'
 
-  REACT_APP_WEB3_FALLBACK_POLYGON_HTTPS_URL='https://rpc.ankr.com/polygon'
+  REACT_APP_WEB3_FALLBACK_POLYGON_HTTPS_URL='https://polygon-mainnet.g.alchemy.com/v2/Y2IRJuoY0G-LAkHTqyXdVetLFm4R2NZT'
   REACT_APP_WEB3_FALLBACK_MUMBAI_HTTPS_URL='https://polygon-mumbai.g.alchemy.com/v2/demo'
 
 [context.production.environment]
