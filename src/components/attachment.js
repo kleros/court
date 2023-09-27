@@ -64,7 +64,7 @@ const Attachment = ({ URI, description, extension: _extension, previewURI, title
           <>
             {description}
             <Divider dashed />
-            <StyledIFrame frameBorder="0" src={previewURI} title="Attachment Preview" />
+            <StyledIFrame sandbox="" frameBorder="0" src={previewURI} title="Attachment Preview" />
           </>
         ) : (
           description

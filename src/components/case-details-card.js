@@ -25,6 +25,7 @@ import CourtDrawer from "./court-drawer";
 import EvidenceTimeline from "./evidence-timeline";
 import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 import useGetDraws from "../hooks/use-get-draws";
+import arbitrableWhitelist from "../temp/arbitrable-whitelist";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const { toBN, soliditySha3 } = Web3.utils;
@@ -664,6 +665,11 @@ export default function CaseDetailsCard({ ID }) {
                   <ReactMarkdown source={metaEvidence.metaEvidenceJSON.description} />
                   {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
                     <iframe
+                      sandbox={
+                        arbitrableWhitelist[chainId]?.find((i) => i === dispute.arbitrated.toLowerCase())
+                          ? "allow-scripts allow-same-origin"
+                          : "allow-scripts"
+                      }
                       title="dispute details"
                       style={{ width: "1px", minWidth: "100%", height: "360px", border: "none" }}
                       src={evidenceDisplayInterfaceURL}
