@@ -666,7 +666,7 @@ export default function CaseDetailsCard({ ID }) {
                   {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
                     <iframe
                       sandbox={
-                        arbitrableWhitelist[chainId]?.find((i) => i === dispute.arbitrated.toLowerCase())
+                        arbitrableWhitelist[chainId]?.includes(dispute.arbitrated.toLowerCase())
                           ? "allow-scripts allow-same-origin"
                           : "allow-scripts"
                       }
