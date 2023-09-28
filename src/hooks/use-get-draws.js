@@ -5,15 +5,15 @@ import { displaySubgraph } from "../bootstrap/subgraph";
 const fetchDraws = async (chainId, where, lastId, first) => {
   const res = await axios.post(displaySubgraph[chainId], {
     query: `
-  {
-    draws(where: {${where}, id_gt: "${lastId}"}, first: ${first}) {
-      id
-      address
-      disputeID
-      appeal
-      voteID
+    {
+      draws(where: {${where}, id_gt: "${lastId}"}, first: ${first}) {
+        id
+        address
+        disputeID
+        appeal
+        voteID
+      }
     }
-  }
   `,
   });
 

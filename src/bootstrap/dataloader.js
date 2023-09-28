@@ -162,11 +162,9 @@ const funcs = {
     } catch (err) {
       console.warn("Failed to get the evidence:", err);
       return {
-        metaEvidenceJSON: {
-          description:
-            "The data for this case is not formatted correctly or has been tampered since the time of its submission. Please refresh the page and refuse to arbitrate if the problem persists.",
-          title: "Invalid or tampered case data, refuse to arbitrate.",
-        },
+        description:
+          "The data for this case is not formatted correctly or has been tampered since the time of its submission. Please refresh the page and refuse to arbitrate if the problem persists.",
+        title: "Invalid or tampered case data, refuse to arbitrate.",
       };
     }
   },

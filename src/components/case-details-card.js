@@ -187,7 +187,7 @@ export default function CaseDetailsCard({ ID }) {
       });
     }
 
-    if (votesData.committed && !votesData.voted && !committedVote && metaEvidence?.metaEvidenceJSON?.rulingOptions) {
+    if (votesData.committed && !votesData.voted && !committedVote && metaEvidence?.rulingOptions) {
       deriveCommitedVote().then(
         (result) => {
           if (mounted && result !== undefined) {
