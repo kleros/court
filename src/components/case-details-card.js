@@ -190,9 +190,9 @@ export default function CaseDetailsCard({ ID }) {
   const [committedVote, setCommittedVote] = useStoredCommittedVote();
 
   useEffect(() => {
-    if (dispute.arbitrated && !arbitrableWhitelist[chainId]?.includes(dispute.arbitrated.toLowerCase()))
+    if (dispute?.arbitrated && !arbitrableWhitelist[chainId]?.includes(dispute?.arbitrated.toLowerCase()))
       console.warn("Arbitrable not included in whitelist for evidence display");
-  }, [dispute.arbitrated, chainId]);
+  }, [dispute?.arbitrated, chainId]);
 
   useEffect(() => {
     let mounted = true;
