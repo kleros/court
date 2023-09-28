@@ -346,7 +346,14 @@ export default function CaseDetailsCard({ ID }) {
   const evidenceDisplayInterfaceURL = useMemo(() => {
     const normalizeIPFSUri = (uri) => uri.replace(/^\/ipfs\//, "https://ipfs.kleros.io/ipfs/");
     if (metaEvidence?.metaEvidenceJSON?.evidenceDisplayInterfaceURI) {
-      const { evidenceDisplayInterfaceURI, _v = "0" } = metaEvidence.metaEvidenceJSON;
+      // hack to allow displaying old t2cr disputes, since old endpoint was lost
+      const evidenceDisplayInterfaceURI =
+        dispute?.arbitrated === "0xEbcf3bcA271B26ae4B162Ba560e243055Af0E679"
+          ? "/ipfs/QmYs17mAJTaQwYeXNTb6n4idoQXmRcAjREeUdjJShNSeKh/index.html"
+          : metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI;
+
+      const { _v = "0" } = metaEvidence.metaEvidenceJSON;
+
       const arbitratorChainID = metaEvidence.metaEvidenceJSON?.arbitratorChainID ?? chainId;
       const arbitrableChainID = metaEvidence.metaEvidenceJSON?.arbitrableChainID ?? arbitratorChainID;
 

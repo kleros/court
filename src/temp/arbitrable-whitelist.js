@@ -24,6 +24,7 @@ const arbitrableWhitelist = {
     "0xd8bf5114796ed28aa52cff61e1b9ef4ec1f69a54",
     "0xe0e1bc8c6cd1b81993e2fcfb80832d814886ea38",
     "0xe5bcea6f87aaee4a81f64dfdb4d30d400e0e5cf4",
+    "0xebcf3bca271b26ae4b162ba560e243055af0e679",
     "0xf339047c85d0dd2645f2bd802a1e8a5e7af61053",
     "0xf65c7560d6ce320cc3a16a07f1f65aab66396b9e",
     "0xf72cfd1b34a91a64f9a98537fe63fbab7530adca",
