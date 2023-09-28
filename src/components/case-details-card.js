@@ -26,6 +26,7 @@ import EvidenceTimeline from "./evidence-timeline";
 import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 import useGetDraws from "../hooks/use-get-draws";
 import { derivedAccountKey } from "../temp/web3-derive-account";
+import arbitrableWhitelist from "../temp/arbitrable-whitelist";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const { toBN, soliditySha3 } = Web3.utils;
@@ -173,6 +174,11 @@ export default function CaseDetailsCard({ ID }) {
     account,
   ]);
   const [committedVote, setCommittedVote] = useStoredCommittedVote();
+
+  useEffect(() => {
+    if (dispute?.arbitrated && !arbitrableWhitelist[chainId]?.includes(dispute?.arbitrated.toLowerCase()))
+      console.warn("Arbitrable not included in whitelist for evidence display");
+  }, [dispute?.arbitrated, chainId]);
 
   useEffect(() => {
     let mounted = true;
@@ -648,6 +654,11 @@ export default function CaseDetailsCard({ ID }) {
                   <ReactMarkdown source={metaEvidence.description} />
                   {metaEvidence.evidenceDisplayInterfaceURI && (
                     <iframe
+                      sandbox={
+                        arbitrableWhitelist[chainId]?.includes(dispute.arbitrated.toLowerCase())
+                          ? "allow-scripts allow-same-origin"
+                          : "allow-scripts"
+                      }
                       title="dispute details"
                       style={{ width: "1px", minWidth: "100%", height: "360px", border: "none" }}
                       src={evidenceDisplayInterfaceURL}
