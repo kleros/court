@@ -66,7 +66,7 @@
     "@kleros/pnk-merkle-drop-contracts": "^0.1.0",
     "@loadable/component": "^5.5.0",
     "@reality.eth/contracts": "3.0.0",
-    "@reality.eth/reality-eth-lib": "^3.0.0",
+    "@reality.eth/reality-eth-lib": "3.0.0",
     "@sentry/react": "^7.37.2",
     "@sentry/tracing": "^7.37.2",
     "antd": "^3.10.8",
@@ -103,7 +103,7 @@
     "web3": "1.5.2"
   },
   "volta": {
-    "node": "14.18.0",
+    "node": "16.20.2",
     "yarn": "1.22.10"
   }
 }
