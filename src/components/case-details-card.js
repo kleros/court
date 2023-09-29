@@ -388,11 +388,7 @@ export default function CaseDetailsCard({ ID }) {
                   {dispute.period !== "2" ? <GavelLarge /> : ""}
                   {votesData.drawnInCurrentRound ? (
                     <>
-                      <div
-                        css={`
-                          margin-bottom: 20px;
-                        `}
-                      >
+                      <div style="margin-bottom: 20px;">
                         {metaEvidence.question ? metaEvidence.question : "What is your decision?"}
                       </div>
                       {votesData.voted ? (
@@ -520,11 +516,7 @@ export default function CaseDetailsCard({ ID }) {
                         {metaEvidence.rulingOptions.type !== "single-select" && (
                           <StyledButtonsDiv>
                             {metaEvidence.rulingOptions.type === "multiple-select" ? (
-                              <div
-                                css={`
-                                  padding-top: 1rem;
-                                `}
-                              >
+                              <div style="padding-top: 1rem;">
                                 <Checkbox.Group
                                   disabled={!votesData.canVote}
                                   name="ruling"
