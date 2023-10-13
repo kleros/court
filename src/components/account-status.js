@@ -14,6 +14,8 @@ export default function AccountStatus() {
     account: drizzleState.accounts[0],
   }));
 
+  if (account === VIEW_ONLY_ADDRESS) return <></>;
+
   return (
     <AccountDetailsPopup
       pinakion

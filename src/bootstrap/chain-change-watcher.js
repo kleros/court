@@ -1,12 +1,16 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import t from "prop-types";
 import useChainId from "../hooks/use-chain-id";
 import usePrevious from "../hooks/use-previous";
+import SwitchChainFallback from "../components/error-fallback/switch-chain";
+import { isSupportedChain } from "../api/side-chain";
 
 export default function ChainChangeWatcher({ children }) {
-  useReloadOnChainChanged();
+  const chainId = useChainId();
+  const isSupported = isSupportedChain(chainId);
 
-  return children;
+  useReloadOnChainChanged();
+  return !isSupported ? <SwitchChainFallback /> : children;
 }
 
 ChainChangeWatcher.propTypes = {
