@@ -1,6 +1,6 @@
 [build.environment]
   YARN_FLAGS='--pure-lockfile'
-  NODE_VERSION='16.6.1'
+  NODE_VERSION='16.20.2'
   REACT_APP_CONTEXT='staging'
 
   REACT_APP_KLEROS_ADDRESS='0x211f01e59b425253c0a0e9a7bf612605b42ce82c'
