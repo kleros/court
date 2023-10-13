@@ -2341,10 +2341,10 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@kleros/archon@^2.2.3":
-  version "2.2.3"
-  resolved "https://registry.yarnpkg.com/@kleros/archon/-/archon-2.2.3.tgz#94c9e81c721ff952d38446d77f71edc5db8eac41"
-  integrity sha512-IPfin3W8/R7f5jo+6wqqHU56P3XrzlqnKXjh95DAZrAC7FjAZd7Mf8BlkFPKx09KHYbS9vGhvj5TgAfzP+zOIQ==
+"@kleros/archon@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@kleros/archon/-/archon-2.3.0.tgz#f81ceacbdf23539105a5323cd472bd6e2a3017a6"
+  integrity sha512-5lZYfcsHRqzcyqUeENh9K8KJS31x02TXHhtdrf7RD0qcQhtwuaCyh13GI+FxD/9muHDVrcWYknknjAU5JqTN2Q==
   dependencies:
     "@babel/runtime" "^7.22.10"
     "@mapbox/node-pre-gyp" "^1.0.11"
@@ -2352,7 +2352,7 @@
     iframe "^1.0.0"
     js-sha3 "^0.8.0"
     multihashes "0.4.21"
-    v8-sandbox "^2.3.0"
+    v8-sandbox "^2.2.2"
 
 "@kleros/pnk-merkle-drop-contracts@^0.1.0":
   version "0.1.0"
@@ -17187,7 +17187,7 @@ v8-compile-cache@^2.3.0:
   resolved "https://registry.npmjs.org/v8-compile-cache/-/v8-compile-cache-2.3.0.tgz"
   integrity sha512-l8lCEmLcLYZh4nbunNZvQCJc5pv7+RCwa8q/LdUx8u7lsWvPDKmpodJAJNwkAhJC//dFY48KuIEmjtd4RViDrA==
 
-v8-sandbox@^2.3.0:
+v8-sandbox@^2.2.2:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/v8-sandbox/-/v8-sandbox-2.3.0.tgz#6372cbb09a459128bbd751053c332738d1a23d5b"
   integrity sha512-xLz9k4DH6HUYhpKF7eAPH0a0CiQHs8IH8OeAOJKVynEMjFTVlyQvTe3UjJazy0KVScd9iRfXxk/vhB59RlcYFA==
