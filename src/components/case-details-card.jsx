@@ -25,41 +25,15 @@ import CourtDrawer from "./court-drawer";
 import EvidenceTimeline from "./evidence-timeline";
 import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 import useGetDraws from "../hooks/use-get-draws";
-import { derivedAccountKey } from "../temp/web3-derive-account";
 import arbitrableWhitelist from "../temp/arbitrable-whitelist";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const { toBN, soliditySha3 } = Web3.utils;
 
-const JustificationBox = ({ web3, account, onChange, justification }) => {
-  const storageKey = `${account}-${derivedAccountKey}`;
-  const secretSigningKey = localStorage.getItem(storageKey);
-  const placeholder = secretSigningKey
-    ? "Justify your vote here..."
-    : "You need a signing key to provide a justification. You can get your signing key by setting your Notifications Settings above, or by clicking the button below. Then reload the page.";
+const JustificationBox = ({ onChange, justification }) => {
+  const placeholder = "Justify your vote here...";
 
-  const makeAndStoreSigningKey = async () => {
-    const signingKey = await web3.eth.personal.sign(derivedAccountKey, account);
-    localStorage.setItem(storageKey, signingKey);
-  };
-
-  return (
-    <>
-      <StyledInputTextArea
-        onChange={onChange}
-        placeholder={placeholder}
-        value={justification}
-        disabled={secretSigningKey === null}
-      />
-      {secretSigningKey === null && (
-        <StyledButtonsDiv>
-          <StyledButton onClick={makeAndStoreSigningKey} size="default" type="primary">
-            Create signing key
-          </StyledButton>
-        </StyledButtonsDiv>
-      )}
-    </>
-  );
+  return <StyledInputTextArea onChange={onChange} placeholder={placeholder} value={justification} />;
 };
 
 export default function CaseDetailsCard({ ID }) {
@@ -492,12 +466,7 @@ export default function CaseDetailsCard({ ID }) {
                     )
                   ) : null}
                   {votesData.canVote && dispute.period === "2" && (
-                    <JustificationBox
-                      web3={web3}
-                      account={account}
-                      onChange={onJustificationChange}
-                      justification={justification}
-                    />
+                    <JustificationBox onChange={onJustificationChange} justification={justification} />
                   )}
                   {Number(dispute.period) < 3 && !votesData.voted && metaEvidence.rulingOptions ? (
                     votesData.committed && committedVote !== undefined ? (
@@ -802,8 +771,6 @@ CaseDetailsCard.propTypes = {
 };
 
 JustificationBox.propTypes = {
-  web3: PropTypes.object,
-  account: PropTypes.string,
   onChange: PropTypes.func,
   justification: PropTypes.string,
 };
