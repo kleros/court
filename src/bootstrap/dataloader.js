@@ -164,6 +164,10 @@ const funcs = {
     }
   },
   async loadPolicy(URI) {
+    if (!URI) {
+      console.error("No URI provided");
+      return;
+    }
     const prefix = URI.startsWith("/ipfs/") ? "" : "/ipfs/";
     const policyURL = `https://ipfs.kleros.io${prefix}${URI}`;
 

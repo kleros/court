@@ -52,6 +52,102 @@ const getVotingStatus = (disputePeriod, votesData, hiddenVotes) => {
   }
 };
 
+const VoteOptions = ({ metaEvidence, votesData, complexRuling, setComplexRuling, onVoteClick, disabledDate }) => {
+  const isSingleSelect = metaEvidence.rulingOptions.type === "single-select";
+  const isMultipleSelect = metaEvidence.rulingOptions.type === "multiple-select";
+  const isDateTime = metaEvidence.rulingOptions.type === "datetime";
+
+  let inputComponent;
+
+  if (isMultipleSelect) {
+    inputComponent = (
+      <div style={{ paddingTop: "1rem" }}>
+        <Checkbox.Group
+          disabled={!votesData.canVote}
+          name="ruling"
+          onChange={setComplexRuling}
+          options={metaEvidence.rulingOptions.titles?.slice(0, 255)}
+          value={complexRuling}
+        />
+      </div>
+    );
+  } else if (isDateTime) {
+    inputComponent = (
+      <DatePicker
+        disabled={!votesData.canVote}
+        disabledDate={disabledDate}
+        onChange={setComplexRuling}
+        size="large"
+        showTime
+        value={complexRuling}
+      />
+    );
+  } else if (isSingleSelect) {
+    inputComponent = metaEvidence.rulingOptions.titles?.slice(0, 2 ** 256 - 1).map((title, index) => (
+      <StyledButton
+        disabled={!votesData.canVote}
+        id={index + 1}
+        key={title}
+        onClick={onVoteClick}
+        size="large"
+        type="primary"
+      >
+        {title}
+      </StyledButton>
+    ));
+  } else {
+    inputComponent = (
+      <InputNumber
+        disabled={!votesData.canVote}
+        max={Number(
+          realitioLibQuestionFormatter
+            .maxNumber({
+              decimals: metaEvidence.rulingOptions.precision,
+              type: metaEvidence.rulingOptions.type,
+            })
+            .minus(1)
+        )}
+        min={Number(
+          realitioLibQuestionFormatter.minNumber({
+            decimals: metaEvidence.rulingOptions.precision,
+            type: metaEvidence.rulingOptions.type,
+          })
+        )}
+        onChange={setComplexRuling}
+        precision={metaEvidence.rulingOptions.precision}
+        size="large"
+        value={complexRuling}
+      />
+    );
+  }
+
+  return (
+    <StyledButtonsDiv>
+      {inputComponent}
+      {!isSingleSelect && (
+        <StyledButton disabled={!votesData.canVote || !complexRuling} onClick={onVoteClick} size="large" type="primary">
+          Submit
+        </StyledButton>
+      )}
+    </StyledButtonsDiv>
+  );
+};
+
+const RevealVoteButton = ({ onRevealClick, votesData, dispute }) => {
+  return (
+    <StyledButtonsDiv>
+      <StyledButton
+        onClick={onRevealClick}
+        size="large"
+        type="primary"
+        disabled={!votesData.canVote || dispute.period !== "2"}
+      >
+        Reveal Vote
+      </StyledButton>
+    </StyledButtonsDiv>
+  );
+};
+
 export default function CaseDetailsCard({ ID }) {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
@@ -468,90 +564,16 @@ export default function CaseDetailsCard({ ID }) {
                   )}
                   {Number(dispute.period) < 3 && !votesData.voted && metaEvidence.rulingOptions ? (
                     votesData.committed && committedVote !== undefined ? (
-                      <StyledButtonsDiv>
-                        <StyledButton
-                          onClick={onRevealClick}
-                          size="large"
-                          type="primary"
-                          disabled={!votesData.canVote || dispute.period !== "2"}
-                        >
-                          Reveal Vote
-                        </StyledButton>
-                      </StyledButtonsDiv>
+                      <RevealVoteButton onRevealClick={onRevealClick} votesData={votesData} dispute={dispute} />
                     ) : (
-                      <>
-                        {metaEvidence.rulingOptions.type !== "single-select" && (
-                          <StyledButtonsDiv>
-                            {metaEvidence.rulingOptions.type === "multiple-select" ? (
-                              <div style={{ paddingTop: "1rem" }}>
-                                <Checkbox.Group
-                                  disabled={!votesData.canVote}
-                                  name="ruling"
-                                  onChange={setComplexRuling}
-                                  options={metaEvidence.rulingOptions.titles?.slice(0, 255)}
-                                  value={complexRuling}
-                                />
-                              </div>
-                            ) : metaEvidence.rulingOptions.type === "datetime" ? (
-                              <DatePicker
-                                disabled={!votesData.canVote}
-                                disabledDate={disabledDate}
-                                onChange={setComplexRuling}
-                                size="large"
-                                showTime
-                                value={complexRuling}
-                              />
-                            ) : (
-                              <InputNumber
-                                disabled={!votesData.canVote}
-                                max={Number(
-                                  realitioLibQuestionFormatter
-                                    .maxNumber({
-                                      decimals: metaEvidence.rulingOptions.precision,
-                                      type: metaEvidence.rulingOptions.type,
-                                    })
-                                    .minus(1)
-                                )}
-                                min={Number(
-                                  realitioLibQuestionFormatter.minNumber({
-                                    decimals: metaEvidence.rulingOptions.precision,
-                                    type: metaEvidence.rulingOptions.type,
-                                  })
-                                )}
-                                onChange={setComplexRuling}
-                                precision={metaEvidence.rulingOptions.precision}
-                                size="large"
-                                value={complexRuling}
-                              />
-                            )}
-                          </StyledButtonsDiv>
-                        )}
-                        <StyledButtonsDiv>
-                          {metaEvidence.rulingOptions.type === "single-select" ? (
-                            metaEvidence.rulingOptions.titles?.slice(0, 2 ** 256 - 1).map((t, i) => (
-                              <StyledButton
-                                disabled={!votesData.canVote}
-                                id={i + 1}
-                                key={t}
-                                onClick={onVoteClick}
-                                size="large"
-                                type="primary"
-                              >
-                                {t}
-                              </StyledButton>
-                            ))
-                          ) : (
-                            <StyledButton
-                              disabled={!votesData.canVote || !complexRuling}
-                              onClick={onVoteClick}
-                              size="large"
-                              type="primary"
-                            >
-                              Submit
-                            </StyledButton>
-                          )}
-                        </StyledButtonsDiv>
-                      </>
+                      <VoteOptions
+                        metaEvidence={metaEvidence}
+                        votesData={votesData}
+                        complexRuling={complexRuling}
+                        setComplexRuling={setComplexRuling}
+                        onVoteClick={onVoteClick}
+                        disabledDate={disabledDate}
+                      />
                     )
                   ) : null}
                 </StyledActionsDiv>
@@ -761,6 +783,21 @@ export default function CaseDetailsCard({ ID }) {
 
 CaseDetailsCard.propTypes = {
   ID: PropTypes.string.isRequired,
+};
+
+VoteOptions.propTypes = {
+  disabledDate: PropTypes.func,
+  metaEvidence: PropTypes.object,
+  votesData: PropTypes.object,
+  onVoteClick: PropTypes.func,
+  setComplexRuling: PropTypes.func,
+  complexRuling: PropTypes.any,
+};
+
+RevealVoteButton.propTypes = {
+  dispute: PropTypes.object,
+  onRevealClick: PropTypes.func,
+  votesData: PropTypes.object,
 };
 
 JustificationBox.propTypes = {
