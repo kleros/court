@@ -38,10 +38,11 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
           fullName: true,
           phone: true,
           pushNotifications: true,
-          ...Object.keys(settings).reduce(
-            (acc, v) => ({ ...acc, [`${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`]: true }),
-            {}
-          ),
+          ...Object.keys(settings).reduce((acc, setting) => {
+            const settingKey = `${key}NotificationSetting${setting.charAt(0).toUpperCase() + setting.slice(1)}`;
+            acc[settingKey] = true;
+            return acc;
+          }, {}),
         },
       }),
     { errorRetryCount: 0, revalidateOnFocus: false }
@@ -78,15 +79,13 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
                             pushNotificationsData: {
                               S: pushNotificationsData ? JSON.stringify(pushNotificationsData) : " ",
                             },
-                            ...Object.keys(rest).reduce(
-                              (acc, v) => ({
-                                ...acc,
-                                [`${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`]: {
-                                  BOOL: rest[v] || false,
-                                },
-                              }),
-                              {}
-                            ),
+                            ...Object.keys(rest).reduce((acc, setting) => {
+                              const settingKey = `${key}NotificationSetting${setting
+                                .charAt(0)
+                                .toUpperCase()}${setting.slice(1)}`;
+                              acc[settingKey] = { BOOL: rest[setting] || false };
+                              return acc;
+                            }, {}),
                           },
                         })
                       );

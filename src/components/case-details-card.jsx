@@ -36,6 +36,22 @@ const JustificationBox = ({ onChange, justification }) => {
   return <StyledInputTextArea onChange={onChange} placeholder={placeholder} value={justification} />;
 };
 
+const getVotingStatus = (disputePeriod, votesData, hiddenVotes) => {
+  if (disputePeriod === "0") {
+    return "Waiting for evidence.";
+  } else if (disputePeriod === "1") {
+    return !votesData.committed
+      ? "You did not commit your vote yet."
+      : "You committed your vote. You will be able to reveal your vote when the period ends.";
+  } else if (hiddenVotes) {
+    return votesData.committed
+      ? "You did not reveal your vote yet."
+      : "You did not commit a vote in the previous period. You cannot vote anymore.";
+  } else {
+    return "You did not cast a vote.";
+  }
+};
+
 export default function CaseDetailsCard({ ID }) {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
@@ -220,11 +236,9 @@ export default function CaseDetailsCard({ ID }) {
       let choice;
       const typeSwitch =
         id !== "0" &&
-        !Object.keys(
-          metaEvidence.rulingOptions && metaEvidence.rulingOptions.reserved ? metaEvidence.rulingOptions.reserved : {}
-        ).includes(id) &&
-        metaEvidence.rulingOptions &&
-        metaEvidence.rulingOptions.type;
+        !Object.keys(metaEvidence.rulingOptions?.reserved ?? {}).includes(id) &&
+        metaEvidence.rulingOptions?.type;
+
       switch (typeSwitch) {
         case "multiple-select":
           choice = metaEvidence.rulingOptions.titles
@@ -389,24 +403,8 @@ export default function CaseDetailsCard({ ID }) {
                             <SecondaryActionText>Waiting for the vote result.</SecondaryActionText>
                           ) : null}
                         </>
-                      ) : dispute.period === "0" ? (
-                        "Waiting for evidence."
-                      ) : dispute.period === "1" ? (
-                        !votesData.committed ? (
-                          "You did not commit your vote yet."
-                        ) : (
-                          <small>
-                            You committed your vote. You will be able to reveal your vote when the period ends.
-                          </small>
-                        )
-                      ) : subcourts[subcourts.length - 1].hiddenVotes ? (
-                        votesData.committed ? (
-                          "You did not reveal your vote yet."
-                        ) : (
-                          "You did not commit a vote in the previous period. You cannot vote anymore."
-                        )
                       ) : (
-                        "You did not cast a vote."
+                        getVotingStatus(dispute.period, votesData, subcourts[subcourts.length - 1].hiddenVotes)
                       )}
                     </>
                   ) : (
@@ -490,9 +488,7 @@ export default function CaseDetailsCard({ ID }) {
                                   disabled={!votesData.canVote}
                                   name="ruling"
                                   onChange={setComplexRuling}
-                                  options={
-                                    metaEvidence.rulingOptions.titles && metaEvidence.rulingOptions.titles.slice(0, 255)
-                                  }
+                                  options={metaEvidence.rulingOptions.titles?.slice(0, 255)}
                                   value={complexRuling}
                                 />
                               </div>
@@ -532,8 +528,7 @@ export default function CaseDetailsCard({ ID }) {
                         )}
                         <StyledButtonsDiv>
                           {metaEvidence.rulingOptions.type === "single-select" ? (
-                            metaEvidence.rulingOptions.titles &&
-                            metaEvidence.rulingOptions.titles.slice(0, 2 ** 256 - 1).map((t, i) => (
+                            metaEvidence.rulingOptions.titles?.slice(0, 2 ** 256 - 1).map((t, i) => (
                               <StyledButton
                                 disabled={!votesData.canVote}
                                 id={i + 1}
@@ -575,23 +570,21 @@ export default function CaseDetailsCard({ ID }) {
                     ) : null}
                   </div>
 
-                  {metaEvidence.rulingOptions &&
-                    metaEvidence.rulingOptions.reserved &&
-                    Object.entries(metaEvidence.rulingOptions.reserved).map(([ruling, title]) => (
-                      <div key={ruling} style={{ marginTop: "32px" }}>
-                        {Number(dispute.period) < "3" && !votesData.voted ? (
-                          <Button
-                            disabled={!votesData.canVote}
-                            ghost={votesData.canVote}
-                            id={ruling}
-                            onClick={onVoteClick}
-                            size="large"
-                          >
-                            {title}
-                          </Button>
-                        ) : null}
-                      </div>
-                    ))}
+                  {Object.entries(metaEvidence.rulingOptions?.reserved ?? {}).map(([ruling, title]) => (
+                    <div key={ruling} style={{ marginTop: "32px" }}>
+                      {Number(dispute.period) < "3" && !votesData.voted ? (
+                        <Button
+                          disabled={!votesData.canVote}
+                          ghost={votesData.canVote}
+                          id={ruling}
+                          onClick={onVoteClick}
+                          size="large"
+                        >
+                          {title}
+                        </Button>
+                      ) : null}
+                    </div>
+                  ))}
                 </StyledDiv>
               </>
             ) : (
@@ -609,7 +602,7 @@ export default function CaseDetailsCard({ ID }) {
         loading={!metaEvidence}
         title={
           <>
-            {metaEvidence && metaEvidence.title}
+            {metaEvidence?.title}
             {subcourts && <StyledBreadcrumbs breadcrumbs={subcourts.map((s) => s.name)} />}
           </>
         }

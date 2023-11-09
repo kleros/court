@@ -213,12 +213,12 @@ const CaseCard = ({ ID, draws }) => {
       title={
         <>
           <Scales style={{ marginRight: "5px" }} />
-          <StyledHeaderText>{metaEvidence && metaEvidence.category}</StyledHeaderText>
+          <StyledHeaderText>{metaEvidence?.category}</StyledHeaderText>
         </>
       }
     >
       <div>
-        <CaseTitleBox>{metaEvidence && metaEvidence.title}</CaseTitleBox>
+        <CaseTitleBox>{metaEvidence?.title}</CaseTitleBox>
         <RewardBox>
           <Row>
             <IconCol md={8} xs={8}>

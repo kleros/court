@@ -44,6 +44,15 @@ const StyledEvidenceTimelineArea = styled.div`
   padding: 35px 10%;
 `;
 
+const getRulingText = (ruling, metaEvidence) => {
+  if (!ruling) {
+    return "Jurors refused to make a ruling";
+  }
+  const rulingIndex = Number(ruling) - 1;
+  const rulingTitle = metaEvidence.rulingOptions?.titles?.[rulingIndex];
+  return `Jurors ruled: ${rulingTitle || ruling}`;
+};
+
 // eslint-disable-next-line react/prop-types
 const EvidenceTimeline = ({ evidence = [], metaEvidence = {}, ruling = null, chainId = 1 }) => {
   // Sort so most recent is first
@@ -61,15 +70,7 @@ const EvidenceTimeline = ({ evidence = [], metaEvidence = {}, ruling = null, cha
       <Row id="scroll-top">
         <StyledHeaderCol lg={4}>Latest</StyledHeaderCol>
         <Col lg={16}>
-          {ruling && (
-            <EventDiv style={{ width: "225px" }}>
-              {ruling
-                ? `Jurors ruled: ${
-                    metaEvidence.rulingOptions ? metaEvidence.rulingOptions.titles[Number(ruling) - 1] : ruling
-                  }`
-                : "Jurors refused to make a ruling"}
-            </EventDiv>
-          )}
+          {ruling && <EventDiv style={{ width: "225px" }}>{getRulingText(ruling, metaEvidence)}</EventDiv>}
         </Col>
         <ScrollText
           lg={4}
