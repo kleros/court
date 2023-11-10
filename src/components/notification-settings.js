@@ -19,6 +19,14 @@ const StyledMail = styled(Mail)`
   min-width: 16px;
 `;
 
+const configureNotificationSettings = (settings, key, isSubmitting) => {
+  return Object.keys(settings).reduce((acc, setting) => {
+    const settingKey = `${key}NotificationSetting${setting.charAt(0).toUpperCase() + setting.slice(1)}`;
+    acc[settingKey] = isSubmitting ? { BOOL: settings[setting] || false } : true;
+    return acc;
+  }, {});
+};
+
 const NotificationSettings = Form.create()(({ form, settings: { key, ...settings } }) => {
   const { drizzle } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
@@ -38,11 +46,7 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
           fullName: true,
           phone: true,
           pushNotifications: true,
-          ...Object.keys(settings).reduce((acc, setting) => {
-            const settingKey = `${key}NotificationSetting${setting.charAt(0).toUpperCase() + setting.slice(1)}`;
-            acc[settingKey] = true;
-            return acc;
-          }, {}),
+          ...configureNotificationSettings(settings, key, false),
         },
       }),
     { errorRetryCount: 0, revalidateOnFocus: false }
@@ -79,13 +83,7 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
                             pushNotificationsData: {
                               S: pushNotificationsData ? JSON.stringify(pushNotificationsData) : " ",
                             },
-                            ...Object.keys(rest).reduce((acc, setting) => {
-                              const settingKey = `${key}NotificationSetting${setting
-                                .charAt(0)
-                                .toUpperCase()}${setting.slice(1)}`;
-                              acc[settingKey] = { BOOL: rest[setting] || false };
-                              return acc;
-                            }, {}),
+                            ...configureNotificationSettings(rest, key, true),
                           },
                         })
                       );

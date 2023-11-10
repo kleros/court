@@ -124,7 +124,7 @@ const VoteOptions = ({ metaEvidence, votesData, complexRuling, setComplexRuling,
   return (
     <StyledButtonsDiv>
       {inputComponent}
-      {!isSingleSelect && (
+      {isSingleSelect ? null : (
         <StyledButton disabled={!votesData.canVote || !complexRuling} onClick={onVoteClick} size="large" type="primary">
           Submit
         </StyledButton>
