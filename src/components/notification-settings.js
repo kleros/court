@@ -19,12 +19,42 @@ const StyledMail = styled(Mail)`
   min-width: 16px;
 `;
 
-const configureNotificationSettings = (settings, key, isSubmitting) => {
+const configureRestOfSettings = (settings, key, isSubmitting) => {
   return Object.keys(settings).reduce((acc, setting) => {
     const settingKey = `${key}NotificationSetting${setting.charAt(0).toUpperCase() + setting.slice(1)}`;
     acc[settingKey] = isSubmitting ? { BOOL: settings[setting] || false } : true;
     return acc;
   }, {});
+};
+
+const prepareSettings = (
+  dynamicSettings,
+  key,
+  isSubmitting,
+  email,
+  fullName,
+  phone,
+  pushNotifications,
+  pushNotificationsData
+) => {
+  return isSubmitting
+    ? {
+        email: { S: email },
+        fullName: { S: fullName },
+        phone: { S: phone || " " },
+        pushNotifications: { BOOL: pushNotifications || false },
+        pushNotificationsData: {
+          S: pushNotificationsData ? JSON.stringify(pushNotificationsData) : " ",
+        },
+        ...configureRestOfSettings(dynamicSettings, key, true),
+      }
+    : {
+        email: true,
+        fullName: true,
+        phone: true,
+        pushNotifications: true,
+        ...configureRestOfSettings(dynamicSettings, key, false),
+      };
 };
 
 const NotificationSettings = Form.create()(({ form, settings: { key, ...settings } }) => {
@@ -41,13 +71,7 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
       await accessSettings({
         web3: drizzle.web3,
         address,
-        settings: {
-          email: true,
-          fullName: true,
-          phone: true,
-          pushNotifications: true,
-          ...configureNotificationSettings(settings, key, false),
-        },
+        settings: prepareSettings(settings, key, false),
       }),
     { errorRetryCount: 0, revalidateOnFocus: false }
   );
@@ -75,16 +99,16 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
                           patch: true,
                           web3: drizzle.web3,
                           address: drizzleState.account,
-                          settings: {
-                            email: { S: email },
-                            fullName: { S: fullName },
-                            phone: { S: phone || " " },
-                            pushNotifications: { BOOL: pushNotifications || false },
-                            pushNotificationsData: {
-                              S: pushNotificationsData ? JSON.stringify(pushNotificationsData) : " ",
-                            },
-                            ...configureNotificationSettings(rest, key, true),
-                          },
+                          settings: prepareSettings(
+                            rest,
+                            key,
+                            true,
+                            email,
+                            fullName,
+                            phone,
+                            pushNotifications,
+                            pushNotificationsData
+                          ),
                         })
                       );
                     } catch (err) {
