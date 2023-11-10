@@ -43,7 +43,7 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
       return justs.reduce(
         (acc, j) => {
           const vote = call("KlerosLiquid", "getVote", ID, i, j.voteID);
-          if (vote && vote.voted) acc[acc.length > vote.choice ? vote.choice : acc.length - 1].push(j.justification);
+          if (vote?.voted) acc[acc.length > vote.choice ? vote.choice : acc.length - 1].push(j.justification);
           return acc;
         },
         [...new Array(2 + (metaEvidence.rulingOptions?.titles?.length || 0))].map(() => [])

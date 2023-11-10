@@ -7,12 +7,7 @@ import { displaySubgraph } from "./subgraph";
 
 const getURIProtocol = (uri) => {
   const uriParts = uri.replace(":", "").split("/");
-  switch (uri.substr(0, 1)) {
-    case "/":
-      return uriParts[1];
-    default:
-      return uriParts[0];
-  }
+  return uri.startsWith("/") ? uriParts[1] : uriParts[0];
 };
 
 const getHttpUri = (uri) => {
@@ -169,13 +164,18 @@ const funcs = {
     }
   },
   async loadPolicy(URI) {
-    URI = `https://ipfs.kleros.io${URI.startsWith("/ipfs/") ? URI : `/ipfs/${URI}`}`;
+    if (!URI) {
+      console.error("No URI provided");
+      return;
+    }
+    const prefix = URI.startsWith("/ipfs/") ? "" : "/ipfs/";
+    const policyURL = `https://ipfs.kleros.io${prefix}${URI}`;
 
     try {
-      const res = await axios.get(URI);
+      const res = await axios.get(policyURL);
 
       if (res.status !== 200)
-        throw new Error(`HTTP Error: Unable to fetch file at ${URI}. Returned status code ${res.status}`);
+        throw new Error(`HTTP Error: Unable to fetch file at ${policyURL}. Returned status code ${res.status}`);
 
       return res.data;
     } catch {
