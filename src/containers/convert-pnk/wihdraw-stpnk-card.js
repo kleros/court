@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components/macro";
+import styled from "styled-components";
 import Web3 from "web3";
 import { useSideChainApi } from "../../api/side-chain";
 import { Card, Button, Form, InputNumber } from "antd";

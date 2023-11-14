@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components/macro";
+import styled from "styled-components";
 import { Link, useHistory, useLocation } from "react-router-dom";
 import { Card, Divider } from "antd";
 import { ButtonLink } from "../../adapters/antd";
