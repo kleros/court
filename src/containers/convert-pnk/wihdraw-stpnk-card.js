@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import Web3 from "web3";
 import { useSideChainApi } from "../../api/side-chain";
-import { Card, Button, Form, InputNumber } from "antd";
+import { Card, Button, Form, Input } from "antd";
 import stPNKAbi from "../../assets/contracts/wrapped-pinakion.json";
 import TokenSymbol from "../../components/token-symbol";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
@@ -112,13 +112,13 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
   const { validateFieldsAndScroll, getFieldDecorator, setFieldsValue, getFieldsError } = form;
-  const maxAvailableNumeric = Number(fromWei(maxAvailable ?? "0"));
 
   const amountDecorator = getFieldDecorator("amount", {
     rules: [
       { required: true, message: "Amount is required." },
       async function validateBalance(_, value) {
-        if (value > maxAvailableNumeric) {
+        if (isNaN(value)) throw new Error("Must be a number.");
+        if (toBN(toWei(value)).gt(maxAvailable ?? toBN("0"))) {
           throw new Error("Not enough available tokens.");
         }
       },
@@ -126,8 +126,8 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
   });
 
   const handleUseMaxClick = React.useCallback(() => {
-    setFieldsValue({ amount: maxAvailableNumeric });
-  }, [setFieldsValue, maxAvailableNumeric]);
+    setFieldsValue({ amount: fromWei(maxAvailable) });
+  }, [setFieldsValue, maxAvailable]);
 
   const handleSubmit = React.useCallback(
     async (evt) => {
@@ -140,7 +140,7 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
         const stPNKaddress = chainId === 100 && process.env.REACT_APP_PINAKION_XDAI_ADDRESS;
         if (stPNKaddress) {
           const stPNK = new drizzle.web3.eth.Contract(stPNKAbi.abi, stPNKaddress);
-          const amountInWei = toWei(String(values.amount));
+          const amountInWei = toBN(toWei(values.amount));
           try {
             await stPNK.methods.withdraw(amountInWei).send({ from: account });
           } catch (_) {
@@ -166,7 +166,7 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
             }
           >
             {amountDecorator(
-              <InputNumber placeholder="Amount to convert" min={0} max={maxAvailableNumeric} size="large" />
+              <Input placeholder="Amount to convert" size="large" />
             )}
           </StyledFormItem>
 
