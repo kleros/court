@@ -111,8 +111,18 @@ const StyledHeaderText = styled.div`
   top: -2px;
 `;
 const TimeoutDiv = styled.div`
-  color: #f60c36;
+  color: ${({ isVoteCommitted }) => (isVoteCommitted ? "#52c41a" : "#f60c36")};
 `;
+
+const TimeoutDivIsCommited = styled.div`
+  display: flex;
+  flex-direction: row;
+
+  @media (max-width: 460px) {
+    flex-direction: column;
+  }
+`;
+
 const TimeoutText = styled.div`
   font-size: 14px;
   font-weight: 500;
@@ -132,20 +142,39 @@ const StakeLocked = styled.div`
   text-align: right;
 `;
 
-const PeriodCard = ({ period, deadline, hiddenVotes }) => {
-  const phases = ["Evidence Submission", "Commit Deadline", "Voting Deadline", "Appeal Deadline", "Execute Deadline"];
-  const periodText = Number(period) === 2 && hiddenVotes ? "Reveal Deadline" : phases[period];
+const phases = ["Evidence Submission", "Commit Deadline", "Voting Deadline", "Appeal Deadline", "Execute Deadline"];
+
+const PeriodCard = ({ period, deadline, hiddenVotes, isVoteCommitted }) => {
+  const showCommited = useMemo(() => Number(period) === 1 && isVoteCommitted, [period, isVoteCommitted]);
+  const periodText = useMemo(() => {
+    const showRevealDeadline = Number(period) === 2 && hiddenVotes;
+
+    if (showRevealDeadline) {
+      return "Reveal Deadline";
+    } else if (showCommited) {
+      return "Committed ✅";
+    } else {
+      return phases[period];
+    }
+  }, [showCommited, period, hiddenVotes]);
+
   return (
-    <TimeoutDiv key="timeout">
+    <TimeoutDiv isVoteCommitted={isVoteCommitted} key="timeout">
       <TimeoutText>{periodText}</TimeoutText>
       <TimeoutTime>
-        <TimeAgo>{deadline}</TimeAgo>
+        {showCommited ? (
+          <TimeoutDivIsCommited>
+            Reveal&nbsp;<TimeAgo>{deadline}</TimeAgo>
+          </TimeoutDivIsCommited>
+        ) : (
+          <TimeAgo>{deadline}</TimeAgo>
+        )}
       </TimeoutTime>
     </TimeoutDiv>
   );
 };
 
-const CaseCard = ({ ID, draws }) => {
+const CaseCard = ({ ID, draws, isVoteCommitted }) => {
   const chainId = useChainId();
   const { drizzle, useCacheCall } = useDrizzle();
   const getMetaEvidence = useDataloader.getMetaEvidence();
@@ -199,13 +228,18 @@ const CaseCard = ({ ID, draws }) => {
       actions={useMemo(
         () => [
           disputeData.deadline && (
-            <PeriodCard period={dispute.period} deadline={disputeData.deadline} hiddenVotes={disputeData.hiddenVotes} />
+            <PeriodCard
+              period={dispute.period}
+              deadline={disputeData.deadline}
+              hiddenVotes={disputeData.hiddenVotes}
+              isVoteCommitted={isVoteCommitted}
+            />
           ),
           <Link key="details" to={`/cases/${ID}`}>
             <Button type="primary">See Details</Button>
           </Link>,
         ],
-        [disputeData.deadline, dispute.period, disputeData.hiddenVotes, ID]
+        [disputeData.deadline, dispute.period, disputeData.hiddenVotes, ID, isVoteCommitted]
       )}
       extra={<StyledHeaderText>Case #{ID}</StyledHeaderText>}
       hoverable
@@ -251,11 +285,13 @@ PeriodCard.propTypes = {
   period: PropTypes.number.isRequired,
   deadline: PropTypes.number.isRequired,
   hiddenVotes: PropTypes.bool.isRequired,
+  isVoteCommitted: PropTypes.bool,
 };
 
 CaseCard.propTypes = {
   ID: PropTypes.string.isRequired,
   draws: PropTypes.array,
+  isVoteCommitted: PropTypes.bool,
 };
 
 export default CaseCard;

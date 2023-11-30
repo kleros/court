@@ -29,31 +29,51 @@ export default function Cases() {
         ).reduce(
           (acc, d) => {
             const dispute = call("KlerosLiquid", "disputes", d.disputeID);
+            if (!dispute) {
+              acc.loading = true;
+              return acc;
+            }
+
             const numberOfVotes = draws.filter((_draw) => _draw.disputeID === d.disputeID);
-            if (dispute)
-              if (dispute.period === "1" || dispute.period === "2") {
-                const dispute2 = call("KlerosLiquid", "getDispute", d.disputeID);
-                if (dispute2)
-                  if (Number(d.appeal) === dispute2.votesLengths.length - 1) {
-                    const vote = call("KlerosLiquid", "getVote", d.disputeID, d.appeal, d.voteID);
-                    if (vote)
-                      acc[vote.voted ? "active" : "votePending"].push({
-                        ID: d.disputeID,
-                        draws: numberOfVotes,
-                      });
-                    else acc.loading = true;
-                  } else
-                    acc.active.push({
-                      ID: d.disputeID,
-                      draws: numberOfVotes,
-                    });
-                else acc.loading = true;
-              } else
-                acc[dispute.period === "4" ? "executed" : "active"].push({
-                  ID: d.disputeID,
-                  draws: numberOfVotes,
-                });
-            else acc.loading = true;
+            const dispute2 = call("KlerosLiquid", "getDispute", d.disputeID);
+
+            if (!dispute2) {
+              return acc;
+            }
+
+            if (Number(d.appeal) !== dispute2.votesLengths.length - 1) {
+              acc.active.push({
+                ID: d.disputeID,
+                draws: numberOfVotes,
+                status: 1,
+              });
+              return acc;
+            }
+
+            if (dispute.period === "1") {
+              const vote = call("KlerosLiquid", "getVote", d.disputeID, d.appeal, d.voteID);
+              const isVoteCommitted =
+                vote?.commit !== "0x0000000000000000000000000000000000000000000000000000000000000000";
+              acc[vote?.voted ? "active" : "votePending"].push({
+                ID: d.disputeID,
+                draws: numberOfVotes,
+                status: !isVoteCommitted ? 0 : 1,
+                isVoteCommitted: isVoteCommitted,
+              });
+            } else if (dispute.period === "2") {
+              const vote = call("KlerosLiquid", "getVote", d.disputeID, d.appeal, d.voteID);
+              acc[vote?.voted ? "active" : "votePending"].push({
+                ID: d.disputeID,
+                draws: numberOfVotes,
+                status: !vote?.voted ? 0 : 1,
+              });
+            } else {
+              acc[dispute.period === "4" ? "executed" : "active"].push({
+                ID: d.disputeID,
+                draws: numberOfVotes,
+              });
+            }
+
             return acc;
           },
           { active: [], executed: [], loading: false, votePending: [] }
@@ -62,6 +82,7 @@ export default function Cases() {
   );
 
   const filteredDisputes = disputes[["votePending", "active", "executed"][filter]];
+  const sortedDisputes = [...filteredDisputes].sort((a, b) => a.status - b.status);
 
   return (
     <>
@@ -84,12 +105,12 @@ export default function Cases() {
       <Divider />
       <Spin spinning={disputes.loading}>
         <Row gutter={48}>
-          {filteredDisputes.length === 0 ? (
+          {sortedDisputes.length === 0 ? (
             <StyledCol>You don&rsquo;t have any {["pending", "active", "closed"][filter]} cases.</StyledCol>
           ) : (
-            filteredDisputes.map((dispute) => (
+            sortedDisputes.map((dispute) => (
               <Col key={dispute.ID} md={12} xl={8}>
-                <CaseCard ID={dispute.ID} draws={dispute.draws} />
+                <CaseCard ID={dispute.ID} draws={dispute.draws} isVoteCommitted={dispute.isVoteCommitted} />
               </Col>
             ))
           )}
