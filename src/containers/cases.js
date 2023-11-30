@@ -54,7 +54,7 @@ export default function Cases() {
               const vote = call("KlerosLiquid", "getVote", d.disputeID, d.appeal, d.voteID);
               const isVoteCommitted =
                 vote?.commit !== "0x0000000000000000000000000000000000000000000000000000000000000000";
-              acc[vote && vote.voted ? "active" : "votePending"].push({
+              acc[vote?.voted ? "active" : "votePending"].push({
                 ID: d.disputeID,
                 draws: numberOfVotes,
                 status: !isVoteCommitted ? 0 : 1,
@@ -62,10 +62,10 @@ export default function Cases() {
               });
             } else if (dispute.period === "2") {
               const vote = call("KlerosLiquid", "getVote", d.disputeID, d.appeal, d.voteID);
-              acc[vote && vote.voted ? "active" : "votePending"].push({
+              acc[vote?.voted ? "active" : "votePending"].push({
                 ID: d.disputeID,
                 draws: numberOfVotes,
-                status: !vote || !vote.voted ? 0 : 1,
+                status: !vote?.voted ? 0 : 1,
               });
             } else {
               acc[dispute.period === "4" ? "executed" : "active"].push({
