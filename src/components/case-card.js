@@ -145,14 +145,18 @@ const StakeLocked = styled.div`
 const phases = ["Evidence Submission", "Commit Deadline", "Voting Deadline", "Appeal Deadline", "Execute Deadline"];
 
 const PeriodCard = ({ period, deadline, hiddenVotes, isVoteCommitted }) => {
-  let periodText = phases[period];
-  const showCommited = Number(period) === 1 && isVoteCommitted;
+  const showCommited = useMemo(() => Number(period) === 1 && isVoteCommitted, [period, isVoteCommitted]);
+  const periodText = useMemo(() => {
+    const showRevealDeadline = Number(period) === 2 && hiddenVotes;
 
-  if (Number(period) === 2 && hiddenVotes) {
-    periodText = "Reveal Deadline";
-  } else if (showCommited) {
-    periodText = "Committed ✅";
-  }
+    if (showRevealDeadline) {
+      return "Reveal Deadline";
+    } else if (showCommited) {
+      return "Committed ✅";
+    } else {
+      return phases[period];
+    }
+  }, [showCommited, period, hiddenVotes]);
 
   return (
     <TimeoutDiv isVoteCommitted={isVoteCommitted} key="timeout">
