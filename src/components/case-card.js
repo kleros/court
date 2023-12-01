@@ -117,6 +117,7 @@ const TimeoutDiv = styled.div`
 const TimeoutDivIsCommited = styled.div`
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
 
   @media (max-width: 460px) {
     flex-direction: column;
