@@ -52,8 +52,7 @@ export default function Cases() {
 
             if (dispute.period === "1") {
               const vote = call("KlerosLiquid", "getVote", d.disputeID, d.appeal, d.voteID);
-              const isVoteCommitted =
-                vote?.commit !== "0x0000000000000000000000000000000000000000000000000000000000000000";
+              const isVoteCommitted = parseInt(vote?.commit, 16) !== 0;
               acc[vote?.voted ? "active" : "votePending"].push({
                 ID: d.disputeID,
                 draws: numberOfVotes,
