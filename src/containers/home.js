@@ -13,7 +13,6 @@ import PerformanceCard from "../components/performance-card";
 import RewardCard from "../components/reward-card";
 import ClaimModal from "../components/claim-modal";
 import TopBanner from "../components/top-banner";
-import TokenSymbol from "../components/token-symbol";
 import RequiredChainIdGateway from "../components/required-chain-id-gateway";
 import RequiredChainIdModal from "../components/required-chain-id-modal";
 import SideChainPnkActions from "../components/side-chain/pnk-actions";
@@ -90,9 +89,7 @@ export default function Home() {
               type="primary"
             >
               <Present style={{ marginRight: "8px", verticalAlign: "text-top" }} />
-              <span>
-                Claim <TokenSymbol token="PNK" />
-              </span>
+              <span>Claim PNK</span>
             </StyledClaimButton>
             <Link
               to="/tokens"

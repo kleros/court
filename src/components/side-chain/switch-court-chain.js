@@ -25,7 +25,7 @@ import { chainIdToNetworkName, chainIdToNetworkShortName } from "../../helpers/n
 import { useSetRequiredChainId } from "../required-chain-id-gateway";
 import AnnouncementBanner from "./announcement-banner";
 import MultiBalance from "../multi-balance";
-import TokenSymbol from "../token-symbol";
+import { getTokenSymbol } from "../token-symbol";
 
 const { useDrizzle } = drizzleReactHooks;
 
@@ -64,7 +64,7 @@ export default function SwitchCourtChain() {
         <StyledButtonWrapper>
           <Link component={StyledButtonLink} to="/convert-pnk" icon="swap">
             <span>
-              Send <TokenSymbol chainId={chainId} token="PNK" /> to {chainIdToNetworkShortName[destinationChainId]}
+              Send {getTokenSymbol(chainId, "PNK")} to {chainIdToNetworkShortName[destinationChainId]}
             </span>
           </Link>
           <CustomButton
@@ -264,7 +264,7 @@ function GetSideChainPnkLink({ icon, as, ...additionalProps }) {
   return (
     <Component href={bridgeAppUrl} target="_blank" rel="noreferrer noopener" {...additionalProps}>
       <span>
-        Get <TokenSymbol chainId={destinationChainId} token="xPNK" /> for {chainIdToNetworkName[destinationChainId]}
+        Get {getTokenSymbol(destinationChainId, "xPNK")} for {chainIdToNetworkName[destinationChainId]}
       </span>
       {icon}
     </Component>
@@ -380,7 +380,7 @@ function SideChainCourtModal({ balance, rawBalance, errors, trigger }) {
         <StyledSpacer style={{ "--size": "2rem" }} />
         <StyledExplainer>
           To be able to stake on Kleros Court on {chainIdToNetworkName[destinationChainId]}, first you need to get some{" "}
-          <TokenSymbol chainId={destinationChainId} token="xPNK" /> for that chain.
+          {getTokenSymbol(destinationChainId, "xPNK")} for that chain.
         </StyledExplainer>
       </StyledModal>
     </>

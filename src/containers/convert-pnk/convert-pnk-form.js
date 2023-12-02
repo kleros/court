@@ -7,11 +7,14 @@ import Web3 from "web3";
 import { useSideChainApi } from "../../api/side-chain";
 import BalanceTable from "../../components/balance-table";
 import MultiTransactionStatus from "../../components/multi-transaction-status";
-import TokenSymbol, { AutoDetectedTokenSymbol } from "../../components/token-symbol";
+import { getTokenSymbol } from "../../components/token-symbol";
 import { chainIdToNetworkShortName } from "../../helpers/networks";
 import useAccount from "../../hooks/use-account";
 import { useAsyncGenerator } from "../../hooks/use-generators";
 import usePromise from "../../hooks/use-promise";
+import { drizzleReactHooks } from "@drizzle/react-plugin";
+
+const { useDrizzleState } = drizzleReactHooks;
 
 const { fromWei, toWei, toBN } = Web3.utils;
 
@@ -97,7 +100,8 @@ function useWithdrawTokens(withdrawTokens) {
 }
 
 function PnkBalanceTable({ balance, locked, pendingStake, staked, available, error }) {
-  const tokenSymbol = <AutoDetectedTokenSymbol token="PNK" />;
+  const chainId = useDrizzleState((ds) => ds.web3.networkId);
+  const tokenSymbol = getTokenSymbol(chainId, "PNK");
 
   return (
     <>
@@ -266,7 +270,7 @@ const ConvertPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, disabl
               hasFeedback
               label={
                 <StyledCompositeLabel>
-                  <TokenSymbol chainId={chainId} token="PNK" />
+                  {getTokenSymbol(chainId, "PNK")}
                   <StyledButtonLink onClick={handleUseMaxClick}>use max.</StyledButtonLink>
                 </StyledCompositeLabel>
               }
@@ -286,7 +290,7 @@ const ConvertPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, disabl
             <Icon type="right-circle" theme="filled" />
           </StyledSeparatorCol>
           <StyledFieldCol>
-            <StyledFormItem hasFeedback label={<TokenSymbol chainId={destinationChainId} token="PNK" />}>
+            <StyledFormItem hasFeedback label={getTokenSymbol(destinationChainId, "PNK")}>
               {destinationDecorator(
                 <InputNumber
                   placeholder="Amount to receive"

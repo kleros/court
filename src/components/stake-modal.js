@@ -8,7 +8,7 @@ import infoImg from "../assets/images/info.png";
 import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import useAccount from "../hooks/use-account";
 import useChainId from "../hooks/use-chain-id";
-import { AutoDetectedTokenSymbol } from "./token-symbol";
+import { getTokenSymbol } from "./token-symbol";
 import ETHAmount from "./eth-amount";
 import { isSupportedSideChain } from "../api/side-chain";
 import SideChainPnkActions from "./side-chain/pnk-actions";
@@ -47,6 +47,7 @@ StakeModal.propTypes = {
 const RECOMMENDED_UNSTAKED_BUFFER = toBN("2000000000000000000000");
 
 const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max }) => {
+  const chainId = useDrizzleState((ds) => ds.web3.networkId);
   const { useCacheCall, useCacheSend } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
@@ -68,6 +69,7 @@ const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max })
   const selectedStakeValue = Number.parseInt(String(form.getFieldValue("PNK")));
   const selectedStake = toBN(toWei(String(Number.isNaN(selectedStakeValue) ? 0 : selectedStakeValue)));
   const shouldShowMaxStakeAlert = selectedStake.gt(maxRecommendedStake) && selectedStake.lte(max);
+  const PNKTokenSymbol = getTokenSymbol(chainId, "PNK");
 
   const loading = !min || !max;
   const { send, status } = useCacheSend("KlerosLiquid", "setStake");
@@ -102,7 +104,7 @@ const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max })
       )}
       title={
         <>
-          Stake <AutoDetectedTokenSymbol token="PNK" /> in {name || "-"}
+          Stake {PNKTokenSymbol} in {name || "-"}
         </>
       }
       visible
@@ -115,8 +117,7 @@ const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max })
             <ETHAmount amount={max} tokenSymbol="PNK" />
           </StyledAmountDiv>
           <div>
-            (<AutoDetectedTokenSymbol token="PNK" /> in your wallet - <AutoDetectedTokenSymbol token="PNK" /> already
-            staked)
+            ({PNKTokenSymbol} in your wallet - {PNKTokenSymbol} already staked)
           </div>
         </AvailableStake>
       </StyledRow>
@@ -151,7 +152,7 @@ const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max })
                   </div>
                 }
                 hasFeedback
-                label={<AutoDetectedTokenSymbol token="PNK" />}
+                label={PNKTokenSymbol}
               >
                 {form.getFieldDecorator("PNK", {
                   initialValue: fromWei(String(maxRecommendedStake)),

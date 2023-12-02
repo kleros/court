@@ -3,11 +3,22 @@ import t from "prop-types";
 import { Skeleton } from "antd";
 import styled from "styled-components/macro";
 import Web3 from "web3";
-import { AutoDetectedTokenSymbol } from "./token-symbol";
+import { getTokenSymbol } from "./token-symbol";
+import { drizzleReactHooks } from "@drizzle/react-plugin";
 
+const { useDrizzleState } = drizzleReactHooks;
 const { fromWei } = Web3.utils;
 
 export default function ETHAmount({ amount, decimals, tokenSymbol }) {
+  const chainId = useDrizzleState((ds) => ds.web3.networkId);
+
+  let finalDecimals = decimals;
+  const chainTokenSymbol = getTokenSymbol(chainId);
+
+  if (chainTokenSymbol === "xDAI" && tokenSymbol !== "PNK") {
+    finalDecimals = 2;
+  }
+
   if (amount === null) {
     return <StyledSkeleton active paragraph={false} title={SkeletonTitleProps} />;
   }
@@ -15,11 +26,14 @@ export default function ETHAmount({ amount, decimals, tokenSymbol }) {
   const numericValue = Number(
     fromWei(typeof amount === "number" ? formatNumber(amount, { decimals: 0 }) : String(amount))
   );
-  const value = formatNumber(decimals === 0 ? Math.trunc(numericValue) : numericValue, { decimals, useGrouping: true });
+  const value = formatNumber(finalDecimals === 0 ? Math.trunc(numericValue) : numericValue, {
+    decimals: finalDecimals,
+    useGrouping: true,
+  });
 
   return tokenSymbol === true ? (
     <>
-      {value} <AutoDetectedTokenSymbol />
+      {value} {getTokenSymbol(chainId)}
     </>
   ) : tokenSymbol === false ? (
     value
@@ -29,7 +43,7 @@ export default function ETHAmount({ amount, decimals, tokenSymbol }) {
     </>
   ) : (
     <>
-      {value} <AutoDetectedTokenSymbol token={tokenSymbol} />
+      {value} {getTokenSymbol(chainId, tokenSymbol)}
     </>
   );
 }

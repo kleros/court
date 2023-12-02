@@ -4,7 +4,7 @@ import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { Divider, Spin } from "antd";
 import { getCounterPartyChainId, isSupportedMainChain, SideChainApiProvider } from "../../api/side-chain";
 import { getReadOnlyWeb3 } from "../../bootstrap/web3";
-import TokenSymbol from "../../components/token-symbol";
+import { getTokenSymbol } from "../../components/token-symbol";
 import TopBanner from "../../components/top-banner";
 import { chainIdToNetworkName } from "../../helpers/networks";
 import useChainId from "../../hooks/use-chain-id";
@@ -65,8 +65,8 @@ function ConvertPnk() {
         title="Convert to PNK"
         description={
           <>
-            Send your <TokenSymbol chainId={originChainId} token="PNK" /> to get{" "}
-            <TokenSymbol chainId={targetChainId} token="PNK" /> back on {chainIdToNetworkName[targetChainId]}
+            Send your {getTokenSymbol(originChainId, "PNK")} to get {getTokenSymbol(targetChainId, "PNK")} back on{" "}
+            {chainIdToNetworkName[targetChainId]}
           </>
         }
       />

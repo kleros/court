@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Link, useHistory, useLocation } from "react-router-dom";
 import { Card, Divider } from "antd";
 import { ButtonLink } from "../../adapters/antd";
-import TokenSymbol from "../../components/token-symbol";
+import { getTokenSymbol } from "../../components/token-symbol";
 import SteppedContent from "../../components/stepped-content";
 import { getCounterPartyChainId, isSupportedMainChain, isSupportedSideChain } from "../../api/side-chain";
 import { chainIdToNetworkShortName } from "../../helpers/networks";
@@ -19,6 +19,9 @@ export default function ConvertPnkCard() {
 
   const originChainId = isSupportedMainChain(counterPartyChainId) ? currentChainId : counterPartyChainId;
   const targetChainId = isSupportedMainChain(counterPartyChainId) ? counterPartyChainId : currentChainId;
+
+  const tokenSymbolOriginChainId = getTokenSymbol(originChainId, "PNK");
+  const tokenSymbolTargetChainId = getTokenSymbol(targetChainId, "PNK");
 
   const { step, next, first } = useStep();
 
@@ -42,7 +45,7 @@ export default function ConvertPnkCard() {
     <StyledCard
       title={
         <>
-          Send <TokenSymbol chainId={originChainId} token="PNK" /> to {chainIdToNetworkShortName[targetChainId]}
+          Send {tokenSymbolOriginChainId} to {chainIdToNetworkShortName[targetChainId]}
         </>
       }
     >
@@ -51,8 +54,8 @@ export default function ConvertPnkCard() {
           margin-top: -1rem;
         `}
       >
-        Keep in mind that <TokenSymbol chainId={originChainId} token="PNK" /> that are staked or locked cannot be sent
-        to {chainIdToNetworkShortName[targetChainId]}. To just get xPNK, use the form below.
+        Keep in mind that {tokenSymbolOriginChainId} that are staked or locked cannot be sent to{" "}
+        {chainIdToNetworkShortName[targetChainId]}. To just get xPNK, use the form below.
       </StyledExplainerText>
       <StyledDivider />
       <SteppedContent
@@ -68,8 +71,7 @@ export default function ConvertPnkCard() {
               <span role="img" aria-label="Party popper emoji">
                 🎉
               </span>{" "}
-              You have successfully sent your <TokenSymbol chainId={originChainId} token="PNK" /> to{" "}
-              {chainIdToNetworkShortName[targetChainId]}!{" "}
+              You have successfully sent your {tokenSymbolOriginChainId} to {chainIdToNetworkShortName[targetChainId]}!{" "}
               <span role="img" aria-label="Party popper emoji">
                 🎉
               </span>
@@ -81,11 +83,7 @@ export default function ConvertPnkCard() {
         )}
         steps={[
           {
-            title: (
-              <>
-                Convert <TokenSymbol chainId={originChainId} token="PNK" />
-              </>
-            ),
+            title: <>Convert {tokenSymbolOriginChainId}</>,
             children() {
               return isSupportedSideChain(currentChainId) ? (
                 <ConvertPnkForm onDone={handleFormDone} />
@@ -101,11 +99,7 @@ export default function ConvertPnkCard() {
             },
           },
           {
-            title: (
-              <>
-                Claim <TokenSymbol chainId={targetChainId} token="PNK" />
-              </>
-            ),
+            title: <>Claim {tokenSymbolTargetChainId}</>,
             children() {
               return <ClaimTokensButton onDone={next} />;
             },

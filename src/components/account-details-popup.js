@@ -7,12 +7,13 @@ import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import ETHAddress from "./eth-address";
 import ETHAmount from "./eth-amount";
 import Identicon from "./identicon";
-import { AutoDetectedTokenSymbol } from "./token-symbol";
+import { getTokenSymbol } from "./token-symbol";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
 export default function AccountDetailsPopup({ trigger, pinakion, className }) {
   const { useCacheCall } = useDrizzle();
+  const chainId = useDrizzleState((ds) => ds.web3.networkId);
 
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
@@ -51,11 +52,7 @@ export default function AccountDetailsPopup({ trigger, pinakion, className }) {
                 <List.Item>
                   <List.Item.Meta
                     description={<ETHAmount amount={PNK} tokenSymbol="PNK" />}
-                    title={
-                      <>
-                        <AutoDetectedTokenSymbol token="PNK" /> Balance
-                      </>
-                    }
+                    title={<>{getTokenSymbol(chainId, "PNK")} Balance</>}
                   />
                 </List.Item>
               </Spin>
