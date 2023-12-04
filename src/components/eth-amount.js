@@ -15,7 +15,7 @@ export default function ETHAmount({ amount, decimals, tokenSymbol }) {
   let finalDecimals = decimals;
   const chainTokenSymbol = getTokenSymbol(chainId);
 
-  if (chainTokenSymbol === "xDAI" && tokenSymbol !== "PNK") {
+  if (chainTokenSymbol === "xDAI" && tokenSymbol === true) {
     finalDecimals = 2;
   }
 
