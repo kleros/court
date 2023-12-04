@@ -700,7 +700,8 @@ export default function CaseDetailsCard({ ID }) {
             <CollapsableCard
               title={
                 <>
-                  <Folder /> {`Evidence (${evidence ? evidence.length : 0})`}
+                  <Folder /> Evidence
+                  <strong> {`(${evidence ? evidence.length : 0})`}</strong>
                 </>
               }
             >
@@ -719,6 +720,7 @@ export default function CaseDetailsCard({ ID }) {
                   title={
                     <>
                       <Scales /> Dispute History
+                      <strong> {`(Current Round: ${disputeExtraInfo?.votesLengths?.length})`}</strong>
                     </>
                   }
                 >
