@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useMemo } from "react";
 import styled from "styled-components";
 import Web3 from "web3";
 import { useSideChainApi } from "../../api/side-chain";
 import { Card, Button, Form, Input } from "antd";
 import stPNKAbi from "../../assets/contracts/wrapped-pinakion.json";
-import TokenSymbol from "../../components/token-symbol";
+import { getTokenSymbol } from "../../helpers/get-token-symbol";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../../bootstrap/dataloader";
 import usePromise from "../../hooks/use-promise";
@@ -112,6 +112,7 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
   const { validateFieldsAndScroll, getFieldDecorator, setFieldsValue, getFieldsError } = form;
+  const pnkTokenSymbol = useMemo(() => getTokenSymbol(chainId, "PNK"), [chainId]);
 
   const amountDecorator = getFieldDecorator("amount", {
     rules: [
@@ -149,7 +150,7 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
         }
       });
     },
-    [validateFieldsAndScroll, account, drizzle.web3.eth.Contract]
+    [validateFieldsAndScroll, account, drizzle.web3.eth.Contract, chainId]
   );
 
   return (
@@ -160,14 +161,12 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
             hasFeedback
             label={
               <StyledCompositeLabel>
-                <TokenSymbol chainId={chainId} token="PNK" />
+                {pnkTokenSymbol}
                 <StyledButtonLink onClick={handleUseMaxClick}>use max.</StyledButtonLink>
               </StyledCompositeLabel>
             }
           >
-            {amountDecorator(
-              <Input placeholder="Amount to convert" size="large" />
-            )}
+            {amountDecorator(<Input placeholder="Amount to convert" size="large" />)}
           </StyledFormItem>
 
           <StyledButton

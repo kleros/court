@@ -8,7 +8,6 @@ import { ReactComponent as Kleros } from "../assets/images/kleros.svg";
 import { ReactComponent as RightArrow } from "../assets/images/right-arrow.svg";
 import useChainId from "../hooks/use-chain-id";
 import ETHAmount from "./eth-amount";
-import TokenSymbol from "./token-symbol";
 
 const chainIdToParams = {
   1: {
@@ -265,11 +264,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       }}
       centered
       keyboard
-      okText={
-        <>
-          Claim Your <TokenSymbol token="PNK" /> Tokens
-        </>
-      }
+      okText={<>Claim Your PNK Tokens</>}
       onOk={onOk}
       onCancel={handleCancel}
       visible={visible}
@@ -309,7 +304,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
             </span>
           </div>
           <div style={{ fontSize: "24px", fontWeight: "500", marginTop: "8px" }}>
-            As a Kleros Juror, you will earn <TokenSymbol token="PNK" /> for staking in Court.
+            As a Kleros Juror, you will earn PNK for staking in Court.
           </div>
 
           <div
@@ -325,9 +320,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <div>
-                Total Rewarded <TokenSymbol token="PNK" />:
-              </div>
+              <div>Total Rewarded PNK:</div>
               <div style={{ fontWeight: "500", textAlign: "right" }}>
                 <ETHAmount amount={claims && getTotalRewarded(claims)} decimals={0} tokenSymbol="PNK" />
               </div>
@@ -413,9 +406,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
           }
           disabled={!claims || Number(drizzle.web3.utils.fromWei(getTotalClaimable(claims))).toFixed(0) < 1}
         >
-          <span>
-            Claim Your <TokenSymbol token="PNK" /> Tokens
-          </span>
+          <span>Claim Your PNK Tokens</span>
         </Button>
       )}
     </Modal>

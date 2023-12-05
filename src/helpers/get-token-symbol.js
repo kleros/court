@@ -1,10 +1,6 @@
-import React from "react";
-import t from "prop-types";
-import { drizzleReactHooks } from "@drizzle/react-plugin";
+import t, { PropTypes } from "prop-types";
 
-const { useDrizzleState } = drizzleReactHooks;
-
-export default function TokenSymbol({ chainId, token }) {
+export function getTokenSymbol(chainId, token) {
   if (token) {
     return chainIdToTokenSuffix[chainId] && chainIdToTokenSuffix[chainId][token]
       ? chainIdToTokenSuffix[chainId][token]
@@ -15,17 +11,8 @@ export default function TokenSymbol({ chainId, token }) {
   return suffix;
 }
 
-TokenSymbol.propTypes = {
-  token: t.string,
-};
-
-export function AutoDetectedTokenSymbol({ token }) {
-  const chainId = useDrizzleState((ds) => ds.web3.networkId);
-
-  return <TokenSymbol chainId={chainId} token={token} />;
-}
-
-AutoDetectedTokenSymbol.propTypes = {
+getTokenSymbol.propTypes = {
+  chainId: PropTypes.number.isRequired,
   token: t.string,
 };
 
