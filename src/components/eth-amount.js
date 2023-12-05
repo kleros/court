@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useMemo } from "react";
 import t from "prop-types";
 import { Skeleton } from "antd";
 import styled from "styled-components/macro";
 import Web3 from "web3";
-import { getTokenSymbol } from "./token-symbol";
+import { getTokenSymbol } from "../helpers/get-token-symbol";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 
 const { useDrizzleState } = drizzleReactHooks;
@@ -13,7 +13,8 @@ export default function ETHAmount({ amount, decimals, tokenSymbol }) {
   const chainId = useDrizzleState((ds) => ds.web3.networkId);
 
   let finalDecimals = decimals;
-  const chainTokenSymbol = getTokenSymbol(chainId);
+  const chainTokenSymbol = useMemo(() => getTokenSymbol(chainId), [chainId]);
+  const calculatedTokenSymbol = useMemo(() => getTokenSymbol(chainId, tokenSymbol), [chainId, tokenSymbol]);
 
   if (chainTokenSymbol === "xDAI" && tokenSymbol === true) {
     finalDecimals = 2;
@@ -33,7 +34,7 @@ export default function ETHAmount({ amount, decimals, tokenSymbol }) {
 
   return tokenSymbol === true ? (
     <>
-      {value} {getTokenSymbol(chainId)}
+      {value} {chainTokenSymbol}
     </>
   ) : tokenSymbol === false ? (
     value
@@ -43,7 +44,7 @@ export default function ETHAmount({ amount, decimals, tokenSymbol }) {
     </>
   ) : (
     <>
-      {value} {getTokenSymbol(chainId, tokenSymbol)}
+      {value} {calculatedTokenSymbol}
     </>
   );
 }

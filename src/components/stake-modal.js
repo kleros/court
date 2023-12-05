@@ -8,7 +8,7 @@ import infoImg from "../assets/images/info.png";
 import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import useAccount from "../hooks/use-account";
 import useChainId from "../hooks/use-chain-id";
-import { getTokenSymbol } from "./token-symbol";
+import { getTokenSymbol } from "../helpers/get-token-symbol";
 import ETHAmount from "./eth-amount";
 import { isSupportedSideChain } from "../api/side-chain";
 import SideChainPnkActions from "./side-chain/pnk-actions";
@@ -69,7 +69,7 @@ const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max })
   const selectedStakeValue = Number.parseInt(String(form.getFieldValue("PNK")));
   const selectedStake = toBN(toWei(String(Number.isNaN(selectedStakeValue) ? 0 : selectedStakeValue)));
   const shouldShowMaxStakeAlert = selectedStake.gt(maxRecommendedStake) && selectedStake.lte(max);
-  const PNKTokenSymbol = getTokenSymbol(chainId, "PNK");
+  const pnkTokenSymbol = useMemo(() => getTokenSymbol(chainId, "PNK"), [chainId]);
 
   const loading = !min || !max;
   const { send, status } = useCacheSend("KlerosLiquid", "setStake");
@@ -104,7 +104,7 @@ const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max })
       )}
       title={
         <>
-          Stake {PNKTokenSymbol} in {name || "-"}
+          Stake {pnkTokenSymbol} in {name || "-"}
         </>
       }
       visible
@@ -117,7 +117,7 @@ const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max })
             <ETHAmount amount={max} tokenSymbol="PNK" />
           </StyledAmountDiv>
           <div>
-            ({PNKTokenSymbol} in your wallet - {PNKTokenSymbol} already staked)
+            ({pnkTokenSymbol} in your wallet - {pnkTokenSymbol} already staked)
           </div>
         </AvailableStake>
       </StyledRow>
@@ -152,7 +152,7 @@ const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max })
                   </div>
                 }
                 hasFeedback
-                label={PNKTokenSymbol}
+                label={pnkTokenSymbol}
               >
                 {form.getFieldDecorator("PNK", {
                   initialValue: fromWei(String(maxRecommendedStake)),

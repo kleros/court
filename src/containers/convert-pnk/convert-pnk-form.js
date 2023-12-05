@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
 import { Alert, Button, Col, Form, Icon, InputNumber, Row, Skeleton } from "antd";
@@ -7,7 +7,7 @@ import Web3 from "web3";
 import { useSideChainApi } from "../../api/side-chain";
 import BalanceTable from "../../components/balance-table";
 import MultiTransactionStatus from "../../components/multi-transaction-status";
-import { getTokenSymbol } from "../../components/token-symbol";
+import { getTokenSymbol } from "../../helpers/get-token-symbol";
 import { chainIdToNetworkShortName } from "../../helpers/networks";
 import useAccount from "../../hooks/use-account";
 import { useAsyncGenerator } from "../../hooks/use-generators";
@@ -101,24 +101,24 @@ function useWithdrawTokens(withdrawTokens) {
 
 function PnkBalanceTable({ balance, locked, pendingStake, staked, available, error }) {
   const chainId = useDrizzleState((ds) => ds.web3.networkId);
-  const tokenSymbol = getTokenSymbol(chainId, "PNK");
+  const pnkTokenSymbol = useMemo(() => getTokenSymbol(chainId, "PNK"), [chainId]);
 
   return (
     <>
       <BalanceTable title="Your Balance">
-        <BalanceTable.Row description="Total:" value={balance} error={error} tokenSymbol={tokenSymbol} />
+        <BalanceTable.Row description="Total:" value={balance} error={error} tokenSymbol={pnkTokenSymbol} />
         <BalanceTable.Row
           description="Locked in cases:"
           value={locked}
           error={error}
-          tokenSymbol={tokenSymbol}
+          tokenSymbol={pnkTokenSymbol}
           variant="warning"
         />
         <BalanceTable.Row
           description="Staked on courts:"
           value={staked}
           error={error}
-          tokenSymbol={tokenSymbol}
+          tokenSymbol={pnkTokenSymbol}
           variant="warning"
         />
         {pendingStake ? (
@@ -126,7 +126,7 @@ function PnkBalanceTable({ balance, locked, pendingStake, staked, available, err
             description="Pending stake*:"
             value={pendingStake}
             error={error}
-            tokenSymbol={tokenSymbol}
+            tokenSymbol={pnkTokenSymbol}
             variant="warning"
           />
         ) : null}
@@ -135,7 +135,7 @@ function PnkBalanceTable({ balance, locked, pendingStake, staked, available, err
           description="Available to convert:"
           value={available}
           error={error}
-          tokenSymbol={tokenSymbol}
+          tokenSymbol={pnkTokenSymbol}
           variant="primary"
         />
       </BalanceTable>
@@ -154,9 +154,9 @@ function PnkBalanceTable({ balance, locked, pendingStake, staked, available, err
                   your stake changes to be processed.
                 </p>
                 <p>
-                  This means that if you have just unstaked, you will not be able to convert those {tokenSymbol} right
-                  now. On the other hand, if you just staked, you can convert those {tokenSymbol} now, but the pending
-                  stake changes will be discarded.
+                  This means that if you have just unstaked, you will not be able to convert those {pnkTokenSymbol}{" "}
+                  right now. On the other hand, if you just staked, you can convert those {pnkTokenSymbol} now, but the
+                  pending stake changes will be discarded.
                 </p>
               </>
             }
@@ -180,6 +180,9 @@ const ConvertPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, disabl
   const sideChainApi = useSideChainApi();
 
   const { chainId, destinationChainId } = sideChainApi;
+
+  const pnkTokenSymbol = useMemo(() => getTokenSymbol(chainId, "PNK"), [chainId]);
+  const pnkDestinationTokenSymbol = useMemo(() => getTokenSymbol(destinationChainId, "PNK"), [destinationChainId]);
 
   const feeRatio = usePromise(React.useCallback(() => sideChainApi.getFeeRatio(), [sideChainApi]));
 
@@ -270,7 +273,7 @@ const ConvertPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, disabl
               hasFeedback
               label={
                 <StyledCompositeLabel>
-                  {getTokenSymbol(chainId, "PNK")}
+                  {pnkTokenSymbol}
                   <StyledButtonLink onClick={handleUseMaxClick}>use max.</StyledButtonLink>
                 </StyledCompositeLabel>
               }
@@ -290,7 +293,7 @@ const ConvertPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, disabl
             <Icon type="right-circle" theme="filled" />
           </StyledSeparatorCol>
           <StyledFieldCol>
-            <StyledFormItem hasFeedback label={getTokenSymbol(destinationChainId, "PNK")}>
+            <StyledFormItem hasFeedback label={pnkDestinationTokenSymbol}>
               {destinationDecorator(
                 <InputNumber
                   placeholder="Amount to receive"

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
 import { Link } from "react-router-dom";
@@ -17,7 +17,7 @@ import useAccount from "../../hooks/use-account";
 import usePromise from "../../hooks/use-promise";
 import useForceUpdate from "../../hooks/use-force-update";
 import { useAsyncGenerator } from "../../hooks/use-generators";
-import { getTokenSymbol } from "../token-symbol";
+import { getTokenSymbol } from "../../helpers/get-token-symbol";
 import MultiBalance from "../multi-balance";
 import MultiTransactionStatus from "../multi-transaction-status";
 
@@ -117,8 +117,8 @@ function UnwrappedSideChainPnkModal({ triggerCondition, account, balance, rawBal
   const showTriggerButton = ["click", "both"].includes(triggerCondition);
   const showAutomatically = ["auto", "both"].includes(triggerCondition);
 
-  const xPNKtokenSymbol = getTokenSymbol(chainId, "xPNK");
-  const PNKTokenSymbol = getTokenSymbol(chainId, "PNK");
+  const xPnkTokenSymbol = useMemo(() => getTokenSymbol(chainId, "xPNK"), [chainId]);
+  const pnkTokenSymbol = useMemo(() => getTokenSymbol(chainId, "PNK"), [chainId]);
 
   const [visible, setVisible] = React.useState(false);
   React.useEffect(() => {
@@ -153,7 +153,7 @@ function UnwrappedSideChainPnkModal({ triggerCondition, account, balance, rawBal
       {showTriggerButton ? (
         <Affix style={{ position: "fixed", bottom: 24, left: 24 }}>
           <StyledPulseButton type="primary" shape="round" size="large" onClick={() => setVisible(true)}>
-            <span>Deposit {xPNKtokenSymbol}</span>
+            <span>Deposit {xPnkTokenSymbol}</span>
           </StyledPulseButton>
         </Affix>
       ) : null}
@@ -161,7 +161,7 @@ function UnwrappedSideChainPnkModal({ triggerCondition, account, balance, rawBal
         visible={visible}
         centered
         width={586}
-        title={<>Deposit your {xPNKtokenSymbol}</>}
+        title={<>Deposit your {xPnkTokenSymbol}</>}
         cancelText="Ignore"
         onCancel={handleCancel}
         cancelButtonProps={{
@@ -175,10 +175,10 @@ function UnwrappedSideChainPnkModal({ triggerCondition, account, balance, rawBal
         onOk={handleOk}
       >
         <StyledExplainer>
-          To be able to stake on Kleros Court, you need to deposit your {xPNKtokenSymbol} to convert it to{" "}
-          {PNKTokenSymbol}(Staking PNK).{" "}
+          To be able to stake on Kleros Court, you need to deposit your {xPnkTokenSymbol} to convert it to{" "}
+          {pnkTokenSymbol}(Staking PNK).{" "}
           <strong>
-            You will receive 1 {PNKTokenSymbol} for every 1 {xPNKtokenSymbol} you deposit.
+            You will receive 1 {pnkTokenSymbol} for every 1 {xPnkTokenSymbol} you deposit.
           </strong>
         </StyledExplainer>
         <MultiBalance errors={errors} balance={balance} rawBalance={rawBalance} />
@@ -212,7 +212,7 @@ UnwrappedSideChainPnkModal.defaultProps = {
 
 function GetSideChainPnkModal({ defaultVisible }) {
   const chainId = useChainId();
-  const xPNKtokenSymbol = getTokenSymbol(chainId, "xPNK");
+  const xPnkTokenSymbol = useMemo(() => getTokenSymbol(chainId, "xPNK"), [chainId]);
 
   const [visible, setVisible] = React.useState(defaultVisible);
   const handleCancel = () => setVisible(false);
@@ -222,12 +222,12 @@ function GetSideChainPnkModal({ defaultVisible }) {
       visible={visible}
       centered
       width={586}
-      title={<>You have no {xPNKtokenSymbol}</>}
+      title={<>You have no {xPnkTokenSymbol}</>}
       onCancel={handleCancel}
       footer={null}
     >
       <StyledExplainer>
-        To be able to stake on Kleros Court, first you need to get some {xPNKtokenSymbol}.
+        To be able to stake on Kleros Court, first you need to get some {xPnkTokenSymbol}.
       </StyledExplainer>
       <div
         css={`

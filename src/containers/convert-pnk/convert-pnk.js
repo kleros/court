@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useMemo } from "react";
 import styled from "styled-components/macro";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { Divider, Spin } from "antd";
 import { getCounterPartyChainId, isSupportedMainChain, SideChainApiProvider } from "../../api/side-chain";
 import { getReadOnlyWeb3 } from "../../bootstrap/web3";
-import { getTokenSymbol } from "../../components/token-symbol";
+import { getTokenSymbol } from "../../helpers/get-token-symbol";
 import TopBanner from "../../components/top-banner";
 import { chainIdToNetworkName } from "../../helpers/networks";
 import useChainId from "../../hooks/use-chain-id";
@@ -59,13 +59,16 @@ function ConvertPnk() {
   const originChainId = isSupportedMainChain(counterPartyChainId) ? currentChainId : counterPartyChainId;
   const targetChainId = isSupportedMainChain(counterPartyChainId) ? counterPartyChainId : currentChainId;
 
+  const originChainTokenSymbol = useMemo(() => getTokenSymbol(originChainId, "PNK"), [originChainId]);
+  const targetChainTokenSymbol = useMemo(() => getTokenSymbol(targetChainId, "PNK"), [targetChainId]);
+
   return (
     <>
       <TopBanner
         title="Convert to PNK"
         description={
           <>
-            Send your {getTokenSymbol(originChainId, "PNK")} to get {getTokenSymbol(targetChainId, "PNK")} back on{" "}
+            Send your {originChainTokenSymbol} to get {targetChainTokenSymbol} back on{" "}
             {chainIdToNetworkName[targetChainId]}
           </>
         }

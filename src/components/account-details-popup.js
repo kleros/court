@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
 import { List, Popover, Spin, Divider } from "antd";
@@ -7,13 +7,14 @@ import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import ETHAddress from "./eth-address";
 import ETHAmount from "./eth-amount";
 import Identicon from "./identicon";
-import { getTokenSymbol } from "./token-symbol";
+import { getTokenSymbol } from "../helpers/get-token-symbol";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
 export default function AccountDetailsPopup({ trigger, pinakion, className }) {
   const { useCacheCall } = useDrizzle();
   const chainId = useDrizzleState((ds) => ds.web3.networkId);
+  const pnkTokenSymbol = useMemo(() => getTokenSymbol(chainId, "PNK"), [chainId]);
 
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
@@ -52,7 +53,7 @@ export default function AccountDetailsPopup({ trigger, pinakion, className }) {
                 <List.Item>
                   <List.Item.Meta
                     description={<ETHAmount amount={PNK} tokenSymbol="PNK" />}
-                    title={<>{getTokenSymbol(chainId, "PNK")} Balance</>}
+                    title={<>{pnkTokenSymbol} Balance</>}
                   />
                 </List.Item>
               </Spin>
