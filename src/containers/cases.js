@@ -41,6 +41,14 @@ export default function Cases() {
               return acc;
             }
 
+            if (dispute.period === "4") {
+              acc.executed.push({
+                ID: d.disputeID,
+                draws: numberOfVotes,
+              });
+              return acc;
+            }
+
             if (Number(d.appeal) !== dispute2.votesLengths.length - 1) {
               acc.active.push({
                 ID: d.disputeID,
