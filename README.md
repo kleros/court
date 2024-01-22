@@ -20,7 +20,7 @@ The Kleros Court user interface.
 3.  Configure MetaMask on the Goerli Test Network.
 4.  Run `yarn` to install dependencies and then `yarn start` to start the dev server.
 
-> To allow view-only mode, you can the REACT_APP_WEB3_FALLBACK_URL variable to a provider of your choice. Example: REACT_APP_WEB3_FALLBACK_URL=wss://mainnet.infura.io/ws/v3/<api-key>
+> To allow view-only mode, you can the REACT_APP_WEB3_FALLBACK_MAINNET_URL variable to a provider of your choice. Example: REACT_APP_WEB3_FALLBACK_MAINNET_URL=wss://mainnet.infura.io/ws/v3/<api-key>
 
 ## Other Scripts
 

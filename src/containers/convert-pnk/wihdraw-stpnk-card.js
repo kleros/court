@@ -4,6 +4,7 @@ import Web3 from "web3";
 import { useSideChainApi } from "../../api/side-chain";
 import { Card, Button, Form, Input } from "antd";
 import stPNKAbi from "../../assets/contracts/wrapped-pinakion.json";
+import gnosis from "../../assets/deployments/gnosis.json";
 import { getTokenSymbol } from "../../helpers/get-token-symbol";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../../bootstrap/dataloader";
@@ -138,7 +139,7 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
           console.debug("Form validation error:", err);
           return;
         }
-        const stPNKaddress = chainId === 100 && process.env.REACT_APP_PINAKION_XDAI_ADDRESS;
+        const stPNKaddress = chainId === 100 && gnosis.pinakionAddress;
         if (stPNKaddress) {
           const stPNK = new drizzle.web3.eth.Contract(stPNKAbi.abi, stPNKaddress);
           const amountInWei = toBN(toWei(values.amount));

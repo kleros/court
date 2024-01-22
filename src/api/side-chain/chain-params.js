@@ -1,7 +1,9 @@
 import logoXPNK from "../../assets/images/xPNK.png";
 import logoStPNK from "../../assets/images/stPNK.png";
-
+import mainnet from "../../assets/deployments/mainnet.json";
+import gnosis from "../../assets/deployments/gnosis.json";
 import { getBaseUrl } from "../../helpers/block-explorer";
+import { GNOSIS, getFallbackHttpsUrl } from "../../helpers/networks";
 
 export const Tokens = {
   PNK: "PNK",
@@ -10,24 +12,24 @@ export const Tokens = {
 
 const supportedSideChains = {
   // xDai
-  100: {
-    chainId: 100,
+  [GNOSIS]: {
+    chainId: GNOSIS,
     chainName: "Gnosis Chain",
     nativeCurrency: { name: "xDAI", symbol: "xDAI", decimals: 18 },
-    rpcUrls: [ensureEnv("REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL")],
+    rpcUrls: getFallbackHttpsUrl(GNOSIS),
     blockExplorerUrls: [getBaseUrl(100)],
-    bridgeAppUrl: `https://omni.gnosischain.com/bridge?from=1&to=100&token=${ensureEnv("REACT_APP_PINAKION_ADDRESS")}`,
+    bridgeAppUrl: `https://omni.gnosischain.com/bridge?from=1&to=100&token=${mainnet.pinakionAddress}`,
     bridgeAppHistoryUrl: "https://omni.gnosischain.com/history",
     mainChainId: 1,
     tokens: {
       [Tokens.PNK]: {
-        address: ensureEnv("REACT_APP_RAW_PINAKION_XDAI_ADDRESS"),
+        address: gnosis.rawPinakionAddress,
         symbol: "PNK",
         decimals: 18,
         image: `${window.location.origin}${logoXPNK}`,
       },
       [Tokens.stPNK]: {
-        address: ensureEnv("REACT_APP_PINAKION_XDAI_ADDRESS"),
+        address: gnosis.pinakionAddress,
         symbol: "stPNK",
         decimals: 18,
         image: `${window.location.origin}${logoStPNK}`,
@@ -88,13 +90,3 @@ const mainChainIdToSideChainParams = Object.values(supportedSideChains).reduce(
   (acc, chainParams) => Object.assign(acc, { [chainParams.mainChainId]: chainParams }),
   {}
 );
-
-function ensureEnv(key, msg = `process.env.${key} is not defined`) {
-  const value = process.env[key];
-
-  if (value === "" || value === undefined || value === null) {
-    throw new Error(msg);
-  }
-
-  return value;
-}

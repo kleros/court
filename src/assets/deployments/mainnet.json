@@ -1,0 +1,11 @@
+{
+    "klerosAddress": "0x211f01e59b425253c0a0e9a7bf612605b42ce82c",
+    "klerosLiquidAddress": "0x988b3a538b618c7a603e1c11ab82cd16dbe28069",
+    "klerosLiquidExtraViewsAddress": "0x2B562ea613ad2f58746935C842d09EB147E1E940",
+    "pinakionAddress": "0x93ed3fbe21207ec2e8f2d3c3de6e058cb73bc04d",
+    "policyRegistryAddress": "0xCf1f07713d5193FaE5c1653C9f61953D048BECe4",
+    "uniswapV2Router02Address": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+    "uniswapV2FactoryAddress": "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
+    "tokenBridgeAddress": "0x88ad09518695c6c3712AC10a214bE5109a655671",
+    "klerosLiquidBlockNumber": 7303699
+}

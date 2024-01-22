@@ -7,85 +7,47 @@ import Pinakion from "../assets/contracts/pinakion.json";
 import PolicyRegistry from "../assets/contracts/policy-registry.json";
 import UniswapV2Factory from "../assets/contracts/uniswap-v2-factory.json";
 import UniswapV2Router02 from "../assets/contracts/uniswap-v2-router-02.json";
+import { MAINNET, GOERLI, GNOSIS, CHIADO, SEPOLIA, getFallbackUrl } from "../helpers/networks";
+import {
+  oldKlerosAddresses,
+  klerosLiquidAddresses,
+  klerosLiquidExtraViewsAddresses,
+  pinakionAddresses,
+  policyRegistryAddresses,
+  uniswapV2FactoryAddresses,
+  uniswapV2Router02Addresses,
+} from "../helpers/deployments";
 
 const defaultOptions = {
-  networkWhitelist: [
-    1, // Mainnet
-    5, // Görli
-    100, // xDAI
-    10200, // Chiado
-    11155111, // Sepolia
-  ],
+  networkWhitelist: [MAINNET, GOERLI, GNOSIS, CHIADO, SEPOLIA],
   contracts: [
     {
       ...Kleros,
-      networks: {
-        1: { address: process.env.REACT_APP_KLEROS_ADDRESS },
-        5: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
-        100: { address: process.env.REACT_APP_KLEROS_XDAI_ADDRESS },
-        10200: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
-        11155111: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
-      },
+      networks: oldKlerosAddresses,
     },
     {
       ...KlerosLiquid,
-      networks: {
-        1: { address: process.env.REACT_APP_KLEROS_LIQUID_ADDRESS },
-        5: { address: process.env.REACT_APP_KLEROS_LIQUID_GOERLI_ADDRESS },
-        100: { address: process.env.REACT_APP_KLEROS_LIQUID_XDAI_ADDRESS },
-        10200: { address: process.env.REACT_APP_KLEROS_LIQUID_CHIADO_ADDRESS },
-        11155111: { address: process.env.REACT_APP_KLEROS_LIQUID_SEPOLIA_ADDRESS },
-      },
+      networks: klerosLiquidAddresses,
     },
     {
       ...KlerosLiquidExtraViews,
-      networks: {
-        1: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_ADDRESS },
-        5: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_GOERLI_ADDRESS },
-        100: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_XDAI_ADDRESS },
-        10200: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_CHIADO_ADDRESS },
-        11155111: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_SEPOLIA_ADDRESS },
-      },
+      networks: klerosLiquidExtraViewsAddresses,
     },
     {
       ...Pinakion,
-      networks: {
-        1: { address: process.env.REACT_APP_PINAKION_ADDRESS },
-        5: { address: process.env.REACT_APP_PINAKION_GOERLI_ADDRESS },
-        100: { address: process.env.REACT_APP_PINAKION_XDAI_ADDRESS },
-        10200: { address: process.env.REACT_APP_PINAKION_CHIADO_ADDRESS },
-        11155111: { address: process.env.REACT_APP_PINAKION_SEPOLIA_ADDRESS },
-      },
+      networks: pinakionAddresses,
     },
     {
       ...PolicyRegistry,
-      networks: {
-        1: { address: process.env.REACT_APP_POLICY_REGISTRY_ADDRESS },
-        5: { address: process.env.REACT_APP_POLICY_REGISTRY_GOERLI_ADDRESS },
-        100: { address: process.env.REACT_APP_POLICY_REGISTRY_XDAI_ADDRESS },
-        10200: { address: process.env.REACT_APP_POLICY_REGISTRY_CHIADO_ADDRESS },
-        11155111: { address: process.env.REACT_APP_POLICY_REGISTRY_SEPOLIA_ADDRESS },
-      },
+      networks: policyRegistryAddresses,
     },
     {
       ...UniswapV2Factory,
-      networks: {
-        1: { address: process.env.REACT_APP_UNISWAP_V2_FACTORY_ADDRESS },
-        5: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
-        100: { address: process.env.REACT_APP_UNISWAP_V2_FACTORY_XDAI_ADDRESS },
-        10200: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
-        11155111: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
-      },
+      networks: uniswapV2FactoryAddresses,
     },
     {
       ...UniswapV2Router02,
-      networks: {
-        1: { address: process.env.REACT_APP_UNISWAP_V2_ROUTER_02_ADDRESS },
-        5: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
-        100: { address: process.env.REACT_APP_UNISWAP_V2_ROUTER_02_XDAI_ADDRESS },
-        10200: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
-        11155111: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
-      },
+      networks: uniswapV2Router02Addresses,
     },
   ],
   polls: {
@@ -94,20 +56,12 @@ const defaultOptions = {
   },
 };
 
-const chainIdToFallbackUrl = {
-  1: process.env.REACT_APP_WEB3_FALLBACK_URL,
-  5: process.env.REACT_APP_WEB3_FALLBACK_GOERLI_URL,
-  100: process.env.REACT_APP_WEB3_FALLBACK_XDAI_URL,
-  10200: process.env.REACT_APP_WEB3_FALLBACK_CHIADO_URL,
-  11155111: process.env.REACT_APP_WEB3_FALLBACK_SEPOLIA_URL,
-};
-
 const { DrizzleProvider, Initializer, useDrizzle } = drizzleReactHooks;
 
 export { DrizzleProvider, Initializer, useDrizzle };
 
 function createDrizzle({ fallbackChainId }) {
-  const fallbackUrl = chainIdToFallbackUrl[fallbackChainId];
+  const fallbackUrl = getFallbackUrl(fallbackChainId);
   const optionsWeb3Mixin = fallbackUrl
     ? {
         web3: {
@@ -142,7 +96,7 @@ function createDrizzle({ fallbackChainId }) {
  * Users with web3 support will not be affected.
  */
 const STORAGE_KEY = "@@kleros/court/fallback-chain-id";
-const DEFAULT_FALLBACK_CHAIN_ID = 1;
+const DEFAULT_FALLBACK_CHAIN_ID = MAINNET;
 
 const extractFromQueryString = (param, search) => {
   if (typeof URLSearchParams !== "function") {

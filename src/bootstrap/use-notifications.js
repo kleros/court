@@ -1,52 +1,44 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import KlerosLiquid from "../assets/contracts/kleros-liquid.json";
+import { getKlerosLiquidBlockNumber, getKlerosLiquidAddress } from "../helpers/deployments";
+import { MAINNET, GOERLI, GNOSIS, CHIADO, SEPOLIA, getUrl } from "../helpers/networks";
 import Web3 from "web3";
 
 const networkIDData = {
-  1: {
+  [MAINNET]: {
     name: "",
-    provider: process.env.REACT_APP_WEB3_FALLBACK_HTTPS_URL,
+    provider: getUrl(MAINNET),
     nativeToken: "ETH",
     pnkToken: "PNK",
-    fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER
-      ? Number(process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER)
-      : 0,
+    fromBlock: getKlerosLiquidBlockNumber(1),
   },
-  5: {
+  [GOERLI]: {
     name: "_GOERLI",
-    provider: "https://goerli.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
+    provider: getUrl(GOERLI),
     nativeToken: "ETH",
     pnkToken: "PNK",
-    fromBlock: process.env.REACT_APP_KLEROS_LIQUID_GOERLI_BLOCK_NUMBER
-      ? Number(process.env.REACT_APP_KLEROS_LIQUID_GOERLI_BLOCK_NUMBER)
-      : 0,
+    fromBlock: getKlerosLiquidBlockNumber(5),
   },
-  100: {
+  [GNOSIS]: {
     name: "_XDAI",
-    provider: "https://rpc.gnosischain.com",
+    provider: getUrl(GNOSIS),
     nativeToken: "xDAI",
     pnkToken: "stPNK",
-    fromBlock: process.env.REACT_APP_KLEROS_LIQUID_XDAI_BLOCK_NUMBER
-      ? Number(process.env.REACT_APP_KLEROS_LIQUID_XDAI_BLOCK_NUMBER)
-      : 0,
+    fromBlock: getKlerosLiquidBlockNumber(100),
   },
-  10200: {
+  [CHIADO]: {
     name: "_CHIADO",
-    provider: "https://rpc.chiadochain.net",
+    provider: getUrl(CHIADO),
     nativeToken: "xDAI",
     pnkToken: "PNK",
-    fromBlock: process.env.REACT_APP_KLEROS_LIQUID_CHIADO_BLOCK_NUMBER
-      ? Number(process.env.REACT_APP_KLEROS_LIQUID_CHIADO_BLOCK_NUMBER)
-      : 0,
+    fromBlock: getKlerosLiquidBlockNumber(10200),
   },
-  11155111: {
+  [SEPOLIA]: {
     name: "_SEPOLIA",
-    provider: "https://sepolia.infura.io/v3/498250ed13a94a6bbdd646ee97e9f64c",
+    provider: getUrl(SEPOLIA),
     nativeToken: "ETH",
     pnkToken: "PNK",
-    fromBlock: process.env.REACT_APP_KLEROS_LIQUID_SEPOLIA_BLOCK_NUMBER
-      ? Number(process.env.REACT_APP_KLEROS_LIQUID_SEPOLIA_BLOCK_NUMBER)
-      : 0,
+    fromBlock: getKlerosLiquidBlockNumber(11155111),
   },
 };
 
@@ -138,10 +130,7 @@ export default (networkID, onNewNotifications) => {
     }
 
     const web3 = new Web3(networkIDData[networkID].provider);
-    const klerosLiquid = new web3.eth.Contract(
-      KlerosLiquid.abi,
-      process.env[`REACT_APP_KLEROS_LIQUID${networkIDData[networkID].name}_ADDRESS`]
-    );
+    const klerosLiquid = new web3.eth.Contract(KlerosLiquid.abi, getKlerosLiquidAddress(networkID));
     let mounted = true;
     web3.eth.getBlockNumber().then((blockNumber) => {
       const fromBlock = blockNumber - 256;
