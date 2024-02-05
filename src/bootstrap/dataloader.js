@@ -3,6 +3,7 @@ import Dataloader from "dataloader";
 import { getReadOnlyRpcUrl } from "./web3";
 import axios from "axios";
 import useSWR from "swr";
+import arbitrableWhitelist from "../temp/arbitrable-whitelist";
 import { displaySubgraph } from "./subgraph";
 
 const getURIProtocol = (uri) => {
@@ -73,7 +74,14 @@ const fetchDataFromScript = async (scriptString, scriptParameters) => {
 
   const _ = iframe({
     body: frameBody,
-    sandboxAttributes: ["allow-scripts"],
+    sandboxAttributes: [
+      "allow-scripts",
+      arbitrableWhitelist[scriptParameters.arbitrableChainID]?.includes(
+        scriptParameters.arbitrableContractAddress.toLowerCase()
+      )
+        ? "allow-same-origin"
+        : undefined,
+    ],
   });
   _.iframe.style.display = "none";
   return returnPromise;
