@@ -8,7 +8,6 @@ import { ReactComponent as Kleros } from "../assets/images/kleros.svg";
 import { ReactComponent as RightArrow } from "../assets/images/right-arrow.svg";
 import useChainId from "../hooks/use-chain-id";
 import ETHAmount from "./eth-amount";
-import TokenSymbol from "./token-symbol";
 
 const chainIdToParams = {
   1: {
@@ -45,6 +44,11 @@ const chainIdToParams = {
       "https://ipfs.kleros.io/ipfs/QmV3gpEkEv4btxAxnPjionT9QxbVo2fKj9fTFnuLjDTQ6N/snapshot-2023-06.json",
       "https://ipfs.kleros.io/ipfs/QmTqXB4i1wd3vvBNknFvixRD7dA36EWxQoBxsEvR3L3bWw/snapshot-2023-07.json",
       "https://ipfs.kleros.io/ipfs/QmfEb61fZ8QV9LX8Y7VU5AcnzCtjxDTFejzMAgAmUajrRH/snapshot-2023-08.json",
+      "https://ipfs.kleros.io/ipfs/QmUaApTCER7A3cfJUMvakoP4BWGMHsSjqhChcr1pn5rJKL/snapshot-2023-09.json",
+      "https://ipfs.kleros.io/ipfs/QmXSrwywMP5vipMbryJAezUP3zFAPTKAaCRkRLc4NZcRR7/snapshot-2023-10.json",
+      "https://ipfs.kleros.io/ipfs/QmbZ9ZVxJhNDRGokQ1PSqaLLprhgtAAm4m7kB2CY9GiaGD/snapshot-2023-11.json",
+      "https://ipfs.kleros.io/ipfs/QmZ1G5hK72tXynU8bj63QATopRgvV55h7Y5rgz3fofkCtw/snapshot-2023-12.json",
+      "https://ipfs.kleros.io/ipfs/Qme5CAtUNaNF3D5QEV3K4Je2uCkaH1kUWM6zNb3W8xr3dk/snapshot-2024-01.json",
     ],
     blockExplorerBaseUrl: "https://etherscan.io",
     klerosboard: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard",
@@ -78,6 +82,11 @@ const chainIdToParams = {
       "https://ipfs.kleros.io/ipfs/QmaMvUbMYtyJVJqV6YCafENrjfN9ULybXRmZTZL7UsTcng/xdai-snapshot-2023-06.json",
       "https://ipfs.kleros.io/ipfs/QmNgZFkE1dtgPZbHPbGcaq47wsLffJ89Uwtt5Fgf25V7DY/xdai-snapshot-2023-07.json",
       "https://ipfs.kleros.io/ipfs/QmYCaK3FPJX6S5jkCCLKqNMVDku9vC7RYaSyyC8gPZYvMp/xdai-snapshot-2023-08.json",
+      "https://ipfs.kleros.io/ipfs/QmewZj5jxML23gxkwHGJmAhutso83U7js8tRMoYLqcMQJj/xdai-snapshot-2023-09.json",
+      "https://ipfs.kleros.io/ipfs/QmZkxygbpHdrpWC39PE8k7wEXgGkC7oJddkkzaiEu5bRMV/xdai-snapshot-2023-10.json",
+      "https://ipfs.kleros.io/ipfs/Qma4dBYJedugVM7JFtbBaDuRK2nqULo8bSsSGR7tpdtw5e/xdai-snapshot-2023-11.json",
+      "https://ipfs.kleros.io/ipfs/QmcXxdjPXQpj1uChX7AHM1Q3imEauB7hFW4J2qR74tXBsJ/xdai-snapshot-2023-12.json",
+      "https://ipfs.kleros.io/ipfs/QmddfsZDD2oQLrskJDUk8AmDKJJvHFe3GLE2Zmm1n2rGrq/xdai-snapshot-2024-01.json",
     ],
     blockExplorerBaseUrl: "https://blockscout.com/poa/xdai/",
     klerosboard: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard-xdai",
@@ -259,11 +268,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       }}
       centered
       keyboard
-      okText={
-        <>
-          Claim Your <TokenSymbol token="PNK" /> Tokens
-        </>
-      }
+      okText={<>Claim Your PNK Tokens</>}
       onOk={onOk}
       onCancel={handleCancel}
       visible={visible}
@@ -303,7 +308,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
             </span>
           </div>
           <div style={{ fontSize: "24px", fontWeight: "500", marginTop: "8px" }}>
-            As a Kleros Juror, you will earn <TokenSymbol token="PNK" /> for staking in Court.
+            As a Kleros Juror, you will earn PNK for staking in Court.
           </div>
 
           <div
@@ -319,9 +324,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <div>
-                Total Rewarded <TokenSymbol token="PNK" />:
-              </div>
+              <div>Total Rewarded PNK:</div>
               <div style={{ fontWeight: "500", textAlign: "right" }}>
                 <ETHAmount amount={claims && getTotalRewarded(claims)} decimals={0} tokenSymbol="PNK" />
               </div>
@@ -407,9 +410,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
           }
           disabled={!claims || Number(drizzle.web3.utils.fromWei(getTotalClaimable(claims))).toFixed(0) < 1}
         >
-          <span>
-            Claim Your <TokenSymbol token="PNK" /> Tokens
-          </span>
+          <span>Claim Your PNK Tokens</span>
         </Button>
       )}
     </Modal>

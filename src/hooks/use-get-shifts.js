@@ -1,12 +1,9 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
+import { displaySubgraph } from "../bootstrap/subgraph";
 
 const fetchShifts = async (chainId, where, lastId, first) => {
-  const subgraphEndpoints = {
-    1: "https://api.thegraph.com/subgraphs/name/greenlucid/kleros-display-mainnet",
-    100: "https://api.thegraph.com/subgraphs/name/greenlucid/kleros-display",
-  };
-
-  const subgraphQuery = {
+  const res = await axios.post(displaySubgraph[chainId], {
     query: `
     {
       tokenAndETHShifts(where: {${where}, id_gt: "${lastId}"}, first: ${first}) {
@@ -18,15 +15,9 @@ const fetchShifts = async (chainId, where, lastId, first) => {
       }
     }
     `,
-  };
-
-  const response = await fetch(subgraphEndpoints[chainId], {
-    method: "POST",
-    body: JSON.stringify(subgraphQuery),
   });
 
-  const { data } = await response.json();
-  return data.tokenAndETHShifts;
+  return res.data.data.tokenAndETHShifts;
 };
 
 const getBatch = async (chainId, where) => {

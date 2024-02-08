@@ -98,7 +98,7 @@ const OngoingCasesCard = () => {
                     const vote = call("KlerosLiquid", "getVote", d.disputeID, d.appeal, d.voteID);
                     if (vote)
                       acc[vote.voted ? "active" : "votePending"].push({
-                        ...metaEvidence,
+                        metaEvidence,
                         statusDiv: (
                           <StyledVoting>
                             Voting <Gavel />
@@ -128,7 +128,7 @@ const OngoingCasesCard = () => {
 
                 if (dispute.period === "4")
                   acc.executed.push({
-                    ...metaEvidence,
+                    metaEvidence,
                     statusDiv: (
                       <StyledExecuted>
                         Executed <HourGlass />
@@ -138,7 +138,7 @@ const OngoingCasesCard = () => {
                   });
                 else
                   acc.active.push({
-                    ...metaEvidence,
+                    metaEvidence,
                     statusDiv: (
                       <StyledPending>
                         Pending <HourGlass />

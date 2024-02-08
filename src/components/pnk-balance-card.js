@@ -7,7 +7,6 @@ import { ReactComponent as PurpleArrowBackground } from "../assets/images/purple
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import ETHAmount from "./eth-amount";
 import Hint from "./hint";
-import TokenSymbol from "./token-symbol";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -174,11 +173,7 @@ const PNKBalanceCard = () => {
               <StyledBottomDiv>
                 Locked{" "}
                 <Hint
-                  description={
-                    <>
-                      These <TokenSymbol token="PNK" /> are locked in active disputes for potential redistribution.
-                    </>
-                  }
+                  description={<>These PNK are locked in active disputes for potential redistribution.</>}
                   title={
                     <>
                       <ETHAmount amount={juror && juror.lockedTokens} tokenSymbol="PNK" />

@@ -11,8 +11,8 @@ import { ReactComponent as Document } from "../assets/images/document.svg";
 import { ReactComponent as Folder } from "../assets/images/folder.svg";
 import { ReactComponent as Gavel } from "../assets/images/gavel.svg";
 import { ReactComponent as Scales } from "../assets/images/scales.svg";
-import { API } from "../bootstrap/api";
-import { useDataloader, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import { postJustification } from "../bootstrap/api";
+import { useDataloader, useEvidence, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import web3Salt from "../temp/web3-salt";
 import { range, binaryPermutations } from "../helpers/array";
 import useChainId from "../hooks/use-chain-id";
@@ -25,41 +25,126 @@ import CourtDrawer from "./court-drawer";
 import EvidenceTimeline from "./evidence-timeline";
 import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 import useGetDraws from "../hooks/use-get-draws";
+import arbitrableWhitelist from "../temp/arbitrable-whitelist";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const { toBN, soliditySha3 } = Web3.utils;
 
-const JustificationBox = ({ web3, account, onChange, justification }) => {
-  const key =
-    "To keep your data safe and to use certain features of Kleros, we ask that you sign these messages to create a secret key for your account. This key is unrelated from your main Ethereum account and will not be able to send any transactions.";
+const JustificationBox = ({ onChange, justification }) => {
+  const placeholder = "Justify your vote here...";
 
-  const storageKey = `${account}-${key}`;
-  const secretSigningKey = localStorage.getItem(storageKey);
-  const placeholder = secretSigningKey
-    ? "Justify your vote here..."
-    : "You need a signing key to provide a justification. You can get your signing key by setting your Notifications Settings above, or by clicking the button below. Then reload the page.";
+  return <StyledInputTextArea onChange={onChange} placeholder={placeholder} value={justification} />;
+};
 
-  const makeAndStoreSigningKey = async () => {
-    const signingKey = await web3.eth.personal.sign(key, account);
-    localStorage.setItem(storageKey, signingKey);
-  };
+const getVotingStatus = (disputePeriod, votesData, hiddenVotes) => {
+  if (disputePeriod === "0") {
+    return "Waiting for evidence.";
+  } else if (disputePeriod === "1") {
+    return !votesData.committed
+      ? "You did not commit your vote yet."
+      : "You committed your vote. You will be able to reveal your vote when the period ends.";
+  } else if (hiddenVotes) {
+    return votesData.committed
+      ? "You did not reveal your vote yet."
+      : "You did not commit a vote in the previous period. You cannot vote anymore.";
+  } else {
+    return "You did not cast a vote.";
+  }
+};
+
+const VoteOptions = ({ metaEvidence, votesData, complexRuling, setComplexRuling, onVoteClick, disabledDate }) => {
+  const isSingleSelect = metaEvidence.rulingOptions.type === "single-select";
+  const isMultipleSelect = metaEvidence.rulingOptions.type === "multiple-select";
+  const isDateTime = metaEvidence.rulingOptions.type === "datetime";
+
+  let inputComponent;
+
+  if (isMultipleSelect) {
+    inputComponent = (
+      <div style={{ paddingTop: "1rem" }}>
+        <Checkbox.Group
+          disabled={!votesData.canVote}
+          name="ruling"
+          onChange={setComplexRuling}
+          options={metaEvidence.rulingOptions.titles?.slice(0, 255)}
+          value={complexRuling}
+        />
+      </div>
+    );
+  } else if (isDateTime) {
+    inputComponent = (
+      <DatePicker
+        disabled={!votesData.canVote}
+        disabledDate={disabledDate}
+        onChange={setComplexRuling}
+        size="large"
+        showTime
+        value={complexRuling}
+      />
+    );
+  } else if (isSingleSelect) {
+    inputComponent = metaEvidence.rulingOptions.titles?.slice(0, 2 ** 256 - 1).map((title, index) => (
+      <StyledButton
+        disabled={!votesData.canVote}
+        id={index + 1}
+        key={title}
+        onClick={onVoteClick}
+        size="large"
+        type="primary"
+      >
+        {title}
+      </StyledButton>
+    ));
+  } else {
+    inputComponent = (
+      <InputNumber
+        disabled={!votesData.canVote}
+        max={Number(
+          realitioLibQuestionFormatter
+            .maxNumber({
+              decimals: metaEvidence.rulingOptions.precision,
+              type: metaEvidence.rulingOptions.type,
+            })
+            .minus(1)
+        )}
+        min={Number(
+          realitioLibQuestionFormatter.minNumber({
+            decimals: metaEvidence.rulingOptions.precision,
+            type: metaEvidence.rulingOptions.type,
+          })
+        )}
+        onChange={setComplexRuling}
+        precision={metaEvidence.rulingOptions.precision}
+        size="large"
+        value={complexRuling}
+      />
+    );
+  }
 
   return (
-    <>
-      <StyledInputTextArea
-        onChange={onChange}
-        placeholder={placeholder}
-        value={justification}
-        disabled={secretSigningKey === null}
-      />
-      {secretSigningKey === null && (
-        <StyledButtonsDiv>
-          <StyledButton onClick={makeAndStoreSigningKey} size="default" type="primary">
-            Create signing key
-          </StyledButton>
-        </StyledButtonsDiv>
+    <StyledButtonsDiv>
+      {inputComponent}
+      {isSingleSelect ? null : (
+        <StyledButton disabled={!votesData.canVote || !complexRuling} onClick={onVoteClick} size="large" type="primary">
+          Submit
+        </StyledButton>
       )}
-    </>
+    </StyledButtonsDiv>
+  );
+};
+
+const RevealVoteButton = ({ onRevealClick, votesData, dispute }) => {
+  return (
+    <StyledButtonsDiv>
+      <StyledButton
+        onClick={onRevealClick}
+        size="large"
+        type="primary"
+        disabled={!votesData.canVote || dispute.period !== "2"}
+      >
+        Reveal Vote
+      </StyledButton>
+    </StyledButtonsDiv>
   );
 };
 
@@ -74,7 +159,6 @@ export default function CaseDetailsCard({ ID }) {
 
   const loadPolicy = useDataloader.loadPolicy();
   const getMetaEvidence = useDataloader.getMetaEvidence();
-  const getEvidence = useDataloader.getEvidence();
   const [activeSubcourtID, setActiveSubcourtID] = useState();
   const [justification, setJustification] = useState();
   const [complexRuling, setComplexRuling] = useState();
@@ -153,20 +237,9 @@ export default function CaseDetailsCard({ ID }) {
       return { ...subcourt, ...subcourtObj };
     }
   });
-  let metaEvidence;
-  let evidence;
 
-  if (dispute) {
-    if (dispute.ruled) {
-      metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, KlerosLiquid.address, ID, {
-        strict: false,
-      });
-    } else {
-      metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, KlerosLiquid.address, ID);
-    }
-
-    evidence = getEvidence(dispute.arbitrated, KlerosLiquid.address, ID);
-  }
+  const metaEvidence = dispute && getMetaEvidence(chainId, dispute.arbitrated, KlerosLiquid.address, ID);
+  const evidence = useEvidence(chainId, ID);
 
   const { send: sendCommit, status: sendCommitStatus } = useCacheSend("KlerosLiquid", "castCommit");
   const { send: sendVote, status: sendVoteStatus } = useCacheSend("KlerosLiquid", "castVote");
@@ -175,8 +248,8 @@ export default function CaseDetailsCard({ ID }) {
     (date) =>
       realitioLibQuestionFormatter
         .maxNumber({
-          decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-          type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+          decimals: metaEvidence.rulingOptions.precision,
+          type: metaEvidence.rulingOptions.type,
         })
         .lte(date.unix() + 1),
     [metaEvidence]
@@ -189,10 +262,15 @@ export default function CaseDetailsCard({ ID }) {
   const [committedVote, setCommittedVote] = useStoredCommittedVote();
 
   useEffect(() => {
+    if (dispute?.arbitrated && !arbitrableWhitelist[chainId]?.includes(dispute?.arbitrated.toLowerCase()))
+      console.warn("Arbitrable not included in whitelist for evidence display");
+  }, [dispute?.arbitrated, chainId]);
+
+  useEffect(() => {
     let mounted = true;
 
     async function deriveCommitedVote() {
-      const { rulingOptions } = metaEvidence.metaEvidenceJSON;
+      const { rulingOptions } = metaEvidence;
       const salt = await web3Salt(web3, account, VOTE_COMMIT_SALT_KEY, ID, disputeExtraInfo.votesLengths.length - 1);
       return deriveVoteFromCommitThroughBruteForce({
         salt,
@@ -201,7 +279,7 @@ export default function CaseDetailsCard({ ID }) {
       });
     }
 
-    if (votesData.committed && !votesData.voted && !committedVote && metaEvidence?.metaEvidenceJSON?.rulingOptions) {
+    if (votesData.committed && !votesData.voted && !committedVote && metaEvidence?.rulingOptions) {
       deriveCommitedVote().then(
         (result) => {
           if (mounted && result !== undefined) {
@@ -221,14 +299,17 @@ export default function CaseDetailsCard({ ID }) {
 
   const sendOrRevealVote = useCallback(
     async (choice) => {
-      if (justification && justification.trim().length > 0) {
-        API.putJustifications(web3, account, {
-          appeal: disputeExtraInfo.votesLengths.length - 1,
-          disputeID: ID,
-          justification,
-          voteIDs: votesData.voteIDs,
+      if (justification && justification.trim().length > 0)
+        await postJustification({
+          account,
+          web3,
+          justification: {
+            appeal: disputeExtraInfo.votesLengths.length - 1,
+            disputeID: ID,
+            justification,
+            voteIDs: votesData.voteIDs,
+          },
         });
-      }
 
       sendVote(
         ID,
@@ -251,17 +332,13 @@ export default function CaseDetailsCard({ ID }) {
       let choice;
       const typeSwitch =
         id !== "0" &&
-        !Object.keys(
-          metaEvidence.metaEvidenceJSON.rulingOptions && metaEvidence.metaEvidenceJSON.rulingOptions.reserved
-            ? metaEvidence.metaEvidenceJSON.rulingOptions.reserved
-            : {}
-        ).includes(id) &&
-        metaEvidence.metaEvidenceJSON.rulingOptions &&
-        metaEvidence.metaEvidenceJSON.rulingOptions.type;
+        !Object.keys(metaEvidence.rulingOptions?.reserved ?? {}).includes(id) &&
+        metaEvidence.rulingOptions?.type;
+
       switch (typeSwitch) {
         case "multiple-select":
-          choice = metaEvidence.metaEvidenceJSON.rulingOptions.titles
-            ? metaEvidence.metaEvidenceJSON.rulingOptions.titles.map((t) => complexRuling.includes(t))
+          choice = metaEvidence.rulingOptions.titles
+            ? metaEvidence.rulingOptions.titles.map((t) => complexRuling.includes(t))
             : [];
           break;
         case "datetime":
@@ -279,8 +356,8 @@ export default function CaseDetailsCard({ ID }) {
         case "datetime":
         case "uint":
           choice = realitioLibQuestionFormatter.answerToBytes32(choice, {
-            decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-            type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+            decimals: metaEvidence.rulingOptions.precision,
+            type: metaEvidence.rulingOptions.type,
           });
           choice = realitioLibQuestionFormatter.padToBytes32(toBN(choice).add(toBN("1")).toString(16));
           break;
@@ -319,12 +396,12 @@ export default function CaseDetailsCard({ ID }) {
   const metaEvidenceActions = useMemo(() => {
     if (metaEvidence) {
       const actions = [];
-      if (metaEvidence.metaEvidenceJSON.fileURI)
+      if (metaEvidence.fileURI)
         actions.push(
           <Attachment
-            URI={metaEvidence.metaEvidenceJSON.fileURI}
+            URI={metaEvidence.fileURI}
             description="This is the primary file uploaded with the dispute."
-            extension={metaEvidence.metaEvidenceJSON.fileTypeExtension}
+            extension={metaEvidence.fileTypeExtension}
             title="Main File"
           />
         );
@@ -339,10 +416,17 @@ export default function CaseDetailsCard({ ID }) {
 
   const evidenceDisplayInterfaceURL = useMemo(() => {
     const normalizeIPFSUri = (uri) => uri.replace(/^\/ipfs\//, "https://ipfs.kleros.io/ipfs/");
-    if (metaEvidence?.metaEvidenceJSON?.evidenceDisplayInterfaceURI) {
-      const { evidenceDisplayInterfaceURI, _v = "0" } = metaEvidence.metaEvidenceJSON;
-      const arbitratorChainID = metaEvidence.metaEvidenceJSON?.arbitratorChainID ?? chainId;
-      const arbitrableChainID = metaEvidence.metaEvidenceJSON?.arbitrableChainID ?? arbitratorChainID;
+    if (metaEvidence?.evidenceDisplayInterfaceURI) {
+      // hack to allow displaying old t2cr disputes, since old endpoint was lost
+      const evidenceDisplayInterfaceURI =
+        dispute?.arbitrated === "0xEbcf3bcA271B26ae4B162Ba560e243055Af0E679"
+          ? "/ipfs/QmYs17mAJTaQwYeXNTb6n4idoQXmRcAjREeUdjJShNSeKh/index.html"
+          : metaEvidence.evidenceDisplayInterfaceURI;
+
+      const { _v = "0" } = metaEvidence;
+
+      const arbitratorChainID = metaEvidence?.arbitratorChainID ?? chainId;
+      const arbitrableChainID = metaEvidence?.arbitrableChainID ?? arbitratorChainID;
 
       let url = normalizeIPFSUri(evidenceDisplayInterfaceURI);
 
@@ -350,11 +434,11 @@ export default function CaseDetailsCard({ ID }) {
         disputeID: ID,
         chainID: chainId, // Deprecated. Use arbitratorChainID and arbitrableChainID instead.
         arbitratorContractAddress: KlerosLiquid.address,
-        arbitratorJsonRpcUrl: getReadOnlyRpcUrl({ chainId: arbitratorChainID }),
+        arbitratorJsonRpcUrl: getReadOnlyRpcUrl(arbitratorChainID),
         arbitratorChainID,
         arbitrableContractAddress: dispute.arbitrated,
         arbitrableChainID,
-        arbitrableJsonRpcUrl: getReadOnlyRpcUrl({ chainId: arbitrableChainID }),
+        arbitrableJsonRpcUrl: getReadOnlyRpcUrl(arbitrableChainID),
       };
 
       if (_v === "0") {
@@ -388,14 +472,8 @@ export default function CaseDetailsCard({ ID }) {
                   {dispute.period !== "2" ? <GavelLarge /> : ""}
                   {votesData.drawnInCurrentRound ? (
                     <>
-                      <div
-                        css={`
-                          margin-bottom: 20px;
-                        `}
-                      >
-                        {metaEvidence.metaEvidenceJSON.question
-                          ? metaEvidence.metaEvidenceJSON.question
-                          : "What is your decision?"}
+                      <div style={{ marginBottom: "20px" }}>
+                        {metaEvidence.question ? metaEvidence.question : "What is your decision?"}
                       </div>
                       {votesData.voted ? (
                         <>
@@ -403,12 +481,12 @@ export default function CaseDetailsCard({ ID }) {
                             You voted for: &ldquo;
                             {votesData.voted === "0"
                               ? "Refuse to Arbitrate"
-                              : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                              : (metaEvidence.rulingOptions &&
                                   realitioLibQuestionFormatter.getAnswerString(
                                     {
-                                      decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-                                      outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
-                                      type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+                                      decimals: metaEvidence.rulingOptions.precision,
+                                      outcomes: metaEvidence.rulingOptions.titles,
+                                      type: metaEvidence.rulingOptions.type,
                                     },
                                     realitioLibQuestionFormatter.padToBytes32(
                                       toBN(votesData.voted).sub(toBN("1")).toString(16)
@@ -421,24 +499,8 @@ export default function CaseDetailsCard({ ID }) {
                             <SecondaryActionText>Waiting for the vote result.</SecondaryActionText>
                           ) : null}
                         </>
-                      ) : dispute.period === "0" ? (
-                        "Waiting for evidence."
-                      ) : dispute.period === "1" ? (
-                        !votesData.committed ? (
-                          "You did not commit your vote yet."
-                        ) : (
-                          <small>
-                            You committed your vote. You will be able to reveal your vote when the period ends.
-                          </small>
-                        )
-                      ) : subcourts[subcourts.length - 1].hiddenVotes ? (
-                        votesData.committed ? (
-                          "You did not reveal your vote yet."
-                        ) : (
-                          "You did not commit a vote in the previous period. You cannot vote anymore."
-                        )
                       ) : (
-                        "You did not cast a vote."
+                        getVotingStatus(dispute.period, votesData, subcourts[subcourts.length - 1].hiddenVotes)
                       )}
                     </>
                   ) : (
@@ -449,12 +511,12 @@ export default function CaseDetailsCard({ ID }) {
                       The winner in this case was: &ldquo;
                       {votesData.currentRuling === "0"
                         ? "Refuse to Arbitrate"
-                        : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                        : (metaEvidence.rulingOptions &&
                             realitioLibQuestionFormatter.getAnswerString(
                               {
-                                decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-                                outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
-                                type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+                                decimals: metaEvidence.rulingOptions.precision,
+                                outcomes: metaEvidence.rulingOptions.titles,
+                                type: metaEvidence.rulingOptions.type,
                               },
                               realitioLibQuestionFormatter.padToBytes32(
                                 toBN(votesData.currentRuling).sub(toBN("1")).toString(16)
@@ -470,12 +532,12 @@ export default function CaseDetailsCard({ ID }) {
                         You committed to:{" "}
                         {votesData.voted === "0"
                           ? "Refuse to Arbitrate"
-                          : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                          : (metaEvidence.rulingOptions &&
                               realitioLibQuestionFormatter.getAnswerString(
                                 {
-                                  decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-                                  outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
-                                  type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+                                  decimals: metaEvidence.rulingOptions.precision,
+                                  outcomes: metaEvidence.rulingOptions.titles,
+                                  type: metaEvidence.rulingOptions.type,
                                 },
                                 realitioLibQuestionFormatter.padToBytes32(
                                   toBN(committedVote).sub(toBN("1")).toString(16)
@@ -498,107 +560,20 @@ export default function CaseDetailsCard({ ID }) {
                     )
                   ) : null}
                   {votesData.canVote && dispute.period === "2" && (
-                    <JustificationBox
-                      web3={web3}
-                      account={account}
-                      onChange={onJustificationChange}
-                      justification={justification}
-                    />
+                    <JustificationBox onChange={onJustificationChange} justification={justification} />
                   )}
-                  {Number(dispute.period) < 3 && !votesData.voted && metaEvidence.metaEvidenceJSON.rulingOptions ? (
+                  {Number(dispute.period) < 3 && !votesData.voted && metaEvidence.rulingOptions ? (
                     votesData.committed && committedVote !== undefined ? (
-                      <StyledButtonsDiv>
-                        <StyledButton
-                          onClick={onRevealClick}
-                          size="large"
-                          type="primary"
-                          disabled={!votesData.canVote || dispute.period !== "2"}
-                        >
-                          Reveal Vote
-                        </StyledButton>
-                      </StyledButtonsDiv>
+                      <RevealVoteButton onRevealClick={onRevealClick} votesData={votesData} dispute={dispute} />
                     ) : (
-                      <>
-                        {metaEvidence.metaEvidenceJSON.rulingOptions.type !== "single-select" && (
-                          <StyledButtonsDiv>
-                            {metaEvidence.metaEvidenceJSON.rulingOptions.type === "multiple-select" ? (
-                              <div
-                                css={`
-                                  padding-top: 1rem;
-                                `}
-                              >
-                                <Checkbox.Group
-                                  disabled={!votesData.canVote}
-                                  name="ruling"
-                                  onChange={setComplexRuling}
-                                  options={
-                                    metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
-                                    metaEvidence.metaEvidenceJSON.rulingOptions.titles.slice(0, 255)
-                                  }
-                                  value={complexRuling}
-                                />
-                              </div>
-                            ) : metaEvidence.metaEvidenceJSON.rulingOptions.type === "datetime" ? (
-                              <DatePicker
-                                disabled={!votesData.canVote}
-                                disabledDate={disabledDate}
-                                onChange={setComplexRuling}
-                                size="large"
-                                showTime
-                                value={complexRuling}
-                              />
-                            ) : (
-                              <InputNumber
-                                disabled={!votesData.canVote}
-                                max={Number(
-                                  realitioLibQuestionFormatter
-                                    .maxNumber({
-                                      decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-                                      type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
-                                    })
-                                    .minus(1)
-                                )}
-                                min={Number(
-                                  realitioLibQuestionFormatter.minNumber({
-                                    decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-                                    type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
-                                  })
-                                )}
-                                onChange={setComplexRuling}
-                                precision={metaEvidence.metaEvidenceJSON.rulingOptions.precision}
-                                size="large"
-                                value={complexRuling}
-                              />
-                            )}
-                          </StyledButtonsDiv>
-                        )}
-                        <StyledButtonsDiv>
-                          {metaEvidence.metaEvidenceJSON.rulingOptions.type === "single-select" ? (
-                            metaEvidence.metaEvidenceJSON.rulingOptions.titles &&
-                            metaEvidence.metaEvidenceJSON.rulingOptions.titles.slice(0, 2 ** 256 - 1).map((t, i) => (
-                              <StyledButton
-                                disabled={!votesData.canVote}
-                                id={i + 1}
-                                key={t}
-                                onClick={onVoteClick}
-                                size="large"
-                                type="primary"
-                              >
-                                {t}
-                              </StyledButton>
-                            ))
-                          ) : (
-                            <StyledButton
-                              disabled={!votesData.canVote || !complexRuling}
-                              onClick={onVoteClick}
-                              size="large"
-                              type="primary"
-                            >
-                              Submit
-                            </StyledButton>
-                          )}
-                        </StyledButtonsDiv>
-                      </>
+                      <VoteOptions
+                        metaEvidence={metaEvidence}
+                        votesData={votesData}
+                        complexRuling={complexRuling}
+                        setComplexRuling={setComplexRuling}
+                        onVoteClick={onVoteClick}
+                        disabledDate={disabledDate}
+                      />
                     )
                   ) : null}
                 </StyledActionsDiv>
@@ -617,23 +592,21 @@ export default function CaseDetailsCard({ ID }) {
                     ) : null}
                   </div>
 
-                  {metaEvidence.metaEvidenceJSON.rulingOptions &&
-                    metaEvidence.metaEvidenceJSON.rulingOptions.reserved &&
-                    Object.entries(metaEvidence.metaEvidenceJSON.rulingOptions.reserved).map(([ruling, title]) => (
-                      <div key={ruling} style={{ marginTop: "32px" }}>
-                        {Number(dispute.period) < "3" && !votesData.voted ? (
-                          <Button
-                            disabled={!votesData.canVote}
-                            ghost={votesData.canVote}
-                            id={ruling}
-                            onClick={onVoteClick}
-                            size="large"
-                          >
-                            {title}
-                          </Button>
-                        ) : null}
-                      </div>
-                    ))}
+                  {Object.entries(metaEvidence.rulingOptions?.reserved ?? {}).map(([ruling, title]) => (
+                    <div key={ruling} style={{ marginTop: "32px" }}>
+                      {Number(dispute.period) < "3" && !votesData.voted ? (
+                        <Button
+                          disabled={!votesData.canVote}
+                          ghost={votesData.canVote}
+                          id={ruling}
+                          onClick={onVoteClick}
+                          size="large"
+                        >
+                          {title}
+                        </Button>
+                      ) : null}
+                    </div>
+                  ))}
                 </StyledDiv>
               </>
             ) : (
@@ -651,7 +624,7 @@ export default function CaseDetailsCard({ ID }) {
         loading={!metaEvidence}
         title={
           <>
-            {metaEvidence && metaEvidence.metaEvidenceJSON.title}
+            {metaEvidence?.title}
             {subcourts && <StyledBreadcrumbs breadcrumbs={subcourts.map((s) => s.name)} />}
           </>
         }
@@ -661,21 +634,22 @@ export default function CaseDetailsCard({ ID }) {
             <Row>
               <Col span={24}>
                 <StyledInnerCard actions={metaEvidenceActions}>
-                  <ReactMarkdown source={metaEvidence.metaEvidenceJSON.description} />
-                  {metaEvidence.metaEvidenceJSON.evidenceDisplayInterfaceURI && (
+                  <ReactMarkdown source={metaEvidence.description} />
+                  {metaEvidence.evidenceDisplayInterfaceURI && (
                     <iframe
+                      sandbox={
+                        arbitrableWhitelist[chainId]?.includes(dispute.arbitrated.toLowerCase())
+                          ? "allow-scripts allow-same-origin"
+                          : "allow-scripts"
+                      }
                       title="dispute details"
                       style={{ width: "1px", minWidth: "100%", height: "360px", border: "none" }}
                       src={evidenceDisplayInterfaceURL}
                     />
                   )}
-                  {metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI && (
+                  {metaEvidence.arbitrableInterfaceURI && (
                     <ArbitrableInterfaceDiv>
-                      <a
-                        href={metaEvidence.metaEvidenceJSON.arbitrableInterfaceURI}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
+                      <a href={metaEvidence.arbitrableInterfaceURI} target="_blank" rel="noopener noreferrer">
                         <Icon type="double-right" style={{ marginRight: "5px" }} />
                         Go to the Arbitrable Application
                       </a>
@@ -726,7 +700,8 @@ export default function CaseDetailsCard({ ID }) {
             <CollapsableCard
               title={
                 <>
-                  <Folder /> {`Evidence (${evidence ? evidence.length : 0})`}
+                  <Folder /> Evidence
+                  <strong> {`(${evidence ? evidence.length : 0})`}</strong>
                 </>
               }
             >
@@ -739,12 +714,13 @@ export default function CaseDetailsCard({ ID }) {
             </CollapsableCard>
             {disputeExtraInfo &&
               metaEvidence &&
-              metaEvidence.metaEvidenceJSON.rulingOptions &&
-              metaEvidence.metaEvidenceJSON.rulingOptions.type === "single-select" && (
+              metaEvidence.rulingOptions &&
+              metaEvidence.rulingOptions.type === "single-select" && (
                 <CollapsableCard
                   title={
                     <>
                       <Scales /> Dispute History
+                      <strong> {`(Current Round: ${disputeExtraInfo?.votesLengths?.length})`}</strong>
                     </>
                   }
                 >
@@ -770,12 +746,12 @@ export default function CaseDetailsCard({ ID }) {
               You successfully voted for{" "}
               {votesData.voted === "0"
                 ? "Refuse to Arbitrate"
-                : (metaEvidence.metaEvidenceJSON.rulingOptions &&
+                : (metaEvidence.rulingOptions &&
                     realitioLibQuestionFormatter.getAnswerString(
                       {
-                        decimals: metaEvidence.metaEvidenceJSON.rulingOptions.precision,
-                        outcomes: metaEvidence.metaEvidenceJSON.rulingOptions.titles,
-                        type: metaEvidence.metaEvidenceJSON.rulingOptions.type,
+                        decimals: metaEvidence.rulingOptions.precision,
+                        outcomes: metaEvidence.rulingOptions.titles,
+                        type: metaEvidence.rulingOptions.type,
                       },
                       realitioLibQuestionFormatter.padToBytes32(toBN(votesData.voted).sub(toBN("1")).toString(16))
                     )) ||
@@ -811,9 +787,22 @@ CaseDetailsCard.propTypes = {
   ID: PropTypes.string.isRequired,
 };
 
+VoteOptions.propTypes = {
+  disabledDate: PropTypes.func,
+  metaEvidence: PropTypes.object,
+  votesData: PropTypes.object,
+  onVoteClick: PropTypes.func,
+  setComplexRuling: PropTypes.func,
+  complexRuling: PropTypes.any,
+};
+
+RevealVoteButton.propTypes = {
+  dispute: PropTypes.object,
+  onRevealClick: PropTypes.func,
+  votesData: PropTypes.object,
+};
+
 JustificationBox.propTypes = {
-  web3: PropTypes.object,
-  account: PropTypes.string,
   onChange: PropTypes.func,
   justification: PropTypes.string,
 };

@@ -24,7 +24,7 @@ const chainIdToRpcEndpoint = {
   11155111: process.env.REACT_APP_WEB3_FALLBACK_SEPOLIA_HTTPS_URL,
 };
 
-export function getReadOnlyRpcUrl({ chainId }) {
+export function getReadOnlyRpcUrl(chainId) {
   const url = chainIdToRpcEndpoint[chainId];
   if (!url) {
     throw new Error(`Unsupported chain ID: ${chainId}`);
@@ -34,5 +34,5 @@ export function getReadOnlyRpcUrl({ chainId }) {
 }
 
 export function getReadOnlyWeb3({ chainId }) {
-  return new Web3(getReadOnlyRpcUrl({ chainId }));
+  return new Web3(getReadOnlyRpcUrl(chainId));
 }

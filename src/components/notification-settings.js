@@ -1,12 +1,13 @@
 import { Alert, Button, Checkbox, Divider, Form, Icon, Input, Popover, Skeleton, Tooltip } from "antd";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { ReactComponent as Mail } from "../assets/images/mail.svg";
 import PropTypes from "prop-types";
 import styled from "styled-components/macro";
-import { useAPI } from "../bootstrap/api";
+import { accessSettings } from "../bootstrap/api";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import { askPermission, subscribeUserToPush } from "../bootstrap/service-worker";
+import useSWR from "swr";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -18,23 +19,63 @@ const StyledMail = styled(Mail)`
   min-width: 16px;
 `;
 
+const configureRestOfSettings = (settings, key, isSubmitting) => {
+  return Object.keys(settings).reduce((acc, setting) => {
+    const settingKey = `${key}NotificationSetting${setting.charAt(0).toUpperCase() + setting.slice(1)}`;
+    acc[settingKey] = isSubmitting ? { BOOL: settings[setting] || false } : true;
+    return acc;
+  }, {});
+};
+
+const prepareSettings = (
+  dynamicSettings,
+  key,
+  isSubmitting,
+  email,
+  fullName,
+  phone,
+  pushNotifications,
+  pushNotificationsData
+) => {
+  return isSubmitting
+    ? {
+        email: { S: email },
+        fullName: { S: fullName },
+        phone: { S: phone || " " },
+        pushNotifications: { BOOL: pushNotifications || false },
+        pushNotificationsData: {
+          S: pushNotificationsData ? JSON.stringify(pushNotificationsData) : " ",
+        },
+        ...configureRestOfSettings(dynamicSettings, key, true),
+      }
+    : {
+        email: true,
+        fullName: true,
+        phone: true,
+        pushNotifications: true,
+        ...configureRestOfSettings(dynamicSettings, key, false),
+      };
+};
+
 const NotificationSettings = Form.create()(({ form, settings: { key, ...settings } }) => {
   const { drizzle } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
-  const userSettings = useAPI.getUserSettings(drizzle.web3, drizzleState.account, {
-    email: true,
-    fullName: true,
-    phone: true,
-    pushNotifications: true,
-    ...Object.keys(settings).reduce((acc, v) => {
-      acc[`${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`] = true;
-      return acc;
-    }, {}),
-  });
-  const loading = userSettings === "pending";
-  const { send, state } = useAPI.patchUserSettings(drizzle.web3, drizzleState.account);
+  const [loadingUserSettingsPatch, setLoadingUserSettingsPatch] = useState(false);
+  const [userSettingsPatchState, setUserSettingsPatchState] = useState(false);
+
+  const { data: userSettings, isLoading: loadingUserSettings } = useSWR(
+    drizzleState.account && key && ["user-settings", drizzleState.account, key],
+    async ([_, address, key]) =>
+      await accessSettings({
+        web3: drizzle.web3,
+        address,
+        settings: prepareSettings(settings, key, false),
+      }),
+    { errorRetryCount: 0, revalidateOnFocus: false }
+  );
+
   return (
     <Popover
       arrowPointAtCenter
@@ -51,76 +92,78 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
                     if (pushNotifications) {
                       pushNotificationsData = await subscribeUserToPush();
                     }
-
-                    send({
-                      email: { S: email },
-                      fullName: { S: fullName },
-                      phone: { S: phone || " " },
-                      pushNotifications: { BOOL: pushNotifications || false },
-                      pushNotificationsData: { S: pushNotificationsData ? JSON.stringify(pushNotificationsData) : " " },
-                      ...Object.keys(rest).reduce((acc, v) => {
-                        acc[`${key}NotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`] = {
-                          BOOL: rest[v] || false,
-                        };
-                        return acc;
-                      }, {}),
-                    });
+                    setLoadingUserSettingsPatch(true);
+                    try {
+                      setUserSettingsPatchState(
+                        await accessSettings({
+                          patch: true,
+                          web3: drizzle.web3,
+                          address: drizzleState.account,
+                          settings: prepareSettings(
+                            rest,
+                            key,
+                            true,
+                            email,
+                            fullName,
+                            phone,
+                            pushNotifications,
+                            pushNotificationsData
+                          ),
+                        })
+                      );
+                    } catch (err) {
+                      console.error(err);
+                    } finally {
+                      setLoadingUserSettingsPatch(false);
+                    }
                   }
                 });
               },
-              [form, key, send]
+              [form, key, drizzle.web3, drizzleState.account]
             )}
           >
             <Divider>I wish to be notified when:</Divider>
-            <Skeleton active loading={loading} title={false}>
-              {!loading && (
+            <Skeleton active loading={loadingUserSettings} title={false}>
+              {!loadingUserSettings && (
                 <>
                   {Object.keys(settings).map((s) => (
                     <Form.Item key={s}>
                       {form.getFieldDecorator(s, {
-                        initialValue:
-                          userSettings.payload &&
-                          userSettings.payload.settings.Item[
-                            `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(1)}`}`
-                          ]
-                            ? userSettings.payload.settings.Item[
-                                `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(1)}`}`
-                              ].BOOL
-                            : false,
+                        initialValue: userSettings?.payload?.settings.Item[
+                          `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(1)}`}`
+                        ]
+                          ? userSettings.payload.settings.Item[
+                              `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(1)}`}`
+                            ].BOOL
+                          : false,
                         valuePropName: "checked",
                       })(<Checkbox>{settings[s]}</Checkbox>)}
                     </Form.Item>
                   ))}
                   <Form.Item hasFeedback>
                     {form.getFieldDecorator("fullName", {
-                      initialValue:
-                        userSettings.payload && userSettings.payload.settings.Item.fullName
-                          ? userSettings.payload.settings.Item.fullName.S
-                          : "",
+                      initialValue: userSettings?.payload?.settings.Item.fullName
+                        ? userSettings.payload.settings.Item.fullName.S
+                        : "",
                       rules: [{ message: "Please enter your name.", required: true }],
                     })(<Input placeholder="Name" />)}
                   </Form.Item>
                   <Form.Item hasFeedback>
                     {form.getFieldDecorator("email", {
-                      initialValue:
-                        userSettings.payload && userSettings.payload.settings.Item.email
-                          ? userSettings.payload.settings.Item.email.S
-                          : "",
+                      initialValue: userSettings?.payload?.settings.Item.email
+                        ? userSettings.payload.settings.Item.email.S
+                        : "",
                       rules: [
                         { message: "Please enter your email.", required: true },
-                        {
-                          message: "Please enter a valid email.",
-                          type: "email",
-                        },
+                        { message: "Please enter a valid email.", type: "email" },
                       ],
                     })(<Input placeholder="Email" />)}
                   </Form.Item>
                   <Form.Item>
                     {form.getFieldDecorator("pushNotifications", {
-                      initialValue:
-                        userSettings.payload && userSettings.payload.settings.Item.pushNotifications
-                          ? userSettings.payload.settings.Item.pushNotifications.BOOL
-                          : false,
+                      initialValue: userSettings?.payload?.settings.Item.pushNotifications
+                        ? userSettings.payload.settings.Item.pushNotifications.BOOL
+                        : false,
                       valuePropName: "checked",
                     })(
                       <Checkbox
@@ -141,7 +184,7 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
                   <Button
                     disabled={Object.values(form.getFieldsError()).some((v) => v)}
                     htmlType="submit"
-                    loading={state === "pending"}
+                    loading={loadingUserSettingsPatch}
                     type="primary"
                   >
                     Save
@@ -150,11 +193,11 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
               )}
             </Skeleton>
             <Divider />
-            {state && state !== "pending" && (
+            {userSettingsPatchState && !loadingUserSettingsPatch && (
               <Alert
                 closable
-                message={state.error ? "Failed to save settings." : "Saved settings."}
-                type={state.error ? "error" : "success"}
+                message={userSettingsPatchState.error || "Saved settings."}
+                type={userSettingsPatchState.error ? "error" : "success"}
               />
             )}
           </StyledForm>

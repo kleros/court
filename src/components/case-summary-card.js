@@ -1,7 +1,8 @@
-import { Col, Row } from 'antd'
-import React from 'react'
-import { Link, withRouter } from 'react-router-dom'
-import styled from 'styled-components'
+import { Col, Row } from "antd";
+import React from "react";
+import { Link, withRouter } from "react-router-dom";
+import styled from "styled-components/macro";
+import t from "prop-types";
 
 const StyledCaseSummary = styled.div`
   background: white;
@@ -9,32 +10,32 @@ const StyledCaseSummary = styled.div`
   display: inline-block;
   margin: 0px 2%;
   width: 96%;
-`
+`;
 
 const CaseNumber = styled.div`
   color: #4d00b4;
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
-`
+`;
 const CaseStatus = styled.div`
   float: right;
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
-`
+`;
 const CaseSummaryBody = styled.div`
   border-radius: 12px;
   box-shadow: 0px 6px 36px #bc9cff;
   padding: 13px 21px;
-`
+`;
 const CaseSummaryText = styled.div`
   color: black;
   font-size: 20px;
   font-weight: 500;
   line-height: 23px;
   margin: 26px 0px;
-`
+`;
 
 const CaseSummaryCard = ({ dispute }) => (
   <Link to={`/cases/${dispute.ID}`}>
@@ -48,12 +49,14 @@ const CaseSummaryCard = ({ dispute }) => (
             <CaseStatus>{dispute.statusDiv}</CaseStatus>
           </Col>
         </Row>
-        <CaseSummaryText>
-          {dispute.metaEvidenceJSON ? dispute.metaEvidenceJSON.title : ''}
-        </CaseSummaryText>
+        <CaseSummaryText>{dispute.metaEvidence ? dispute.metaEvidence.title : ""}</CaseSummaryText>
       </CaseSummaryBody>
     </StyledCaseSummary>
   </Link>
-)
+);
 
-export default withRouter(CaseSummaryCard)
+export default withRouter(CaseSummaryCard);
+
+CaseSummaryCard.propTypes = {
+  dispute: t.any.isRequired,
+};
