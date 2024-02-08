@@ -60,6 +60,8 @@
   REACT_APP_WEB3_FALLBACK_POLYGON_HTTPS_URL='https://polygon-mainnet.g.alchemy.com/v2/Y2IRJuoY0G-LAkHTqyXdVetLFm4R2NZT'
   REACT_APP_WEB3_FALLBACK_MUMBAI_HTTPS_URL='https://polygon-mumbai.g.alchemy.com/v2/demo'
 
+  REACT_APP_WEB3_FALLBACK_ZKSYNCSEPOLIA_HTTPS_URL='https://sepolia.era.zksync.dev'
+
 [context.production.environment]
   REACT_APP_CONTEXT='production'
   REACT_APP_USER_SETTINGS_URL='https://hgyxlve79a.execute-api.us-east-2.amazonaws.com/production/user-settings'
