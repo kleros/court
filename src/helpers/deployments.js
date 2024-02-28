@@ -24,11 +24,11 @@ export const oldKlerosAddresses = {
 };
 
 export const klerosLiquidAddresses = {
-  [MAINNET]: { address: mainnet.klerosAddress },
-  [GOERLI]: { address: DUMMY_ADDRESS },
-  [GNOSIS]: { address: gnosis.klerosAddress },
-  [CHIADO]: { address: DUMMY_ADDRESS },
-  [SEPOLIA]: { address: DUMMY_ADDRESS },
+  [MAINNET]: { address: mainnet.klerosLiquidAddress },
+  [GOERLI]: { address: goerli.klerosLiquidAddress },
+  [GNOSIS]: { address: gnosis.klerosLiquidAddress },
+  [CHIADO]: { address: chiado.klerosLiquidAddress },
+  [SEPOLIA]: { address: sepolia.klerosLiquidAddress },
 };
 
 export const klerosLiquidExtraViewsAddresses = {
