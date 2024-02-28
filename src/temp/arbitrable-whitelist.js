@@ -51,6 +51,9 @@ const arbitrableWhitelist = {
     "0xe04f5791d671d5c4e08ab49b39807087b591ea3e",
     "0xf7de5537ecd69a94695fcf4bcdbdee6329b63322",
   ],
+  11155111: [
+    "0xe3705b31546eae49543e384d17cfc6a376560e28",
+  ],
 };
 
 export default arbitrableWhitelist;
