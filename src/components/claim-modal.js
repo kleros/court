@@ -50,6 +50,7 @@ const chainIdToParams = {
       "https://ipfs.kleros.io/ipfs/QmZ1G5hK72tXynU8bj63QATopRgvV55h7Y5rgz3fofkCtw/snapshot-2023-12.json",
       "https://ipfs.kleros.io/ipfs/Qme5CAtUNaNF3D5QEV3K4Je2uCkaH1kUWM6zNb3W8xr3dk/snapshot-2024-01.json",
       "https://ipfs.kleros.io/ipfs/QmPmrHWcGrXD9F2YDDS4BiZxZbv5qDxakhDw1MRH58tUjP/snapshot-2024-02.json",
+      "https://ipfs.kleros.io/ipfs/QmWDAc4nE2P6XuPXjj5FMs68oUg2Bdz2GHsUJXpywqbjz8/snapshot-2024-03.json"
     ],
     blockExplorerBaseUrl: "https://etherscan.io",
     klerosboard: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard",
@@ -89,6 +90,7 @@ const chainIdToParams = {
       "https://ipfs.kleros.io/ipfs/QmcXxdjPXQpj1uChX7AHM1Q3imEauB7hFW4J2qR74tXBsJ/xdai-snapshot-2023-12.json",
       "https://ipfs.kleros.io/ipfs/QmddfsZDD2oQLrskJDUk8AmDKJJvHFe3GLE2Zmm1n2rGrq/xdai-snapshot-2024-01.json",
       "https://ipfs.kleros.io/ipfs/QmdGBZ43WhtTVZNVCtu7fFfsgxoYwPzr8xSJGnFPQEcYcX/xdai-snapshot-2024-02.json",
+      "https://ipfs.kleros.io/ipfs/QmcWw37anHSMcFkuZMZRLZRKMByTNAPUKEM6hQ1bPAZDnn/xdai-snapshot-2024-03.json"
     ],
     blockExplorerBaseUrl: "https://blockscout.com/poa/xdai/",
     klerosboard: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard-xdai",
