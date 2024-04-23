@@ -260,21 +260,32 @@ const evidenceFetcher = async ([subgraph, disputeId]) => {
     )
     .then((res) => res.data.data.dispute.evidenceGroup.evidence);
 
-  return await Promise.all(
-    evidence.map(async (evidenceItem) => {
-      const uri = getHttpUri(evidenceItem.URI);
+  return (
+    (
+      await Promise.all(
+        evidence.map(async (evidenceItem) => {
+          let uri;
+          try {
+            uri = getHttpUri(evidenceItem.URI);
+          } catch (e) {
+            // invalid uri
+            return null;
+          }
+          const fileRes = await axios.get(uri);
 
-      const fileRes = await axios.get(uri);
+          if (fileRes.status !== 200)
+            throw new Error(`HTTP Error: Unable to fetch file at ${uri}. Returned status code ${fileRes.status}`);
 
-      if (fileRes.status !== 200)
-        throw new Error(`HTTP Error: Unable to fetch file at ${uri}. Returned status code ${fileRes.status}`);
-
-      return {
-        evidenceJSON: fileRes.data,
-        submittedAt: evidenceItem.creationTime,
-        submittedBy: evidenceItem.sender,
-      };
-    })
+          return {
+            evidenceJSON: fileRes.data,
+            submittedAt: evidenceItem.creationTime,
+            submittedBy: evidenceItem.sender,
+          };
+        })
+      )
+    )
+      //filter out the bad URIs (nulls)
+      .filter((e) => !!e)
   );
 };
 
