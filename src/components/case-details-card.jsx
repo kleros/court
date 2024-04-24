@@ -639,7 +639,7 @@ export default function CaseDetailsCard({ ID }) {
                     <iframe
                       sandbox={
                         arbitrableWhitelist[chainId]?.includes(dispute.arbitrated.toLowerCase())
-                          ? "allow-scripts allow-same-origin"
+                          ? "allow-scripts allow-same-origin allow-popups"
                           : "allow-scripts"
                       }
                       title="dispute details"
