@@ -278,7 +278,7 @@ const evidenceFetcher = async ([subgraph, disputeId]) => {
           } catch (requestError) {
             // URI is correct, but the request failed
             return {
-              error: requestError.message,
+              error: `${requestError.message}. Requested URI: ${uri}`,
               submittedAt: evidenceItem.creationTime,
               submittedBy: evidenceItem.sender,
             };
