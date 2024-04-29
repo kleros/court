@@ -28,7 +28,7 @@ const arbitrableWhitelist = {
     "0xf339047c85d0dd2645f2bd802a1e8a5e7af61053",
     "0xf65c7560d6ce320cc3a16a07f1f65aab66396b9e",
     "0xf72cfd1b34a91a64f9a98537fe63fbab7530adca",
-  ],
+  ].map((address) => address.toLowerCase()),
   100: [
     "0x0b928165a67df8254412483ae8c3b8cc7f2b4d36",
     "0x1d48a279966f37385b4ab963530c6dc813b3a8df",
@@ -44,13 +44,14 @@ const arbitrableWhitelist = {
     "0x76944a2678a0954a610096ee78e8ceb8d46d5922",
     "0x86e72802d9abbf7505a889721fd4d6947b02320e",
     "0x957a53a994860be4750810131d9c876b2f52d6e1",
+    "0x9FE4D9E4989ad031FDc424d8C34D77E70aA0b269",
     "0xa2bfff0553de7405781fe0c39c04a383f04b9c80",
     "0xa78ec5742a5d360f92f6d6d7e775fb35ab559a51",
     "0xaeecfa44639b61d2e0a9534d918789d94a24a9de",
     "0xd5994f15be9987104d9821aa99d1c97227c7c08c",
     "0xe04f5791d671d5c4e08ab49b39807087b591ea3e",
     "0xf7de5537ecd69a94695fcf4bcdbdee6329b63322",
-  ],
+  ].map((address) => address.toLowerCase()),
 };
 
 export default arbitrableWhitelist;

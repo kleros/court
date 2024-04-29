@@ -260,22 +260,37 @@ const evidenceFetcher = async ([subgraph, disputeId]) => {
     )
     .then((res) => res.data.data.dispute.evidenceGroup.evidence);
 
-  return await Promise.all(
-    evidence.map(async (evidenceItem) => {
-      const uri = getHttpUri(evidenceItem.URI);
+  return (
+    await Promise.all(
+      evidence.map(async (evidenceItem) => {
+        try {
+          const uri = getHttpUri(evidenceItem.URI);
+          try {
+            const fileRes = await axios.get(uri);
+            if (fileRes.status !== 200)
+              throw new Error(`HTTP Error: Unable to fetch file at ${uri}. Returned status code ${fileRes.status}`);
 
-      const fileRes = await axios.get(uri);
-
-      if (fileRes.status !== 200)
-        throw new Error(`HTTP Error: Unable to fetch file at ${uri}. Returned status code ${fileRes.status}`);
-
-      return {
-        evidenceJSON: fileRes.data,
-        submittedAt: evidenceItem.creationTime,
-        submittedBy: evidenceItem.sender,
-      };
-    })
-  );
+            return {
+              evidenceJSON: fileRes.data,
+              submittedAt: evidenceItem.creationTime,
+              submittedBy: evidenceItem.sender,
+            };
+          } catch (requestError) {
+            // URI is correct, but the request failed
+            return {
+              error: `${requestError.message}. Requested URI: ${uri}`,
+              submittedAt: evidenceItem.creationTime,
+              submittedBy: evidenceItem.sender,
+            };
+          }
+        } catch (uriError) {
+          // invalid uri, returning null to be filtered out
+          console.error(uriError.message);
+          return null;
+        }
+      })
+    )
+  ).filter((e) => !!e); // This will filter out the null values (invalid URIs)
 };
 
 export function useEvidence(chainId, disputeID) {
