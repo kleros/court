@@ -262,8 +262,11 @@ export default function CaseDetailsCard({ ID }) {
   const [committedVote, setCommittedVote] = useStoredCommittedVote();
 
   useEffect(() => {
-    if (dispute?.arbitrated && !arbitrableWhitelist[chainId]?.includes(dispute?.arbitrated.toLowerCase()))
-      console.warn("Arbitrable not included in whitelist for evidence display");
+    if (dispute?.arbitrated && !arbitrableWhitelist[chainId]?.includes(dispute?.arbitrated.toLowerCase())) {
+      console.warn("Arbitrable NOT included in whitelist for evidence display: ", dispute?.arbitrated);
+    } else {
+      console.info("Arbitrable included in whitelist for evidence display: ", dispute?.arbitrated);
+    }
   }, [dispute?.arbitrated, chainId]);
 
   useEffect(() => {
@@ -451,7 +454,6 @@ export default function CaseDetailsCard({ ID }) {
       return url;
     }
   }, [metaEvidence, ID, dispute, chainId, KlerosLiquid.address]);
-
   return (
     <>
       <StyledCard
