@@ -418,7 +418,7 @@ export default function CaseDetailsCard({ ID }) {
   }, [metaEvidence]);
 
   const evidenceDisplayInterfaceURL = useMemo(() => {
-    const normalizeIPFSUri = (uri) => uri.replace(/^\/ipfs\//, "https://ipfs.kleros.io/ipfs/");
+    const normalizeIPFSUri = (uri) => uri.replace(/^\/ipfs\//, "https://cdn.kleros.link/ipfs/");
     if (metaEvidence?.evidenceDisplayInterfaceURI) {
       // hack to allow displaying old t2cr disputes, since old endpoint was lost
       const evidenceDisplayInterfaceURI =
