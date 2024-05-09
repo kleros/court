@@ -26,8 +26,8 @@ const getHttpUri = (uri) => {
       uri = uri.replace("://", ":/");
       if (uri.substr(0, 5) === "/ipfs" || uri.substr(0, 5) === "ipfs/") {
         if (uri.substr(0, 1) === "/") uri = uri.substr(1, uri.length - 1);
-        uri = `https://ipfs.kleros.io/${uri}`;
-      } else if (uri.substr(0, 6) === "ipfs:/") uri = `https://ipfs.kleros.io/${uri.split(":/").pop()}`;
+        uri = `https://cdn.kleros.link/${uri}`;
+      } else if (uri.substr(0, 6) === "ipfs:/") uri = `https://cdn.kleros.link/${uri.split(":/").pop()}`;
       else throw new Error(`Unrecognized protocol ${protocol}`);
       break;
     default:
@@ -182,7 +182,7 @@ const funcs = {
       return;
     }
     const prefix = URI.startsWith("/ipfs/") ? "" : "/ipfs/";
-    const policyURL = `https://ipfs.kleros.io${prefix}${URI}`;
+    const policyURL = `https://cdn.kleros.link${prefix}${URI}`;
 
     try {
       const res = await axios.get(policyURL);
