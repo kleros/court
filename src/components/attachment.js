@@ -48,7 +48,7 @@ const Attachment = ({ URI, description, extension: _extension, previewURI, title
   if (!title && !description) {
     if (URI)
       return (
-        <a href={URI.replace(/^\/ipfs\//, "https://ipfs.kleros.io/ipfs/")} rel="noopener noreferrer" target="_blank">
+        <a href={URI.replace(/^\/ipfs\//, "https://cdn.kleros.link/ipfs/")} rel="noopener noreferrer" target="_blank">
           {Component}
         </a>
       );
@@ -73,7 +73,7 @@ const Attachment = ({ URI, description, extension: _extension, previewURI, title
       title={title}
     >
       {URI ? (
-        <a href={URI.replace(/^\/ipfs\//, "https://ipfs.kleros.io/ipfs/")} rel="noopener noreferrer" target="_blank">
+        <a href={URI.replace(/^\/ipfs\//, "https://cdn.kleros.link/ipfs/")} rel="noopener noreferrer" target="_blank">
           {Component}
         </a>
       ) : (
