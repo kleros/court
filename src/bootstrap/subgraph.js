@@ -1,6 +1,6 @@
 export const displaySubgraph = {
-  1: "https://api.thegraph.com/subgraphs/name/kleros/kleros-display-mainnet",
+  1: "https://api.studio.thegraph.com/query/61738/kleros-display-mainnet/version/latest",
   5: "https://api.thegraph.com/subgraphs/name/andreimvp/kleros-display-goerli",
-  100: "https://api.thegraph.com/subgraphs/name/kleros/kleros-display-gnosis",
-  11155111: "https://api.thegraph.com/subgraphs/name/kleros/kleros-display-sepolia",
+  100: "https://api.studio.thegraph.com/query/61738/kleros-display-gnosis/version/latest",
+  11155111: "https://api.studio.thegraph.com/query/61738/kleros-display-sepolia/version/latest",
 };

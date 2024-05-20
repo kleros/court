@@ -54,7 +54,7 @@ const chainIdToParams = {
       "https://cdn.kleros.link/ipfs/QmbJ3tiiH7pRB6iLfSoJVtEG2dx7pY7YHCqc13y3FeekZQ/snapshot-2024-04.json",
     ],
     blockExplorerBaseUrl: "https://etherscan.io",
-    klerosboard: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard",
+    klerosboard: "https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest",
   },
   100: {
     contractAddress: "0xf1A9589880DbF393F32A5b2d5a0054Fa10385074",
@@ -95,7 +95,7 @@ const chainIdToParams = {
       "https://cdn.kleros.link/ipfs/QmUYBkvBEDXLvLtnKBvPCj6fJgTJ9nDQYseU4f1Wo33AY2/xdai-snapshot-2024-04.json",
     ],
     blockExplorerBaseUrl: "https://blockscout.com/poa/xdai/",
-    klerosboard: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard-xdai",
+    klerosboard: "https://api.studio.thegraph.com/query/66145/klerosboard-gnosis/version/latest",
   },
 };
 
