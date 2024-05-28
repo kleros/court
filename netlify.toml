@@ -59,6 +59,7 @@
   REACT_APP_WEB3_FALLBACK_MUMBAI_HTTPS_URL='https://polygon-mumbai.g.alchemy.com/v2/demo'
 
   REACT_APP_WEB3_FALLBACK_ZKSYNCSEPOLIA_HTTPS_URL='https://sepolia.era.zksync.dev'
+  REACT_APP_WEB3_FALLBACK_ARBITRUMSEPOLIA_HTTPS_URL='https://sepolia-rollup.arbitrum.io/rpc'
 
 [context.production.environment]
   REACT_APP_CONTEXT='production'
