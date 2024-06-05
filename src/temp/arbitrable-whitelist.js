@@ -56,6 +56,7 @@ const arbitrableWhitelist = {
     "0x73E4F71e5ecE8d1319807DC7cd2EAA9Fda8F5182",
     "0xE620947519E8102aa625BBB4669fE317c9FffeD7",
     "0x1ec9729366e4C3eb8b8Ea776935508188051C0F4",
+    "0xb994886066B17cfa0fE088C5933498B17FE66A50",
   ].map((address) => address.toLowerCase()),
 };
 
