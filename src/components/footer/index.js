@@ -1,11 +1,11 @@
-import React from 'react'
-import { ReactComponent as Question } from '../../assets/images/question-circle.svg'
-import { ReactComponent as Twitter } from '../../assets/images/twitter.svg'
-import { ReactComponent as Github } from '../../assets/images/github.svg'
-import { ReactComponent as Ghost } from '../../assets/images/ghost.svg'
-import { ReactComponent as LinkedIn } from '../../assets/images/linkedin.svg'
-import { ReactComponent as Telegram } from '../../assets/images/telegram.svg'
-import './footer.css'
+import React from "react";
+import { ReactComponent as Question } from "../../assets/images/question-circle.svg";
+import { ReactComponent as Twitter } from "../../assets/images/x.svg";
+import { ReactComponent as Github } from "../../assets/images/github.svg";
+import { ReactComponent as Ghost } from "../../assets/images/ghost.svg";
+import { ReactComponent as LinkedIn } from "../../assets/images/linkedin.svg";
+import { ReactComponent as Telegram } from "../../assets/images/telegram.svg";
+import "./footer.css";
 
 const Footer = () => (
   <div className="footer">
@@ -39,6 +39,6 @@ const Footer = () => (
       </div>
     </div>
   </div>
-)
+);
 
-export default Footer
+export default Footer;
