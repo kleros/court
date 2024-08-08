@@ -1,12 +1,12 @@
 import { Card, Tooltip } from "antd";
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { ReactComponent as Hexagon } from "../assets/images/hexagon.svg";
 import { ReactComponent as Question } from "../assets/images/question-circle.svg";
-
 import PropTypes from "prop-types";
 import { ReactComponent as Underline } from "../assets/images/underline.svg";
 import styled from "styled-components/macro";
 import useChainId from "../hooks/use-chain-id";
+import { getStakingReward } from "../helpers/rewards";
 
 const StyledCard = styled(Card)`
   background: none;
@@ -105,7 +105,13 @@ const StyledTooltipDiv = styled.span`
 
 const TitledListCard = ({ children, loading, prefix, title, apy }) => {
   const chainId = useChainId();
-  const pnkPerMonth = { 1: 900000, 100: 100000 };
+  const [realApy, setRealApy] = useState(undefined);
+
+  useEffect(() => {
+    if (!realApy && chainId && apy) {
+      getStakingReward(chainId.toString(), apy).then((r) => setRealApy(r));
+    }
+  }, [apy, chainId]);
 
   return (
     <StyledCard
@@ -114,13 +120,13 @@ const TitledListCard = ({ children, loading, prefix, title, apy }) => {
       loading={loading}
       title={
         <>
-          {apy && pnkPerMonth[chainId] && (
+          {realApy && (
             <Tooltip
               title="The current rate. Subject to change depending on total staked amount."
               getPopupContainer={(triggerNode) => triggerNode}
             >
               <StyledTooltipDiv>
-                {`${((pnkPerMonth[chainId] / apy) * 12 * 100).toFixed(2)}% APY`}
+                {`${realApy.toFixed(2)}% APY`}
                 <Question
                   style={{
                     verticalAlign: "text-bottom",
