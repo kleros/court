@@ -68,10 +68,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.footer-right-icons a {
-  padding-right: 10px;
+  gap: 10px;
 }
 
 @media (max-width: 1130px) {
