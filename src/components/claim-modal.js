@@ -149,8 +149,9 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
     const snapshots = airdropParams?.snapshots ?? [];
 
     for (var month = 0; month < snapshots.length; month++) {
-      responses[month] = fetch(`${ipfsEndpoint}` + "/ipfs/" + snapshots[month]);
+      responses[month] = fetch(`${ipfsEndpoint}/ipfs/${snapshots[month]}`);
     }
+
     const results = Promise.all(
       responses.map((promise) => promise.then((r) => r.json()).catch((e) => console.error(e)))
     );
