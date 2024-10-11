@@ -761,25 +761,25 @@ export default function CaseDetailsCard({ ID }) {
               .
             </div>
           )}
-          {Number(dispute.period) < "3" && !votesData.voted && (
-            <>
-              <div>
-                If the dispute is failing to load and appears to be broken it is advised to refuse to arbitrate. Please
-                cast your vote using button below.
-              </div>
-              <Button
-                style={{ color: "#4d00b4", marginTop: "16px", float: "right" }}
-                disabled={!votesData.canVote}
-                ghost={!votesData.canVote}
-                id={0}
-                onClick={onVoteClick}
-                size="large"
-              >
-                {"Refuse to Arbitrate"}
-              </Button>
-            </>
-          )}
         </div>
+      )}
+      {dispute && Number(dispute.period) < "3" && !votesData.voted && (
+        <>
+          <div style={{ marginTop: "32px" }}>
+            If the dispute is failing to load and appears to be broken it is advised to refuse to arbitrate. Please cast
+            your vote using button below.
+          </div>
+          <Button
+            style={{ color: "#4d00b4", marginTop: "16px", float: "right" }}
+            disabled={!votesData.canVote}
+            ghost={!votesData.canVote}
+            id={0}
+            onClick={onVoteClick}
+            size="large"
+          >
+            {"Refuse to Arbitrate"}
+          </Button>
+        </>
       )}
     </>
   );
