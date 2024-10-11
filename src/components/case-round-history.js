@@ -15,7 +15,7 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
   const { drizzle, useCacheCall } = useDrizzle();
   const getMetaEvidence = useDataloader.getMetaEvidence();
   const [round, setRound] = useState(dispute.votesLengths.length - 1);
-  const [rulingOption, setRulingOption] = useState(Number(ruling) || 1);
+  const [rulingOption, setRulingOption] = useState(ruling || 1);
   const [justificationIndex, setJustificationIndex] = useState(0);
   const chainId = useChainId();
 
@@ -40,14 +40,15 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
     dispute.votesLengths.map((_, i) => {
       if (!justificationsByRound || !metaEvidence) return [];
       const justs = justificationsByRound[i];
-      return justs.reduce(
-        (acc, j) => {
-          const vote = call("KlerosLiquid", "getVote", ID, i, j.voteID);
-          if (vote?.voted) acc[acc.length > vote.choice ? vote.choice : acc.length - 1].push(j.justification);
-          return acc;
-        },
-        [...new Array(2 + (metaEvidence.rulingOptions?.titles?.length || 0))].map(() => [])
-      );
+      return justs.reduce((acc, j) => {
+        const vote = call("KlerosLiquid", "getVote", ID, i, j.voteID);
+        if (vote?.voted) {
+          const key = vote.choice.toString();
+          const currentValue = acc[key];
+          acc[key] = currentValue ? [...currentValue, j.justification] : [j.justification];
+        }
+        return acc;
+      }, {});
     })
   );
 
@@ -91,15 +92,23 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
                 >
                   <Row>
                     <Col lg={24}>
-                      <Radio.Button size="large" value={0}>
+                      <Radio.Button size="large" value={"0"}>
                         Refuse to Arbitrate
                       </Radio.Button>
                     </Col>
                     {metaEvidence &&
-                      metaEvidence.rulingOptions.titles.map((option, i) => (
+                      metaEvidence.rulingOptions?.titles?.map((option, i) => (
                         <Col lg={24} key={i}>
-                          <Radio.Button size="large" value={i + 1}>
+                          <Radio.Button size="large" value={(i + 1).toString()}>
                             {option}
+                          </Radio.Button>
+                        </Col>
+                      ))}
+                    {metaEvidence.rulingOptions?.reserved &&
+                      Object.keys(metaEvidence.rulingOptions.reserved).map((key) => (
+                        <Col lg={24} key={key}>
+                          <Radio.Button size="large" value={key}>
+                            {metaEvidence.rulingOptions.reserved[key]}
                           </Radio.Button>
                         </Col>
                       ))}
@@ -111,7 +120,7 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
               <JustificationsBox>
                 <Skeleton active loading={!justificationsChoices[round]}>
                   <h2>Justification</h2>
-                  {justificationsChoices[round] && justificationsChoices[round][rulingOption].length > 0 ? (
+                  {justificationsChoices[round] && justificationsChoices[round][rulingOption]?.length > 0 ? (
                     <>
                       <JustificationText>
                         {justificationsChoices[round][rulingOption][justificationIndex]}
@@ -119,7 +128,7 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
                       <ScrollBarContainer>
                         <ScrollBar
                           currentOption={justificationIndex}
-                          numberOfOptions={justificationsChoices[round][rulingOption].length - 1}
+                          numberOfOptions={justificationsChoices[round][rulingOption]?.length - 1}
                           setOption={setJustificationIndex}
                         />
                       </ScrollBarContainer>
