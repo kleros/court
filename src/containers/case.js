@@ -1,5 +1,5 @@
-import React from "react";
-import { Button, Row, Col, Tooltip } from "antd";
+import React, { useMemo } from "react";
+import { Button, Modal, Row, Col, Tooltip } from "antd";
 import { useParams } from "react-router-dom";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import CaseDetailsCard from "../components/case-details-card";
@@ -12,6 +12,7 @@ import styled from "styled-components/macro";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import useChainId from "../hooks/use-chain-id";
 import useGetDraws from "../hooks/use-get-draws";
+import { chainIdToNetworkName } from "../helpers/networks";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -76,66 +77,106 @@ export default function Case() {
     return disputeData;
   });
 
+  const isDisputeTooOld = useMemo(() => {
+    return disputeData.deadline && (new Date().getTime() - disputeData.deadline.getTime() > 30 * 365 * 24 * 60 * 60 * 1000);
+  }, [disputeData.deadline]);
+
+  async function handleChainSwitch() {
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x1' }],
+      });
+    } catch (error) {
+      console.error('Error switching chains:', error);
+    }
+  }
+
+  const renderContent = () => {
+    if (isDisputeTooOld && chainId !== 1) {
+      return (
+        <Modal
+          title="Dispute Not Found"
+          visible={true}
+          closable={false}
+          footer={[
+            <Button key="switch" type="primary" onClick={handleChainSwitch}>
+              Switch to Mainnet
+            </Button>,
+          ]}
+        >
+          <p>The dispute with ID {ID} does not exist on the {chainIdToNetworkName[chainId]}. Please switch to Mainnet.</p>
+        </Modal>
+      );
+    }
+
+    return (
+      <>
+        <TopBanner
+          description={
+            <>
+              Case #{ID} | <ETHAmount amount={disputeData.atStake} tokenSymbol="PNK" /> Locked
+            </>
+          }
+          extra={
+            <Row>
+              {dispute && dispute.ruled ? (
+                <ResolvedTag>Resolved</ResolvedTag>
+              ) : (
+                <>
+                  {disputeData.deadline && disputeData.hiddenVotes !== undefined && (
+                    <Col lg={disputeData.showPassPeriod ? 12 : 24}>
+                      <StyledDiv>{periodToPhase(dispute.period, disputeData.hiddenVotes)} Period Over</StyledDiv>
+                      <StyledBigTextDiv>
+                        <TimeAgo className="primary-color theme-color">{disputeData.deadline}</TimeAgo>
+                      </StyledBigTextDiv>
+                    </Col>
+                  )}
+                  {disputeData.showPassPeriod ? (
+                    <Col lg={12}>
+                      {Number(dispute.period) === 4 ? (
+                        <Tooltip title={"Enforce the ruling of this case"}>
+                          <StyledButton
+                            type="primary"
+                            onClick={() => {
+                              sendExecuteRuling(ID);
+                            }}
+                          >
+                            Execute Ruling
+                          </StyledButton>
+                        </Tooltip>
+                      ) : (
+                        <Tooltip title={"Advance this case to the next phase"}>
+                          <StyledButton
+                            type="primary"
+                            onClick={() => {
+                              sendPassPeriod(ID);
+                            }}
+                          >
+                            Pass Period
+                          </StyledButton>
+                        </Tooltip>
+                      )}
+                    </Col>
+                  ) : (
+                    ""
+                  )}
+                </>
+              )}
+            </Row>
+          }
+          title="Case Details"
+        />
+        <CaseDetailsCard ID={ID} />
+      </>
+    );
+  };
+
   return (
     <RequiredChainIdGateway
       renderOnMismatch={({ requiredChainId }) => <RequiredChainIdModal requiredChainId={requiredChainId} />}
     >
-      <TopBanner
-        description={
-          <>
-            Case #{ID} | <ETHAmount amount={disputeData.atStake} tokenSymbol="PNK" /> Locked
-          </>
-        }
-        extra={
-          <Row>
-            {dispute && dispute.ruled ? (
-              <ResolvedTag>Resolved</ResolvedTag>
-            ) : (
-              <>
-                {disputeData.deadline && disputeData.hiddenVotes !== undefined && (
-                  <Col lg={disputeData.showPassPeriod ? 12 : 24}>
-                    <StyledDiv>{periodToPhase(dispute.period, disputeData.hiddenVotes)} Period Over</StyledDiv>
-                    <StyledBigTextDiv>
-                      <TimeAgo className="primary-color theme-color">{disputeData.deadline}</TimeAgo>
-                    </StyledBigTextDiv>
-                  </Col>
-                )}
-                {disputeData.showPassPeriod ? (
-                  <Col lg={12}>
-                    {Number(dispute.period) === 4 ? (
-                      <Tooltip title={"Enforce the ruling of this case"}>
-                        <StyledButton
-                          type="primary"
-                          onClick={() => {
-                            sendExecuteRuling(ID);
-                          }}
-                        >
-                          Execute Ruling
-                        </StyledButton>
-                      </Tooltip>
-                    ) : (
-                      <Tooltip title={"Advance this case to the next phase"}>
-                        <StyledButton
-                          type="primary"
-                          onClick={() => {
-                            sendPassPeriod(ID);
-                          }}
-                        >
-                          Pass Period
-                        </StyledButton>
-                      </Tooltip>
-                    )}
-                  </Col>
-                ) : (
-                  ""
-                )}
-              </>
-            )}
-          </Row>
-        }
-        title="Case Details"
-      />
-      <CaseDetailsCard ID={ID} />
+      {renderContent()}
     </RequiredChainIdGateway>
   );
 }
