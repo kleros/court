@@ -81,7 +81,7 @@ export default function Case() {
     return disputeData.deadline && (new Date().getTime() - disputeData.deadline.getTime() > 30 * 365 * 24 * 60 * 60 * 1000);
   }, [disputeData.deadline]);
 
-  async function handleChainSwitch() {
+  async function handleChainSwitchToMainnet() {
     try {
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
@@ -100,12 +100,12 @@ export default function Case() {
           visible={true}
           closable={false}
           footer={[
-            <Button key="switch" type="primary" onClick={handleChainSwitch}>
+            <Button key="switch" type="primary" onClick={handleChainSwitchToMainnet}>
               Switch to Mainnet
             </Button>,
           ]}
         >
-          <p>The dispute with ID {ID} does not exist on the {chainIdToNetworkName[chainId]}. Please switch to Mainnet.</p>
+          <p>The dispute with ID {ID} does not exist on {chainIdToNetworkName[chainId]}. Please switch to Mainnet.</p>
         </Modal>
       );
     }
