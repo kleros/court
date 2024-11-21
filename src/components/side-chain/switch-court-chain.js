@@ -21,7 +21,7 @@ import useAccount from "../../hooks/use-account";
 import usePromise from "../../hooks/use-promise";
 import useInterval from "../../hooks/use-interval";
 import useForceUpdate from "../../hooks/use-force-update";
-import { chainIdToNetworkName, chainIdToNetworkShortName } from "../../helpers/networks";
+import { chainIdToNetworkName } from "../../helpers/networks";
 import { useSetRequiredChainId } from "../required-chain-id-gateway";
 import AnnouncementBanner from "./announcement-banner";
 import MultiBalance from "../multi-balance";
@@ -35,8 +35,6 @@ export default function SwitchCourtChain() {
   const chainId = useChainId();
   const account = useAccount();
   const hasAccount = !!account;
-
-  const pnkTokenSymbol = useMemo(() => getTokenSymbol(chainId, "PNK"), [chainId]);
 
   const destinationChainId = React.useMemo(() => {
     try {
@@ -64,11 +62,16 @@ export default function SwitchCourtChain() {
         </StyledButtonWrapper>
       ) : isSupportedMainChain(destinationChainId) ? (
         <StyledButtonWrapper>
-          <Link component={StyledButtonLink} to="/convert-pnk" icon="swap">
-            <span>
-              Send {pnkTokenSymbol} to {chainIdToNetworkShortName[destinationChainId]}
-            </span>
-          </Link>
+          <StyledLink component={StyledButtonLink} to="/convert-pnk" icon="swap">
+            <span>Convert stPNK to xPNK</span>
+          </StyledLink>
+          <StyledCustomButton
+            text="Bridge xPNK to Mainnet"
+            href="https://bridge.gnosischain.com/"
+            rel="noopener noreferrer"
+            target="_blank"
+            icon="arrow-right"
+          />
           <CustomButton
             text={`Court on ${chainIdToNetworkName[destinationChainId]}`}
             iconAfter={<Icon type="arrow-right" />}
@@ -481,4 +484,16 @@ const StyledResponsiveBannerButton = styled(Button).attrs((props) => ({
   @media (max-width: 767.98px) {
     min-height: 48px;
   }
+`;
+
+const StyledLink = styled(Link)`
+  display: flex;
+  text-decoration: none;
+  align-items: center;
+`;
+
+const StyledCustomButton = styled(CustomButton)`
+  display: flex;
+  text-decoration: none;
+  align-items: center;
 `;
