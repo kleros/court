@@ -105,7 +105,7 @@ function hasErrors(fieldsError) {
   return Object.keys(fieldsError).some((field) => fieldsError[field]);
 }
 
-const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, disabled }) => {
+const ConvertStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, disabled }) => {
   const { chainId } = useSideChainApi();
   const { drizzle } = useDrizzle();
   const { account } = useDrizzleState((drizzleState) => ({
@@ -184,7 +184,7 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
   );
 });
 
-const WithdrawStPnk = () => {
+const ConvertStPnk = () => {
   const sideChainApi = useSideChainApi();
   const account = useAccount();
   const tokenStats = usePromise(
@@ -199,11 +199,12 @@ const WithdrawStPnk = () => {
           margin-top: -1rem;
         `}
       >
-        Use this if you only want to obtain xPNK, for example, for usage in Gnosis Chain exchanges.
+        Use this if you only want to obtain xPNK, for example, for bridging it to Mainnet via the Gnosis Bridge, or for
+        trading it in Gnosis Chain exchanges.
       </StyledExplainerText>
-      <WithdrawStPnkForm maxAvailable={hasAvailableTokens ? tokenStats.value.available : "0"} />
+      <ConvertStPnkForm maxAvailable={hasAvailableTokens ? tokenStats.value.available : "0"} />
     </StyledCard>
   );
 };
 
-export default WithdrawStPnk;
+export default ConvertStPnk;
