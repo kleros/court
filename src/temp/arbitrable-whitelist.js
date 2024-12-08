@@ -32,6 +32,7 @@ const arbitrableWhitelist = {
     "0xFe0eb5fC686f929Eb26D541D75Bb59F816c0Aa68",
     "0x2018038203aEE8e7a29dABd73771b0355D4F85ad",
     "0xeF2Ae6961Ec7F2105bc2693Bc32fA7b7386B2f59",
+    "0x32bcDC9776692679CfBBf8350BAd67Da13FaaA3F",
   ].map((address) => address.toLowerCase()),
   100: [
     "0x0b928165a67df8254412483ae8c3b8cc7f2b4d36",
@@ -58,6 +59,7 @@ const arbitrableWhitelist = {
     "0xFe0eb5fC686f929Eb26D541D75Bb59F816c0Aa68",
     "0x8453bA2C9eA5Bae36fDe6cBd61c12c05b6552425",
     "0xeF2Ae6961Ec7F2105bc2693Bc32fA7b7386B2f59",
+    "0x32bcDC9776692679CfBBf8350BAd67Da13FaaA3F",
   ].map((address) => address.toLowerCase()),
   11155111: [
     "0x73E4F71e5ecE8d1319807DC7cd2EAA9Fda8F5182",
