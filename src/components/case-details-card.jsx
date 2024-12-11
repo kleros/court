@@ -241,6 +241,14 @@ export default function CaseDetailsCard({ ID }) {
   const metaEvidence = dispute && getMetaEvidence(chainId, dispute.arbitrated, KlerosLiquid.address, ID);
   const evidence = useEvidence(chainId, ID);
 
+  const [showRefuse, setShowRefuse] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowRefuse(true);
+    }, 180000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const { send: sendCommit, status: sendCommitStatus } = useCacheSend("KlerosLiquid", "castCommit");
   const { send: sendVote, status: sendVoteStatus } = useCacheSend("KlerosLiquid", "castVote");
   const onJustificationChange = useCallback(({ currentTarget: { value } }) => setJustification(value), []);
@@ -763,7 +771,7 @@ export default function CaseDetailsCard({ ID }) {
           )}
         </div>
       )}
-      {dispute && Number(dispute.period) < "3" && !votesData.voted && (
+      {showRefuse && dispute && Number(dispute.period) < "3" && !votesData.voted && (
         <>
           <div style={{ marginTop: "32px" }}>
             If the dispute is failing to load and appears to be broken it is advised to refuse to arbitrate. Please cast
