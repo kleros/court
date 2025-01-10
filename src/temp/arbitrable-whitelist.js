@@ -66,8 +66,14 @@ const arbitrableWhitelist = {
   300: [
     "0x54C68fa979883d317C10F3cfDdc33522889d5612", // zkRealitioForeignProxy (Sepolia)
   ].map((address) => address.toLowerCase()),
+  1301: [
+    "0xC10D916467aDdC02464aC98036E58644F0E50311", // RealitioForeignProxyUnichain (Sepolia)
+  ].map((address) => address.toLowerCase()),
   10200: [
     "0x252e210B33083E9dFB9d94C526767B83Be579d8b", // RealitioForeignArbitrationProxyWithAppeals (Sepolia)
+  ].map((address) => address.toLowerCase()),
+  11155420: [
+    "0x6a41AF8FC7f68bdd13B2c7D50824Ed49155DC3bA", // RealitioForeignProxyOptimism (Sepolia)
   ].map((address) => address.toLowerCase()),
 };
 
