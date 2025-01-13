@@ -270,14 +270,6 @@ export default function CaseDetailsCard({ ID }) {
   const [committedVote, setCommittedVote] = useStoredCommittedVote();
 
   useEffect(() => {
-    if (dispute?.arbitrated && !arbitrableWhitelist[chainId]?.includes(dispute?.arbitrated.toLowerCase())) {
-      console.warn("Arbitrable NOT included in whitelist for evidence display: ", dispute?.arbitrated);
-    } else {
-      console.info("Arbitrable included in whitelist for evidence display: ", dispute?.arbitrated);
-    }
-  }, [dispute?.arbitrated, chainId]);
-
-  useEffect(() => {
     let mounted = true;
 
     async function deriveCommitedVote() {
@@ -425,6 +417,20 @@ export default function CaseDetailsCard({ ID }) {
     }
   }, [metaEvidence]);
 
+  const arbitratorChainID = useMemo(() => metaEvidence?.arbitratorChainID ?? chainId, [metaEvidence, chainId]);
+  const arbitrableChainID = useMemo(() => metaEvidence?.arbitrableChainID ?? arbitratorChainID, [
+    metaEvidence,
+    arbitratorChainID,
+  ]);
+
+  useEffect(() => {
+    if (dispute?.arbitrated && !arbitrableWhitelist[arbitrableChainID]?.includes(dispute?.arbitrated.toLowerCase())) {
+      console.warn("Arbitrable NOT included in whitelist for evidence display: ", dispute?.arbitrated);
+    } else {
+      console.info("Arbitrable included in whitelist for evidence display: ", dispute?.arbitrated);
+    }
+  }, [dispute?.arbitrated, arbitrableChainID]);
+
   const evidenceDisplayInterfaceURL = useMemo(() => {
     const normalizeIPFSUri = (uri) => uri.replace(/^\/ipfs\//, "https://cdn.kleros.link/ipfs/");
     if (metaEvidence?.evidenceDisplayInterfaceURI) {
@@ -435,9 +441,6 @@ export default function CaseDetailsCard({ ID }) {
           : metaEvidence.evidenceDisplayInterfaceURI;
 
       const { _v = "0" } = metaEvidence;
-
-      const arbitratorChainID = metaEvidence?.arbitratorChainID ?? chainId;
-      const arbitrableChainID = metaEvidence?.arbitrableChainID ?? arbitratorChainID;
 
       let url = normalizeIPFSUri(evidenceDisplayInterfaceURI);
 
@@ -461,7 +464,8 @@ export default function CaseDetailsCard({ ID }) {
 
       return url;
     }
-  }, [metaEvidence, ID, dispute, chainId, KlerosLiquid.address]);
+  }, [metaEvidence, ID, dispute, chainId, KlerosLiquid.address, arbitratorChainID, arbitrableChainID]);
+
   return (
     <>
       <StyledCard
@@ -648,7 +652,7 @@ export default function CaseDetailsCard({ ID }) {
                   {metaEvidence.evidenceDisplayInterfaceURI && (
                     <iframe
                       sandbox={
-                        arbitrableWhitelist[chainId]?.includes(dispute.arbitrated.toLowerCase())
+                        arbitrableWhitelist[arbitrableChainID]?.includes(dispute.arbitrated.toLowerCase())
                           ? "allow-scripts allow-same-origin allow-popups"
                           : "allow-scripts"
                       }
