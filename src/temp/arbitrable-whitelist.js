@@ -28,11 +28,7 @@ const arbitrableWhitelist = {
     "0xf339047c85d0dd2645f2bd802a1e8a5e7af61053",
     "0xf65c7560d6ce320cc3a16a07f1f65aab66396b9e",
     "0xf72cfd1b34a91a64f9a98537fe63fbab7530adca",
-    "0x8453bA2C9eA5Bae36fDe6cBd61c12c05b6552425",
-    "0xFe0eb5fC686f929Eb26D541D75Bb59F816c0Aa68",
     "0x2018038203aEE8e7a29dABd73771b0355D4F85ad",
-    "0xeF2Ae6961Ec7F2105bc2693Bc32fA7b7386B2f59",
-    "0x32bcDC9776692679CfBBf8350BAd67Da13FaaA3F",
   ].map((address) => address.toLowerCase()),
   100: [
     "0x0b928165a67df8254412483ae8c3b8cc7f2b4d36",
@@ -56,21 +52,23 @@ const arbitrableWhitelist = {
     "0xd5994f15be9987104d9821aa99d1c97227c7c08c",
     "0xe04f5791d671d5c4e08ab49b39807087b591ea3e",
     "0xf7de5537ecd69a94695fcf4bcdbdee6329b63322",
-    "0xFe0eb5fC686f929Eb26D541D75Bb59F816c0Aa68",
-    "0x8453bA2C9eA5Bae36fDe6cBd61c12c05b6552425",
-    "0xeF2Ae6961Ec7F2105bc2693Bc32fA7b7386B2f59",
-    "0x32bcDC9776692679CfBBf8350BAd67Da13FaaA3F",
+    "0xFe0eb5fC686f929Eb26D541D75Bb59F816c0Aa68", // RealitioForeignArbitrationProxyWithAppeals (Ethereum)
+    "0x8453bA2C9eA5Bae36fDe6cBd61c12c05b6552425", // RealitioForeignArbitrationProxyWithAppeals (Ethereum)
+    "0xeF2Ae6961Ec7F2105bc2693Bc32fA7b7386B2f59", // RealitioForeignArbitrationProxyWithAppeals (Ethereum)
+    "0x32bcDC9776692679CfBBf8350BAd67Da13FaaA3F", // RealitioForeignArbitrationProxyWithAppeals (Ethereum)
   ].map((address) => address.toLowerCase()),
   11155111: [
     "0x73E4F71e5ecE8d1319807DC7cd2EAA9Fda8F5182",
     "0xE620947519E8102aa625BBB4669fE317c9FffeD7",
     "0x1ec9729366e4C3eb8b8Ea776935508188051C0F4",
     "0xb994886066B17cfa0fE088C5933498B17FE66A50",
-    "0x54C68fa979883d317C10F3cfDdc33522889d5612",
-    "0x252e210B33083E9dFB9d94C526767B83Be579d8b",
   ].map((address) => address.toLowerCase()),
-  300: ["0x54C68fa979883d317C10F3cfDdc33522889d5612"].map((address) => address.toLowerCase()),
-  10200: ["0x252e210B33083E9dFB9d94C526767B83Be579d8b"].map((address) => address.toLowerCase()),
+  300: [
+    "0x54C68fa979883d317C10F3cfDdc33522889d5612", // zkRealitioForeignProxy (Sepolia)
+  ].map((address) => address.toLowerCase()),
+  10200: [
+    "0x252e210B33083E9dFB9d94C526767B83Be579d8b", // RealitioForeignArbitrationProxyWithAppeals (Sepolia)
+  ].map((address) => address.toLowerCase()),
 };
 
 export default arbitrableWhitelist;
