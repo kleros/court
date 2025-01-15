@@ -1,4 +1,4 @@
-import { Button, Cascader, Col, Modal, Row, Skeleton, Tooltip } from "antd";
+import { Button, Cascader, Col, Modal, Row, Skeleton, Tooltip, Typography } from "antd";
 import React, { useCallback, useState } from "react";
 import PropTypes from "prop-types";
 import ReactMarkdown from "react-markdown";
@@ -136,10 +136,11 @@ const CourtCascaderModal = ({ onClick }) => {
             <Skeleton active loading={option.loading}>
               <StyledPolicyRow gutter={16}>
                 <Col md={12}>
-                  <StyledPolicySection>
-                    {option.label} | Min Stake = <ETHAmount amount={minStake} decimals={0} tokenSymbol="PNK" />
-                    <div style={{ fontWeight: "400", fontSize: "12px" }}>
-                      Each vote has a stake of{" "}
+                  <Typography.Title level={1}>
+                    {option.label}
+                    <StyledMinStakeDisplay>
+                      Min Stake = <ETHAmount amount={minStake} decimals={0} tokenSymbol="PNK" /> | Each vote has a stake
+                      of{" "}
                       <ETHAmount
                         amount={
                           minStake &&
@@ -150,35 +151,36 @@ const CourtCascaderModal = ({ onClick }) => {
                         tokenSymbol="PNK"
                       />
                       .
-                    </div>
-                  </StyledPolicySection>
+                    </StyledMinStakeDisplay>
+                  </Typography.Title>
                   <ReactMarkdown source={option.description} />
                   <ReactMarkdown source={option.summary} />
                 </Col>
-                <Col md={12}>
+                <Col md={12} style={{ marginTop: "62px" }}>
                   {option.requiredSkills ? (
-                    <Row>
-                      <Col md={4}>
-                        <Hexagon className="ternary-fill" />
+                    <Row gutter={16}>
+                      <Col span={2} offset={2}>
                         <StyledPrefixDiv>
-                          <img src={skillsImg} alt="skills" />
+                          <Hexagon className="ternary-fill" />
+                          <img src={skillsImg} alt="skills" style={{ maxWidth: "108%" }} />
                         </StyledPrefixDiv>
                       </Col>
-                      <Col md={20}>
-                        <StyledHeader>Required Skills</StyledHeader>
+                      <Col span={20}>
+                        <Typography.Title level={2}>Required Skills</Typography.Title>
                         <ReactMarkdown source={option.requiredSkills} />
+                        <br />
                       </Col>
                     </Row>
                   ) : null}
-                  <Row>
-                    <Col md={4}>
-                      <Hexagon className="ternary-fill" />
-                      <StyledPrefixDiv style={{ top: "33px" }}>
-                        <img src={rewardImg} alt="reward" />
+                  <Row gutter={16}>
+                    <Col span={2} offset={2}>
+                      <StyledPrefixDiv>
+                        <Hexagon className="ternary-fill" />
+                        <img src={rewardImg} alt="reward" style={{ maxWidth: "92%" }} />
                       </StyledPrefixDiv>
                     </Col>
-                    <Col md={20}>
-                      <StyledHeader>Reward</StyledHeader>
+                    <Col span={20}>
+                      <Typography.Title level={2}>Reward</Typography.Title>
                       <div>
                         For each coherent vote you will receive{" "}
                         <strong>
@@ -223,6 +225,24 @@ const StyledModal = styled(Modal)`
   padding-bottom: 0;
   width: 90% !important;
   height: 90vh;
+
+  h1 {
+    font-size: 20px;
+    font-weight: bolder;
+    color: #4d00b4;
+  }
+
+  h2 {
+    font-size: 18px;
+    font-weight: bolder;
+    color: #4d00b4;
+  }
+
+  h3 {
+    font-size: 16px;
+    font-weight: bolder;
+    color: #4d00b4;
+  }
 
   .ant-modal {
     &-header {
@@ -285,11 +305,6 @@ const StyledButton = styled(Button)`
   ${SelectButtonArea} > &:last-of-type {
     margin-left: auto;
   }
-`;
-
-const StyledHeader = styled.div`
-  ffnt-size: 18px;
-  font-weight: bold;
 `;
 
 const StyledCascader = styled(Cascader)`
@@ -358,10 +373,17 @@ const StyledCascader = styled(Cascader)`
 `;
 
 const StyledPrefixDiv = styled.div`
-  left: 29px;
   position: absolute;
-  top: 29px;
   transform: translate(-50%, -50%);
+  left: 8px;
+  top: 36px;
+
+  img {
+    position: absolute;
+    right: 50%;
+    top: 50%;
+    transform: translate(50%, -50%);
+  }
 `;
 
 const StyledPolicyWrapper = styled.div`
@@ -371,11 +393,11 @@ const StyledPolicyWrapper = styled.div`
 
 const StyledPolicyRow = styled(Row)`
   overflow: auto;
-  max-height: 100%;
+  height: 100%;
 `;
 
-const StyledPolicySection = styled.section`
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 20px;
+const StyledMinStakeDisplay = styled.div`
+  font-weight: 400;
+  font-size: 12px;
+  margin: 3px 0 20px 0;
 `;
