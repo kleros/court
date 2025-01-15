@@ -138,7 +138,7 @@ const CourtCascaderModal = ({ onClick }) => {
                 <Col md={12}>
                   <Typography.Title level={1}>
                     {option.label}
-                    <div style={{ fontWeight: "400", fontSize: "12px", margin: "3px 0 20px 0" }}>
+                    <StyledMinStakeDisplay>
                       Min Stake = <ETHAmount amount={minStake} decimals={0} tokenSymbol="PNK" /> | Each vote has a stake
                       of{" "}
                       <ETHAmount
@@ -151,7 +151,7 @@ const CourtCascaderModal = ({ onClick }) => {
                         tokenSymbol="PNK"
                       />
                       .
-                    </div>
+                    </StyledMinStakeDisplay>
                   </Typography.Title>
                   <ReactMarkdown source={option.description} />
                   <ReactMarkdown source={option.summary} />
@@ -159,15 +159,13 @@ const CourtCascaderModal = ({ onClick }) => {
                 <Col md={12} style={{ marginTop: "62px" }}>
                   {option.requiredSkills ? (
                     <Row gutter={16}>
-                      <Col md={2} offset={2}>
-                        <StyledPrefixDiv style={{ left: "7px", top: "35px" }}>
+                      <Col span={2} offset={2}>
+                        <StyledPrefixDiv>
                           <Hexagon className="ternary-fill" />
-                        </StyledPrefixDiv>
-                        <StyledPrefixDiv style={{ left: "6px", top: "29px" }}>
                           <img src={skillsImg} alt="skills" style={{ maxWidth: "108%" }} />
                         </StyledPrefixDiv>
                       </Col>
-                      <Col md={20}>
+                      <Col span={20}>
                         <Typography.Title level={2}>Required Skills</Typography.Title>
                         <ReactMarkdown source={option.requiredSkills} />
                         <br />
@@ -175,15 +173,13 @@ const CourtCascaderModal = ({ onClick }) => {
                     </Row>
                   ) : null}
                   <Row gutter={16}>
-                    <Col md={2} offset={2}>
-                      <StyledPrefixDiv style={{ left: "7px", top: "35px" }}>
+                    <Col span={2} offset={2}>
+                      <StyledPrefixDiv>
                         <Hexagon className="ternary-fill" />
-                      </StyledPrefixDiv>
-                      <StyledPrefixDiv style={{ left: "8px", top: "36px" }}>
                         <img src={rewardImg} alt="reward" style={{ maxWidth: "92%" }} />
                       </StyledPrefixDiv>
                     </Col>
-                    <Col md={20}>
+                    <Col span={20}>
                       <Typography.Title level={2}>Reward</Typography.Title>
                       <div>
                         For each coherent vote you will receive{" "}
@@ -379,6 +375,15 @@ const StyledCascader = styled(Cascader)`
 const StyledPrefixDiv = styled.div`
   position: absolute;
   transform: translate(-50%, -50%);
+  left: 8px;
+  top: 36px;
+
+  img {
+    position: absolute;
+    right: 50%;
+    top: 50%;
+    transform: translate(50%, -50%);
+  }
 `;
 
 const StyledPolicyWrapper = styled.div`
@@ -389,4 +394,10 @@ const StyledPolicyWrapper = styled.div`
 const StyledPolicyRow = styled(Row)`
   overflow: auto;
   height: 100%;
+`;
+
+const StyledMinStakeDisplay = styled.div`
+  font-weight: 400;
+  font-size: 12px;
+  margin: 3px 0 20px 0;
 `;
