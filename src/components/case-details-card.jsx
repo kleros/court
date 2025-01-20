@@ -424,12 +424,17 @@ export default function CaseDetailsCard({ ID }) {
   ]);
 
   useEffect(() => {
-    if (dispute?.arbitrated && !arbitrableWhitelist[arbitrableChainID]?.includes(dispute?.arbitrated.toLowerCase())) {
+    if (
+      metaEvidence &&
+      metaEvidence.title !== "Invalid or tampered case data, refuse to arbitrate." &&
+      dispute?.arbitrated &&
+      !arbitrableWhitelist[arbitrableChainID]?.includes(dispute?.arbitrated.toLowerCase())
+    ) {
       console.warn("Arbitrable NOT included in whitelist for evidence display: ", dispute?.arbitrated);
     } else {
       console.info("Arbitrable included in whitelist for evidence display: ", dispute?.arbitrated);
     }
-  }, [dispute?.arbitrated, arbitrableChainID]);
+  }, [dispute?.arbitrated, arbitrableChainID, metaEvidence]);
 
   const evidenceDisplayInterfaceURL = useMemo(() => {
     const normalizeIPFSUri = (uri) => uri.replace(/^\/ipfs\//, "https://cdn.kleros.link/ipfs/");

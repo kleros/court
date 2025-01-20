@@ -89,92 +89,98 @@ const fetchDataFromScript = async (scriptString, scriptParameters) => {
 
 const funcs = {
   async getMetaEvidence(chainID, arbitrated, arbitrator, disputeId) {
-    try {
-      const metaEvidenceUriData = await axios.get(
-        `${process.env.REACT_APP_METAEVIDENCE_URL}?chainId=${chainID}&disputeId=${disputeId}`
-      );
+    const startTime = Date.now();
+    const maxTime = 120000;
+    const waitTime = 5000;
+    while (Date.now() - startTime < maxTime) {
+      try {
+        const metaEvidenceUriData = await axios.get(
+          `${process.env.REACT_APP_METAEVIDENCE_URL}?chainId=${chainID}&disputeId=${disputeId}`
+        );
 
-      const uri = metaEvidenceUriData.data?.metaEvidenceUri;
-      if (!uri) throw new Error(`No MetaEvidence log for disputeId ${disputeId} on chainID ${chainID}`);
+        const uri = metaEvidenceUriData.data?.metaEvidenceUri;
+        if (!uri) throw new Error(`No MetaEvidence log for disputeId ${disputeId} on chainID ${chainID}`);
 
-      let metaEvidenceJSON = (await axios.get(getHttpUri(uri))).data;
+        let metaEvidenceJSON = (await axios.get(getHttpUri(uri))).data;
 
-      const updateDict = {
-        evidenceDisplayInterfaceURL: "evidenceDisplayInterfaceURI",
-        evidenceDisplayInterfaceURLHash: "evidenceDisplayInterfaceHash",
-      };
-
-      const replacePairs = Object.entries(updateDict);
-      for (const [legacyKey, updatedKey] of replacePairs) {
-        if (!metaEvidenceJSON[legacyKey]) continue;
-        const value = metaEvidenceJSON[legacyKey];
-        delete metaEvidenceJSON[legacyKey];
-        metaEvidenceJSON[updatedKey] = value;
-      }
-
-      if (metaEvidenceJSON.rulingOptions && !metaEvidenceJSON.rulingOptions.type)
-        metaEvidenceJSON.rulingOptions.type = "single-select";
-
-      if (metaEvidenceJSON.dynamicScriptURI) {
-        const scriptURI =
-          chainID === 1 && disputeId === "1621"
-            ? getHttpUri("/ipfs/Qmf1k727vP7qZv21MDB8vwL6tfVEKPCUQAiw8CTfHStkjf")
-            : getHttpUri(metaEvidenceJSON.dynamicScriptURI);
-
-        console.info("Fetching dynamic script file at", scriptURI);
-
-        const fileResponse = await axios.get(scriptURI);
-
-        if (fileResponse.status !== 200) throw new Error(`Unable to fetch dynamic script file at ${scriptURI}.`);
-
-        const injectedParameters = {
-          arbitratorChainID: metaEvidenceJSON.arbitratorChainID || chainID,
-          arbitrableChainID: metaEvidenceJSON.arbitrableChainID || chainID,
-          disputeID: disputeId,
+        const updateDict = {
+          evidenceDisplayInterfaceURL: "evidenceDisplayInterfaceURI",
+          evidenceDisplayInterfaceURLHash: "evidenceDisplayInterfaceHash",
         };
 
-        injectedParameters.arbitrableContractAddress = injectedParameters.arbitrableContractAddress || arbitrated;
-        injectedParameters.arbitratorJsonRpcUrl =
-          injectedParameters.arbitratorJsonRpcUrl || getReadOnlyRpcUrl(injectedParameters.arbitratorChainID);
-        injectedParameters.arbitrableChainID = injectedParameters.arbitrableChainID || arbitrator;
-        injectedParameters.arbitrableJsonRpcUrl =
-          injectedParameters.arbitrableJsonRpcUrl || getReadOnlyRpcUrl(injectedParameters.arbitrableChainID);
-
-        if (
-          injectedParameters.arbitratorChainID !== undefined &&
-          injectedParameters.arbitratorJsonRpcUrl === undefined
-        ) {
-          console.warn(
-            `Could not obtain a valid 'arbitratorJsonRpcUrl' for chain ID ${injectedParameters.arbitratorChainID} on the Arbitrator side.`
-          );
+        const replacePairs = Object.entries(updateDict);
+        for (const [legacyKey, updatedKey] of replacePairs) {
+          if (!metaEvidenceJSON[legacyKey]) continue;
+          const value = metaEvidenceJSON[legacyKey];
+          delete metaEvidenceJSON[legacyKey];
+          metaEvidenceJSON[updatedKey] = value;
         }
 
-        if (
-          injectedParameters.arbitrableChainID !== undefined &&
-          injectedParameters.arbitrableJsonRpcUrl === undefined
-        ) {
-          console.warn(
-            `Could not obtain a valid 'arbitrableJsonRpcUrl' for chain ID ${injectedParameters.arbitrableChainID} on the Arbitrable side.`
-          );
+        if (metaEvidenceJSON.rulingOptions && !metaEvidenceJSON.rulingOptions.type)
+          metaEvidenceJSON.rulingOptions.type = "single-select";
+
+        if (metaEvidenceJSON.dynamicScriptURI) {
+          const scriptURI =
+            chainID === 1 && disputeId === "1621"
+              ? getHttpUri("/ipfs/Qmf1k727vP7qZv21MDB8vwL6tfVEKPCUQAiw8CTfHStkjf")
+              : getHttpUri(metaEvidenceJSON.dynamicScriptURI);
+
+          console.info("Fetching dynamic script file at", scriptURI);
+
+          const fileResponse = await axios.get(scriptURI);
+
+          if (fileResponse.status !== 200) throw new Error(`Unable to fetch dynamic script file at ${scriptURI}.`);
+
+          const injectedParameters = {
+            arbitratorChainID: metaEvidenceJSON.arbitratorChainID || chainID,
+            arbitrableChainID: metaEvidenceJSON.arbitrableChainID || chainID,
+            disputeID: disputeId,
+          };
+
+          injectedParameters.arbitrableContractAddress = injectedParameters.arbitrableContractAddress || arbitrated;
+          injectedParameters.arbitratorJsonRpcUrl =
+            injectedParameters.arbitratorJsonRpcUrl || getReadOnlyRpcUrl(injectedParameters.arbitratorChainID);
+          injectedParameters.arbitrableChainID = injectedParameters.arbitrableChainID || arbitrator;
+          injectedParameters.arbitrableJsonRpcUrl =
+            injectedParameters.arbitrableJsonRpcUrl || getReadOnlyRpcUrl(injectedParameters.arbitrableChainID);
+
+          if (
+            injectedParameters.arbitratorChainID !== undefined &&
+            injectedParameters.arbitratorJsonRpcUrl === undefined
+          ) {
+            console.warn(
+              `Could not obtain a valid 'arbitratorJsonRpcUrl' for chain ID ${injectedParameters.arbitratorChainID} on the Arbitrator side.`
+            );
+          }
+
+          if (
+            injectedParameters.arbitrableChainID !== undefined &&
+            injectedParameters.arbitrableJsonRpcUrl === undefined
+          ) {
+            console.warn(
+              `Could not obtain a valid 'arbitrableJsonRpcUrl' for chain ID ${injectedParameters.arbitrableChainID} on the Arbitrable side.`
+            );
+          }
+
+          const metaEvidenceEdits = await fetchDataFromScript(fileResponse.data, injectedParameters);
+
+          metaEvidenceJSON = {
+            ...metaEvidenceJSON,
+            ...metaEvidenceEdits,
+          };
         }
 
-        const metaEvidenceEdits = await fetchDataFromScript(fileResponse.data, injectedParameters);
-
-        metaEvidenceJSON = {
-          ...metaEvidenceJSON,
-          ...metaEvidenceEdits,
-        };
+        return metaEvidenceJSON;
+      } catch (err) {
+        await new Promise((r) => setTimeout(() => r(), waitTime));
+        console.warn("Failed to get the evidence:", err);
       }
-
-      return metaEvidenceJSON;
-    } catch (err) {
-      console.warn("Failed to get the evidence:", err);
-      return {
-        description:
-          "The data for this case is not formatted correctly or has been tampered since the time of its submission. Please refresh the page and refuse to arbitrate if the problem persists.",
-        title: "Invalid or tampered case data, refuse to arbitrate.",
-      };
     }
+    return {
+      description:
+        "The data for this case is not formatted correctly or has been tampered since the time of its submission. Please refresh the page and refuse to arbitrate if the problem persists.",
+      title: "Invalid or tampered case data, refuse to arbitrate.",
+    };
   },
   async loadPolicy(URI) {
     if (!URI) {
