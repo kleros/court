@@ -89,9 +89,10 @@ const fetchDataFromScript = async (scriptString, scriptParameters) => {
 
 const funcs = {
   async getMetaEvidence(chainID, arbitrated, arbitrator, disputeId) {
-    let attempts = 0;
-    const max_attempts = 3;
-    while (attempts < max_attempts) {
+    const startTime = Date.now();
+    const maxTime = 120000;
+    const waitTime = 5000;
+    while (Date.now() - startTime < maxTime) {
       try {
         const metaEvidenceUriData = await axios.get(
           `${process.env.REACT_APP_METAEVIDENCE_URL}?chainId=${chainID}&disputeId=${disputeId}`
@@ -171,9 +172,8 @@ const funcs = {
 
         return metaEvidenceJSON;
       } catch (err) {
-        attempts++;
+        await new Promise((r) => setTimeout(() => r(), waitTime));
         console.warn("Failed to get the evidence:", err);
-        console.warn("Attempts:", attempts);
       }
     }
     return {
