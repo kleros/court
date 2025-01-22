@@ -780,11 +780,14 @@ export default function CaseDetailsCard({ ID }) {
           )}
         </div>
       )}
-      {showRefuse && dispute && Number(dispute.period) < "3" && !votesData.voted && (
+      {showRefuse && dispute && Number(dispute.period) < "3" && !votesData.voted && votesData.drawnInCurrentRound && (
         <>
           <div style={{ marginTop: "32px" }}>
-            If the dispute is failing to load and appears to be broken it is advised to refuse to arbitrate. Please cast
-            your vote using button below.
+            If the dispute is failing to load and appears to be broken, in case you have an AdBlock enabled please
+            disable it and refresh the page as it maybe preventing the correct working of the page. If that is not the
+            case, the data for this case is not formatted correctly or has been tampered since the time of its
+            submission. Please refresh the page, if the problem persists it is advised to refuse to arbitrate. Please
+            cast your vote using button below.
           </div>
           <Button
             style={{ color: "#4d00b4", marginTop: "16px", float: "right" }}
