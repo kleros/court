@@ -784,7 +784,7 @@ export default function CaseDetailsCard({ ID }) {
         <>
           <div style={{ marginTop: "32px" }}>
             If the dispute is failing to load and appears to be broken, in case you have an AdBlock enabled please
-            disable it and refresh the page as it maybe preventing the correct working of the page. If that is not the
+            disable it and refresh the page as it may be preventing the correct working of the page. If that is not the
             case, the data for this case is not formatted correctly or has been tampered since the time of its
             submission. Please refresh the page, if the problem persists it is advised to refuse to arbitrate. Please
             cast your vote using button below.
