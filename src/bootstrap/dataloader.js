@@ -178,7 +178,7 @@ const funcs = {
     }
     return {
       description:
-        "In case you have an AdBlock enabled, please disable it and refresh the page. It maybe preventing the correct working of the page. If that's not the case, the data for this case is not formatted correctly or has been tampered since the time of its submission. Please refresh the page and refuse to arbitrate if the problem persists.",
+        "In case you have an AdBlock enabled, please disable it and refresh the page. It may be preventing the correct working of the page. If that's not the case, the data for this case is not formatted correctly or has been tampered since the time of its submission. Please refresh the page and refuse to arbitrate if the problem persists.",
       title: "Invalid or tampered case data, refuse to arbitrate.",
     };
   },
