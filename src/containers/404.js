@@ -16,7 +16,7 @@ export default function C404({ Web3 }) {
         {Web3 && <Spin spinning={true}></Spin>}
         <StyledMessageLine3 className="ternary-color theme-color">
           {Web3
-            ? "Please make sure you have your wallet unlocked on Mainnet, Gnosis Chain, Goerli or Chiado. If you don't have a wallet, we recommend you install MetaMask on desktop and Trust on mobile."
+            ? "Please make sure you have your wallet unlocked on Mainnet, Gnosis Chain, Sepolia or Chiado. If you don't have a wallet, we recommend you install MetaMask on desktop and Trust on mobile."
             : "The greek gods are not available at the moment."}
         </StyledMessageLine3>
       </StyledInfoDiv>

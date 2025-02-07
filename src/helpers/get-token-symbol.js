@@ -18,7 +18,6 @@ getTokenSymbol.propTypes = {
 
 const chainIdToSuffix = {
   1: "ETH",
-  5: "gETH",
   100: "xDAI",
   10200: "xDAI",
   11155111: "sETH",
@@ -26,7 +25,6 @@ const chainIdToSuffix = {
 
 const chainIdToTokenSuffix = {
   1: { PNK: "PNK", xPNK: "<<Invalid>>" },
-  5: { PNK: "PNK", xPNK: "<<Invalid>>" },
   100: { PNK: "stPNK", xPNK: "PNK" },
   10200: { PNK: "stPNK", xPNK: "PNK" },
   11155111: { PNK: "PNK", xPNK: "<<Invalid>>" },
