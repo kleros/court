@@ -11,7 +11,6 @@ import UniswapV2Router02 from "../assets/contracts/uniswap-v2-router-02.json";
 const defaultOptions = {
   networkWhitelist: [
     1, // Mainnet
-    5, // Görli
     100, // xDAI
     10200, // Chiado
     11155111, // Sepolia
@@ -21,7 +20,6 @@ const defaultOptions = {
       ...Kleros,
       networks: {
         1: { address: process.env.REACT_APP_KLEROS_ADDRESS },
-        5: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
         100: { address: process.env.REACT_APP_KLEROS_XDAI_ADDRESS },
         10200: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
         11155111: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
@@ -31,7 +29,6 @@ const defaultOptions = {
       ...KlerosLiquid,
       networks: {
         1: { address: process.env.REACT_APP_KLEROS_LIQUID_ADDRESS },
-        5: { address: process.env.REACT_APP_KLEROS_LIQUID_GOERLI_ADDRESS },
         100: { address: process.env.REACT_APP_KLEROS_LIQUID_XDAI_ADDRESS },
         10200: { address: process.env.REACT_APP_KLEROS_LIQUID_CHIADO_ADDRESS },
         11155111: { address: process.env.REACT_APP_KLEROS_LIQUID_SEPOLIA_ADDRESS },
@@ -41,7 +38,6 @@ const defaultOptions = {
       ...KlerosLiquidExtraViews,
       networks: {
         1: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_ADDRESS },
-        5: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_GOERLI_ADDRESS },
         100: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_XDAI_ADDRESS },
         10200: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_CHIADO_ADDRESS },
         11155111: { address: process.env.REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_SEPOLIA_ADDRESS },
@@ -51,7 +47,6 @@ const defaultOptions = {
       ...Pinakion,
       networks: {
         1: { address: process.env.REACT_APP_PINAKION_ADDRESS },
-        5: { address: process.env.REACT_APP_PINAKION_GOERLI_ADDRESS },
         100: { address: process.env.REACT_APP_PINAKION_XDAI_ADDRESS },
         10200: { address: process.env.REACT_APP_PINAKION_CHIADO_ADDRESS },
         11155111: { address: process.env.REACT_APP_PINAKION_SEPOLIA_ADDRESS },
@@ -61,7 +56,6 @@ const defaultOptions = {
       ...PolicyRegistry,
       networks: {
         1: { address: process.env.REACT_APP_POLICY_REGISTRY_ADDRESS },
-        5: { address: process.env.REACT_APP_POLICY_REGISTRY_GOERLI_ADDRESS },
         100: { address: process.env.REACT_APP_POLICY_REGISTRY_XDAI_ADDRESS },
         10200: { address: process.env.REACT_APP_POLICY_REGISTRY_CHIADO_ADDRESS },
         11155111: { address: process.env.REACT_APP_POLICY_REGISTRY_SEPOLIA_ADDRESS },
@@ -71,7 +65,6 @@ const defaultOptions = {
       ...UniswapV2Factory,
       networks: {
         1: { address: process.env.REACT_APP_UNISWAP_V2_FACTORY_ADDRESS },
-        5: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
         100: { address: process.env.REACT_APP_UNISWAP_V2_FACTORY_XDAI_ADDRESS },
         10200: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
         11155111: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
@@ -81,7 +74,6 @@ const defaultOptions = {
       ...UniswapV2Router02,
       networks: {
         1: { address: process.env.REACT_APP_UNISWAP_V2_ROUTER_02_ADDRESS },
-        5: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
         100: { address: process.env.REACT_APP_UNISWAP_V2_ROUTER_02_XDAI_ADDRESS },
         10200: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
         11155111: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
@@ -96,7 +88,6 @@ const defaultOptions = {
 
 const chainIdToFallbackUrl = {
   1: process.env.REACT_APP_WEB3_FALLBACK_URL,
-  5: process.env.REACT_APP_WEB3_FALLBACK_GOERLI_URL,
   100: process.env.REACT_APP_WEB3_FALLBACK_XDAI_URL,
   10200: process.env.REACT_APP_WEB3_FALLBACK_CHIADO_URL,
   11155111: process.env.REACT_APP_WEB3_FALLBACK_SEPOLIA_URL,

@@ -12,15 +12,6 @@ const networkIDData = {
       ? Number(process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER)
       : 0,
   },
-  5: {
-    name: "_GOERLI",
-    provider: "https://goerli.infura.io/v3/261bdc527a49430b9b31d28ba9fecfde",
-    nativeToken: "ETH",
-    pnkToken: "PNK",
-    fromBlock: process.env.REACT_APP_KLEROS_LIQUID_GOERLI_BLOCK_NUMBER
-      ? Number(process.env.REACT_APP_KLEROS_LIQUID_GOERLI_BLOCK_NUMBER)
-      : 0,
-  },
   100: {
     name: "_XDAI",
     provider: "https://rpc.gnosischain.com",
