@@ -427,12 +427,13 @@ export default function CaseDetailsCard({ ID }) {
     if (
       metaEvidence &&
       metaEvidence.title !== "Invalid or tampered case data, refuse to arbitrate." &&
-      dispute?.arbitrated &&
-      !arbitrableWhitelist[arbitrableChainID]?.includes(dispute?.arbitrated.toLowerCase())
+      dispute?.arbitrated
     ) {
-      console.warn("Arbitrable NOT included in whitelist for evidence display: ", dispute?.arbitrated);
-    } else {
-      console.info("Arbitrable included in whitelist for evidence display: ", dispute?.arbitrated);
+      if (!arbitrableWhitelist[arbitrableChainID]?.includes(dispute?.arbitrated.toLowerCase())) {
+        console.warn("Arbitrable NOT included in whitelist for evidence display: ", dispute?.arbitrated);
+      } else {
+        console.info("Arbitrable included in whitelist for evidence display: ", dispute?.arbitrated);
+      }
     }
   }, [dispute?.arbitrated, arbitrableChainID, metaEvidence]);
 
