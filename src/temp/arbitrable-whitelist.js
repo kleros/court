@@ -67,6 +67,9 @@ const arbitrableWhitelist = {
   300: [
     "0x54C68fa979883d317C10F3cfDdc33522889d5612", // zkRealitioForeignProxy (Sepolia)
   ].map((address) => address.toLowerCase()),
+  130: [
+    "0x3FB8314C628E9afE7677946D3E23443Ce748Ac17", // RealitioForeignProxyUnichain
+  ].map((address) => address.toLowerCase()),
   1301: [
     "0xC10D916467aDdC02464aC98036E58644F0E50311", // RealitioForeignProxyUnichain (Sepolia)
   ].map((address) => address.toLowerCase()),
