@@ -26,6 +26,7 @@ import EvidenceTimeline from "./evidence-timeline";
 import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 import useGetDraws from "../hooks/use-get-draws";
 import arbitrableWhitelist from "../temp/arbitrable-whitelist";
+import { getAnswerString } from "../temp/answer-string";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const { toBN, soliditySha3 } = Web3.utils;
@@ -145,6 +146,23 @@ const RevealVoteButton = ({ onRevealClick, votesData, dispute }) => {
         Reveal Vote
       </StyledButton>
     </StyledButtonsDiv>
+  );
+};
+
+const AnswerDisplay = ({ msg, votesData, rulingOptions }) => {
+  const [displayHex, setDisplayHex] = useState();
+
+  return (
+    <>
+      {msg}
+      {votesData.voted === "0"
+        ? "Refuse to Arbitrate"
+        : (rulingOptions && getAnswerString(rulingOptions, votesData, displayHex)) || "Unknown Choice"}
+      &rdquo;.
+      {["uint", "int"].includes(rulingOptions?.type) ? (
+        <StyledButton onClick={() => setDisplayHex(!displayHex)}>{displayHex ? "Decimal" : "Hex"}</StyledButton>
+      ) : null}
+    </>
   );
 };
 
@@ -498,22 +516,11 @@ export default function CaseDetailsCard({ ID }) {
                       {votesData.voted ? (
                         <>
                           <div>
-                            You voted for: &ldquo;
-                            {votesData.voted === "0"
-                              ? "Refuse to Arbitrate"
-                              : (metaEvidence.rulingOptions &&
-                                  realitioLibQuestionFormatter.getAnswerString(
-                                    {
-                                      decimals: metaEvidence.rulingOptions.precision,
-                                      outcomes: metaEvidence.rulingOptions.titles,
-                                      type: metaEvidence.rulingOptions.type,
-                                    },
-                                    realitioLibQuestionFormatter.padToBytes32(
-                                      toBN(votesData.voted).sub(toBN("1")).toString(16)
-                                    )
-                                  )) ||
-                                "Unknown Choice"}
-                            &rdquo;.
+                            <AnswerDisplay
+                              msg="You voted for: &ldquo;"
+                              rulingOptions={metaEvidence.rulingOptions}
+                              votesData={votesData}
+                            />
                           </div>
                           {Number(dispute.period) < 4 ? (
                             <SecondaryActionText>Waiting for the vote result.</SecondaryActionText>
@@ -528,43 +535,21 @@ export default function CaseDetailsCard({ ID }) {
                   )}
                   {dispute.period === "4" && (
                     <SecondaryActionText>
-                      The winner in this case was: &ldquo;
-                      {votesData.currentRuling === "0"
-                        ? "Refuse to Arbitrate"
-                        : (metaEvidence.rulingOptions &&
-                            realitioLibQuestionFormatter.getAnswerString(
-                              {
-                                decimals: metaEvidence.rulingOptions.precision,
-                                outcomes: metaEvidence.rulingOptions.titles,
-                                type: metaEvidence.rulingOptions.type,
-                              },
-                              realitioLibQuestionFormatter.padToBytes32(
-                                toBN(votesData.currentRuling).sub(toBN("1")).toString(16)
-                              )
-                            )) ||
-                          "Unknown Choice"}
-                      &rdquo;.
+                      <AnswerDisplay
+                        msg="The winner in this case was: &ldquo;"
+                        rulingOptions={metaEvidence.rulingOptions}
+                        votesData={votesData}
+                      />
                     </SecondaryActionText>
                   )}
                   {votesData.committed && !votesData.voted ? (
                     committedVote !== undefined ? (
                       <SecondaryActionText>
-                        You committed to:{" "}
-                        {votesData.voted === "0"
-                          ? "Refuse to Arbitrate"
-                          : (metaEvidence.rulingOptions &&
-                              realitioLibQuestionFormatter.getAnswerString(
-                                {
-                                  decimals: metaEvidence.rulingOptions.precision,
-                                  outcomes: metaEvidence.rulingOptions.titles,
-                                  type: metaEvidence.rulingOptions.type,
-                                },
-                                realitioLibQuestionFormatter.padToBytes32(
-                                  toBN(committedVote).sub(toBN("1")).toString(16)
-                                )
-                              )) ||
-                            "Unknown Choice"}
-                        .
+                        <AnswerDisplay
+                          msg="You committed to: "
+                          rulingOptions={metaEvidence.rulingOptions}
+                          votesData={votesData}
+                        />
                       </SecondaryActionText>
                     ) : (
                       <Alert
@@ -763,20 +748,11 @@ export default function CaseDetailsCard({ ID }) {
         <div key={0} style={{ marginTop: "32px" }}>
           {votesData.voted && (
             <div>
-              You successfully voted for{" "}
-              {votesData.voted === "0"
-                ? "Refuse to Arbitrate"
-                : (metaEvidence.rulingOptions &&
-                    realitioLibQuestionFormatter.getAnswerString(
-                      {
-                        decimals: metaEvidence.rulingOptions.precision,
-                        outcomes: metaEvidence.rulingOptions.titles,
-                        type: metaEvidence.rulingOptions.type,
-                      },
-                      realitioLibQuestionFormatter.padToBytes32(toBN(votesData.voted).sub(toBN("1")).toString(16))
-                    )) ||
-                  "Unknown Choice"}
-              .
+              <AnswerDisplay
+                msg="You successfully voted for "
+                rulingOptions={metaEvidence.rulingOptions}
+                votesData={votesData}
+              />
             </div>
           )}
         </div>
@@ -828,6 +804,12 @@ RevealVoteButton.propTypes = {
 JustificationBox.propTypes = {
   onChange: PropTypes.func,
   justification: PropTypes.string,
+};
+
+AnswerDisplay.propTypes = {
+  msg: PropTypes.string.isRequired,
+  rulingOptions: PropTypes.object.isRequired,
+  votesData: PropTypes.object.isRequired,
 };
 
 realitioLibQuestionFormatter.minNumber = realitioLibQuestionFormatter.minNumber.bind({
