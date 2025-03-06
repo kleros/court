@@ -12,7 +12,6 @@ import PNKBalanceCard from "../components/pnk-balance-card";
 import RequiredChainIdGateway from "../components/required-chain-id-gateway";
 import RequiredChainIdModal from "../components/required-chain-id-modal";
 import StakeModal from "../components/stake-modal";
-import TokenSymbol from "../components/token-symbol";
 import TopBanner from "../components/top-banner";
 import SideChainPnkActions from "../components/side-chain/pnk-actions";
 import useChainId from "../hooks/use-chain-id";
@@ -37,11 +36,7 @@ export default function Courts() {
   const content = (
     <>
       <TopBanner
-        description={
-          <>
-            Select courts and stake <TokenSymbol token="PNK" />
-          </>
-        }
+        description={<>Select courts and stake PNK</>}
         extra={
           <StyledButtonBar>
             <Link

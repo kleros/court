@@ -13,16 +13,16 @@ import PerformanceCard from "../components/performance-card";
 import RewardCard from "../components/reward-card";
 import ClaimModal from "../components/claim-modal";
 import TopBanner from "../components/top-banner";
-import TokenSymbol from "../components/token-symbol";
 import RequiredChainIdGateway from "../components/required-chain-id-gateway";
 import RequiredChainIdModal from "../components/required-chain-id-modal";
 import SideChainPnkActions from "../components/side-chain/pnk-actions";
 import useChainId from "../hooks/use-chain-id";
 import { ReactComponent as Present } from "../assets/images/present.svg";
+import CourtDrawer from "../components/court-drawer";
 
 const { useDrizzleState } = drizzleReactHooks;
 
-const airdropChainIds = [1, 42, 77, 100];
+const airdropChainIds = [1, 100];
 const buyPnkChainIds = [1, 100];
 
 export default function Home() {
@@ -38,6 +38,8 @@ export default function Home() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalButtonVisible, setIsModalButtonVisible] = useState(false);
   const [apy, setApy] = useState(0);
+
+  const [activeSubcourtID, setActiveSubcourtID] = useState();
 
   useEffect(() => {
     setIsModalButtonVisible(false);
@@ -87,9 +89,7 @@ export default function Home() {
               type="primary"
             >
               <Present style={{ marginRight: "8px", verticalAlign: "text-top" }} />
-              <span>
-                Claim <TokenSymbol token="PNK" />
-              </span>
+              <span>Claim PNK</span>
             </StyledClaimButton>
             <Link
               to="/tokens"
@@ -113,7 +113,7 @@ export default function Home() {
       <RewardCard />
       <Row gutter={32}>
         <Col lg={8}>
-          <CourtsListCard apy={apy > 1000000 ? apy : null} />
+          <CourtsListCard apy={apy > 1000000 ? apy : null} setActiveSubcourtID={setActiveSubcourtID} />
         </Col>
         <Col lg={8}>
           <CasesListCard />
@@ -125,6 +125,7 @@ export default function Home() {
       <OngoingCasesCard />
       <NotificationsCard />
       <SideChainPnkActions showGetSideChainPnkModal={false} />
+      {activeSubcourtID !== undefined && <CourtDrawer ID={activeSubcourtID} onClose={setActiveSubcourtID} />}
     </>
   );
 

@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Button, Row, Col, Tooltip } from "antd";
+import { Button, Modal, Row, Col, Tooltip } from "antd";
 import { useParams } from "react-router-dom";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import CaseDetailsCard from "../components/case-details-card";
@@ -10,6 +10,9 @@ import RequiredChainIdGateway from "../components/required-chain-id-gateway";
 import RequiredChainIdModal from "../components/required-chain-id-modal";
 import styled from "styled-components/macro";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import useChainId from "../hooks/use-chain-id";
+import useGetDraws from "../hooks/use-get-draws";
+import { chainIdToNetworkName } from "../helpers/networks";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -23,7 +26,7 @@ const periodToPhase = (period, hiddenVotes) => {
 
 export default function Case() {
   const { ID } = useParams();
-  const { drizzle, useCacheCall, useCacheEvents, useCacheSend } = useDrizzle();
+  const { drizzle, useCacheCall, useCacheSend } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
@@ -31,25 +34,15 @@ export default function Case() {
   const { send: sendExecuteRuling } = useCacheSend("KlerosLiquid", "executeRuling");
   const dispute = useCacheCall("KlerosLiquid", "disputes", ID);
   const dispute2 = useCacheCall("KlerosLiquid", "getDispute", ID);
-  const draws = useCacheEvents(
-    "KlerosLiquid",
-    "Draw",
-    useMemo(
-      () => ({
-        filter: { _address: drizzleState.account, _disputeID: ID },
-        fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER,
-      }),
-      [drizzleState.account, ID]
-    )
-  );
+  const chainId = useChainId();
+  const draws = useGetDraws(chainId, `address: "${drizzleState.account}", disputeID: ${ID}`);
+
   const disputeData = useCacheCall(["KlerosLiquid"], (call) => {
     let disputeData = {};
     if (dispute2 && draws) {
       const tokensAtStakePerJuror = dispute2.tokensAtStakePerJuror.map(drizzle.web3.utils.toBN);
       const votesByAppeal = draws.reduce((acc, d) => {
-        acc[d.returnValues._appeal] = acc[d.returnValues._appeal]
-          ? acc[d.returnValues._appeal].add(drizzle.web3.utils.toBN(1))
-          : drizzle.web3.utils.toBN(1);
+        acc[d.appeal] = acc[d.appeal] ? acc[d.appeal].add(drizzle.web3.utils.toBN(1)) : drizzle.web3.utils.toBN(1);
         return acc;
       }, {});
       disputeData = Object.keys(votesByAppeal).reduce(
@@ -84,66 +77,106 @@ export default function Case() {
     return disputeData;
   });
 
+  const isDisputeTooOld = useMemo(() => {
+    return disputeData.deadline && (new Date().getTime() - disputeData.deadline.getTime() > 30 * 365 * 24 * 60 * 60 * 1000);
+  }, [disputeData.deadline]);
+
+  async function handleChainSwitchToMainnet() {
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x1' }],
+      });
+    } catch (error) {
+      console.error('Error switching chains:', error);
+    }
+  }
+
+  const renderContent = () => {
+    if (isDisputeTooOld && chainId !== 1) {
+      return (
+        <Modal
+          title="Dispute Not Found"
+          visible={true}
+          closable={false}
+          footer={[
+            <Button key="switch" type="primary" onClick={handleChainSwitchToMainnet}>
+              Switch to Mainnet
+            </Button>,
+          ]}
+        >
+          <p>The dispute with ID {ID} does not exist on {chainIdToNetworkName[chainId]}. Please switch to Mainnet.</p>
+        </Modal>
+      );
+    }
+
+    return (
+      <>
+        <TopBanner
+          description={
+            <>
+              Case #{ID} | <ETHAmount amount={disputeData.atStake} tokenSymbol="PNK" /> Locked
+            </>
+          }
+          extra={
+            <Row>
+              {dispute && dispute.ruled ? (
+                <ResolvedTag>Resolved</ResolvedTag>
+              ) : (
+                <>
+                  {disputeData.deadline && disputeData.hiddenVotes !== undefined && (
+                    <Col lg={disputeData.showPassPeriod ? 12 : 24}>
+                      <StyledDiv>{periodToPhase(dispute.period, disputeData.hiddenVotes)} Period Over</StyledDiv>
+                      <StyledBigTextDiv>
+                        <TimeAgo className="primary-color theme-color">{disputeData.deadline}</TimeAgo>
+                      </StyledBigTextDiv>
+                    </Col>
+                  )}
+                  {disputeData.showPassPeriod ? (
+                    <Col lg={12}>
+                      {Number(dispute.period) === 4 ? (
+                        <Tooltip title={"Enforce the ruling of this case"}>
+                          <StyledButton
+                            type="primary"
+                            onClick={() => {
+                              sendExecuteRuling(ID);
+                            }}
+                          >
+                            Execute Ruling
+                          </StyledButton>
+                        </Tooltip>
+                      ) : (
+                        <Tooltip title={"Advance this case to the next phase"}>
+                          <StyledButton
+                            type="primary"
+                            onClick={() => {
+                              sendPassPeriod(ID);
+                            }}
+                          >
+                            Pass Period
+                          </StyledButton>
+                        </Tooltip>
+                      )}
+                    </Col>
+                  ) : (
+                    ""
+                  )}
+                </>
+              )}
+            </Row>
+          }
+          title="Case Details"
+        />
+        <CaseDetailsCard ID={ID} />
+      </>
+    );
+  };
+
   return (
     <RequiredChainIdGateway
       renderOnMismatch={({ requiredChainId }) => <RequiredChainIdModal requiredChainId={requiredChainId} />}
     >
-      <TopBanner
-        description={
-          <>
-            Case #{ID} | <ETHAmount amount={disputeData.atStake} tokenSymbol="PNK" /> Locked
-          </>
-        }
-        extra={
-          <Row>
-            {dispute && dispute.ruled ? (
-              <ResolvedTag>Resolved</ResolvedTag>
-            ) : (
-              <>
-                {disputeData.deadline && disputeData.hiddenVotes !== undefined && (
-                  <Col lg={disputeData.showPassPeriod ? 12 : 24}>
-                    <StyledDiv>{periodToPhase(dispute.period, disputeData.hiddenVotes)} Period Over</StyledDiv>
-                    <StyledBigTextDiv>
-                      <TimeAgo className="primary-color theme-color">{disputeData.deadline}</TimeAgo>
-                    </StyledBigTextDiv>
-                  </Col>
-                )}
-                {disputeData.showPassPeriod ? (
-                  <Col lg={12}>
-                    {Number(dispute.period) === 4 ? (
-                      <Tooltip title={"Enforce the ruling of this case"}>
-                        <StyledButton
-                          type="primary"
-                          onClick={() => {
-                            sendExecuteRuling(ID);
-                          }}
-                        >
-                          Execute Ruling
-                        </StyledButton>
-                      </Tooltip>
-                    ) : (
-                      <Tooltip title={"Advance this case to the next phase"}>
-                        <StyledButton
-                          type="primary"
-                          onClick={() => {
-                            sendPassPeriod(ID);
-                          }}
-                        >
-                          Pass Period
-                        </StyledButton>
-                      </Tooltip>
-                    )}
-                  </Col>
-                ) : (
-                  ""
-                )}
-              </>
-            )}
-          </Row>
-        }
-        title="Case Details"
-      />
-      <CaseDetailsCard ID={ID} />
+      {renderContent()}
     </RequiredChainIdGateway>
   );
 }

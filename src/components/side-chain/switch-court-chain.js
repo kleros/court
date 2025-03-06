@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
 import { Button, Icon, Modal, Typography } from "antd";
@@ -21,11 +21,11 @@ import useAccount from "../../hooks/use-account";
 import usePromise from "../../hooks/use-promise";
 import useInterval from "../../hooks/use-interval";
 import useForceUpdate from "../../hooks/use-force-update";
-import { chainIdToNetworkName, chainIdToNetworkShortName } from "../../helpers/networks";
+import { chainIdToNetworkName } from "../../helpers/networks";
 import { useSetRequiredChainId } from "../required-chain-id-gateway";
 import AnnouncementBanner from "./announcement-banner";
 import MultiBalance from "../multi-balance";
-import TokenSymbol from "../token-symbol";
+import { getTokenSymbol } from "../../helpers/get-token-symbol";
 
 const { useDrizzle } = drizzleReactHooks;
 
@@ -62,11 +62,16 @@ export default function SwitchCourtChain() {
         </StyledButtonWrapper>
       ) : isSupportedMainChain(destinationChainId) ? (
         <StyledButtonWrapper>
-          <Link component={StyledButtonLink} to="/convert-pnk" icon="swap">
-            <span>
-              Send <TokenSymbol chainId={chainId} token="PNK" /> to {chainIdToNetworkShortName[destinationChainId]}
-            </span>
-          </Link>
+          <StyledLink component={StyledButtonLink} to="/convert-pnk" icon="swap">
+            <span>Convert stPNK to xPNK</span>
+          </StyledLink>
+          <StyledCustomButton
+            text="Bridge xPNK to Mainnet"
+            href="https://bridge.gnosischain.com/"
+            rel="noopener noreferrer"
+            target="_blank"
+            icon="arrow-right"
+          />
           <CustomButton
             text={`Court on ${chainIdToNetworkName[destinationChainId]}`}
             iconAfter={<Icon type="arrow-right" />}
@@ -260,11 +265,12 @@ function GetSideChainPnkLink({ icon, as, ...additionalProps }) {
   const Component = as;
   const destinationChainId = useDestinationChainId();
   const { bridgeAppUrl } = getSideChainParams(destinationChainId);
+  const xPnkDestinationTokenSymbol = useMemo(() => getTokenSymbol(destinationChainId, "xPNK"), [destinationChainId]);
 
   return (
     <Component href={bridgeAppUrl} target="_blank" rel="noreferrer noopener" {...additionalProps}>
       <span>
-        Get <TokenSymbol chainId={destinationChainId} token="xPNK" /> for {chainIdToNetworkName[destinationChainId]}
+        Get {xPnkDestinationTokenSymbol} for {chainIdToNetworkName[destinationChainId]}
       </span>
       {icon}
     </Component>
@@ -319,6 +325,8 @@ const StyledButtonLink = styled(ButtonLink)`
 function SideChainCourtModal({ balance, rawBalance, errors, trigger }) {
   const [visible, setVisible] = React.useState(false);
   const destinationChainId = useDestinationChainId();
+
+  const xPnkDestinationTokenSymbol = useMemo(() => getTokenSymbol(destinationChainId, "xPNK"), [destinationChainId]);
 
   const switchChain = useSwitchChain(destinationChainId);
 
@@ -380,7 +388,7 @@ function SideChainCourtModal({ balance, rawBalance, errors, trigger }) {
         <StyledSpacer style={{ "--size": "2rem" }} />
         <StyledExplainer>
           To be able to stake on Kleros Court on {chainIdToNetworkName[destinationChainId]}, first you need to get some{" "}
-          <TokenSymbol chainId={destinationChainId} token="xPNK" /> for that chain.
+          {xPnkDestinationTokenSymbol} for that chain.
         </StyledExplainer>
       </StyledModal>
     </>
@@ -476,4 +484,16 @@ const StyledResponsiveBannerButton = styled(Button).attrs((props) => ({
   @media (max-width: 767.98px) {
     min-height: 48px;
   }
+`;
+
+const StyledLink = styled(Link)`
+  display: flex;
+  text-decoration: none;
+  align-items: center;
+`;
+
+const StyledCustomButton = styled(CustomButton)`
+  display: flex;
+  text-decoration: none;
+  align-items: center;
 `;

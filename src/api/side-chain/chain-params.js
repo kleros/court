@@ -12,7 +12,7 @@ const supportedSideChains = {
   // xDai
   100: {
     chainId: 100,
-    chainName: "xDAI Chain",
+    chainName: "Gnosis Chain",
     nativeCurrency: { name: "xDAI", symbol: "xDAI", decimals: 18 },
     rpcUrls: [ensureEnv("REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL")],
     blockExplorerUrls: [getBaseUrl(100)],
@@ -28,33 +28,6 @@ const supportedSideChains = {
       },
       [Tokens.stPNK]: {
         address: ensureEnv("REACT_APP_PINAKION_XDAI_ADDRESS"),
-        symbol: "stPNK",
-        decimals: 18,
-        image: `${window.location.origin}${logoStPNK}`,
-      },
-    },
-  },
-  // Sokol
-  77: {
-    chainId: 77,
-    chainName: "Sokol",
-    nativeCurrency: { name: "Sokol POA", symbol: "SPOA", decimals: 18 },
-    rpcUrls: [ensureEnv("REACT_APP_WEB3_FALLBACK_SOKOL_HTTPS_URL")],
-    blockExplorerUrls: [getBaseUrl(77)],
-    bridgeAppUrl: `https://sokol-omnibridge.web.app/bridge?from=42&to=77&token=${ensureEnv(
-      "REACT_APP_PINAKION_KOVAN_ADDRESS"
-    )}`,
-    bridgeAppHistoryUrl: "https://sokol-omnibridge.web.app/history",
-    mainChainId: 42,
-    tokens: {
-      [Tokens.PNK]: {
-        address: ensureEnv("REACT_APP_RAW_PINAKION_SOKOL_ADDRESS"),
-        symbol: "PNK",
-        decimals: 18,
-        image: `${window.location.origin}${logoXPNK}`,
-      },
-      [Tokens.stPNK]: {
-        address: ensureEnv("REACT_APP_PINAKION_SOKOL_ADDRESS"),
         symbol: "stPNK",
         decimals: 18,
         image: `${window.location.origin}${logoStPNK}`,

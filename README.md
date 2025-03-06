@@ -16,9 +16,7 @@ The Kleros Court user interface.
 ## Get Started
 
 1.  Clone this repo.
-2.  Install and set up the [MetaMask](https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en) chrome extension.
-3.  Configure MetaMask on the Kovan Test Network.
-4.  Run `yarn` to install dependencies and then `yarn start` to start the dev server.
+2.  Run `yarn` to install dependencies and then `yarn start` to start the dev server.
 
 > To allow view-only mode, you can the REACT_APP_WEB3_FALLBACK_URL variable to a provider of your choice. Example: REACT_APP_WEB3_FALLBACK_URL=wss://mainnet.infura.io/ws/v3/<api-key>
 

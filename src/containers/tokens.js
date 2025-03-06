@@ -8,7 +8,6 @@ import PNKMainnetExchangesCard from "../components/pnk-exchanges-card";
 import PNKXdaiExchangesCard from "../components/pnk-xdai-exchanges-card";
 import TopBanner from "../components/top-banner";
 import useChainId from "../hooks/use-chain-id";
-import TokenSymbol from "../components/token-symbol";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
@@ -48,9 +47,7 @@ export default function Tokens() {
               ) : hasOldKlerosAtStake ? (
                 "Looks like you have some PNK locked in the old Kleros. Come back later when the periods have passed to withdraw."
               ) : (
-                <>
-                  The more <TokenSymbol token="PNK" /> you stake, the higher your chances of being drawn as a juror.
-                </>
+                <>The more PNK you stake, the higher your chances of being drawn as a juror.</>
               )}
             </Skeleton>
           }
@@ -96,9 +93,7 @@ export default function Tokens() {
               ) : hasOldKlerosAtStake ? (
                 "Looks like you have some PNK locked in the old Kleros. Come back later when the periods have passed to withdraw."
               ) : (
-                <>
-                  The more <TokenSymbol token="PNK" /> you stake, the higher your chances of being drawn as a juror.
-                </>
+                <>The more PNK you stake, the higher your chances of being drawn as a juror.</>
               )}
             </Skeleton>
           }

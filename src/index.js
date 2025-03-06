@@ -1,8 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { register } from "./bootstrap/service-worker";
-import SentryApp from "./bootstrap/sentry";
+import "./bootstrap/sentry";
+import App from "./bootstrap/app";
+import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 
 register();
 
-ReactDOM.render(<SentryApp />, document.getElementById("root"));
+ReactDOM.render(<App />, document.getElementById("root"));

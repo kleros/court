@@ -1,19 +1,20 @@
-import { Col, Icon, Row } from 'antd'
-import React from 'react'
-import styled from 'styled-components'
-import EvidenceCard from './evidence-card'
+import { Col, Icon, Row } from "antd";
+import React from "react";
+// eslint-disable-next-line no-restricted-imports
+import styled from "styled-components";
+import EvidenceCard from "./evidence-card";
 
 const StyledHeaderCol = styled(Col)`
   color: #4d00b4;
   font-size: 18px;
   font-weight: 500;
   line-height: 21px;
-`
+`;
 const StyledDividerCol = styled(Col)`
   border-right: 1px solid #4d00b4;
   height: 30px;
   width: 50%;
-`
+`;
 const EventDiv = styled.div`
   background: #4d00b4;
   border-radius: 300px;
@@ -26,7 +27,7 @@ const EventDiv = styled.div`
   padding: 10px 0;
   text-align: center;
   width: 135px;
-`
+`;
 const ScrollText = styled.div`
   color: #009aff;
   cursor: pointer;
@@ -38,50 +39,44 @@ const ScrollText = styled.div`
   @media (max-width: 500px) {
     text-align: center;
   }
-`
+`;
 const StyledEvidenceTimelineArea = styled.div`
   padding: 35px 10%;
-`
+`;
 
-const EvidenceTimeline = ({
-  evidence = [],
-  metaEvidence = {},
-  ruling = null
-}) => {
+const getRulingText = (ruling, metaEvidence) => {
+  if (!ruling) {
+    return "Jurors refused to make a ruling";
+  }
+  const rulingIndex = Number(ruling) - 1;
+  const rulingTitle = metaEvidence.rulingOptions?.titles?.[rulingIndex];
+  return `Jurors ruled: ${rulingTitle || ruling}`;
+};
+
+// eslint-disable-next-line react/prop-types
+const EvidenceTimeline = ({ evidence = [], metaEvidence = {}, ruling = null, chainId = 1 }) => {
   // Sort so most recent is first
   const sortedEvidence = evidence.sort((a, b) => {
-    if (a.submittedAt > b.submittedAt) return -1
-    else if (a.submittedAt < b.submittedAt) return 1
+    if (a.submittedAt > b.submittedAt) return -1;
+    else if (a.submittedAt < b.submittedAt) return 1;
 
-    return 0
-  })
+    return 0;
+  });
 
-  if (sortedEvidence.length === 0) return null
+  if (sortedEvidence.length === 0) return null;
 
   return (
     <StyledEvidenceTimelineArea>
       <Row id="scroll-top">
         <StyledHeaderCol lg={4}>Latest</StyledHeaderCol>
         <Col lg={16}>
-          {ruling && (
-            <EventDiv style={{ width: '225px' }}>
-              {ruling
-                ? `Jurors ruled: ${
-                    metaEvidence.metaEvidenceJSON.rulingOptions
-                      ? metaEvidence.metaEvidenceJSON.rulingOptions.titles[
-                          Number(ruling) - 1
-                        ]
-                      : ruling
-                  }`
-                : 'Jurors refused to make a ruling'}
-            </EventDiv>
-          )}
+          {ruling && <EventDiv style={{ width: "225px" }}>{getRulingText(ruling, metaEvidence)}</EventDiv>}
         </Col>
         <ScrollText
           lg={4}
           onClick={() => {
-            const _bottomRow = document.getElementById('scroll-bottom')
-            _bottomRow.scrollIntoView()
+            const _bottomRow = document.getElementById("scroll-bottom");
+            _bottomRow.scrollIntoView();
           }}
         >
           Scroll to Bottom <Icon type="arrow-down" />
@@ -92,10 +87,7 @@ const EvidenceTimeline = ({
           <Row>
             <StyledDividerCol lg={12} />
           </Row>
-          <EvidenceCard
-            evidence={_evidence}
-            metaEvidence={metaEvidence.metaEvidenceJSON}
-          />
+          <EvidenceCard evidence={_evidence} metaEvidence={metaEvidence} chainId={chainId} />
         </div>
       ))}
       <Row>
@@ -109,15 +101,15 @@ const EvidenceTimeline = ({
         <ScrollText
           lg={4}
           onClick={() => {
-            const _bottomRow = document.getElementById('scroll-top')
-            _bottomRow.scrollIntoView()
+            const _bottomRow = document.getElementById("scroll-top");
+            _bottomRow.scrollIntoView();
           }}
         >
           Scroll to Top <Icon type="arrow-up" />
         </ScrollText>
       </Row>
     </StyledEvidenceTimelineArea>
-  )
-}
+  );
+};
 
-export default EvidenceTimeline
+export default EvidenceTimeline;

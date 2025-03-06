@@ -8,95 +8,116 @@ import { ReactComponent as Kleros } from "../assets/images/kleros.svg";
 import { ReactComponent as RightArrow } from "../assets/images/right-arrow.svg";
 import useChainId from "../hooks/use-chain-id";
 import ETHAmount from "./eth-amount";
-import TokenSymbol from "./token-symbol";
+
+const ipfsEndpoint = "https://cdn.kleros.link";
 
 const chainIdToParams = {
   1: {
     contractAddress: "0xdbc3088Dfebc3cc6A84B0271DaDe2696DB00Af38",
     snapshots: [
-      "https://ipfs.kleros.io/ipfs/QmYJGrQBh68kAvqk57FdynEixdu4VY87mHme821rtPS92u/snapshot-1.json",
-      "https://ipfs.kleros.io/ipfs/QmUCTdvyAWU8eEV1nwgiF7CwKpL5FnXiDxGD9FedFdrHYU/snapshot-2021-03.json",
-      "https://ipfs.kleros.io/ipfs/QmXG2EKcd3tyMwoxhrqmBAu7gsrzgF3jCde75CjQzmg1Am/snapshot-2021-04.json",
-      "https://ipfs.kleros.io/ipfs/QmYEpiCACmZttwxFqsG4sSYsCpUeGchEgJGSRQFPuB6Txe/snapshot-2021-05.json",
-      "https://ipfs.kleros.io/ipfs/QmQ6Bdih6SR4KjoMeAPwvkfp33pYTQXEAAkSeZxGeHXCpo/snapshot-2021-06.json",
-      "https://ipfs.kleros.io/ipfs/QmUvo4mMGCz4dK8dMY1D68RBqEmyg1qpjxauo99FGDkMos/snapshot-2021-07.json",
-      "https://ipfs.kleros.io/ipfs/Qmdv94xuQoe5yy88NyBC8sRFLXwx7sqpWJKbGX5xx1cKjM/snapshot-2021-08.json",
-      "https://ipfs.kleros.io/ipfs/QmTJNeQ9mSyrKiPDaRxX9ektijkZXofra3wYwzbiej1ppB/snapshot-2021-09.json",
-      "https://ipfs.kleros.io/ipfs/QmRPFBHemHrmGFQCvxtwA13VQs2dR9KujZCBYMXrpw6pHd/snapshot-2021-10.json",
-      "https://ipfs.kleros.io/ipfs/QmRKxvfmskMboUcGb2jK6HMVDAPC7RtchxMbhaKH7aQFTm/snapshot-2021-11.json",
-      "https://ipfs.kleros.io/ipfs/QmVoSJv7TP3KZp71vbbm1ocHrt1RfYarZW8zEn7vR67Bj2/snapshot-2021-12.json",
-      "https://ipfs.kleros.io/ipfs/QmRARe8tM5wZwUmViqJFmMTMfm5XNUroLW4w8TPYfkDAR9/snapshot-2022-01.json",
-      "https://ipfs.kleros.io/ipfs/QmWY3uExz6kWtAkKq7hZuoZAPa4NYvUyk2FD7u4Xkp22da/snapshot-2022-02.json",
-      "https://ipfs.kleros.io/ipfs/Qmaz1f7ets65kCCYi5z2Feot3NLCKqQ8vn7zaLdm4Rbmqy/snapshot-2022-03.json",
-      "https://ipfs.kleros.io/ipfs/Qmdcxpb4TDCPPEcgF3eVw7Nz2Ch2LzRNigPPLy9S4W6h2M/snapshot-2022-04.json",
-      "https://ipfs.kleros.io/ipfs/Qmc2S1mcMjjHCX5TSrt1xioA9z7hB6seh9BKEfVjD1kwGG/snapshot-2022-05.json",
-      "https://ipfs.kleros.io/ipfs/QmenR1R6NMfCPcwN1gyJAj9RbpqUQMAnDHCybpB6s4Tsff/snapshot-2022-06.json",
-      "https://ipfs.kleros.io/ipfs/QmUWkVsXgGHsJ26VgphjZwDPzEtdkcPNAo1xogcPHfMCLt/snapshot-2022-07.json",
-      "https://ipfs.kleros.io/ipfs/QmUaJ5vxD9zVRqNiU2t7GgUL1vLmWKFHanaCEik9Mkzm3v/snapshot-2022-08.json",
-      "https://ipfs.kleros.io/ipfs/QmTDo9Mv2W6mQLqpxwRVpNTHEJzzNProiHQLppu95VVnXa/snapshot-2022-09.json",
-      "https://ipfs.kleros.io/ipfs/QmdK6dgxuBCRJ7wTvQBnHrZWJuWGiiFpEDLM6nr38FgYGF/snapshot-2022-10.json",
-      "https://ipfs.kleros.io/ipfs/QmbKotXSryjrRMEeeM51ChgBxpq8DFhwViG6rKLsJfu5wq/snapshot-2022-11.json",
+      "QmYJGrQBh68kAvqk57FdynEixdu4VY87mHme821rtPS92u/snapshot-1.json",
+      "QmUCTdvyAWU8eEV1nwgiF7CwKpL5FnXiDxGD9FedFdrHYU/snapshot-2021-03.json",
+      "QmXG2EKcd3tyMwoxhrqmBAu7gsrzgF3jCde75CjQzmg1Am/snapshot-2021-04.json",
+      "QmYEpiCACmZttwxFqsG4sSYsCpUeGchEgJGSRQFPuB6Txe/snapshot-2021-05.json",
+      "QmQ6Bdih6SR4KjoMeAPwvkfp33pYTQXEAAkSeZxGeHXCpo/snapshot-2021-06.json",
+      "QmUvo4mMGCz4dK8dMY1D68RBqEmyg1qpjxauo99FGDkMos/snapshot-2021-07.json",
+      "Qmdv94xuQoe5yy88NyBC8sRFLXwx7sqpWJKbGX5xx1cKjM/snapshot-2021-08.json",
+      "QmTJNeQ9mSyrKiPDaRxX9ektijkZXofra3wYwzbiej1ppB/snapshot-2021-09.json",
+      "QmRPFBHemHrmGFQCvxtwA13VQs2dR9KujZCBYMXrpw6pHd/snapshot-2021-10.json",
+      "QmRKxvfmskMboUcGb2jK6HMVDAPC7RtchxMbhaKH7aQFTm/snapshot-2021-11.json",
+      "QmVoSJv7TP3KZp71vbbm1ocHrt1RfYarZW8zEn7vR67Bj2/snapshot-2021-12.json",
+      "QmRARe8tM5wZwUmViqJFmMTMfm5XNUroLW4w8TPYfkDAR9/snapshot-2022-01.json",
+      "QmWY3uExz6kWtAkKq7hZuoZAPa4NYvUyk2FD7u4Xkp22da/snapshot-2022-02.json",
+      "Qmaz1f7ets65kCCYi5z2Feot3NLCKqQ8vn7zaLdm4Rbmqy/snapshot-2022-03.json",
+      "Qmdcxpb4TDCPPEcgF3eVw7Nz2Ch2LzRNigPPLy9S4W6h2M/snapshot-2022-04.json",
+      "Qmc2S1mcMjjHCX5TSrt1xioA9z7hB6seh9BKEfVjD1kwGG/snapshot-2022-05.json",
+      "QmenR1R6NMfCPcwN1gyJAj9RbpqUQMAnDHCybpB6s4Tsff/snapshot-2022-06.json",
+      "QmUWkVsXgGHsJ26VgphjZwDPzEtdkcPNAo1xogcPHfMCLt/snapshot-2022-07.json",
+      "QmUaJ5vxD9zVRqNiU2t7GgUL1vLmWKFHanaCEik9Mkzm3v/snapshot-2022-08.json",
+      "QmTDo9Mv2W6mQLqpxwRVpNTHEJzzNProiHQLppu95VVnXa/snapshot-2022-09.json",
+      "QmdK6dgxuBCRJ7wTvQBnHrZWJuWGiiFpEDLM6nr38FgYGF/snapshot-2022-10.json",
+      "QmbKotXSryjrRMEeeM51ChgBxpq8DFhwViG6rKLsJfu5wq/snapshot-2022-11.json",
+      "QmU2XtH8sSC4rGgfpchqnFXKGaXzzj1PTpnUXdfR4NfUYL/snapshot-2022-12.json",
+      "QmUrG7TNEjeYcCrvJ1WsCT7SVbBC81R2bJxRUmUVXBK3rx/snapshot-2023-01.json",
+      "QmW1BkMv4pRDTjrNkrcp6njLc61HBmD2yD8Jk5nnPn7gmR/snapshot-2023-02.json",
+      "QmUfaq5LctG4dZmSEBGnNoDgKqEdyooibYhnivKcp7Xvf2/snapshot-2023-03.json",
+      "QmRSkssLsS4A4KMpdKRVW8vS72kXcRbC4aG5i5rGcoi2Gi/snapshot-2023-04.json",
+      "QmbBQoSXrmQFj9cUNWbPcoE7B6MKs4sZ5mtt8Vnu3ZMWdE/snapshot-2023-05.json",
+      "QmV3gpEkEv4btxAxnPjionT9QxbVo2fKj9fTFnuLjDTQ6N/snapshot-2023-06.json",
+      "QmTqXB4i1wd3vvBNknFvixRD7dA36EWxQoBxsEvR3L3bWw/snapshot-2023-07.json",
+      "QmfEb61fZ8QV9LX8Y7VU5AcnzCtjxDTFejzMAgAmUajrRH/snapshot-2023-08.json",
+      "QmUaApTCER7A3cfJUMvakoP4BWGMHsSjqhChcr1pn5rJKL/snapshot-2023-09.json",
+      "QmXSrwywMP5vipMbryJAezUP3zFAPTKAaCRkRLc4NZcRR7/snapshot-2023-10.json",
+      "QmbZ9ZVxJhNDRGokQ1PSqaLLprhgtAAm4m7kB2CY9GiaGD/snapshot-2023-11.json",
+      "QmZ1G5hK72tXynU8bj63QATopRgvV55h7Y5rgz3fofkCtw/snapshot-2023-12.json",
+      "Qme5CAtUNaNF3D5QEV3K4Je2uCkaH1kUWM6zNb3W8xr3dk/snapshot-2024-01.json",
+      "QmPmrHWcGrXD9F2YDDS4BiZxZbv5qDxakhDw1MRH58tUjP/snapshot-2024-02.json",
+      "QmWDAc4nE2P6XuPXjj5FMs68oUg2Bdz2GHsUJXpywqbjz8/snapshot-2024-03.json",
+      "QmbJ3tiiH7pRB6iLfSoJVtEG2dx7pY7YHCqc13y3FeekZQ/snapshot-2024-04.json",
+      "QmSCLnDTGSonAzmLrpHdQMumRe3V35pGbnXHPGm71pAdXj/snapshot-2024-05.json",
+      "QmUnVTiaqSTMyjQ31GWanKzN2ZVZoUiYQcPwgptxxfMptX/snapshot-2024-06.json",
+      "QmTJ6dcTrdqW4SJZzcm14h7cavHepN9HF2qAHsRZVCpzby/snapshot-2024-07.json",
+      "Qme4JAKA84Kvb7C6aNCQ3fcoTfrrMukdkNwUfqjJLhhHQz/snapshot-2024-08.json",
+      "QmSNu2C8nSRLzF1E7UNyV8HDSrcVfSy8JWq86hcPRCJKWo/snapshot-2024-09.json",
+      "QmcwjSjgtTD5JC52DNbXVv8tNxL1ou3Ap98k8ViwQxw6HJ/snapshot-2024-10.json",
+      "QmT76RCkaMqPPHM5kyy9FKdjNATdYVEeZpWkNeTVKEMQRC/snapshot-2024-11.json",
+      "QmRHKSvdm8MPnQy1GKwRtikDNAsbLoPS679vBR2Ype8mut/snapshot-2024-12.json",
+      "QmfSrb13pZvvgSQ4oGtocshzsRDNMatBUxADdwG2uda5qR/snapshot-2025-01.json",
+      "QmUfBdXtNwozCjBPmqjmFwpEDkopZ6Xua9zL9VVpc6ZSnw/snapshot-2025-02.json",
     ],
     blockExplorerBaseUrl: "https://etherscan.io",
-    klerosboard: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard",
-  },
-  42: {
-    contractAddress: "0xd5052B32CD3921303B3B96452458A7C5b4Cc0947",
-    snapshots: [
-      "https://ipfs.kleros.io/ipfs/QmW21mhJnQCeigBSNvSE8VnYnR5P5zh7ew8wZEWUjf8JKM/kovan-snapshot-2022-01.json",
-      "https://ipfs.kleros.io/ipfs/QmNm7Db4kxpGRY9HToAF1ofde9ZDC5eDRsR7cqDfrjfKSr/kovan-snapshot-2022-02.json",
-      "https://ipfs.kleros.io/ipfs/QmZTFHbjZ53LwQhGzRo6B7KY53z5cBcRnfLRZPbyQytito/kovan-snapshot-2022-03.json",
-      "https://ipfs.kleros.io/ipfs/QmcWgnWe7o4f2BDcsqFW8ecNemKKduorQz1VW9LKRfRNN4/kovan-snapshot-2022-04.json",
-      "https://ipfs.kleros.io/ipfs/QmZHBL3r1MGnk8eiWoFW5GFfiSRechzLi9fXCZTDDrHLeC/kovan-snapshot-2022-05.json",
-      "https://ipfs.kleros.io/ipfs/Qmb87JV82a5Uy24SP3UhvMKNwpSTgN7U54opyGDkePdALi/kovan-snapshot-2022-06.json",
-      "https://ipfs.kleros.io/ipfs/QmZYs5fHhHsVrzBTPt5RYHtp5LhF4n5BexKp7vzV413D9u/kovan-snapshot-2022-07.json",
-      "https://ipfs.kleros.io/ipfs/QmfXLfwYMCHzUqjYXFMP9s9z6WPNsDuFDDodGaNmiVVf4a/kovan-snapshot-2022-08.json",
-      "https://ipfs.kleros.io/ipfs/QmW9ocWQenbuh3TQMvF6UaSnbTnGn39faFqYyWyFRWLWhd/kovan-snapshot-2022-09.json",
-      "https://ipfs.kleros.io/ipfs/QmNzGsT1dQ5NjDv6B4A2ypEnewm7EaCMqLUgQ1p3pzR3fM/kovan-snapshot-2022-10.json",
-      "https://ipfs.kleros.io/ipfs/QmYfetiYBfsXstdaaMtFsQCqzksoGbwqdM9pmCgPB2ZXJW/kovan-snapshot-2022-11.json",
-    ],
-    blockExplorerBaseUrl: "https://kovan.etherscan.io",
-  },
-  77: {
-    contractAddress: "0x29fCc6D88581CD4315969b69DD450fD89FE30C34",
-    snapshots: [
-      "https://ipfs.kleros.io/ipfs/QmVsUjonMuhNe6dVDJNgM4pw1adVvcipkvy7s61yd3w9hs/sokol-snapshot-2022-01.json",
-      "https://ipfs.kleros.io/ipfs/QmdkZ9NYHYd4iTpUWTQw1dMFUkgbUWqLncTPQYyZCDErdD/sokol-snapshot-2022-02.json",
-      "https://ipfs.kleros.io/ipfs/QmUk8sgxLe3tG2x3Q952B3nRRxChAP8uiXiuMF3UBzvqrc/sokol-snapshot-2022-03.json",
-      "https://ipfs.kleros.io/ipfs/QmZf4mgUHFh7Eb53DZPQ763vnKDX8Q19gyJ8wK3K3cKsBw/sokol-snapshot-2022-04.json",
-      "https://ipfs.kleros.io/ipfs/QmQApsyryUfBF6c8qhcW6iRdh7ZqziEZjD9w8G6sFKktrZ/sokol-snapshot-2022-05.json",
-      "https://ipfs.kleros.io/ipfs/QmetgHetHGFgF9Ek1rWarzh5eo7yi4HqTMvDVwMvS4cd3b/sokol-snapshot-2022-06.json",
-      "https://ipfs.kleros.io/ipfs/QmUqdM2F6KkQ4Uieg6GJQf9hswT3LCoAoWDZ2BCJvh4iXs/sokol-snapshot-2022-07.json",
-      "https://ipfs.kleros.io/ipfs/QmUMaACgtcDs3RJv8eUwZ8Hs678eeVda1VUxfBKtEGutjs/sokol-snapshot-2022-08.json",
-      "https://ipfs.kleros.io/ipfs/QmT5xtEDCPTYmaai45eHw7jNf7K7WuucM7Wf6tAVS5txvv/sokol-snapshot-2022-09.json",
-      "https://ipfs.kleros.io/ipfs/QmQSy32WQA6WzZZ2R6PpBTAZgZJwDmhWfniW5yEfYnQuej/sokol-snapshot-2022-10.json",
-      "https://ipfs.kleros.io/ipfs/QmaFAePeKjRCYLfRcb6Mm71Z95hRexgTcN9cdkJMAVLfav/sokol-snapshot-2022-11.json",
-    ],
-    blockExplorerBaseUrl: "https://blockscout.com/poa/sokol/",
+    klerosboard: "https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest",
   },
   100: {
     contractAddress: "0xf1A9589880DbF393F32A5b2d5a0054Fa10385074",
     snapshots: [
-      "https://ipfs.kleros.io/ipfs/QmRJQn5K3zaKH5TaSb3xEq8WBpJZhEaEKURj2kFssqEkeb/xdai-snapshot-2021-07.json",
-      "https://ipfs.kleros.io/ipfs/QmUWvWmW53xZYqQEx1i1w4eCGg7nowpHZ6WY5caJdPDDZK/xdai-snapshot-2021-08.json",
-      "https://ipfs.kleros.io/ipfs/QmeqtF2wFoUd5uNDuXwPTwCyaF5ZjgKFLuqSQQQ2uM5qEP/xdai-snapshot-2021-09.json",
-      "https://ipfs.kleros.io/ipfs/QmUtVwhcqhX3vm6rtzEKD9K5eCMFR6b7VjotTGKts2Njmm/xdai-snapshot-2021-10.json",
-      "https://ipfs.kleros.io/ipfs/QmcotSzkVhxK4AAaEyv4n7hks9oX6z8AjEfCL1QcGH9mB5/xdai-snapshot-2021-11.json",
-      "https://ipfs.kleros.io/ipfs/QmSGLSzRNtDJ2Lt59muizuKrcpWs9KS9RdsEiBuDRsx7nR/xdai-snapshot-2021-12.json",
-      "https://ipfs.kleros.io/ipfs/QmQ4yZgoUopYbudnz88i7MSXcTY4NDB1P9KuAMUejtawup/xdai-snapshot-2022-01.json",
-      "https://ipfs.kleros.io/ipfs/Qmd7EAFoEBDuJkALRsE6pPtqaYjPt543omZQGipupntGWy/xdai-snapshot-2022-02.json",
-      "https://ipfs.kleros.io/ipfs/QmUaWM1yjB9CdHohvTdTqaR8wDggLy4q3tDThS7kZV1p1M/xdai-snapshot-2022-03.json",
-      "https://ipfs.kleros.io/ipfs/QmThLvjyhgWnK5a26i5ibajGBgnwZwN651TmWLvb9T4uZU/xdai-snapshot-2022-04.json",
-      "https://ipfs.kleros.io/ipfs/QmStjhSzMiRUq2T64esc3AdCn5yK6ovArErNrBeJ5GatRU/xdai-snapshot-2022-05.json",
-      "https://ipfs.kleros.io/ipfs/QmRtnaynSgVaEPZ9xWAfwmNi4JNnfxqYx8Qvx8V45Cvvmq/xdai-snapshot-2022-06.json",
-      "https://ipfs.kleros.io/ipfs/QmaasQi77pSMuLg5gq3Kch7yv5Ek8mkwMeb3oqm6gQne1q/xdai-snapshot-2022-07.json",
-      "https://ipfs.kleros.io/ipfs/Qmdy9dXZpRax7zhuPp1cYxz347H5RGcxDAhMSgAQ4Gdiwm/xdai-snapshot-2022-08.json",
-      "https://ipfs.kleros.io/ipfs/QmX9ZkppuUfXaGo2u5NnCEvCoriqZp3VkeCYvmQmbnFoPC/xdai-snapshot-2022-09.json",
-      "https://ipfs.kleros.io/ipfs/QmZKCAZK3RoFkugFBBJRFA4WQccJByEXuXnSATU6pwCgN1/xdai-snapshot-2022-10.json",
-      "https://ipfs.kleros.io/ipfs/QmWS5p6xbqBvJ2GXbM4wDTKzL1hUEvYdzTm6D9syttdVd9/xdai-snapshot-2022-11.json",
+      "QmRJQn5K3zaKH5TaSb3xEq8WBpJZhEaEKURj2kFssqEkeb/xdai-snapshot-2021-07.json",
+      "QmUWvWmW53xZYqQEx1i1w4eCGg7nowpHZ6WY5caJdPDDZK/xdai-snapshot-2021-08.json",
+      "QmeqtF2wFoUd5uNDuXwPTwCyaF5ZjgKFLuqSQQQ2uM5qEP/xdai-snapshot-2021-09.json",
+      "QmUtVwhcqhX3vm6rtzEKD9K5eCMFR6b7VjotTGKts2Njmm/xdai-snapshot-2021-10.json",
+      "QmcotSzkVhxK4AAaEyv4n7hks9oX6z8AjEfCL1QcGH9mB5/xdai-snapshot-2021-11.json",
+      "QmSGLSzRNtDJ2Lt59muizuKrcpWs9KS9RdsEiBuDRsx7nR/xdai-snapshot-2021-12.json",
+      "QmQ4yZgoUopYbudnz88i7MSXcTY4NDB1P9KuAMUejtawup/xdai-snapshot-2022-01.json",
+      "Qmd7EAFoEBDuJkALRsE6pPtqaYjPt543omZQGipupntGWy/xdai-snapshot-2022-02.json",
+      "QmUaWM1yjB9CdHohvTdTqaR8wDggLy4q3tDThS7kZV1p1M/xdai-snapshot-2022-03.json",
+      "QmThLvjyhgWnK5a26i5ibajGBgnwZwN651TmWLvb9T4uZU/xdai-snapshot-2022-04.json",
+      "QmStjhSzMiRUq2T64esc3AdCn5yK6ovArErNrBeJ5GatRU/xdai-snapshot-2022-05.json",
+      "QmRtnaynSgVaEPZ9xWAfwmNi4JNnfxqYx8Qvx8V45Cvvmq/xdai-snapshot-2022-06.json",
+      "QmaasQi77pSMuLg5gq3Kch7yv5Ek8mkwMeb3oqm6gQne1q/xdai-snapshot-2022-07.json",
+      "Qmdy9dXZpRax7zhuPp1cYxz347H5RGcxDAhMSgAQ4Gdiwm/xdai-snapshot-2022-08.json",
+      "QmX9ZkppuUfXaGo2u5NnCEvCoriqZp3VkeCYvmQmbnFoPC/xdai-snapshot-2022-09.json",
+      "QmZKCAZK3RoFkugFBBJRFA4WQccJByEXuXnSATU6pwCgN1/xdai-snapshot-2022-10.json",
+      "QmWS5p6xbqBvJ2GXbM4wDTKzL1hUEvYdzTm6D9syttdVd9/xdai-snapshot-2022-11.json",
+      "QmWFMQB8riKYTfBfdz7n8faExwHC6dAZt1fBA5RriCUshv/xdai-snapshot-2022-12.json",
+      "QmP2dmqWYLq9TU1ysmynBtn4rKqzKLx4MzeL6nNEkZjBQP/xdai-snapshot-2023-01.json",
+      "Qmf1NihFrzywSamyeYLYSCpnY7jG45fWTU2M5rRHLpU8YY/xdai-snapshot-2023-02.json",
+      "QmPkZbPygY5MMU6tTG6xG7esePBg1dUBb9rtNu9nSzzekh/xdai-snapshot-2023-03.json",
+      "QmNV9qreJH7k7KwqsZUXV69Q9gDqaywenJ1B5EiUuwYa7x/xdai-snapshot-2023-04.json",
+      "QmXmGbRFZcuBFuKPjRcuawd55fEYXfsWcM9k2ze48HYzZE/xdai-snapshot-2023-05.json",
+      "QmaMvUbMYtyJVJqV6YCafENrjfN9ULybXRmZTZL7UsTcng/xdai-snapshot-2023-06.json",
+      "QmNgZFkE1dtgPZbHPbGcaq47wsLffJ89Uwtt5Fgf25V7DY/xdai-snapshot-2023-07.json",
+      "QmYCaK3FPJX6S5jkCCLKqNMVDku9vC7RYaSyyC8gPZYvMp/xdai-snapshot-2023-08.json",
+      "QmewZj5jxML23gxkwHGJmAhutso83U7js8tRMoYLqcMQJj/xdai-snapshot-2023-09.json",
+      "QmZkxygbpHdrpWC39PE8k7wEXgGkC7oJddkkzaiEu5bRMV/xdai-snapshot-2023-10.json",
+      "Qma4dBYJedugVM7JFtbBaDuRK2nqULo8bSsSGR7tpdtw5e/xdai-snapshot-2023-11.json",
+      "QmcXxdjPXQpj1uChX7AHM1Q3imEauB7hFW4J2qR74tXBsJ/xdai-snapshot-2023-12.json",
+      "QmddfsZDD2oQLrskJDUk8AmDKJJvHFe3GLE2Zmm1n2rGrq/xdai-snapshot-2024-01.json",
+      "QmdGBZ43WhtTVZNVCtu7fFfsgxoYwPzr8xSJGnFPQEcYcX/xdai-snapshot-2024-02.json",
+      "QmcWw37anHSMcFkuZMZRLZRKMByTNAPUKEM6hQ1bPAZDnn/xdai-snapshot-2024-03.json",
+      "QmUYBkvBEDXLvLtnKBvPCj6fJgTJ9nDQYseU4f1Wo33AY2/xdai-snapshot-2024-04.json",
+      "QmasCmVBzZaxWcSHMc3uhK3ZdwSQXMdX5bdZBaistpXXxX/xdai-snapshot-2024-05.json",
+      "QmPnL6Y3tZABGwKdn6XroBXB4f2FShrmKrdXzGXwfRJEbC/xdai-snapshot-2024-06.json",
+      "QmfPhtSQib6ytndGXeGqE9k4EvaD9g25Zi1HH4JwAzJfpT/xdai-snapshot-2024-07.json",
+      "QmcmDHECzY8YRv65nB6zjt28BYyY6FGSTJc9669JAb7brP/xdai-snapshot-2024-08.json",
+      "QmU4W2w3UFkTP3Biyjx1ecxpaUrC3NpqKhACe7J8jNV197/xdai-snapshot-2024-09.json",
+      "QmTBJ2bYMTE5eMGTtoKJ3ia8ET6wwngwgahaq3wfstCMM1/xdai-snapshot-2024-10.json",
+      "QmPx9ABCPRvFuLDQxeVdV1fPHoDrsm1uH6zMnRNjk2PC7n/xdai-snapshot-2024-11.json",
+      "QmNge4Ei6TWAK3m4GrC21GJc4RbPVE8KBftXrieM4zAgqj/xdai-snapshot-2024-12.json",
+      "QmQhnESLtYoZy4DbjPrFa3x7Mm262jfDTW5b4p4MMccCiw/xdai-snapshot-2025-01.json",
+      "QmXSvhfY5pP8umyBQJJKZUBmuE1mTRP8F2rUiYReM9UMkb/xdai-snapshot-2025-02.json",
     ],
-    blockExplorerBaseUrl: "https://blockscout.com/poa/xdai/",
-    klerosboard: "https://api.thegraph.com/subgraphs/name/salgozino/klerosboard-xdai",
+    blockExplorerBaseUrl: "https://gnosisscan.io",
+    klerosboard: "https://api.studio.thegraph.com/query/66145/klerosboard-gnosis/version/latest",
   },
 };
 
@@ -140,8 +161,9 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
     const snapshots = airdropParams?.snapshots ?? [];
 
     for (var month = 0; month < snapshots.length; month++) {
-      responses[month] = fetch(snapshots[month]);
+      responses[month] = fetch(`${ipfsEndpoint}/ipfs/${snapshots[month]}`);
     }
+
     const results = Promise.all(
       responses.map((promise) => promise.then((r) => r.json()).catch((e) => console.error(e)))
     );
@@ -275,11 +297,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       }}
       centered
       keyboard
-      okText={
-        <>
-          Claim Your <TokenSymbol token="PNK" /> Tokens
-        </>
-      }
+      okText={<>Claim Your PNK Tokens</>}
       onOk={onOk}
       onCancel={handleCancel}
       visible={visible}
@@ -319,7 +337,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
             </span>
           </div>
           <div style={{ fontSize: "24px", fontWeight: "500", marginTop: "8px" }}>
-            As a Kleros Juror, you will earn <TokenSymbol token="PNK" /> for staking in Court.
+            As a Kleros Juror, you will earn PNK for staking in Court.
           </div>
 
           <div
@@ -335,9 +353,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <div>
-                Total Rewarded <TokenSymbol token="PNK" />:
-              </div>
+              <div>Total Rewarded PNK:</div>
               <div style={{ fontWeight: "500", textAlign: "right" }}>
                 <ETHAmount amount={claims && getTotalRewarded(claims)} decimals={0} tokenSymbol="PNK" />
               </div>
@@ -423,9 +439,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
           }
           disabled={!claims || Number(drizzle.web3.utils.fromWei(getTotalClaimable(claims))).toFixed(0) < 1}
         >
-          <span>
-            Claim Your <TokenSymbol token="PNK" /> Tokens
-          </span>
+          <span>Claim Your PNK Tokens</span>
         </Button>
       )}
     </Modal>

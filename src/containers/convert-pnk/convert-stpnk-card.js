@@ -1,10 +1,10 @@
-import React from "react";
-import styled from "styled-components/macro";
+import React, { useMemo } from "react";
+import styled from "styled-components";
 import Web3 from "web3";
 import { useSideChainApi } from "../../api/side-chain";
-import { Card, Button, Form, InputNumber } from "antd";
+import { Card, Button, Form, Input } from "antd";
 import stPNKAbi from "../../assets/contracts/wrapped-pinakion.json";
-import TokenSymbol from "../../components/token-symbol";
+import { getTokenSymbol } from "../../helpers/get-token-symbol";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../../bootstrap/dataloader";
 import usePromise from "../../hooks/use-promise";
@@ -105,20 +105,21 @@ function hasErrors(fieldsError) {
   return Object.keys(fieldsError).some((field) => fieldsError[field]);
 }
 
-const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, disabled }) => {
+const ConvertStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, disabled }) => {
   const { chainId } = useSideChainApi();
   const { drizzle } = useDrizzle();
   const { account } = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
   const { validateFieldsAndScroll, getFieldDecorator, setFieldsValue, getFieldsError } = form;
-  const maxAvailableNumeric = Number(fromWei(maxAvailable ?? "0"));
+  const pnkTokenSymbol = useMemo(() => getTokenSymbol(chainId, "PNK"), [chainId]);
 
   const amountDecorator = getFieldDecorator("amount", {
     rules: [
       { required: true, message: "Amount is required." },
       async function validateBalance(_, value) {
-        if (value > maxAvailableNumeric) {
+        if (isNaN(value)) throw new Error("Must be a number.");
+        if (toBN(toWei(value)).gt(maxAvailable ?? toBN("0"))) {
           throw new Error("Not enough available tokens.");
         }
       },
@@ -126,8 +127,8 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
   });
 
   const handleUseMaxClick = React.useCallback(() => {
-    setFieldsValue({ amount: maxAvailableNumeric });
-  }, [setFieldsValue, maxAvailableNumeric]);
+    setFieldsValue({ amount: fromWei(maxAvailable) });
+  }, [setFieldsValue, maxAvailable]);
 
   const handleSubmit = React.useCallback(
     async (evt) => {
@@ -137,15 +138,10 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
           console.debug("Form validation error:", err);
           return;
         }
-        const stPNKaddress =
-          chainId === 100
-            ? process.env.REACT_APP_PINAKION_XDAI_ADDRESS
-            : chainId === 77
-            ? process.env.REACT_APP_PINAKION_SOKOL_ADDRESS
-            : false;
+        const stPNKaddress = chainId === 100 && process.env.REACT_APP_PINAKION_XDAI_ADDRESS;
         if (stPNKaddress) {
           const stPNK = new drizzle.web3.eth.Contract(stPNKAbi.abi, stPNKaddress);
-          const amountInWei = toWei(String(values.amount));
+          const amountInWei = toBN(toWei(values.amount));
           try {
             await stPNK.methods.withdraw(amountInWei).send({ from: account });
           } catch (_) {
@@ -154,7 +150,7 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
         }
       });
     },
-    [validateFieldsAndScroll, account, drizzle.web3.eth.Contract]
+    [validateFieldsAndScroll, account, drizzle.web3.eth.Contract, chainId]
   );
 
   return (
@@ -165,14 +161,12 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
             hasFeedback
             label={
               <StyledCompositeLabel>
-                <TokenSymbol chainId={chainId} token="PNK" />
+                {pnkTokenSymbol}
                 <StyledButtonLink onClick={handleUseMaxClick}>use max.</StyledButtonLink>
               </StyledCompositeLabel>
             }
           >
-            {amountDecorator(
-              <InputNumber placeholder="Amount to convert" min={0} max={maxAvailableNumeric} size="large" />
-            )}
+            {amountDecorator(<Input placeholder="Amount to convert" size="large" />)}
           </StyledFormItem>
 
           <StyledButton
@@ -190,7 +184,7 @@ const WithdrawStPnkForm = Form.create()(({ form, maxAvailable, isSubmitting, dis
   );
 });
 
-const WithdrawStPnk = () => {
+const ConvertStPnk = () => {
   const sideChainApi = useSideChainApi();
   const account = useAccount();
   const tokenStats = usePromise(
@@ -205,11 +199,12 @@ const WithdrawStPnk = () => {
           margin-top: -1rem;
         `}
       >
-        Use this if you only want to obtain xPNK, for example, for usage in Gnosis Chain exchanges.
+        Use this if you only want to obtain xPNK, for example, for bridging it to Mainnet via the Gnosis Bridge, or for
+        trading it in Gnosis Chain exchanges.
       </StyledExplainerText>
-      <WithdrawStPnkForm maxAvailable={hasAvailableTokens ? tokenStats.value.available : "0"} />
+      <ConvertStPnkForm maxAvailable={hasAvailableTokens ? tokenStats.value.available : "0"} />
     </StyledCard>
   );
 };
 
-export default WithdrawStPnk;
+export default ConvertStPnk;

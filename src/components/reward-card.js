@@ -7,6 +7,8 @@ import { ReactComponent as PurpleArrowBackground } from "../assets/images/purple
 import { ReactComponent as LightPurpleArrowBackground } from "../assets/images/light-purple-arrow.svg";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import ETHAmount from "./eth-amount";
+import useChainId from "../hooks/use-chain-id";
+import useGetShifts from "../hooks/use-get-shifts";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -169,27 +171,20 @@ const ETHOffset = styled.div``;
 const PNKOffset = styled.div``;
 
 const RewardCard = () => {
-  const { drizzle, useCacheEvents } = useDrizzle();
+  const { drizzle } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
     balance: drizzleState.accounts[0] ? drizzleState.accountBalances[drizzleState.accounts[0]] : 0,
   }));
-  const rewards = useCacheEvents(
-    "KlerosLiquid",
-    "TokenAndETHShift",
-    {
-      filter: { _address: drizzleState.account },
-      fromBlock: process.env.REACT_APP_KLEROS_LIQUID_BLOCK_NUMBER,
-    },
-    [drizzleState.account]
-  );
+  const chainId = useChainId();
+  const rewards = useGetShifts(chainId, `address: "${drizzleState.account}"`);
 
   let ethRewards = drizzle.web3.utils.toBN("0");
   let pnkRewards = drizzle.web3.utils.toBN("0");
   if (rewards)
     for (const reward of rewards) {
-      ethRewards = ethRewards.add(drizzle.web3.utils.toBN(reward.returnValues._ETHAmount));
-      pnkRewards = pnkRewards.add(drizzle.web3.utils.toBN(reward.returnValues._tokenAmount));
+      ethRewards = ethRewards.add(drizzle.web3.utils.toBN(reward.ETHAmount));
+      pnkRewards = pnkRewards.add(drizzle.web3.utils.toBN(reward.tokenAmount));
     }
 
   return (
@@ -211,7 +206,7 @@ const RewardCard = () => {
               <ETHOffset>
                 <StyledTopDiv>Total</StyledTopDiv>
                 <StyledCenterDiv>
-                  <ETHAmount amount={ethRewards} decimals={2} tokenSymbol={true} />
+                  <ETHAmount amount={ethRewards} decimals={3} tokenSymbol={true} />
                 </StyledCenterDiv>
               </ETHOffset>
             </AmountCol>

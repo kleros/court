@@ -4,13 +4,10 @@ import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { Divider, Spin } from "antd";
 import { getCounterPartyChainId, isSupportedMainChain, SideChainApiProvider } from "../../api/side-chain";
 import { getReadOnlyWeb3 } from "../../bootstrap/web3";
-import TokenSymbol from "../../components/token-symbol";
 import TopBanner from "../../components/top-banner";
-import { chainIdToNetworkName } from "../../helpers/networks";
 import useChainId from "../../hooks/use-chain-id";
 import C404 from "../404";
-import ConvertPnkCard from "./convert-pnk-card";
-import WithdrawStPnk from "./wihdraw-stpnk-card";
+import ConvertStPnk from "./convert-stpnk-card";
 
 const { useDrizzle } = drizzleReactHooks;
 
@@ -53,27 +50,11 @@ export default function ConvertPnkWrapper() {
 }
 
 function ConvertPnk() {
-  const currentChainId = useChainId();
-  const counterPartyChainId = getCounterPartyChainId(currentChainId);
-
-  const originChainId = isSupportedMainChain(counterPartyChainId) ? currentChainId : counterPartyChainId;
-  const targetChainId = isSupportedMainChain(counterPartyChainId) ? counterPartyChainId : currentChainId;
-
   return (
     <>
-      <TopBanner
-        title="Convert to PNK"
-        description={
-          <>
-            Send your <TokenSymbol chainId={originChainId} token="PNK" /> to get{" "}
-            <TokenSymbol chainId={targetChainId} token="PNK" /> back on {chainIdToNetworkName[targetChainId]}
-          </>
-        }
-      />
+      <TopBanner title="Convert stPNK to xPNK" />
       <StyledDivider />
-      <ConvertPnkCard />
-      <StyledDivider />
-      <WithdrawStPnk />
+      <ConvertStPnk />
     </>
   );
 }
