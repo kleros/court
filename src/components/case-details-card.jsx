@@ -149,15 +149,15 @@ const RevealVoteButton = ({ onRevealClick, votesData, dispute }) => {
   );
 };
 
-const AnswerDisplay = ({ msg, votesData, rulingOptions }) => {
+const AnswerDisplay = ({ msg, vote, rulingOptions }) => {
   const [displayHex, setDisplayHex] = useState();
 
   return (
     <>
       {msg}
-      {votesData.voted === "0"
+      {vote === "0"
         ? "Refuse to Arbitrate"
-        : (rulingOptions && getAnswerString(rulingOptions, votesData, displayHex)) || "Unknown Choice"}
+        : (rulingOptions && getAnswerString(rulingOptions, vote, displayHex)) || "Unknown Choice"}
       &rdquo;.
       {["uint", "int"].includes(rulingOptions?.type) ? (
         <StyledButton onClick={() => setDisplayHex(!displayHex)}>{displayHex ? "Decimal" : "Hex"}</StyledButton>
@@ -519,7 +519,7 @@ export default function CaseDetailsCard({ ID }) {
                             <AnswerDisplay
                               msg="You voted for: &ldquo;"
                               rulingOptions={metaEvidence.rulingOptions}
-                              votesData={votesData}
+                              vote={votesData.voted}
                             />
                           </div>
                           {Number(dispute.period) < 4 ? (
@@ -538,7 +538,7 @@ export default function CaseDetailsCard({ ID }) {
                       <AnswerDisplay
                         msg="The winner in this case was: &ldquo;"
                         rulingOptions={metaEvidence.rulingOptions}
-                        votesData={votesData}
+                        vote={votesData.currentRuling}
                       />
                     </SecondaryActionText>
                   )}
@@ -548,7 +548,7 @@ export default function CaseDetailsCard({ ID }) {
                         <AnswerDisplay
                           msg="You committed to: "
                           rulingOptions={metaEvidence.rulingOptions}
-                          votesData={votesData}
+                          vote={committedVote}
                         />
                       </SecondaryActionText>
                     ) : (
@@ -751,7 +751,7 @@ export default function CaseDetailsCard({ ID }) {
               <AnswerDisplay
                 msg="You successfully voted for "
                 rulingOptions={metaEvidence.rulingOptions}
-                votesData={votesData}
+                vote={votesData.voted}
               />
             </div>
           )}
@@ -809,7 +809,7 @@ JustificationBox.propTypes = {
 AnswerDisplay.propTypes = {
   msg: PropTypes.string.isRequired,
   rulingOptions: PropTypes.object.isRequired,
-  votesData: PropTypes.object.isRequired,
+  vote: PropTypes.string.isRequired,
 };
 
 realitioLibQuestionFormatter.minNumber = realitioLibQuestionFormatter.minNumber.bind({
