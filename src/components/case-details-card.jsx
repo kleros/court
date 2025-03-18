@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components/macro";
-import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, InputNumber, Row, Spin } from "antd";
+import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, Row, Spin } from "antd";
+import InputNumber from "rc-input-number";
+import BigNumber from "bignumber.js";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import * as realitioLibQuestionFormatter from "@reality.eth/reality-eth-lib/formatters/question";
 import ReactMarkdown from "react-markdown";
@@ -99,25 +101,58 @@ const VoteOptions = ({ metaEvidence, votesData, complexRuling, setComplexRuling,
   } else {
     inputComponent = (
       <InputNumber
+        type="number"
         disabled={!votesData.canVote}
-        max={Number(
-          realitioLibQuestionFormatter
-            .maxNumber({
+        max={
+          new BigNumber(
+            realitioLibQuestionFormatter
+              .maxNumber({
+                decimals: metaEvidence.rulingOptions.precision,
+                type: metaEvidence.rulingOptions.type,
+              })
+              .minus(1)
+          )
+        }
+        min={
+          new BigNumber(
+            realitioLibQuestionFormatter.minNumber({
               decimals: metaEvidence.rulingOptions.precision,
               type: metaEvidence.rulingOptions.type,
             })
-            .minus(1)
-        )}
-        min={Number(
-          realitioLibQuestionFormatter.minNumber({
-            decimals: metaEvidence.rulingOptions.precision,
-            type: metaEvidence.rulingOptions.type,
-          })
-        )}
-        onChange={setComplexRuling}
+          )
+        }
+        onInput={(value) => {
+          if (value === "") setComplexRuling("");
+          const decimals = metaEvidence.rulingOptions.precision;
+          BigNumber.config({ EXPONENTIAL_AT: 1e9 });
+          const bigValue = new BigNumber(value).decimalPlaces(decimals);
+          const max = new BigNumber(
+            realitioLibQuestionFormatter
+              .maxNumber({
+                decimals,
+                type: metaEvidence.rulingOptions.type,
+              })
+              .minus(1)
+          );
+          const min = new BigNumber(
+            realitioLibQuestionFormatter.minNumber({
+              decimals,
+              type: metaEvidence.rulingOptions.type,
+            })
+          );
+          setComplexRuling(
+            BigNumber.min(BigNumber.max(bigValue, min).decimalPlaces(decimals), max).decimalPlaces(decimals)
+          );
+        }}
         precision={metaEvidence.rulingOptions.precision}
         size="large"
         value={complexRuling}
+        formatter={(value) => {
+          if (value === "") return "";
+          const valueBN = new BigNumber(value).decimalPlaces(metaEvidence.rulingOptions.precision);
+          return valueBN.toString();
+        }}
+        controls={false}
       />
     );
   }
@@ -366,7 +401,7 @@ export default function CaseDetailsCard({ ID }) {
           choice = complexRuling.utcOffset(0).unix();
           break;
         case "uint":
-          choice = complexRuling;
+          choice = complexRuling.toString(16);
           break;
         default:
           choice = id;
