@@ -100,7 +100,8 @@ const VoteOptions = ({ metaEvidence, votesData, complexRuling, setComplexRuling,
     ));
   } else {
     inputComponent = (
-      <InputNumber
+      <StyledInputNumber
+        prefixCls="ant-input-number"
         type="number"
         disabled={!votesData.canVote}
         max={
@@ -977,6 +978,10 @@ const StyledInputTextArea = styled(Input.TextArea)`
   height: 91px !important;
   margin: 24px 0;
   width: 70%;
+`;
+
+const StyledInputNumber = styled(InputNumber)`
+  width: 80%;
 `;
 
 const StyledButtonsDiv = styled.div`
