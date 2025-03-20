@@ -15,7 +15,8 @@ export const getAnswerString = (rulingOptions, vote, hex = false) => {
     realitioLibQuestionFormatter.padToBytes32(toBN(vote).sub(toBN("1")).toString(16))
   );
 
-  const isNumericAnswer = /^\d+[.,]?\d*(e-?\d+)?$/.test(returnString) && ["uint", "int"].includes(rulingOptions.type);
+  const isNumericAnswer =
+    /^\d+[.,]?\d*(e[-+]?\d+)?$/.test(returnString) && ["uint", "int"].includes(rulingOptions.type);
 
   if (isNumericAnswer) {
     if (hex) {

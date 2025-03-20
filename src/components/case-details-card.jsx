@@ -102,31 +102,19 @@ const VoteOptions = ({ metaEvidence, votesData, complexRuling, setComplexRuling,
     inputComponent = (
       <StyledInputNumber
         prefixCls="ant-input-number"
+        decimalSeparator="."
         type="number"
+        stringMode={true}
         disabled={!votesData.canVote}
-        max={
-          new BigNumber(
-            realitioLibQuestionFormatter
-              .maxNumber({
-                decimals: metaEvidence.rulingOptions.precision,
-                type: metaEvidence.rulingOptions.type,
-              })
-              .minus(1)
-          )
-        }
-        min={
-          new BigNumber(
-            realitioLibQuestionFormatter.minNumber({
-              decimals: metaEvidence.rulingOptions.precision,
-              type: metaEvidence.rulingOptions.type,
-            })
-          )
-        }
         onInput={(value) => {
           if (value === "") setComplexRuling("");
           const decimals = metaEvidence.rulingOptions.precision;
-          BigNumber.config({ EXPONENTIAL_AT: 1e9 });
-          const bigValue = new BigNumber(value).decimalPlaces(decimals);
+          const decimalPart = value.match(/[.,](\d+)/);
+          const decimalsFormat = Math.min(decimalPart ? decimalPart.at(1)?.length : 0, decimals);
+          BigNumber.config({
+            EXPONENTIAL_AT: 1e9,
+          });
+          const bigValue = new BigNumber(value);
           const max = new BigNumber(
             realitioLibQuestionFormatter
               .maxNumber({
@@ -141,18 +129,14 @@ const VoteOptions = ({ metaEvidence, votesData, complexRuling, setComplexRuling,
               type: metaEvidence.rulingOptions.type,
             })
           );
-          setComplexRuling(
-            BigNumber.min(BigNumber.max(bigValue, min).decimalPlaces(decimals), max).decimalPlaces(decimals)
-          );
+          const stringTest = BigNumber.min(BigNumber.max(bigValue, min), max).toFixed(decimalsFormat);
+          setComplexRuling(stringTest);
         }}
-        precision={metaEvidence.rulingOptions.precision}
+        formatter={(value) => {
+          return value;
+        }}
         size="large"
         value={complexRuling}
-        formatter={(value) => {
-          if (value === "") return "";
-          const valueBN = new BigNumber(value).decimalPlaces(metaEvidence.rulingOptions.precision);
-          return valueBN.toString();
-        }}
         controls={false}
       />
     );
@@ -402,7 +386,7 @@ export default function CaseDetailsCard({ ID }) {
           choice = complexRuling.utcOffset(0).unix();
           break;
         case "uint":
-          choice = complexRuling.toString(16);
+          choice = complexRuling;
           break;
         default:
           choice = id;
