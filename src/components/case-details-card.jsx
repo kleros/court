@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components/macro";
-import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, Row, Spin } from "antd";
+import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, Row, Spin, Radio } from "antd";
 import InputNumber from "rc-input-number";
 import BigNumber from "bignumber.js";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
@@ -169,22 +169,15 @@ const RevealVoteButton = ({ onRevealClick, votesData, dispute }) => {
   );
 };
 
-const AnswerDisplay = ({ msg, vote, rulingOptions }) => {
-  const [displayHex, setDisplayHex] = useState();
-
-  return (
-    <>
-      {msg}
-      {vote === "0"
-        ? "Refuse to Arbitrate"
-        : (rulingOptions && getAnswerString(rulingOptions, vote, displayHex)) || "Unknown Choice"}
-      &rdquo;.
-      {["uint", "int"].includes(rulingOptions?.type) ? (
-        <StyledButton onClick={() => setDisplayHex(!displayHex)}>{displayHex ? "Decimal" : "Hex"}</StyledButton>
-      ) : null}
-    </>
-  );
-};
+const AnswerDisplay = ({ msg, vote, rulingOptions, uintDisplayMode }) => (
+  <>
+    {msg}
+    {vote === "0"
+      ? "Refuse to Arbitrate"
+      : (rulingOptions && getAnswerString(rulingOptions, vote, uintDisplayMode)) || "Unknown Choice"}
+    &rdquo;.
+  </>
+);
 
 export default function CaseDetailsCard({ ID }) {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle();
@@ -200,6 +193,7 @@ export default function CaseDetailsCard({ ID }) {
   const [activeSubcourtID, setActiveSubcourtID] = useState();
   const [justification, setJustification] = useState();
   const [complexRuling, setComplexRuling] = useState();
+  const [uintDisplayMode, setUintDisplayMode] = useState("dec");
   const dispute = useCacheCall("KlerosLiquid", "disputes", ID);
   const disputeExtraInfo = useCacheCall("KlerosLiquid", "getDispute", ID);
   const chainId = useChainId();
@@ -540,6 +534,7 @@ export default function CaseDetailsCard({ ID }) {
                               msg="You voted for: &ldquo;"
                               rulingOptions={metaEvidence.rulingOptions}
                               vote={votesData.voted}
+                              {...{ uintDisplayMode }}
                             />
                           </div>
                           {Number(dispute.period) < 4 ? (
@@ -559,6 +554,7 @@ export default function CaseDetailsCard({ ID }) {
                         msg="The winner in this case was: &ldquo;"
                         rulingOptions={metaEvidence.rulingOptions}
                         vote={votesData.currentRuling}
+                        {...{ uintDisplayMode }}
                       />
                     </SecondaryActionText>
                   )}
@@ -569,6 +565,7 @@ export default function CaseDetailsCard({ ID }) {
                           msg="You committed to: "
                           rulingOptions={metaEvidence.rulingOptions}
                           vote={committedVote}
+                          {...{ uintDisplayMode }}
                         />
                       </SecondaryActionText>
                     ) : (
@@ -600,6 +597,13 @@ export default function CaseDetailsCard({ ID }) {
                         disabledDate={disabledDate}
                       />
                     )
+                  ) : null}
+                  {metaEvidence.rulingOptions.type === "uint" ? (
+                    <StyledRadioGroup onChange={(e) => setUintDisplayMode(e.target.value)} value={uintDisplayMode}>
+                      <Radio value="dec">Decimal</Radio>
+                      <Radio value="sci">Scientific</Radio>
+                      <Radio value="hex">Hex</Radio>
+                    </StyledRadioGroup>
                   ) : null}
                 </StyledActionsDiv>
                 <StyledDiv className="secondary-background theme-background" style={{ display: "inherit" }}>
@@ -772,6 +776,7 @@ export default function CaseDetailsCard({ ID }) {
                 msg="You successfully voted for "
                 rulingOptions={metaEvidence.rulingOptions}
                 vote={votesData.voted}
+                {...{ uintDisplayMode }}
               />
             </div>
           )}
@@ -830,6 +835,7 @@ AnswerDisplay.propTypes = {
   msg: PropTypes.string.isRequired,
   rulingOptions: PropTypes.object.isRequired,
   vote: PropTypes.string.isRequired,
+  uintDisplayMode: PropTypes.string,
 };
 
 realitioLibQuestionFormatter.minNumber = realitioLibQuestionFormatter.minNumber.bind({
@@ -949,6 +955,15 @@ const StyledDiv = styled.div`
 const StyledActionsDiv = styled(StyledDiv)`
   min-height: 250px;
   overflow: hidden;
+`;
+
+const StyledRadioGroup = styled(Radio.Group)`
+  margin-top: 32px;
+  align-self: end;
+  label {
+    color: white;
+    font-size: 16px;
+  }
 `;
 
 const SecondaryActionText = styled.div`

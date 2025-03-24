@@ -3,7 +3,7 @@ import * as realitioLibQuestionFormatter from "@reality.eth/reality-eth-lib/form
 import Web3 from "web3";
 const { toBN } = Web3.utils;
 
-export const getAnswerString = (rulingOptions, vote, hex = false) => {
+export const getAnswerString = (rulingOptions, vote, uintDisplayMode = "dec") => {
   const questionJson = {
     decimals: rulingOptions.precision,
     outcomes: rulingOptions.titles,
@@ -19,12 +19,16 @@ export const getAnswerString = (rulingOptions, vote, hex = false) => {
     /^\d+[.,]?\d*(e[-+]?\d+)?$/.test(returnString) && ["uint", "int"].includes(rulingOptions.type);
 
   if (isNumericAnswer) {
-    if (hex) {
+    if (uintDisplayMode === "hex") {
       return realitioLibQuestionFormatter.padToBytes32(toBN(vote).sub(toBN("1")).toString(16));
     }
-    BigNumber.config({ EXPONENTIAL_AT: 1e9 });
-    const noExponential = new BigNumber(returnString);
-    return noExponential.toString();
+    if (uintDisplayMode === "dec") {
+      BigNumber.config({ EXPONENTIAL_AT: 1e9 });
+    } else {
+      BigNumber.config({ EXPONENTIAL_AT: [-3, 1e9] });
+    }
+    const returnStringFormated = new BigNumber(returnString);
+    return returnStringFormated.toString();
   }
 
   return returnString;
