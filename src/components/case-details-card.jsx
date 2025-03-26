@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components/macro";
-import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, InputNumber, Row, Spin } from "antd";
+import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, Row, Spin, Radio } from "antd";
+import InputNumber from "rc-input-number";
+import BigNumber from "bignumber.js";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import * as realitioLibQuestionFormatter from "@reality.eth/reality-eth-lib/formatters/question";
 import ReactMarkdown from "react-markdown";
@@ -26,6 +28,7 @@ import EvidenceTimeline from "./evidence-timeline";
 import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 import useGetDraws from "../hooks/use-get-draws";
 import arbitrableWhitelist from "../temp/arbitrable-whitelist";
+import { getAnswerString } from "../temp/answer-string";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const { toBN, soliditySha3 } = Web3.utils;
@@ -97,26 +100,44 @@ const VoteOptions = ({ metaEvidence, votesData, complexRuling, setComplexRuling,
     ));
   } else {
     inputComponent = (
-      <InputNumber
+      <StyledInputNumber
+        prefixCls="ant-input-number"
+        decimalSeparator="."
+        type="number"
+        stringMode={true}
         disabled={!votesData.canVote}
-        max={Number(
-          realitioLibQuestionFormatter
-            .maxNumber({
-              decimals: metaEvidence.rulingOptions.precision,
+        onInput={(value) => {
+          if (value === "") setComplexRuling("");
+          const decimals = metaEvidence.rulingOptions.precision;
+          const decimalPart = value.match(/[.,](\d+)/);
+          const decimalsFormat = Math.min(decimalPart ? decimalPart.at(1)?.length : 0, decimals);
+          BigNumber.config({
+            EXPONENTIAL_AT: 1e9,
+          });
+          const bigValue = new BigNumber(value);
+          const max = new BigNumber(
+            realitioLibQuestionFormatter
+              .maxNumber({
+                decimals,
+                type: metaEvidence.rulingOptions.type,
+              })
+              .minus(1)
+          );
+          const min = new BigNumber(
+            realitioLibQuestionFormatter.minNumber({
+              decimals,
               type: metaEvidence.rulingOptions.type,
             })
-            .minus(1)
-        )}
-        min={Number(
-          realitioLibQuestionFormatter.minNumber({
-            decimals: metaEvidence.rulingOptions.precision,
-            type: metaEvidence.rulingOptions.type,
-          })
-        )}
-        onChange={setComplexRuling}
-        precision={metaEvidence.rulingOptions.precision}
+          );
+          const stringTest = BigNumber.min(BigNumber.max(bigValue, min), max).toFixed(decimalsFormat);
+          setComplexRuling(stringTest);
+        }}
+        formatter={(value) => {
+          return value;
+        }}
         size="large"
         value={complexRuling}
+        controls={false}
       />
     );
   }
@@ -148,6 +169,16 @@ const RevealVoteButton = ({ onRevealClick, votesData, dispute }) => {
   );
 };
 
+const AnswerDisplay = ({ msg, vote, rulingOptions, uintDisplayMode }) => (
+  <>
+    {msg}
+    {vote === "0"
+      ? "Refuse to Arbitrate"
+      : (rulingOptions && getAnswerString(rulingOptions, vote, uintDisplayMode)) || "Unknown Choice"}
+    &rdquo;.
+  </>
+);
+
 export default function CaseDetailsCard({ ID }) {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
@@ -162,6 +193,7 @@ export default function CaseDetailsCard({ ID }) {
   const [activeSubcourtID, setActiveSubcourtID] = useState();
   const [justification, setJustification] = useState();
   const [complexRuling, setComplexRuling] = useState();
+  const [uintDisplayMode, setUintDisplayMode] = useState("dec");
   const dispute = useCacheCall("KlerosLiquid", "disputes", ID);
   const disputeExtraInfo = useCacheCall("KlerosLiquid", "getDispute", ID);
   const chainId = useChainId();
@@ -498,22 +530,12 @@ export default function CaseDetailsCard({ ID }) {
                       {votesData.voted ? (
                         <>
                           <div>
-                            You voted for: &ldquo;
-                            {votesData.voted === "0"
-                              ? "Refuse to Arbitrate"
-                              : (metaEvidence.rulingOptions &&
-                                  realitioLibQuestionFormatter.getAnswerString(
-                                    {
-                                      decimals: metaEvidence.rulingOptions.precision,
-                                      outcomes: metaEvidence.rulingOptions.titles,
-                                      type: metaEvidence.rulingOptions.type,
-                                    },
-                                    realitioLibQuestionFormatter.padToBytes32(
-                                      toBN(votesData.voted).sub(toBN("1")).toString(16)
-                                    )
-                                  )) ||
-                                "Unknown Choice"}
-                            &rdquo;.
+                            <AnswerDisplay
+                              msg="You voted for: &ldquo;"
+                              rulingOptions={metaEvidence.rulingOptions}
+                              vote={votesData.voted}
+                              {...{ uintDisplayMode }}
+                            />
                           </div>
                           {Number(dispute.period) < 4 ? (
                             <SecondaryActionText>Waiting for the vote result.</SecondaryActionText>
@@ -528,43 +550,23 @@ export default function CaseDetailsCard({ ID }) {
                   )}
                   {dispute.period === "4" && (
                     <SecondaryActionText>
-                      The winner in this case was: &ldquo;
-                      {votesData.currentRuling === "0"
-                        ? "Refuse to Arbitrate"
-                        : (metaEvidence.rulingOptions &&
-                            realitioLibQuestionFormatter.getAnswerString(
-                              {
-                                decimals: metaEvidence.rulingOptions.precision,
-                                outcomes: metaEvidence.rulingOptions.titles,
-                                type: metaEvidence.rulingOptions.type,
-                              },
-                              realitioLibQuestionFormatter.padToBytes32(
-                                toBN(votesData.currentRuling).sub(toBN("1")).toString(16)
-                              )
-                            )) ||
-                          "Unknown Choice"}
-                      &rdquo;.
+                      <AnswerDisplay
+                        msg="The winner in this case was: &ldquo;"
+                        rulingOptions={metaEvidence.rulingOptions}
+                        vote={votesData.currentRuling}
+                        {...{ uintDisplayMode }}
+                      />
                     </SecondaryActionText>
                   )}
                   {votesData.committed && !votesData.voted ? (
                     committedVote !== undefined ? (
                       <SecondaryActionText>
-                        You committed to:{" "}
-                        {votesData.voted === "0"
-                          ? "Refuse to Arbitrate"
-                          : (metaEvidence.rulingOptions &&
-                              realitioLibQuestionFormatter.getAnswerString(
-                                {
-                                  decimals: metaEvidence.rulingOptions.precision,
-                                  outcomes: metaEvidence.rulingOptions.titles,
-                                  type: metaEvidence.rulingOptions.type,
-                                },
-                                realitioLibQuestionFormatter.padToBytes32(
-                                  toBN(committedVote).sub(toBN("1")).toString(16)
-                                )
-                              )) ||
-                            "Unknown Choice"}
-                        .
+                        <AnswerDisplay
+                          msg="You committed to: "
+                          rulingOptions={metaEvidence.rulingOptions}
+                          vote={committedVote}
+                          {...{ uintDisplayMode }}
+                        />
                       </SecondaryActionText>
                     ) : (
                       <Alert
@@ -595,6 +597,13 @@ export default function CaseDetailsCard({ ID }) {
                         disabledDate={disabledDate}
                       />
                     )
+                  ) : null}
+                  {metaEvidence.rulingOptions.type === "uint" ? (
+                    <StyledRadioGroup onChange={(e) => setUintDisplayMode(e.target.value)} value={uintDisplayMode}>
+                      <Radio value="dec">Decimal</Radio>
+                      <Radio value="sci">Scientific</Radio>
+                      <Radio value="hex">Hex</Radio>
+                    </StyledRadioGroup>
                   ) : null}
                 </StyledActionsDiv>
                 <StyledDiv className="secondary-background theme-background" style={{ display: "inherit" }}>
@@ -763,20 +772,12 @@ export default function CaseDetailsCard({ ID }) {
         <div key={0} style={{ marginTop: "32px" }}>
           {votesData.voted && (
             <div>
-              You successfully voted for{" "}
-              {votesData.voted === "0"
-                ? "Refuse to Arbitrate"
-                : (metaEvidence.rulingOptions &&
-                    realitioLibQuestionFormatter.getAnswerString(
-                      {
-                        decimals: metaEvidence.rulingOptions.precision,
-                        outcomes: metaEvidence.rulingOptions.titles,
-                        type: metaEvidence.rulingOptions.type,
-                      },
-                      realitioLibQuestionFormatter.padToBytes32(toBN(votesData.voted).sub(toBN("1")).toString(16))
-                    )) ||
-                  "Unknown Choice"}
-              .
+              <AnswerDisplay
+                msg="You successfully voted for "
+                rulingOptions={metaEvidence.rulingOptions}
+                vote={votesData.voted}
+                {...{ uintDisplayMode }}
+              />
             </div>
           )}
         </div>
@@ -828,6 +829,13 @@ RevealVoteButton.propTypes = {
 JustificationBox.propTypes = {
   onChange: PropTypes.func,
   justification: PropTypes.string,
+};
+
+AnswerDisplay.propTypes = {
+  msg: PropTypes.string.isRequired,
+  rulingOptions: PropTypes.object.isRequired,
+  vote: PropTypes.string.isRequired,
+  uintDisplayMode: PropTypes.string,
 };
 
 realitioLibQuestionFormatter.minNumber = realitioLibQuestionFormatter.minNumber.bind({
@@ -949,6 +957,15 @@ const StyledActionsDiv = styled(StyledDiv)`
   overflow: hidden;
 `;
 
+const StyledRadioGroup = styled(Radio.Group)`
+  margin-top: 32px;
+  align-self: end;
+  label {
+    color: white;
+    font-size: 16px;
+  }
+`;
+
 const SecondaryActionText = styled.div`
   margin-top: 30px;
 `;
@@ -960,6 +977,10 @@ const StyledInputTextArea = styled(Input.TextArea)`
   height: 91px !important;
   margin: 24px 0;
   width: 70%;
+`;
+
+const StyledInputNumber = styled(InputNumber)`
+  width: 80%;
 `;
 
 const StyledButtonsDiv = styled.div`

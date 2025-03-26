@@ -83,6 +83,7 @@
     "javascript-time-ago": "^1.0.32",
     "polished": "^2.3.0",
     "prop-types": "^15.6.2",
+    "rc-input-number": "^9.4.0",
     "react": "^17.0.2",
     "react-blockies": "^1.4.0",
     "react-bootstrap": "^2.7.4",
