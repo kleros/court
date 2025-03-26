@@ -9114,11 +9114,6 @@ ignore@^5.1.4, ignore@^5.1.8:
   resolved "https://registry.npmjs.org/ignore/-/ignore-5.1.8.tgz"
   integrity sha512-BMpfD7PpiETpBl/A6S498BaIJ6Y/ABT93ETbby2fP00v4EbvPBXWEoaR1UBPKs3iR53pJY7EtZk5KACI57i1Uw==
 
-image-extensions@^1.0.1:
-  version "1.1.0"
-  resolved "https://registry.npmjs.org/image-extensions/-/image-extensions-1.1.0.tgz"
-  integrity sha1-uOa/YDnfAFbjM1AqALZjejEF2JQ=
-
 image-size@~0.5.0:
   version "0.5.5"
   resolved "https://registry.npmjs.org/image-size/-/image-size-0.5.5.tgz"
@@ -9713,12 +9708,10 @@ is-hexadecimal@^1.0.0:
   resolved "https://registry.npmjs.org/is-hexadecimal/-/is-hexadecimal-1.0.4.tgz"
   integrity sha512-gyPJuv83bHMpocVYoqof5VDiZveEoGoFL8m3BXNb2VW8Xs+rz9kqO8LOQ5DH6EsuvilT1ApazU0pyl+ytbPtlw==
 
-is-image@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.npmjs.org/is-image/-/is-image-2.0.0.tgz"
-  integrity sha1-RUyVaVeN4xhpNx+/rqSVj0YbPgw=
-  dependencies:
-    image-extensions "^1.0.1"
+is-image@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/is-image/-/is-image-4.0.0.tgz#3caa93ce42406e8bc631e74aa9ca6764ea2f3e70"
+  integrity sha512-GaEydOss69aTWNUH0EczOLH7WhNeEjf61fqU4pxUZE7+s86T2X3tEtolOkQ8mI5esdsNHl68ogD9h4cUWSSMog==
 
 is-map@^2.0.1:
   version "2.0.2"
