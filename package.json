@@ -70,7 +70,7 @@
     "@sentry/react": "^7.37.2",
     "@sentry/tracing": "^7.37.2",
     "antd": "^3.10.8",
-    "axios": "^1.4.0",
+    "axios": "^1.9.0",
     "bootstrap": "^5.2.3",
     "clsx": "^1.1.1",
     "dataloader": "^1.4.0",
