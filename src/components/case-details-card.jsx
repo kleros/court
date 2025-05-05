@@ -70,12 +70,15 @@ const VoteOptions = ({ metaEvidence, votesData, complexRuling, setComplexRuling,
         onInput={(e) => {
           const newValue = e.target.value;
           if (/^(0)?([xX])?[0-9a-fA-F]{0,64}$/.test(newValue)) {
-            setComplexRuling(newValue);
+            if (!/0{64}/.test(newValue)) {
+              setComplexRuling(newValue);
+            }
           }
         }}
         onBlur={() => {
-          const formatted = complexRuling.replace("0x", "").padStart(64, "0");
-          setComplexRuling(`0x${formatted}`);
+          const emptyOrUndefined = typeof complexRuling === "undefined" || complexRuling === "";
+          const formatted = complexRuling?.replace("0x", "").padStart(64, "0");
+          setComplexRuling(emptyOrUndefined ? "" : `0x${formatted}`);
         }}
         value={complexRuling}
         placeholder="0xffff...ffff"
