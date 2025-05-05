@@ -59,10 +59,30 @@ const VoteOptions = ({ metaEvidence, votesData, complexRuling, setComplexRuling,
   const isSingleSelect = metaEvidence.rulingOptions.type === "single-select";
   const isMultipleSelect = metaEvidence.rulingOptions.type === "multiple-select";
   const isDateTime = metaEvidence.rulingOptions.type === "datetime";
+  const isHash = metaEvidence.rulingOptions.type === "hash";
 
   let inputComponent;
 
-  if (isMultipleSelect) {
+  if (isHash) {
+    inputComponent = (
+      <StyledInput
+        disabled={!votesData.canVote}
+        onInput={(e) => {
+          const newValue = e.target.value;
+          if (/^(0)?([xX])?[0-9a-fA-F]{0,64}$/.test(newValue)) {
+            setComplexRuling(newValue);
+          }
+        }}
+        onBlur={() => {
+          const formatted = complexRuling.replace("0x", "").padStart(64, "0");
+          setComplexRuling(`0x${formatted}`);
+        }}
+        value={complexRuling}
+        placeholder="0xffff...ffff"
+        size="large"
+      />
+    );
+  } else if (isMultipleSelect) {
     inputComponent = (
       <div style={{ paddingTop: "1rem" }}>
         <Checkbox.Group
@@ -382,6 +402,9 @@ export default function CaseDetailsCard({ ID }) {
         case "uint":
           choice = complexRuling;
           break;
+        case "hash":
+          choice = complexRuling;
+          break;
         default:
           choice = id;
           break;
@@ -390,6 +413,7 @@ export default function CaseDetailsCard({ ID }) {
         case "multiple-select":
         case "datetime":
         case "uint":
+        case "hash":
           choice = realitioLibQuestionFormatter.answerToBytes32(choice, {
             decimals: metaEvidence.rulingOptions.precision,
             type: metaEvidence.rulingOptions.type,
@@ -980,6 +1004,10 @@ const StyledInputTextArea = styled(Input.TextArea)`
 `;
 
 const StyledInputNumber = styled(InputNumber)`
+  width: 80%;
+`;
+
+const StyledInput = styled(Input)`
   width: 80%;
 `;
 
