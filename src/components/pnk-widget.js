@@ -6,7 +6,7 @@ export default function PNKWidget({ wallet }) {
       containerId: 'ahora-widget',
       language: 'en',
       cryptoCurrency: 'PNK',
-      fiatCurrency: 'EUR',
+      fiatCurrency: 'USD',
       borderRadius: 24,
       borderWithShadow: true,
       theme: 'light',
