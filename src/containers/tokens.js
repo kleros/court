@@ -3,6 +3,7 @@ import React, { useCallback } from "react";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import BuyPNKCard from "../components/buy-pnk-card";
 import OTCCard from "../components/otc-card";
+import PNKWidget from "../components/pnk-widget";
 import PNKBalanceCard from "../components/pnk-balance-card";
 import PNKMainnetExchangesCard from "../components/pnk-exchanges-card";
 import PNKXdaiExchangesCard from "../components/pnk-xdai-exchanges-card";
@@ -64,6 +65,7 @@ export default function Tokens() {
           title="Buy PNK"
         />
         <PNKBalanceCard />
+        <PNKWidget wallet={drizzleState.account} />
         <Row gutter={40}>
           <Col lg={8} md={12}>
             <BuyPNKCard />
@@ -110,6 +112,7 @@ export default function Tokens() {
           title="Buy PNK"
         />
         <PNKBalanceCard />
+        <PNKWidget wallet={drizzleState.account} />
         <Row gutter={40}>
           <Col>
             <PNKXdaiExchangesCard />
