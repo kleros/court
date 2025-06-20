@@ -65,7 +65,7 @@ export default function Tokens() {
           title="Buy PNK"
         />
         <PNKBalanceCard />
-        <PNKWidget wallet={drizzleState.account} />
+        <h2 style={{ margin: "24px auto", color: "#1F1F1F" }}>Crypto-to-Crypto</h2>
         <Row gutter={40}>
           <Col lg={8} md={12}>
             <BuyPNKCard />
@@ -74,6 +74,8 @@ export default function Tokens() {
             <PNKMainnetExchangesCard />
           </Col>
         </Row>
+        <h2 style={{ margin: "24px auto", color: "#1F1F1F" }}>Fiat-to-Crypto</h2>
+        <PNKWidget wallet={drizzleState.account} />
         <Divider />
         <Row>
           <OTCCard />
@@ -112,12 +114,14 @@ export default function Tokens() {
           title="Buy PNK"
         />
         <PNKBalanceCard />
-        <PNKWidget wallet={drizzleState.account} />
+        <h2 style={{ margin: "24px auto", color: "#1F1F1F" }}>Crypto-to-Crypto</h2>
         <Row gutter={40}>
           <Col>
             <PNKXdaiExchangesCard />
           </Col>
         </Row>
+        <h2 style={{ margin: "24px auto", color: "#1F1F1F" }}>Fiat-to-Crypto</h2>
+        <PNKWidget wallet={drizzleState.account} />
         <Divider />
         <Row>
           <OTCCard />
