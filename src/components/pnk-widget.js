@@ -7,8 +7,8 @@ export default function PNKWidget({ wallet }) {
       <iframe
         src={src}
         width="416"
-        height="700"
-        style={{ border: 0, marginBottom: "28px" }}
+        height="532"
+        style={{  border: 0 }}
         sandbox="allow-scripts"
         title="PNK Widget"
       />
