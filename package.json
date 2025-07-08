@@ -99,7 +99,7 @@
     "react-time-ago": "^3.0.3",
     "shallowequal": "^1.1.0",
     "styled-components": "^5.3.0",
-    "swr": "^2.2.0",
+    "swr": "^2.3.4",
     "use-persisted-state": "^0.3.3",
     "web3": "1.5.2"
   },
