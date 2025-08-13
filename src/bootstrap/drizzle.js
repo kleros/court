@@ -1,5 +1,6 @@
 import { Drizzle, generateStore } from "@drizzle/store";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
+import Web3 from "web3";
 import Kleros from "../assets/contracts/kleros.json";
 import KlerosLiquid from "../assets/contracts/kleros-liquid.json";
 import KlerosLiquidExtraViews from "../assets/contracts/kleros-liquid-extra-views.json";
@@ -97,18 +98,23 @@ const { DrizzleProvider, Initializer, useDrizzle } = drizzleReactHooks;
 
 export { DrizzleProvider, Initializer, useDrizzle };
 
-function createDrizzle({ fallbackChainId }) {
-  const fallbackUrl = chainIdToFallbackUrl[fallbackChainId];
-  const optionsWeb3Mixin = fallbackUrl
-    ? {
-        web3: {
-          fallback: {
-            url: fallbackUrl,
-          },
-        },
-      }
-    : {};
+function createDrizzle({ fallbackChainId, customProvider } = {}) {
+  let web3Instance;
 
+  if (customProvider) {
+    web3Instance = customProvider instanceof Web3 ? customProvider : new Web3(customProvider);
+  } else {
+    const fallbackUrl = chainIdToFallbackUrl[fallbackChainId];
+    if (fallbackUrl) {
+      web3Instance = new Web3(fallbackUrl);
+    }
+  }
+
+  const optionsWeb3Mixin = {
+    web3: {
+      customProvider: web3Instance,
+    },
+  };
   const options = { ...defaultOptions, ...optionsWeb3Mixin };
 
   return new Drizzle(options, generateStore(options));
@@ -166,4 +172,4 @@ const detectRequiredChainId = () => {
   return chainId;
 };
 
-export default createDrizzle({ fallbackChainId: detectRequiredChainId() });
+export { createDrizzle, detectRequiredChainId };
