@@ -39,7 +39,7 @@ const SafeNotificationsSetup = ({ safeAddress }) => {
       //Get the transaction
       const setupTx = await sdk.txs.getBySafeTxHash(setupTxHash);
 
-      if (!setupTx || !setupTx.executedAt) {
+      if (!setupTx?.executedAt) {
         throw new Error(
           "Setup transaction not yet found in the Transaction Service. Please, make sure it has been executed and retry."
         );

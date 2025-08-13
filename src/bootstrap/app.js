@@ -63,7 +63,7 @@ export default function App() {
 
         //Wallets found, check for existing connection, otherwise force connection
         const provider = getLastConnectedWalletProvider();
-        if (provider && provider.request) {
+        if (provider?.request) {
           const accounts = await provider.request({ method: "eth_accounts" });
           if (accounts && accounts.length > 0) {
             handleWalletConnected(provider);

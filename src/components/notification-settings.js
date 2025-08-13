@@ -59,6 +59,122 @@ const prepareSettings = (
       };
 };
 
+const NotificationSettingsContent = (
+  key,
+  drizzleState,
+  needsSafeSetup,
+  safeAddress,
+  form,
+  onSubmit,
+  settings,
+  userSettings,
+  loadingUserSettings,
+  loadingUserSettingsPatch,
+  userSettingsPatchState
+) => {
+  if (drizzleState.account === VIEW_ONLY_ADDRESS) {
+    return (
+      <StyledForm>
+        <Divider>No Wallet Detected</Divider>
+        <p>
+          To change notifications, a web3 wallet such as{" "}
+          <a href="https://metamask.io/" target="_blank" rel="noopener noreferrer">
+            Metamask
+          </a>{" "}
+          is required.
+        </p>
+      </StyledForm>
+    );
+  }
+
+  if (needsSafeSetup) {
+    return <SafeNotificationsSetup safeAddress={safeAddress} />;
+  }
+
+  return (
+    <StyledForm onSubmit={onSubmit}>
+      <Divider>I wish to be notified when:</Divider>
+      <Skeleton active loading={loadingUserSettings} title={false}>
+        {!loadingUserSettings && (
+          <>
+            {Object.keys(settings).map((s) => (
+              <Form.Item key={s}>
+                {form.getFieldDecorator(s, {
+                  initialValue: userSettings?.payload?.settings.Item[
+                    `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(1)}`}`
+                  ]
+                    ? userSettings.payload.settings.Item[
+                        `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(1)}`}`
+                      ].BOOL
+                    : false,
+                  valuePropName: "checked",
+                })(<Checkbox>{settings[s]}</Checkbox>)}
+              </Form.Item>
+            ))}
+            <Form.Item hasFeedback>
+              {form.getFieldDecorator("fullName", {
+                initialValue: userSettings?.payload?.settings.Item.fullName
+                  ? userSettings.payload.settings.Item.fullName.S
+                  : "",
+                rules: [{ message: "Please enter your name.", required: true }],
+              })(<Input placeholder="Name" />)}
+            </Form.Item>
+            <Form.Item hasFeedback>
+              {form.getFieldDecorator("email", {
+                initialValue: userSettings?.payload?.settings.Item.email
+                  ? userSettings.payload.settings.Item.email.S
+                  : "",
+                rules: [
+                  { message: "Please enter your email.", required: true },
+                  { message: "Please enter a valid email.", type: "email" },
+                ],
+              })(<Input placeholder="Email" />)}
+            </Form.Item>
+            <Form.Item>
+              {form.getFieldDecorator("pushNotifications", {
+                initialValue: userSettings?.payload?.settings.Item.pushNotifications
+                  ? userSettings.payload.settings.Item.pushNotifications.BOOL
+                  : false,
+                valuePropName: "checked",
+              })(
+                <Checkbox
+                  onChange={(e) => {
+                    if (e.target.checked) askPermission();
+                  }}
+                  placeholder="PushNotifications"
+                >
+                  <div style={{ display: "inline-block" }}>
+                    Push Notifications{" "}
+                    <Tooltip title="Enables browser notifications. When prompted, please grant access.">
+                      <Icon type="question-circle" />
+                    </Tooltip>
+                  </div>
+                </Checkbox>
+              )}
+            </Form.Item>
+            <Button
+              disabled={Object.values(form.getFieldsError()).some((v) => v)}
+              htmlType="submit"
+              loading={loadingUserSettingsPatch}
+              type="primary"
+            >
+              Save
+            </Button>
+          </>
+        )}
+      </Skeleton>
+      <Divider />
+      {userSettingsPatchState && !loadingUserSettingsPatch && (
+        <Alert
+          closable
+          message={userSettingsPatchState.error || "Saved settings."}
+          type={userSettingsPatchState.error ? "error" : "success"}
+        />
+      )}
+    </StyledForm>
+  );
+};
+
 const NotificationSettings = Form.create()(({ form, settings: { key, ...settings }, isSafe, safeAddress }) => {
   const { drizzle } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
@@ -78,151 +194,65 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
     { errorRetryCount: 0, revalidateOnFocus: false }
   );
 
+  const onSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      form.validateFieldsAndScroll(async (err, values) => {
+        if (!err) {
+          const { email, fullName, phone, pushNotifications, ...rest } = values;
+          let pushNotificationsData;
+          if (pushNotifications) {
+            pushNotificationsData = await subscribeUserToPush();
+          }
+          setLoadingUserSettingsPatch(true);
+          try {
+            setUserSettingsPatchState(
+              await accessSettings({
+                patch: true,
+                web3: drizzle.web3,
+                address: drizzleState.account,
+                settings: prepareSettings(
+                  rest,
+                  key,
+                  true,
+                  email,
+                  fullName,
+                  phone,
+                  pushNotifications,
+                  pushNotificationsData
+                ),
+              })
+            );
+          } catch (err) {
+            console.error(err);
+          } finally {
+            setLoadingUserSettingsPatch(false);
+          }
+        }
+      });
+    },
+    [form, key, drizzle.web3, drizzleState.account, setLoadingUserSettingsPatch, setUserSettingsPatchState]
+  );
+
   // Determine if Safe needs setup - check if derived account exists in localStorage
   const needsSafeSetup = isSafe && !localStorage.getItem(`${safeAddress}-${derivedAccountKey}`);
 
   return (
     <Popover
       arrowPointAtCenter
-      content={
-        drizzleState.account !== VIEW_ONLY_ADDRESS ? (
-          needsSafeSetup ? (
-            <SafeNotificationsSetup safeAddress={safeAddress} />
-          ) : (
-            <StyledForm
-              onSubmit={useCallback(
-                async (e) => {
-                  e.preventDefault();
-                  form.validateFieldsAndScroll(async (err, values) => {
-                    if (!err) {
-                      const { email, fullName, phone, pushNotifications, ...rest } = values;
-                      let pushNotificationsData;
-                      if (pushNotifications) {
-                        pushNotificationsData = await subscribeUserToPush();
-                      }
-                      setLoadingUserSettingsPatch(true);
-                      try {
-                        setUserSettingsPatchState(
-                          await accessSettings({
-                            patch: true,
-                            web3: drizzle.web3,
-                            address: drizzleState.account,
-                            settings: prepareSettings(
-                              rest,
-                              key,
-                              true,
-                              email,
-                              fullName,
-                              phone,
-                              pushNotifications,
-                              pushNotificationsData
-                            ),
-                          })
-                        );
-                      } catch (err) {
-                        console.error(err);
-                      } finally {
-                        setLoadingUserSettingsPatch(false);
-                      }
-                    }
-                  });
-                },
-                [form, key, drizzle.web3, drizzleState.account]
-              )}
-            >
-              <Divider>I wish to be notified when:</Divider>
-              <Skeleton active loading={loadingUserSettings} title={false}>
-                {!loadingUserSettings && (
-                  <>
-                    {Object.keys(settings).map((s) => (
-                      <Form.Item key={s}>
-                        {form.getFieldDecorator(s, {
-                          initialValue: userSettings?.payload?.settings.Item[
-                            `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(1)}`}`
-                          ]
-                            ? userSettings.payload.settings.Item[
-                                `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(1)}`}`
-                              ].BOOL
-                            : false,
-                          valuePropName: "checked",
-                        })(<Checkbox>{settings[s]}</Checkbox>)}
-                      </Form.Item>
-                    ))}
-                    <Form.Item hasFeedback>
-                      {form.getFieldDecorator("fullName", {
-                        initialValue: userSettings?.payload?.settings.Item.fullName
-                          ? userSettings.payload.settings.Item.fullName.S
-                          : "",
-                        rules: [{ message: "Please enter your name.", required: true }],
-                      })(<Input placeholder="Name" />)}
-                    </Form.Item>
-                    <Form.Item hasFeedback>
-                      {form.getFieldDecorator("email", {
-                        initialValue: userSettings?.payload?.settings.Item.email
-                          ? userSettings.payload.settings.Item.email.S
-                          : "",
-                        rules: [
-                          { message: "Please enter your email.", required: true },
-                          { message: "Please enter a valid email.", type: "email" },
-                        ],
-                      })(<Input placeholder="Email" />)}
-                    </Form.Item>
-                    <Form.Item>
-                      {form.getFieldDecorator("pushNotifications", {
-                        initialValue: userSettings?.payload?.settings.Item.pushNotifications
-                          ? userSettings.payload.settings.Item.pushNotifications.BOOL
-                          : false,
-                        valuePropName: "checked",
-                      })(
-                        <Checkbox
-                          onChange={(e) => {
-                            if (e.target.checked) askPermission();
-                          }}
-                          placeholder="PushNotifications"
-                        >
-                          <div style={{ display: "inline-block" }}>
-                            Push Notifications{" "}
-                            <Tooltip title="Enables browser notifications. When prompted, please grant access.">
-                              <Icon type="question-circle" />
-                            </Tooltip>
-                          </div>
-                        </Checkbox>
-                      )}
-                    </Form.Item>
-                    <Button
-                      disabled={Object.values(form.getFieldsError()).some((v) => v)}
-                      htmlType="submit"
-                      loading={loadingUserSettingsPatch}
-                      type="primary"
-                    >
-                      Save
-                    </Button>
-                  </>
-                )}
-              </Skeleton>
-              <Divider />
-              {userSettingsPatchState && !loadingUserSettingsPatch && (
-                <Alert
-                  closable
-                  message={userSettingsPatchState.error || "Saved settings."}
-                  type={userSettingsPatchState.error ? "error" : "success"}
-                />
-              )}
-            </StyledForm>
-          )
-        ) : (
-          <StyledForm>
-            <Divider>No Wallet Detected</Divider>
-            <p>
-              To change notifications, a web3 wallet such as{" "}
-              <a href="https://metamask.io/" target="_blank" rel="noopener noreferrer">
-                Metamask
-              </a>{" "}
-              is required.
-            </p>
-          </StyledForm>
-        )
-      }
+      content={NotificationSettingsContent(
+        key,
+        drizzleState,
+        needsSafeSetup,
+        safeAddress,
+        form,
+        onSubmit,
+        settings,
+        userSettings,
+        loadingUserSettings,
+        loadingUserSettingsPatch,
+        userSettingsPatchState
+      )}
       placement="bottomRight"
       title="Notification Settings"
       trigger="click"
