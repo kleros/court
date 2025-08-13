@@ -15,9 +15,9 @@
   "private": true,
   "scripts": {
     "prestart": "run-s build:theme",
-    "start": "cross-env BROWSER=none react-app-rewired start",
+    "start": "NODE_OPTIONS=--openssl-legacy-provider cross-env BROWSER=none react-app-rewired start",
     "prebuild": "run-s build:theme",
-    "build": "react-app-rewired build",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider react-app-rewired build",
     "build:analyze": "source-map-explorer build/static/js/main.*",
     "build:theme": "lessc --js ./src/components/theme.less ./src/components/theme.css",
     "fix": "run-p -c fix:*",
@@ -67,6 +67,8 @@
     "@loadable/component": "^5.5.0",
     "@reality.eth/contracts": "3.0.0",
     "@reality.eth/reality-eth-lib": "3.4.6",
+    "@safe-global/safe-apps-provider": "0.15.2",
+    "@safe-global/safe-apps-react-sdk": "4.6.3",
     "@sentry/react": "^7.37.2",
     "@sentry/tracing": "^7.37.2",
     "antd": "^3.10.8",
@@ -99,7 +101,7 @@
     "react-time-ago": "^3.0.3",
     "shallowequal": "^1.1.0",
     "styled-components": "^5.3.0",
-    "swr": "^2.2.0",
+    "swr": "2.2.0",
     "use-persisted-state": "^0.3.3",
     "web3": "1.5.2"
   },
@@ -107,7 +109,7 @@
     "html-to-text": "^7.0.0"
   },
   "volta": {
-    "node": "16.20.2",
+    "node": "18.20.8",
     "yarn": "1.22.10"
   },
   "packageManager": "yarn@1.22.22"
