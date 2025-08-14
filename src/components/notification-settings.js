@@ -59,7 +59,7 @@ const prepareSettings = (
       };
 };
 
-const NotificationSettingsContent = (
+const NotificationSettingsContent = ({
   key,
   drizzleState,
   needsSafeSetup,
@@ -70,8 +70,8 @@ const NotificationSettingsContent = (
   userSettings,
   loadingUserSettings,
   loadingUserSettingsPatch,
-  userSettingsPatchState
-) => {
+  userSettingsPatchState,
+}) => {
   if (drizzleState.account === VIEW_ONLY_ADDRESS) {
     return (
       <StyledForm>
@@ -175,6 +175,20 @@ const NotificationSettingsContent = (
   );
 };
 
+NotificationSettingsContent.propTypes = {
+  key: PropTypes.string.isRequired,
+  drizzleState: PropTypes.object.isRequired,
+  needsSafeSetup: PropTypes.bool.isRequired,
+  safeAddress: PropTypes.string.isRequired,
+  form: PropTypes.object.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  settings: PropTypes.object.isRequired,
+  userSettings: PropTypes.object.isRequired,
+  loadingUserSettings: PropTypes.bool.isRequired,
+  loadingUserSettingsPatch: PropTypes.bool.isRequired,
+  userSettingsPatchState: PropTypes.object.isRequired,
+};
+
 const NotificationSettings = Form.create()(({ form, settings: { key, ...settings }, isSafe, safeAddress }) => {
   const { drizzle } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
@@ -240,7 +254,7 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
   return (
     <Popover
       arrowPointAtCenter
-      content={NotificationSettingsContent(
+      content={NotificationSettingsContent({
         key,
         drizzleState,
         needsSafeSetup,
@@ -251,8 +265,8 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
         userSettings,
         loadingUserSettings,
         loadingUserSettingsPatch,
-        userSettingsPatchState
-      )}
+        userSettingsPatchState,
+      })}
       placement="bottomRight"
       title="Notification Settings"
       trigger="click"
