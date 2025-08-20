@@ -1,13 +1,11 @@
 import { Alert, Button, Checkbox, Divider, Form, Icon, Input, Popover, Skeleton, Tooltip } from "antd";
 import React, { useCallback, useState } from "react";
-import SafeNotificationsSetup from "./safe-notifications-setup.jsx";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { ReactComponent as Mail } from "../assets/images/mail.svg";
 import PropTypes from "prop-types";
 import styled from "styled-components/macro";
 import { accessSettings } from "../bootstrap/api";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
-import { derivedAccountKey } from "../temp/web3-derive-account";
 import { askPermission, subscribeUserToPush } from "../bootstrap/service-worker";
 import useSWR from "swr";
 
@@ -62,8 +60,6 @@ const prepareSettings = (
 const NotificationSettingsContent = ({
   key,
   drizzleState,
-  needsSafeSetup,
-  safeAddress,
   form,
   onSubmit,
   settings,
@@ -85,10 +81,6 @@ const NotificationSettingsContent = ({
         </p>
       </StyledForm>
     );
-  }
-
-  if (needsSafeSetup) {
-    return <SafeNotificationsSetup safeAddress={safeAddress} />;
   }
 
   return (
@@ -178,8 +170,6 @@ const NotificationSettingsContent = ({
 NotificationSettingsContent.propTypes = {
   key: PropTypes.string.isRequired,
   drizzleState: PropTypes.object.isRequired,
-  needsSafeSetup: PropTypes.bool.isRequired,
-  safeAddress: PropTypes.string.isRequired,
   form: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired,
   settings: PropTypes.object.isRequired,
@@ -189,7 +179,7 @@ NotificationSettingsContent.propTypes = {
   userSettingsPatchState: PropTypes.object.isRequired,
 };
 
-const NotificationSettings = Form.create()(({ form, settings: { key, ...settings }, isSafe, safeAddress }) => {
+const NotificationSettings = Form.create()(({ form, settings: { key, ...settings } }) => {
   const { drizzle } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
@@ -248,17 +238,12 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
     [form, key, drizzle.web3, drizzleState.account, setLoadingUserSettingsPatch, setUserSettingsPatchState]
   );
 
-  // Determine if Safe needs setup - check if derived account exists in localStorage
-  const needsSafeSetup = isSafe && !localStorage.getItem(`${safeAddress}-${derivedAccountKey}`);
-
   return (
     <Popover
       arrowPointAtCenter
       content={NotificationSettingsContent({
         key,
         drizzleState,
-        needsSafeSetup,
-        safeAddress,
         form,
         onSubmit,
         settings,

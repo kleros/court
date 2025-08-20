@@ -1,7 +1,6 @@
 {
   "short_name": "Kleros Court",
   "name": "Kleros · Court",
-  "description": "Decentralized dispute resolution",
   "icons": [
     {
       "src": "icon-192.png",
@@ -16,7 +15,5 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff",
-  "iconPath": "icon-192.png"
+  "theme_color": "#000000"
 }

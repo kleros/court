@@ -18,8 +18,6 @@ import ChainChangeWatcher from "./chain-change-watcher";
 import { DrizzleProvider, Initializer, createDrizzle, detectRequiredChainId, useDrizzle } from "./drizzle";
 import ErrorBoundary from "../components/error-boundary";
 import SwitchChainFallback from "../components/error-fallback/switch-chain";
-import { useSafeAppsSDK } from "@safe-global/safe-apps-react-sdk";
-import { SafeAppProvider } from "@safe-global/safe-apps-provider";
 import SmartContractWalletWarning from "../components/smart-contract-wallet-warning";
 
 export default function App() {
@@ -27,31 +25,11 @@ export default function App() {
   const [customDrizzle, setCustomDrizzle] = useState(null);
   const [checkingProvider, setCheckingProvider] = useState(true);
 
-  const { sdk, safe } = useSafeAppsSDK();
-
-  //If running inside an iframe, it most likely means the user is using the safe web app
-  const isInsideSafeApp = window.parent !== window;
-  const hasSafeAddress = !!safe.safeAddress;
-
   //Check if wallet is already connected
   useEffect(() => {
     (async () => {
       try {
-        // if we have a safe address, create Drizzle with Safe provider immediately
-        if (hasSafeAddress) {
-          const safeProvider = new SafeAppProvider(safe, sdk);
-          setCustomDrizzle(createDrizzle({ customProvider: safeProvider }));
-          setCheckingProvider(false);
-          return;
-        }
-
-        //If in an iframe, assume the user is using the safe web app, and if we don't already have the safe address,
-        //we need to wait for the handshake to finish, because Drizzle doesn't seem to allow provider swaps
-        if (isInsideSafeApp) {
-          return;
-        }
-
-        //Otherwise, the user is not using the safe web app, and we can look for wallets
+        //Look for wallets
         const wallets = detectWallets();
 
         //No wallets found, enter view mode
@@ -75,7 +53,7 @@ export default function App() {
         setCheckingProvider(false);
       }
     })();
-  }, [hasSafeAddress, isInsideSafeApp, safe, sdk]);
+  }, []);
 
   const handleWalletConnected = (provider) => {
     try {
@@ -145,11 +123,7 @@ export default function App() {
                           <StyledTrayCol lg={6} md={8} sm={12} xs={24}>
                             <StyledTray>
                               <AccountStatus />
-                              <NotificationSettings
-                                settings={settings}
-                                isSafe={isInsideSafeApp && hasSafeAddress}
-                                safeAddress={safe.safeAddress}
-                              />
+                              <NotificationSettings settings={settings} />
                             </StyledTray>
                           </StyledTrayCol>
                         </Row>

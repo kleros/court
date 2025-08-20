@@ -211,9 +211,6 @@ export default function CaseDetailsCard({ ID }) {
   const { web3 } = drizzle;
   const { KlerosLiquid } = drizzle.contracts;
 
-  //If running inside an iframe, it most likely means the user is using the safe web app
-  const isInsideSafeApp = window.parent !== window;
-
   const loadPolicy = useDataloader.loadPolicy();
   const getMetaEvidence = useDataloader.getMetaEvidence();
   const [activeSubcourtID, setActiveSubcourtID] = useState();
@@ -611,9 +608,7 @@ export default function CaseDetailsCard({ ID }) {
                       />
                     )
                   ) : null}
-                  {/* Only show the justification box if the user is not using the safe web app, 
-                  because signing is a transaction that needs to be executed and causes problem with the current derivedAccountKey and secret logic*/}
-                  {votesData.canVote && dispute.period === "2" && !isInsideSafeApp && (
+                  {votesData.canVote && dispute.period === "2" && (
                     <JustificationBox onChange={onJustificationChange} justification={justification} />
                   )}
                   {Number(dispute.period) < 3 && !votesData.voted && metaEvidence.rulingOptions ? (
