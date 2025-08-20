@@ -7,7 +7,7 @@ import styled from "styled-components/macro";
 import { Alert, Col, Layout, Menu, Row, Spin } from "antd";
 import { Helmet } from "react-helmet";
 import { BrowserRouter, NavLink, Route, Switch, useParams } from "react-router-dom";
-import { ReactComponent as Logo } from "../assets/images/logo.svg";
+import { ReactComponent as Logo } from "../assets/images/kleros-logo-flat-light.svg";
 import AccountStatus from "../components/account-status";
 import WalletConnector from "../components/wallet-connector";
 import { getLastConnectedWalletProvider, detectWallets } from "../bootstrap/wallet-connector";
