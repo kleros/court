@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import { useDrizzle } from "../bootstrap/drizzle";
 import { Alert } from "antd";
 import { createPortal } from "react-dom";
 import styled from "styled-components";
+import createPersistedState from "use-persisted-state";
 
 const { useDrizzleState } = drizzleReactHooks;
+const useSmartContractWalletWarning = createPersistedState("@kleros/court/alert/smart-contract-wallet-warning");
 const bannerRoot = document.querySelector("#banner-root");
 
 const StyledAlert = styled(Alert)`
@@ -22,13 +24,17 @@ export default function SmartContractWalletWarning() {
   const { account = VIEW_ONLY_ADDRESS } = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0],
   }));
+  const [showWarning, setShowWarning] = useSmartContractWalletWarning(true);
   const [isSmartContractWallet, setIsSmartContractWallet] = useState(false);
 
-  drizzle.web3.eth.getCode(account).then((code) => {
-    setIsSmartContractWallet(code !== "0x");
-  });
+  useEffect(() => {
+    drizzle.web3.eth.getCode(account).then((code) => {
+      setIsSmartContractWallet(code !== "0x");
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account, drizzle]);
 
-  if (!isSmartContractWallet) {
+  if (!showWarning || !isSmartContractWallet) {
     return null;
   }
 
@@ -39,6 +45,7 @@ export default function SmartContractWalletWarning() {
       type="warning"
       banner
       closable
+      onClose={() => setShowWarning(false)}
     />,
     bannerRoot
   );
