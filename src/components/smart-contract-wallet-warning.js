@@ -19,6 +19,10 @@ const StyledAlert = styled(Alert)`
   }
 `;
 
+const StyledP = styled.p`
+  margin: 0;
+`;
+
 export default function SmartContractWalletWarning() {
   const { drizzle } = useDrizzle();
   const { account = VIEW_ONLY_ADDRESS } = useDrizzleState((drizzleState) => ({
@@ -41,7 +45,18 @@ export default function SmartContractWalletWarning() {
   return createPortal(
     <StyledAlert
       message="Warning"
-      description="You are using a smart contract wallet. This is not recommended."
+      description={
+        <StyledP>
+          You are using a smart contract wallet. This is not recommended.{" "}
+          <a
+            href="https://docs.kleros.io/kleros-faq#can-i-use-a-smart-contract-account-to-stake-in-the-court"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Learn more.
+          </a>
+        </StyledP>
+      }
       type="warning"
       banner
       closable
