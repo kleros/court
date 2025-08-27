@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import { useDrizzle } from "../bootstrap/drizzle";
@@ -6,9 +6,9 @@ import { Alert } from "antd";
 import { createPortal } from "react-dom";
 import styled from "styled-components";
 import createPersistedState from "use-persisted-state";
+import PropTypes from "prop-types";
 
 const { useDrizzleState } = drizzleReactHooks;
-const useSmartContractWalletWarning = createPersistedState("@kleros/court/alert/smart-contract-wallet-warning");
 const EIP7702_PREFIX = "0xef0100";
 const bannerRoot = document.querySelector("#banner-root");
 
@@ -24,12 +24,21 @@ const StyledP = styled.p`
   margin: 0;
 `;
 
+//Render a separate component for each connected account by giving it a `key={account}`.
+//Otherwise, on wallet change, even though `createPersistedState` reads the correct dismissal flag, the showWarning state would not be updated without a forced refresh.
 export default function SmartContractWalletWarning() {
+  const { account = VIEW_ONLY_ADDRESS } = useDrizzleState((s) => ({ account: s.accounts[0] }));
+  return <WalletWarningPerAccount key={account} account={account} />;
+}
+
+function WalletWarningPerAccount({ account }) {
   const { drizzle } = useDrizzle();
-  const { account = VIEW_ONLY_ADDRESS } = useDrizzleState((drizzleState) => ({
-    account: drizzleState.accounts[0],
-  }));
-  const [showWarning, setShowWarning] = useSmartContractWalletWarning(true);
+
+  const useWalletWarning = useMemo(
+    () => createPersistedState(`@kleros/court/alert/smart-contract-wallet-warning:${account?.toLowerCase()}`),
+    [account]
+  );
+  const [showWarning, setShowWarning] = useWalletWarning(true);
   const [isSmartContractWallet, setIsSmartContractWallet] = useState(false);
 
   useEffect(() => {
@@ -70,3 +79,7 @@ export default function SmartContractWalletWarning() {
     bannerRoot
   );
 }
+
+WalletWarningPerAccount.propTypes = {
+  account: PropTypes.string.isRequired,
+};
