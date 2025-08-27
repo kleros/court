@@ -9,6 +9,7 @@ import createPersistedState from "use-persisted-state";
 
 const { useDrizzleState } = drizzleReactHooks;
 const useSmartContractWalletWarning = createPersistedState("@kleros/court/alert/smart-contract-wallet-warning");
+const EIP7702_PREFIX = "0xef0100";
 const bannerRoot = document.querySelector("#banner-root");
 
 const StyledAlert = styled(Alert)`
@@ -33,7 +34,11 @@ export default function SmartContractWalletWarning() {
 
   useEffect(() => {
     drizzle.web3.eth.getCode(account).then((code) => {
-      setIsSmartContractWallet(code !== "0x");
+      const formattedCode = code.toLowerCase();
+      const isEip7702Eoa = formattedCode.startsWith(EIP7702_PREFIX);
+
+      //Do not show warning for EIP-7702 EOAs
+      setIsSmartContractWallet(code !== "0x" && !isEip7702Eoa);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, drizzle]);
