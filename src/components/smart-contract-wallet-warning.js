@@ -23,8 +23,7 @@ const StyledP = styled.p`
   margin: 0;
 `;
 
-//Render a separate component for each connected account by giving it a `key={account}`.
-//Otherwise, on wallet change, even though `createPersistedState` reads the correct dismissal flag, the showWarning state would not be updated without a forced refresh.
+//Remount on account changes, so the per-account persisted `showWarning` value takes effect immediately without requiring a full refresh.
 export default function SmartContractWalletWarning() {
   const { account = VIEW_ONLY_ADDRESS } = useDrizzleState((s) => ({ account: s.accounts[0] }));
   return <WalletWarningPerAccount key={account} account={account} />;
