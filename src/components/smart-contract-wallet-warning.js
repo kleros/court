@@ -10,7 +10,6 @@ import PropTypes from "prop-types";
 
 const { useDrizzleState } = drizzleReactHooks;
 const EIP7702_PREFIX = "0xef0100";
-const bannerRoot = document.querySelector("#banner-root");
 
 const StyledAlert = styled(Alert)`
   text-align: center;
@@ -33,6 +32,7 @@ export default function SmartContractWalletWarning() {
 
 function WalletWarningPerAccount({ account }) {
   const { drizzle } = useDrizzle();
+  const bannerRoot = typeof document !== "undefined" ? document.querySelector("#banner-root") : null;
 
   const useWalletWarning = useMemo(
     () => createPersistedState(`@kleros/court/alert/smart-contract-wallet-warning:${account?.toLowerCase()}`),
@@ -42,17 +42,38 @@ function WalletWarningPerAccount({ account }) {
   const [isSmartContractWallet, setIsSmartContractWallet] = useState(false);
 
   useEffect(() => {
-    drizzle.web3.eth.getCode(account).then((code) => {
-      const formattedCode = code.toLowerCase();
-      const isEip7702Eoa = formattedCode.startsWith(EIP7702_PREFIX);
+    let cancelled = false;
 
-      //Do not show warning for EIP-7702 EOAs
-      setIsSmartContractWallet(code !== "0x" && !isEip7702Eoa);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account, drizzle]);
+    const fetchCode = async () => {
+      try {
+        const code = await drizzle.web3.eth.getCode(account);
+        const formattedCode = (code || "").toLowerCase();
+        const isEip7702 = formattedCode.startsWith(EIP7702_PREFIX);
 
-  if (!showWarning || !isSmartContractWallet) {
+        if (!cancelled) {
+          //Do not show warning for EIP-7702 EOAs
+          setIsSmartContractWallet(formattedCode !== "0x" && !isEip7702);
+        }
+      } catch (error) {
+        console.error("Error fetching code for account", error);
+
+        //If the component is still mounted
+        if (!cancelled) {
+          setIsSmartContractWallet(false);
+        }
+      }
+    };
+
+    if (account) {
+      fetchCode();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [account, drizzle.web3]);
+
+  if (!showWarning || !isSmartContractWallet || !bannerRoot) {
     return null;
   }
 
