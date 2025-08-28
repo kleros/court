@@ -10,7 +10,7 @@ import { BrowserRouter, NavLink, Route, Switch, useParams } from "react-router-d
 import { ReactComponent as Logo } from "../assets/images/kleros-logo-flat-light.svg";
 import AccountStatus from "../components/account-status";
 import WalletConnector from "../components/wallet-connector";
-import { getLastConnectedWalletProvider, detectWallets } from "../bootstrap/wallet-connector";
+import { getLastConnectedWalletProvider, detectWalletsAsync } from "../bootstrap/wallet-connector";
 import Footer from "../components/footer";
 import NotificationSettings from "../components/notification-settings";
 import { ChainIdProvider } from "../hooks/use-chain-id";
@@ -29,8 +29,8 @@ export default function App() {
   useEffect(() => {
     (async () => {
       try {
-        //Look for wallets
-        const wallets = detectWallets();
+        //Trigger wallet search and await results
+        const wallets = await detectWalletsAsync();
 
         //No wallets found, enter view mode
         if (wallets.length === 0) {

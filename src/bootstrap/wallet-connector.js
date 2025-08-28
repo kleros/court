@@ -22,8 +22,9 @@ function onAnnounce(event) {
   });
 }
 
+//Call syncronously to check cached wallet list
 export function detectWallets() {
-  if (typeof window === "undefined" || !window.ethereum) return [];
+  if (typeof window === "undefined") return [];
 
   if (!hasRequestedEip6963Announcements) {
     //Listen for eip6963:announceProvider events
@@ -40,6 +41,25 @@ export function detectWallets() {
   }
 
   return eip6963WalletsCache;
+}
+
+//Await the first announcement window (≈100 ms + margin).
+//However, if cache exists, we resolve instantly.
+export function detectWalletsAsync({ timeoutMs = 300 } = {}) {
+  //Check cache and trigger wallet search (if not yet done)
+  const initial = detectWallets();
+
+  //Cache already populated → return immediately.
+  if (initial.length > 0) {
+    return Promise.resolve(initial);
+  }
+
+  //Otherwise wait a little longer than the 100 ms window and read the cache again.
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(detectWallets());
+    }, timeoutMs);
+  });
 }
 
 const STORAGE_KEY_LAST_WALLET_TYPE = "court-v1-last-wallet-connected";
