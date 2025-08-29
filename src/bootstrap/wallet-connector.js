@@ -11,9 +11,7 @@ function onAnnounce(event) {
   //When this shim runs in a web page, the call is made without an extension ID, so Chrome
   //repeatedly throws "runtime.sendMessage..." errors and keeps sending GET requests to chrome-extension://invalid/.
   //The result is errors flooding the console. Functionally Rainbow works (you can sign and send txs) but the spam is unacceptable.
-  const isRainbow =
-    (info.rdns && info.rdns.toLowerCase() === "me.rainbow") ||
-    (info.name && info.name.toLowerCase().includes("rainbow"));
+  const isRainbow = info.rdns?.toLowerCase() === "me.rainbow" || info.name?.toLowerCase().includes("rainbow");
 
   if (discoveredWalletIDs.has(walletId) || isRainbow) return;
   discoveredWalletIDs.add(walletId);
