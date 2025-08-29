@@ -16,6 +16,7 @@ import ChainChangeWatcher from "./chain-change-watcher";
 import drizzle, { DrizzleProvider, Initializer, useDrizzle } from "./drizzle";
 import ErrorBoundary from "../components/error-boundary";
 import SwitchChainFallback from "../components/error-fallback/switch-chain";
+import SmartContractWalletWarning from "../components/smart-contract-wallet-warning";
 
 export default function App() {
   const [isMenuClosed, setIsMenuClosed] = useState(true);
@@ -37,6 +38,7 @@ export default function App() {
               <ErrorBoundary fallback={SwitchChainFallback}>
                 <BrowserRouter>
                   <Layout>
+                    <SmartContractWalletWarning />
                     <StyledLayoutSider
                       breakpoint="md"
                       collapsedWidth="0"
