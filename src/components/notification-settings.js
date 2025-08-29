@@ -121,8 +121,14 @@ const NotificationSettingsContent = ({
                 valuePropName: "checked",
               })(
                 <Checkbox
-                  onChange={(e) => {
-                    if (e.target.checked) askPermission();
+                  onChange={async (e) => {
+                    if (e.target.checked) {
+                      try {
+                        await askPermission();
+                      } catch (err) {
+                        form.setFieldsValue({ pushNotifications: false });
+                      }
+                    }
                   }}
                   placeholder="PushNotifications"
                 >
@@ -199,7 +205,12 @@ const NotificationSettings = Form.create()(({ form, settings: { key: settingsKey
           const { email, fullName, phone, pushNotifications, ...rest } = values;
           let pushNotificationsData;
           if (pushNotifications) {
-            pushNotificationsData = await subscribeUserToPush();
+            try {
+              pushNotificationsData = await subscribeUserToPush();
+            } catch (e) {
+              setUserSettingsPatchState({ error: e?.message || "Failed to enable push notifications." });
+              return;
+            }
           }
           setLoadingUserSettingsPatch(true);
           try {
