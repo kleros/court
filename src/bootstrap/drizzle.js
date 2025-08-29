@@ -110,12 +110,7 @@ function createDrizzle({ fallbackChainId, customProvider } = {}) {
     }
   }
 
-  const optionsWeb3Mixin = {
-    web3: {
-      customProvider: web3Instance,
-    },
-  };
-  const options = { ...defaultOptions, ...optionsWeb3Mixin };
+  const options = web3Instance ? { ...defaultOptions, web3: { customProvider: web3Instance } } : { ...defaultOptions };
 
   return new Drizzle(options, generateStore(options));
 }
