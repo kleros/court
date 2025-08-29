@@ -4,48 +4,43 @@ const eip6963WalletsCache = [];
 
 function onAnnounce(event) {
   const { info, provider } = event.detail;
-  const id = info.uuid || info.name;
+  const walletId = info.rdns || info.name.toLowerCase();
 
   //Ignore duplicates and rainbow.
   //Rainbow extension seems to inject a provider shim that still relies on chrome.runtime.sendMessage().
   //When this shim runs in a web page, the call is made without an extension ID, so Chrome
   //repeatedly throws "runtime.sendMessage..." errors and keeps sending GET requests to chrome-extension://invalid/.
   //The result is errors flooding the console. Functionally Rainbow works (you can sign and send txs) but the spam is unacceptable.
-  if (discoveredWalletIDs.has(id) || info.name.includes("Rainbow")) return;
-  discoveredWalletIDs.add(id);
+  if (discoveredWalletIDs.has(walletId) || info.name.includes("Rainbow")) return;
+  discoveredWalletIDs.add(walletId);
 
   eip6963WalletsCache.push({
+    id: walletId,
     type: info.name.toLowerCase(),
     name: info.name,
     icon: info.icon,
-    provider: provider,
+    provider,
   });
 }
 
-//Call syncronously to check cached wallet list
+//Call synchronously to check cached wallet list and trigger a new discovery.
 export function detectWallets() {
   if (typeof window === "undefined") return [];
 
   if (!hasRequestedEip6963Announcements) {
-    //Listen for eip6963:announceProvider events
+    //Keep it attached during page lifetimeto catch late providers.
     window.addEventListener("eip6963:announceProvider", onAnnounce);
-    window.dispatchEvent(new Event("eip6963:requestProvider"));
-
-    //Give wallets ~100 ms to respond, then detach listener.
-    setTimeout(() => {
-      window.removeEventListener("eip6963:announceProvider", onAnnounce);
-    }, 100);
-
-    //Regardless of the caller, we no longer care for these events.
     hasRequestedEip6963Announcements = true;
   }
+  //Request on every call so newly-installed wallets can announce.
+  window.dispatchEvent(new Event("eip6963:requestProvider"));
 
-  return eip6963WalletsCache;
+  return [...eip6963WalletsCache];
 }
 
-//Await the first announcement window (≈100 ms + margin).
-//However, if cache exists, we resolve instantly.
-export function detectWalletsAsync({ timeoutMs = 300 } = {}) {
+//If we already have at least one wallet cached, resolve immediately.
+//Otherwise wait a short time to give extensions a chance to announce.
+export function detectWalletsAsync({ timeoutMs = 150 } = {}) {
   //Check cache and trigger wallet search (if not yet done)
   const initial = detectWallets();
 
@@ -54,7 +49,7 @@ export function detectWalletsAsync({ timeoutMs = 300 } = {}) {
     return Promise.resolve(initial);
   }
 
-  //Otherwise wait a little longer than the 100 ms window and read the cache again.
+  //Otherwise wait a short time.
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(detectWallets());
@@ -62,7 +57,7 @@ export function detectWalletsAsync({ timeoutMs = 300 } = {}) {
   });
 }
 
-const STORAGE_KEY_LAST_WALLET_TYPE = "court-v1-last-wallet-connected";
+const STORAGE_KEY_LAST_WALLET_ID = "@kleros/court-v1/last-wallet-connected";
 
 export function getLastConnectedWalletProvider() {
   const wallets = detectWallets();
@@ -71,10 +66,13 @@ export function getLastConnectedWalletProvider() {
     return null;
   }
 
-  let lastWalletType = window?.localStorage?.getItem(STORAGE_KEY_LAST_WALLET_TYPE) ?? undefined;
+  const lastStored =
+    typeof window !== "undefined" && window.localStorage
+      ? window.localStorage.getItem(STORAGE_KEY_LAST_WALLET_ID)
+      : undefined;
 
-  if (lastWalletType) {
-    const lastWallet = wallets.find((w) => w.type === lastWalletType);
+  if (lastStored) {
+    const lastWallet = wallets.find((w) => w.id === lastStored);
     if (lastWallet) {
       return lastWallet.provider;
     }
@@ -85,24 +83,31 @@ export function getLastConnectedWalletProvider() {
 }
 
 //Connect to a specific wallet
-export async function connectWallet(walletType) {
+export async function connectWallet(walletId) {
   const wallets = detectWallets();
-  const wallet = wallets.find((w) => w.type === walletType);
+  const wallet = wallets.find((w) => w.id === walletId);
 
   if (!wallet) {
-    throw new Error(`Wallet ${walletType} not available`);
+    throw new Error(`Wallet ${walletId} not available`);
   }
 
   try {
-    await wallet.provider.request({
-      method: "eth_requestAccounts",
-    });
+    //Prefer EIP-1193 request, fallback to legacy enable if present.
+    if (typeof wallet.provider?.request === "function") {
+      await wallet.provider.request({ method: "eth_requestAccounts" });
+    } else if (typeof wallet.provider?.enable === "function") {
+      await wallet.provider.enable();
+    } else {
+      throw new Error("Provider does not implement a connection method");
+    }
 
-    //eslint-disable-next-line no-unused-expressions
-    window?.localStorage?.setItem(STORAGE_KEY_LAST_WALLET_TYPE, wallet.type);
+    if (typeof window !== "undefined" && window.localStorage) {
+      window.localStorage.setItem(STORAGE_KEY_LAST_WALLET_ID, wallet.id);
+    }
 
     return wallet.provider;
   } catch (error) {
-    throw new Error(`Failed to connect to ${wallet.name}: ${error.message}`);
+    const message = error && typeof error === "object" && "message" in error ? error.message : String(error);
+    throw new Error(`Failed to connect to ${wallet.name}: ${message}`);
   }
 }
