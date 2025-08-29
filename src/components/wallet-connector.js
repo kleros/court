@@ -37,6 +37,7 @@ export default function WalletConnector({ onProviderConnected }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [wallets, setWallets] = useState([]);
   const [error, setError] = useState(null);
+  const [connecting, setConnecting] = useState(false);
 
   const openModal = () => {
     setWallets(detectWallets());
@@ -49,21 +50,28 @@ export default function WalletConnector({ onProviderConnected }) {
   };
 
   const handleConnect = async (walletId) => {
+    if (connecting) return;
+    setConnecting(true);
     setError(null);
-    message.loading("Connecting wallet…");
+
+    const msgKey = "wallet-connect";
+    message.loading({ content: "Connecting wallet…", key: msgKey, duration: 0 });
 
     try {
       const provider = await connectWallet(walletId);
-      message.success("Wallet connected successfully!");
+      message.success({ content: "Wallet connected successfully!", key: msgKey });
       setModalVisible(false);
 
       if (typeof onProviderConnected === "function" && provider) {
         onProviderConnected(provider);
-      } else if (window.location?.reload) {
+      } else if (typeof window !== "undefined" && typeof window.location?.reload === "function") {
         window.location.reload();
       }
     } catch (err) {
       setError(err.message);
+      message.error({ content: err.message, key: msgKey });
+    } finally {
+      setConnecting(false);
     }
   };
 
@@ -85,7 +93,7 @@ export default function WalletConnector({ onProviderConnected }) {
           dataSource={wallets}
           renderItem={(wallet) => (
             <List.Item>
-              <StyledWalletItem onClick={() => handleConnect(wallet.id)}>
+              <StyledWalletItem onClick={() => !connecting && handleConnect(wallet.id)}>
                 <Avatar src={wallet.icon} />
                 <Text strong>{wallet.name}</Text>
               </StyledWalletItem>

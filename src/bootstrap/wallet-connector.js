@@ -4,14 +4,18 @@ const eip6963WalletsCache = [];
 
 function onAnnounce(event) {
   const { info, provider } = event.detail;
-  const walletId = info.rdns || info.name.toLowerCase();
+  const walletId = (info.rdns || info.name || "").toLowerCase();
 
   //Ignore duplicates and rainbow.
   //Rainbow extension seems to inject a provider shim that still relies on chrome.runtime.sendMessage().
   //When this shim runs in a web page, the call is made without an extension ID, so Chrome
   //repeatedly throws "runtime.sendMessage..." errors and keeps sending GET requests to chrome-extension://invalid/.
   //The result is errors flooding the console. Functionally Rainbow works (you can sign and send txs) but the spam is unacceptable.
-  if (discoveredWalletIDs.has(walletId) || info.name.includes("Rainbow")) return;
+  const isRainbow =
+    (info.rdns && info.rdns.toLowerCase() === "me.rainbow") ||
+    (info.name && info.name.toLowerCase().includes("rainbow"));
+
+  if (discoveredWalletIDs.has(walletId) || isRainbow) return;
   discoveredWalletIDs.add(walletId);
 
   eip6963WalletsCache.push({
