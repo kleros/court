@@ -126,6 +126,7 @@ const NotificationSettingsContent = ({
                       try {
                         await askPermission();
                       } catch (err) {
+                        console.error("Notification permission error: ", err);
                         form.setFieldsValue({ pushNotifications: false });
                       }
                     }
