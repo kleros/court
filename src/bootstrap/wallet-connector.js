@@ -3,7 +3,12 @@ const discoveredWalletIDs = new Set();
 const eip6963WalletsCache = [];
 
 function onAnnounce(event) {
-  const { info, provider } = event.detail;
+  const detail = event?.detail || {};
+  const info = detail.info;
+  const provider = detail.provider;
+
+  if (!info || !provider) return;
+
   const walletId = (info.rdns || info.name || "").toLowerCase();
 
   //Ignore duplicates and rainbow.
@@ -18,7 +23,7 @@ function onAnnounce(event) {
 
   eip6963WalletsCache.push({
     id: walletId,
-    type: info.name.toLowerCase(),
+    type: (info.name || "").toLowerCase(),
     name: info.name,
     icon: info.icon,
     provider,

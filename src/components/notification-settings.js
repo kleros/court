@@ -7,7 +7,7 @@ import styled from "styled-components/macro";
 import { accessSettings } from "../bootstrap/api";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import { askPermission, subscribeUserToPush } from "../bootstrap/service-worker";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -75,7 +75,7 @@ const NotificationSettingsContent = ({
         <p>
           To change notifications, a web3 wallet such as{" "}
           <a href="https://metamask.io/" target="_blank" rel="noopener noreferrer">
-            Metamask
+            MetaMask
           </a>{" "}
           is required.
         </p>
@@ -173,7 +173,7 @@ NotificationSettingsContent.propTypes = {
   form: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired,
   settings: PropTypes.object.isRequired,
-  userSettings: PropTypes.object.isRequired,
+  userSettings: PropTypes.object,
   loadingUserSettings: PropTypes.bool.isRequired,
   loadingUserSettingsPatch: PropTypes.bool.isRequired,
   userSettingsPatchState: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]).isRequired,
@@ -201,6 +201,7 @@ const NotificationSettings = Form.create()(({ form, settings: { key: settingsKey
   const onSubmit = useCallback(
     async (e) => {
       e.preventDefault();
+      if (loadingUserSettingsPatch) return;
       form.validateFieldsAndScroll(async (err, values) => {
         if (!err) {
           const { email, fullName, phone, pushNotifications, ...rest } = values;
@@ -215,23 +216,23 @@ const NotificationSettings = Form.create()(({ form, settings: { key: settingsKey
           }
           setLoadingUserSettingsPatch(true);
           try {
-            setUserSettingsPatchState(
-              await accessSettings({
-                patch: true,
-                web3: drizzle.web3,
-                address: drizzleState.account,
-                settings: prepareSettings(
-                  rest,
-                  settingsKey,
-                  true,
-                  email,
-                  fullName,
-                  phone,
-                  pushNotifications,
-                  pushNotificationsData
-                ),
-              })
-            );
+            const result = await accessSettings({
+              patch: true,
+              web3: drizzle.web3,
+              address: drizzleState.account,
+              settings: prepareSettings(
+                rest,
+                settingsKey,
+                true,
+                email,
+                fullName,
+                phone,
+                pushNotifications,
+                pushNotificationsData
+              ),
+            });
+            setUserSettingsPatchState(result);
+            mutate(["user-settings", drizzleState.account, settingsKey]);
           } catch (err) {
             console.error(err);
           } finally {
@@ -240,7 +241,15 @@ const NotificationSettings = Form.create()(({ form, settings: { key: settingsKey
         }
       });
     },
-    [form, settingsKey, drizzle.web3, drizzleState.account, setLoadingUserSettingsPatch, setUserSettingsPatchState]
+    [
+      form,
+      settingsKey,
+      drizzle.web3,
+      drizzleState.account,
+      loadingUserSettingsPatch,
+      setLoadingUserSettingsPatch,
+      setUserSettingsPatchState,
+    ]
   );
 
   return (
