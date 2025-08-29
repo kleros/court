@@ -58,7 +58,7 @@ const prepareSettings = (
 };
 
 const NotificationSettingsContent = ({
-  key,
+  settingsKey,
   drizzleState,
   form,
   onSubmit,
@@ -92,30 +92,23 @@ const NotificationSettingsContent = ({
             {Object.keys(settings).map((s) => (
               <Form.Item key={s}>
                 {form.getFieldDecorator(s, {
-                  initialValue: userSettings?.payload?.settings.Item[
-                    `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(1)}`}`
-                  ]
-                    ? userSettings.payload.settings.Item[
-                        `${key}NotificationSetting${`${s[0].toUpperCase()}${s.slice(1)}`}`
-                      ].BOOL
-                    : false,
+                  initialValue:
+                    userSettings?.payload?.settings?.Item?.[
+                      `${settingsKey}NotificationSetting${s[0].toUpperCase()}${s.slice(1)}`
+                    ]?.BOOL ?? false,
                   valuePropName: "checked",
                 })(<Checkbox>{settings[s]}</Checkbox>)}
               </Form.Item>
             ))}
             <Form.Item hasFeedback>
               {form.getFieldDecorator("fullName", {
-                initialValue: userSettings?.payload?.settings.Item.fullName
-                  ? userSettings.payload.settings.Item.fullName.S
-                  : "",
+                initialValue: userSettings?.payload?.settings?.Item?.fullName?.S ?? "",
                 rules: [{ message: "Please enter your name.", required: true }],
               })(<Input placeholder="Name" />)}
             </Form.Item>
             <Form.Item hasFeedback>
               {form.getFieldDecorator("email", {
-                initialValue: userSettings?.payload?.settings.Item.email
-                  ? userSettings.payload.settings.Item.email.S
-                  : "",
+                initialValue: userSettings?.payload?.settings?.Item?.email?.S ?? "",
                 rules: [
                   { message: "Please enter your email.", required: true },
                   { message: "Please enter a valid email.", type: "email" },
@@ -124,9 +117,7 @@ const NotificationSettingsContent = ({
             </Form.Item>
             <Form.Item>
               {form.getFieldDecorator("pushNotifications", {
-                initialValue: userSettings?.payload?.settings.Item.pushNotifications
-                  ? userSettings.payload.settings.Item.pushNotifications.BOOL
-                  : false,
+                initialValue: userSettings?.payload?.settings?.Item?.pushNotifications?.BOOL ?? false,
                 valuePropName: "checked",
               })(
                 <Checkbox
@@ -145,7 +136,9 @@ const NotificationSettingsContent = ({
               )}
             </Form.Item>
             <Button
-              disabled={Object.values(form.getFieldsError()).some((v) => v)}
+              disabled={Object.values(form.getFieldsError()).some((v) =>
+                Array.isArray(v) ? v.length > 0 : Boolean(v)
+              )}
               htmlType="submit"
               loading={loadingUserSettingsPatch}
               type="primary"
@@ -168,7 +161,7 @@ const NotificationSettingsContent = ({
 };
 
 NotificationSettingsContent.propTypes = {
-  key: PropTypes.string.isRequired,
+  settingsKey: PropTypes.string.isRequired,
   drizzleState: PropTypes.object.isRequired,
   form: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired,
@@ -176,10 +169,10 @@ NotificationSettingsContent.propTypes = {
   userSettings: PropTypes.object.isRequired,
   loadingUserSettings: PropTypes.bool.isRequired,
   loadingUserSettingsPatch: PropTypes.bool.isRequired,
-  userSettingsPatchState: PropTypes.object.isRequired,
+  userSettingsPatchState: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]).isRequired,
 };
 
-const NotificationSettings = Form.create()(({ form, settings: { key, ...settings } }) => {
+const NotificationSettings = Form.create()(({ form, settings: { key: settingsKey, ...settings } }) => {
   const { drizzle } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
@@ -188,12 +181,12 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
   const [userSettingsPatchState, setUserSettingsPatchState] = useState(false);
 
   const { data: userSettings, isLoading: loadingUserSettings } = useSWR(
-    drizzleState.account && key && ["user-settings", drizzleState.account, key],
-    async ([_, address, key]) =>
+    drizzleState.account && settingsKey && ["user-settings", drizzleState.account, settingsKey],
+    async ([_, address, settingsKeyParam]) =>
       await accessSettings({
         web3: drizzle.web3,
         address,
-        settings: prepareSettings(settings, key, false),
+        settings: prepareSettings(settings, settingsKeyParam, false),
       }),
     { errorRetryCount: 0, revalidateOnFocus: false }
   );
@@ -217,7 +210,7 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
                 address: drizzleState.account,
                 settings: prepareSettings(
                   rest,
-                  key,
+                  settingsKey,
                   true,
                   email,
                   fullName,
@@ -235,23 +228,25 @@ const NotificationSettings = Form.create()(({ form, settings: { key, ...settings
         }
       });
     },
-    [form, key, drizzle.web3, drizzleState.account, setLoadingUserSettingsPatch, setUserSettingsPatchState]
+    [form, settingsKey, drizzle.web3, drizzleState.account, setLoadingUserSettingsPatch, setUserSettingsPatchState]
   );
 
   return (
     <Popover
       arrowPointAtCenter
-      content={NotificationSettingsContent({
-        key,
-        drizzleState,
-        form,
-        onSubmit,
-        settings,
-        userSettings,
-        loadingUserSettings,
-        loadingUserSettingsPatch,
-        userSettingsPatchState,
-      })}
+      content={
+        <NotificationSettingsContent
+          settingsKey={settingsKey}
+          drizzleState={drizzleState}
+          form={form}
+          onSubmit={onSubmit}
+          settings={settings}
+          userSettings={userSettings}
+          loadingUserSettings={loadingUserSettings}
+          loadingUserSettingsPatch={loadingUserSettingsPatch}
+          userSettingsPatchState={userSettingsPatchState}
+        />
+      }
       placement="bottomRight"
       title="Notification Settings"
       trigger="click"
