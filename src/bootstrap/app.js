@@ -1,25 +1,85 @@
 import "../components/theme.css";
 import "./app.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import t from "prop-types";
 import loadable from "@loadable/component";
 import styled from "styled-components/macro";
-import { Col, Layout, Menu, Row, Spin } from "antd";
+import { Alert, Col, Layout, Menu, Row, Spin } from "antd";
 import { Helmet } from "react-helmet";
 import { BrowserRouter, NavLink, Route, Switch, useParams } from "react-router-dom";
 import { ReactComponent as Logo } from "../assets/images/kleros-logo-flat-light.svg";
 import AccountStatus from "../components/account-status";
+import WalletConnector from "../components/wallet-connector";
+import { getLastConnectedWalletProvider, detectWalletsAsync } from "../bootstrap/wallet-connector";
 import Footer from "../components/footer";
 import NotificationSettings from "../components/notification-settings";
 import { ChainIdProvider } from "../hooks/use-chain-id";
 import ChainChangeWatcher from "./chain-change-watcher";
-import drizzle, { DrizzleProvider, Initializer, useDrizzle } from "./drizzle";
+import { DrizzleProvider, Initializer, createDrizzle, detectRequiredChainId, useDrizzle } from "./drizzle";
 import ErrorBoundary from "../components/error-boundary";
 import SwitchChainFallback from "../components/error-fallback/switch-chain";
 import SmartContractWalletWarning from "../components/smart-contract-wallet-warning";
 
 export default function App() {
   const [isMenuClosed, setIsMenuClosed] = useState(true);
+  const [customDrizzle, setCustomDrizzle] = useState(null);
+  const [checkingProvider, setCheckingProvider] = useState(true);
+
+  //Check if wallet is already connected
+  useEffect(() => {
+    (async () => {
+      try {
+        //Trigger wallet search and await results
+        const wallets = await detectWalletsAsync();
+
+        //No wallets found, enter view mode
+        if (wallets.length === 0) {
+          setCustomDrizzle(createDrizzle({ fallbackChainId: detectRequiredChainId() }));
+          setCheckingProvider(false);
+          return;
+        }
+
+        //Wallets found, check for existing connection, otherwise force connection
+        const provider = getLastConnectedWalletProvider();
+        if (provider?.request) {
+          const accounts = await provider.request({ method: "eth_accounts" });
+          if (accounts && accounts.length > 0) {
+            handleWalletConnected(provider);
+          }
+        }
+      } catch (err) {
+        console.warn("Auto-detect provider failed", err);
+      } finally {
+        setCheckingProvider(false);
+      }
+    })();
+  }, []);
+
+  const handleWalletConnected = (provider) => {
+    try {
+      setCustomDrizzle(createDrizzle({ customProvider: provider }));
+    } catch (err) {
+      console.error("Failed to create Drizzle with custom provider", err);
+    }
+  };
+
+  if (checkingProvider) {
+    return <StyledSpin tip="Checking wallet…" />;
+  }
+
+  if (!customDrizzle) {
+    //User hasn’t connected a wallet yet - show simple placeholder screen with wallet selector.
+    return (
+      <StyledContainer>
+        <StyledAlert
+          message="Wallet required"
+          description="Please connect a wallet for the best experience on Kleros Court."
+          type="info"
+        />
+        <WalletConnector onProviderConnected={handleWalletConnected} />
+      </StyledContainer>
+    );
+  }
 
   return (
     <>
@@ -27,7 +87,7 @@ export default function App() {
         <title>Kleros · Court</title>
         <link href="https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i,700,700i" rel="stylesheet" />
       </Helmet>
-      <DrizzleProvider drizzle={drizzle}>
+      <DrizzleProvider drizzle={customDrizzle}>
         <Initializer
           error={<C404 Web3 />}
           loadingContractsAndAccounts={<C404 Web3 />}
@@ -143,20 +203,9 @@ const Cases = loadable(() => import(/* webpackPrefetch: true */ "../containers/c
   fallback: <StyledSpin />,
 });
 
-const CasePage = loadable(
-  async ({ ID }) => {
-    try {
-      await drizzle.contracts.KlerosLiquid.methods.disputes(ID).call();
-    } catch (err) {
-      console.error(err);
-      return C404;
-    }
-    return import(/* webpackPrefetch: true */ "../containers/case");
-  },
-  {
-    fallback: <StyledSpin />,
-  }
-);
+const CasePage = loadable(() => import(/* webpackPrefetch: true */ "../containers/case"), {
+  fallback: <StyledSpin />,
+});
 
 const Case = () => {
   const { ID } = useParams();
@@ -321,4 +370,20 @@ const LogoNavLink = styled(NavLink)`
     display: block;
     width: 100%;
   }
+`;
+
+const StyledContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  background: #f2e3ff;
+  gap: 24px;
+`;
+
+const StyledAlert = styled(Alert)`
+  margin-top: 24px;
+  width: 80%;
+  text-align: center;
 `;

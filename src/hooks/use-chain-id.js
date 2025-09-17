@@ -63,10 +63,18 @@ export function ChainIdProvider({ web3, children, renderOnError, renderOnLoading
       }
     };
 
+    const handleAccountsChanged = (accounts) => {
+      if (accounts.length === 0) {
+        window.location.reload();
+      }
+    };
+
     addListener("chainChanged", handleNetworkChanged);
+    addListener("accountsChanged", handleAccountsChanged);
 
     return () => {
       removeListener("chainChanged", handleNetworkChanged);
+      removeListener("accountsChanged", handleAccountsChanged);
       isMounted = false;
     };
   }, [web3]);

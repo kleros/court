@@ -1,8 +1,8 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button, Modal, Row, Col, Tooltip } from "antd";
 import { useParams } from "react-router-dom";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
-import CaseDetailsCard from "../components/case-details-card";
+import CaseDetailsCard from "../components/case-details-card.jsx";
 import ETHAmount from "../components/eth-amount";
 import TimeAgo from "../components/time-ago";
 import TopBanner from "../components/top-banner";
@@ -13,6 +13,7 @@ import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import useChainId from "../hooks/use-chain-id";
 import useGetDraws from "../hooks/use-get-draws";
 import { chainIdToNetworkName } from "../helpers/networks";
+import C404 from "./404";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
@@ -30,6 +31,26 @@ export default function Case() {
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
+
+  //Do what was done in app.js loadable() here, so we can avoid using a fallback drizzle there
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    //Avoid setting state after component is unmounted
+    let mounted = true;
+
+    (async () => {
+      try {
+        await drizzle.contracts.KlerosLiquid.methods.disputes(ID).call();
+      } catch (err) {
+        if (mounted) setError(err);
+      }
+    })();
+
+    return () => (mounted = false);
+  }, [drizzle, ID]);
+  //----
+
   const { send: sendPassPeriod } = useCacheSend("KlerosLiquid", "passPeriod");
   const { send: sendExecuteRuling } = useCacheSend("KlerosLiquid", "executeRuling");
   const dispute = useCacheCall("KlerosLiquid", "disputes", ID);
@@ -78,17 +99,22 @@ export default function Case() {
   });
 
   const isDisputeTooOld = useMemo(() => {
-    return disputeData.deadline && (new Date().getTime() - disputeData.deadline.getTime() > 30 * 365 * 24 * 60 * 60 * 1000);
+    return (
+      disputeData.deadline && new Date().getTime() - disputeData.deadline.getTime() > 30 * 365 * 24 * 60 * 60 * 1000
+    );
   }, [disputeData.deadline]);
+
+  //Fallback to the 404 like the loadable() in app.js used to do
+  if (error) return <C404 />;
 
   async function handleChainSwitchToMainnet() {
     try {
       await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: '0x1' }],
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: "0x1" }],
       });
     } catch (error) {
-      console.error('Error switching chains:', error);
+      console.error("Error switching chains:", error);
     }
   }
 
@@ -105,7 +131,9 @@ export default function Case() {
             </Button>,
           ]}
         >
-          <p>The dispute with ID {ID} does not exist on {chainIdToNetworkName[chainId]}. Please switch to Mainnet.</p>
+          <p>
+            The dispute with ID {ID} does not exist on {chainIdToNetworkName[chainId]}. Please switch to Mainnet.
+          </p>
         </Modal>
       );
     }

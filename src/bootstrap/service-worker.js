@@ -140,24 +140,26 @@ export const askPermission = () => {
 }
 
 export const subscribeUserToPush = async () => {
-  const swUrl = `${process.env.PUBLIC_URL}/sw.js`
+  const swUrl = `${process.env.PUBLIC_URL}/sw.js`;
   return new Promise((resolve, reject) => {
-    navigator.serviceWorker.register(swUrl).then(registration => {
-      const subscribeOptions = {
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(
-          'BPRV92GzWwsZcr3PX6pz_RZRCOStsM68JcqkCJJbfdZqKm1resLwElm7MgiU4_gNGXtzZv0gN4pkKVRnnF8KQPk'
-        )
-      }
+    navigator.serviceWorker
+      .register(swUrl)
+      .then((registration) => {
+        const subscribeOptions = {
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(
+            "BPRV92GzWwsZcr3PX6pz_RZRCOStsM68JcqkCJJbfdZqKm1resLwElm7MgiU4_gNGXtzZv0gN4pkKVRnnF8KQPk"
+          ),
+        };
 
-      registration.pushManager
-        .subscribe(subscribeOptions)
-        .then(function(pushSubscription) {
-          resolve(pushSubscription)
-        })
-    })
-  })
-}
+        registration.pushManager
+          .subscribe(subscribeOptions)
+          .then((pushSubscription) => resolve(pushSubscription))
+          .catch((err) => reject(err));
+      })
+      .catch((err) => reject(err));
+  });
+};
 
 const urlBase64ToUint8Array = base64String => {
   var padding = '='.repeat((4 - (base64String.length % 4)) % 4)
