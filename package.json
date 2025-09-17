@@ -91,7 +91,7 @@
     "react-countdown": "^2.3.5",
     "react-dom": "^17.0.2",
     "react-helmet": "^5.2.0",
-    "react-is": "^17.0.2",
+    "react-is": "^19.1.1",
     "react-markdown": "^4.0.4",
     "react-minimal-pie-chart": "^3.3.0",
     "react-router-dom": "^5.2.0",
