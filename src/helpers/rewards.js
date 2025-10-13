@@ -4,15 +4,15 @@ import Web3 from "web3";
 
 function getTarget() {
   let months;
-  const start = new Date(2023, 11, 1); // When KIP-66 started
-  const initialTarget = 0.28; // initial staking target for KIP-66
+  const start = new Date(2025, 8, 1); // When KIP-78 started (September 2025)
+  const initialTarget = 0.33; // initial staking target for KIP-78
   const now = new Date();
-  // add 1% per month since start date of kip66 with max 50%
+  // add 0.2% per month since start date of kip78 with max 50%
   months = (now.getFullYear() - start.getFullYear()) * 12;
   months -= start.getMonth();
   months += now.getMonth();
   months = months <= 0 ? 0 : months;
-  const target = initialTarget + months * 0.01;
+  const target = initialTarget + months * 0.002;
   return target > 0.5 ? 0.5 : target;
 }
 
