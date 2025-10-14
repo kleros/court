@@ -1,9 +1,8 @@
 import { BigNumber, ethers } from "ethers";
 import PNKAbi from "../assets/contracts/pinakion.json";
 import Web3 from "web3";
+import { klerosboardSubgraph } from "../bootstrap/subgraph";
 
-const MAINNET_SUBGRAPH_URL = "https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest";
-const GNOSIS_SUBGRAPH_URL = "https://api.studio.thegraph.com/query/66145/klerosboard-gnosis/version/latest";
 const CLAIM_MODAL_URL = "https://raw.githubusercontent.com/kleros/court/master/src/components/claim-modal.js";
 
 function getTarget() {
@@ -109,7 +108,7 @@ async function getTotalStakedAllChains() {
 
   // Try mainnet subgraph first, fallback to snapshot
   try {
-    mainnetStaked = await fetchSubgraphStaked(MAINNET_SUBGRAPH_URL);
+    mainnetStaked = await fetchSubgraphStaked(klerosboardSubgraph[1]);
   } catch (mainnetError) {
     try {
       const snapshotUrls = await getLatestSnapshotUrls();
@@ -125,7 +124,7 @@ async function getTotalStakedAllChains() {
 
   // Try gnosis subgraph first, fallback to snapshot
   try {
-    gnosisStaked = await fetchSubgraphStaked(GNOSIS_SUBGRAPH_URL);
+    gnosisStaked = await fetchSubgraphStaked(klerosboardSubgraph[100]);
   } catch (gnosisError) {
     try {
       const snapshotUrls = await getLatestSnapshotUrls();
