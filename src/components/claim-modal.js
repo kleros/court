@@ -8,6 +8,7 @@ import { ReactComponent as Kleros } from "../assets/images/kleros.svg";
 import { ReactComponent as RightArrow } from "../assets/images/right-arrow.svg";
 import useChainId from "../hooks/use-chain-id";
 import ETHAmount from "./eth-amount";
+import { klerosboardSubgraph } from "../bootstrap/subgraph";
 
 const ipfsEndpoint = "https://cdn.kleros.link";
 
@@ -73,7 +74,7 @@ const chainIdToParams = {
       "Qme31g7UyrGVarRa6LLoaLSuxNGS8tWBfs7CHD5cgNmcXM/snapshot-2025-09.json",
     ],
     blockExplorerBaseUrl: "https://etherscan.io",
-    klerosboard: "https://api.studio.thegraph.com/query/66145/klerosboard-mainnet/version/latest",
+    klerosboard: klerosboardSubgraph[1],
   },
   100: {
     contractAddress: "0xf1A9589880DbF393F32A5b2d5a0054Fa10385074",
@@ -131,7 +132,7 @@ const chainIdToParams = {
       "QmUcemx5p2FVxncj9geEkT2DgqMLTjPND2VenaMdibX4zx/xdai-snapshot-2025-09.json",
     ],
     blockExplorerBaseUrl: "https://gnosisscan.io",
-    klerosboard: "https://api.studio.thegraph.com/query/66145/klerosboard-gnosis/version/latest",
+    klerosboard: klerosboardSubgraph[100],
   },
 };
 
