@@ -29,6 +29,7 @@ const arbitrableWhitelist = {
     "0xf65c7560d6ce320cc3a16a07f1f65aab66396b9e",
     "0xf72cfd1b34a91a64f9a98537fe63fbab7530adca",
     "0x2018038203aEE8e7a29dABd73771b0355D4F85ad",
+    "0xbE9834097A4E97689d9B667441acafb456D0480A", //PoH V2
   ].map((address) => address.toLowerCase()),
   100: [
     "0x0b928165a67df8254412483ae8c3b8cc7f2b4d36",
@@ -56,6 +57,7 @@ const arbitrableWhitelist = {
     "0x8453bA2C9eA5Bae36fDe6cBd61c12c05b6552425", // RealitioForeignArbitrationProxyWithAppeals (Ethereum)
     "0xeF2Ae6961Ec7F2105bc2693Bc32fA7b7386B2f59", // RealitioForeignArbitrationProxyWithAppeals (Ethereum)
     "0x32bcDC9776692679CfBBf8350BAd67Da13FaaA3F", // RealitioForeignArbitrationProxyWithAppeals (Ethereum)
+    "0xa4AC94C4fa65Bb352eFa30e3408e64F72aC857bc", // PoH V2
   ].map((address) => address.toLowerCase()),
   11155111: [
     "0x73E4F71e5ecE8d1319807DC7cd2EAA9Fda8F5182",
