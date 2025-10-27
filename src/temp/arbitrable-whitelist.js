@@ -81,6 +81,9 @@ const arbitrableWhitelist = {
   11155420: [
     "0x6a41AF8FC7f68bdd13B2c7D50824Ed49155DC3bA", // RealitioForeignProxyOptimism (Sepolia)
   ].map((address) => address.toLowerCase()),
+  8453: [
+    "0xF0b37Feda6CDF5F78B37e1Fbccc24969059F2044", // RealitioForeignProxyBase
+  ].map((address) => address.toLowerCase()),
 };
 
 export default arbitrableWhitelist;
