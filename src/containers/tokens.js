@@ -3,6 +3,7 @@ import React, { useCallback } from "react";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import BuyPNKCard from "../components/buy-pnk-card";
 import OTCCard from "../components/otc-card";
+import PNKWidget from "../components/pnk-widget";
 import PNKBalanceCard from "../components/pnk-balance-card";
 import PNKMainnetExchangesCard from "../components/pnk-exchanges-card";
 import PNKXdaiExchangesCard from "../components/pnk-xdai-exchanges-card";
@@ -64,6 +65,7 @@ export default function Tokens() {
           title="Buy PNK"
         />
         <PNKBalanceCard />
+        <h2 style={{ margin: "24px 0", color: "#1F1F1F", textAlign: "center" }}>Crypto-to-Crypto</h2>
         <Row gutter={40}>
           <Col lg={8} md={12}>
             <BuyPNKCard />
@@ -72,6 +74,8 @@ export default function Tokens() {
             <PNKMainnetExchangesCard />
           </Col>
         </Row>
+        <h2 style={{ margin: "24px 0", color: "#1F1F1F", textAlign: "center" }}>Fiat-to-Crypto</h2>
+        <PNKWidget wallet={drizzleState.account} />
         <Divider />
         <Row>
           <OTCCard />
@@ -110,11 +114,14 @@ export default function Tokens() {
           title="Buy PNK"
         />
         <PNKBalanceCard />
+        <h2 style={{ margin: "24px 0", color: "#1F1F1F", textAlign: "center" }}>Crypto-to-Crypto</h2>
         <Row gutter={40}>
           <Col>
             <PNKXdaiExchangesCard />
           </Col>
         </Row>
+        <h2 style={{ margin: "24px 0", color: "#1F1F1F", textAlign: "center" }}>Fiat-to-Crypto</h2>
+        <PNKWidget wallet={drizzleState.account} />
         <Divider />
         <Row>
           <OTCCard />
