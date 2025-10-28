@@ -12,7 +12,7 @@ export default async function createSideChainApi(provider) {
   const chainId = await web3.eth.getChainId();
 
   if (!isSupportedSideChain(chainId)) {
-    throw new Error(`Unsuported chain ID: ${chainId}`);
+    throw new Error(`Unsupported chain ID: ${chainId}`);
   }
 
   const api = xDai.createApi(xDaiParametersFactory(web3));
