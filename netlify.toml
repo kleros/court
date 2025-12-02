@@ -44,7 +44,7 @@
   REACT_APP_TOKEN_BRIDGE_XDAI_ADDRESS='0xf6A78083ca3e2a662D6dd1703c939c8aCE2e268d'
   REACT_APP_KLEROS_LIQUID_XDAI_BLOCK_NUMBER='16895601'
   REACT_APP_WEB3_FALLBACK_XDAI_URL='wss://rpc.eu-central-7.gateway.fm/ws/v4/gnosis/non-archival/mainnet'
-  REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL='https://gnosis.rpc.grove.city/v1/fdd5be46'
+  REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL='https://gnosis-mainnet.g.alchemy.com/v2/TcScxP88R7TlPSvDaJ5-V'
   REACT_APP_WEB3_FALLBACK_ZKSYNCSEPOLIA_HTTPS_URL='https://sepolia.era.zksync.dev'
 
 [context.production.environment]
