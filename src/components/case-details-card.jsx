@@ -345,7 +345,7 @@ export default function CaseDetailsCard({ ID }) {
           }
         },
         (err) => {
-          console.warn("Error while trying to derive the commited vote", err);
+          console.warn("Error while trying to derive the committed vote", err);
         }
       );
     }
