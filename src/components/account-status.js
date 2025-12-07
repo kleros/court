@@ -1,10 +1,8 @@
 import React from "react";
 import styled from "styled-components/macro";
-import { Divider } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import AccountDetailsPopup from "./account-details-popup";
-import NetworkStatus from "./network-status";
 import ETHAddress from "./eth-address";
 
 const { useDrizzleState } = drizzleReactHooks;
@@ -19,14 +17,10 @@ export default function AccountStatus() {
       pinakion
       trigger={
         <StyledAccountStatus>
-          <NetworkStatus />
           {account !== VIEW_ONLY_ADDRESS ? (
-            <>
-              <StyledDivider type="vertical" />
-              <span className="address">
-                <ETHAddress address={account} withLink={false} />
-              </span>
-            </>
+            <span className="address">
+              <ETHAddress address={account} withLink={false} />
+            </span>
           ) : null}
         </StyledAccountStatus>
       }
@@ -56,12 +50,4 @@ const StyledAccountStatus = styled.button`
     font-family: "Roboto Mono", monospace;
     font-size: 12px;
   }
-`;
-
-const StyledDivider = styled(Divider)`
-  position: static;
-  top: initial;
-  height: 14px;
-  background-color: rgba(255, 255, 255, 0.25);
-  margin: 0;
 `;

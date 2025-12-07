@@ -8,6 +8,7 @@ import { Alert, Col, Layout, Menu, Row, Spin } from "antd";
 import { Helmet } from "react-helmet";
 import { BrowserRouter, NavLink, Route, Switch, useParams } from "react-router-dom";
 import { ReactComponent as Logo } from "../assets/images/kleros-logo-flat-light.svg";
+import NetworkStatus from "../components/network-status";
 import AccountStatus from "../components/account-status";
 import WalletConnector from "../components/wallet-connector";
 import { getLastConnectedWalletProvider, detectWalletsAsync } from "../bootstrap/wallet-connector";
@@ -122,6 +123,7 @@ export default function App() {
                           </Col>
                           <StyledTrayCol lg={6} md={8} sm={12} xs={24}>
                             <StyledTray>
+                              <NetworkStatus />
                               <AccountStatus />
                               <NotificationSettings settings={settings} />
                             </StyledTray>
