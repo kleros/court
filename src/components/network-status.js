@@ -2,7 +2,7 @@ import React from "react";
 import t from "prop-types";
 import clsx from "clsx";
 import styled from "styled-components/macro";
-import { Badge, Dropdown, Menu, Skeleton } from "antd";
+import { Badge, Dropdown, Menu, message, Skeleton } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import useChainId from "../hooks/use-chain-id";
 import { chainIdToNetworkShortName } from "../helpers/networks";
@@ -22,6 +22,7 @@ function SwitchChainMenu() {
       await requestSwitchChain(drizzle.web3.currentProvider, targetChainId);
     } catch (error) {
       console.error("Failed to switch chain:", error);
+      message.error({ content: "Failed to switch network. Please try again.", key: "switch-chain" });
     }
   };
 
