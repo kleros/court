@@ -11,6 +11,12 @@ import { useDrizzle } from "../bootstrap/drizzle";
 
 const { useDrizzleState } = drizzleReactHooks;
 
+// Only allow switching to production chains
+const switchableChains = {
+  1: "Mainnet",
+  100: "Gnosis Chain",
+};
+
 function SwitchChainMenu() {
   const { drizzle } = useDrizzle();
   const chainId = useChainId();
@@ -28,7 +34,7 @@ function SwitchChainMenu() {
 
   return (
     <StyledMenu>
-      {Object.entries(chainIdToNetworkShortName)
+      {Object.entries(switchableChains)
         .filter(([key]) => Number(key) !== chainId)
         .map(([key, value]) => (
           <Menu.Item key={key} onClick={() => handleSwitchChain(Number(key))}>
