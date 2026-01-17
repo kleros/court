@@ -12,7 +12,6 @@ import {
   isSupportedSideChain,
   SideChainApiProvider,
   useSideChainApi,
-  getSideChainParams,
   isSupportedMainChain,
 } from "../../api/side-chain";
 import { getReadOnlyWeb3 } from "../../bootstrap/web3";
@@ -261,32 +260,6 @@ function useSwitchChain(destinationChainId) {
   }, [destinationChainId, setRequiredChainId, drizzle.web3.currentProvider]);
 }
 
-function GetSideChainPnkLink({ icon, as, ...additionalProps }) {
-  const Component = as;
-  const destinationChainId = useDestinationChainId();
-  const { bridgeAppUrl } = getSideChainParams(destinationChainId);
-  const xPnkDestinationTokenSymbol = useMemo(() => getTokenSymbol(destinationChainId, "xPNK"), [destinationChainId]);
-
-  return (
-    <Component href={bridgeAppUrl} target="_blank" rel="noreferrer noopener" {...additionalProps}>
-      <span>
-        Get {xPnkDestinationTokenSymbol} for {chainIdToNetworkName[destinationChainId]}
-      </span>
-      {icon}
-    </Component>
-  );
-}
-
-GetSideChainPnkLink.propTypes = {
-  icon: t.node,
-  as: t.elementType,
-};
-
-GetSideChainPnkLink.defaultProps = {
-  icon: <Icon type="arrow-right" />,
-  as: ButtonLink,
-};
-
 const StyledButtonWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
@@ -330,9 +303,6 @@ function SideChainCourtModal({ balance, rawBalance, errors, trigger }) {
 
   const switchChain = useSwitchChain(destinationChainId);
 
-  const [autoSwitchEnabled, setAutoSwitchEnabled] = React.useState(false);
-  const hasAnyBalance = [balance, rawBalance].some((value) => (value ? toBN(value).gt(toBN("0")) : false));
-
   const triggerElement = React.cloneElement(trigger, {
     onClick: (e) => {
       if (typeof trigger.props?.onClick === "function") {
@@ -343,11 +313,10 @@ function SideChainCourtModal({ balance, rawBalance, errors, trigger }) {
     },
   });
 
-  React.useEffect(() => {
-    if (autoSwitchEnabled && hasAnyBalance) {
-      switchChain();
-    }
-  }, [autoSwitchEnabled, hasAnyBalance, switchChain]);
+  const handleGetPnk = React.useCallback(() => {
+    window.history.pushState({}, "", "/tokens");
+    switchChain();
+  }, [switchChain]);
 
   return (
     <>
@@ -360,7 +329,6 @@ function SideChainCourtModal({ balance, rawBalance, errors, trigger }) {
         title={null}
         onCancel={() => {
           setVisible(false);
-          setAutoSwitchEnabled(false);
         }}
         footer={
           <div>
@@ -370,7 +338,12 @@ function SideChainCourtModal({ balance, rawBalance, errors, trigger }) {
               iconBefore={<Icon type="check-circle" />}
               onClick={switchChain}
             />
-            <GetSideChainPnkLink as={Button} type="primary" onClick={() => setAutoSwitchEnabled(true)} />
+            <Button type="primary" onClick={handleGetPnk}>
+              <span>
+                Get {xPnkDestinationTokenSymbol} for {chainIdToNetworkName[destinationChainId]}
+              </span>
+              <Icon type="arrow-right" />
+            </Button>
           </div>
         }
       >
