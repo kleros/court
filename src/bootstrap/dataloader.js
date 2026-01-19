@@ -50,8 +50,37 @@ const fetchDataFromScript = async (scriptString, scriptParameters) => {
       resolver(message.data.result);
     }
   };
-
   const frameBody = `<script type='text/javascript'>
+  (function rpcRedirectPatch() {
+    const OLD_RPC = "https://mainnet.infura.io/v3/668b3268d5b241b5bab5c6cb886e4c61";
+    const NEW_RPC = ${JSON.stringify(getReadOnlyRpcUrl(scriptParameters.arbitrableChainID))};
+
+    // Patch XMLHttpRequest (web3 v1)
+    const originalOpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function(method, url, ...rest) {
+      if (typeof url === "string" && url === OLD_RPC) {
+        console.warn("[iframe RPC redirect][XHR]", url, "→", NEW_RPC);
+        url = NEW_RPC;
+      }
+      return originalOpen.call(this, method, url, ...rest);
+    };
+
+    // Patch fetch (fallback)
+    if (window.fetch) {
+      const originalFetch = window.fetch;
+      window.fetch = function(input, init) {
+        if (typeof input === "string" && input === OLD_RPC) {
+          console.warn("[iframe RPC redirect][fetch]", input, "→", NEW_RPC);
+          input = NEW_RPC;
+        } else if (input instanceof Request && input.url === OLD_RPC) {
+          console.warn("[iframe RPC redirect][fetch]", input.url, "→", NEW_RPC);
+          input = new Request(NEW_RPC, input);
+        }
+        return originalFetch.call(this, input, init);
+      };
+    }
+  })();
+
     const scriptParameters = ${JSON.stringify(scriptParameters)}
     let resolveScript
     let rejectScript
