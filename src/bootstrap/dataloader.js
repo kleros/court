@@ -121,7 +121,7 @@ const funcs = {
 
         if (metaEvidenceJSON.dynamicScriptURI) {
           const scriptURI =
-            chainID === 1 && disputeId === "1621"
+            chainID === 1 && (disputeId === "1621" || disputeId === "1672")
               ? getHttpUri("/ipfs/Qmf1k727vP7qZv21MDB8vwL6tfVEKPCUQAiw8CTfHStkjf")
               : getHttpUri(metaEvidenceJSON.dynamicScriptURI);
 
