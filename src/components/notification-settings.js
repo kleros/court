@@ -1,5 +1,5 @@
 import { Alert, Button, Divider, Form, Input, Popover, Skeleton } from "antd";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { ReactComponent as Mail } from "../assets/images/mail.svg";
 import PropTypes from "prop-types";
@@ -194,13 +194,15 @@ const NotificationSettings = Form.create()(({ form }) => {
   //Check if user is authenticated and has a valid token for the current connected wallet
   const token = getAuthToken();
   const isTokenForCurrentWallet = isTokenForAccount(drizzleState.account);
-  const isAuthenticated = token && isTokenForCurrentWallet && isTokenValid(token);
+  const isAuthenticated = !!(token && isTokenForCurrentWallet && isTokenValid(token));
 
   //Clear auth data if token doesn't match current account
-  if (token && !isTokenForCurrentWallet) {
-    clearAuthData();
-    form.resetFields();
-  }
+  useEffect(() => {
+    if (token && !isTokenForCurrentWallet) {
+      clearAuthData();
+      form.resetFields();
+    }
+  }, [token, isTokenForCurrentWallet, form]);
 
   //Fetch user email from Atlas if authenticated
   const { data: userData, isLoading: isLoadingUserEmail } = useSWR(

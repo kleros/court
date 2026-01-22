@@ -26,9 +26,9 @@ export default function EmailConfirmation() {
     //Parse query params from hash URL (e.g., #/settings/email-confirmation?address=...&token=...) or from regular query string
     let queryString = location.search;
     if (!queryString && window.location.hash) {
-      const hashMatch = window.location.hash.match(/\?.*$/);
-      if (hashMatch) {
-        queryString = hashMatch[0];
+      const hashIndex = window.location.hash.indexOf("?");
+      if (hashIndex !== -1) {
+        queryString = window.location.hash.substring(hashIndex);
       }
     }
 

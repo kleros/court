@@ -77,7 +77,11 @@ export const isTokenForAccount = (address) => {
 export const isTokenValid = (token) => {
   if (!token) return false;
   try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
+    //JWT uses Base64URL encoding, convert to standard Base64 before decoding
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64 + "===".slice((base64.length + 3) % 4);
+    const payload = JSON.parse(atob(padded));
     if (payload.exp && payload.exp < Date.now() / 1000) {
       return false;
     }
@@ -87,24 +91,57 @@ export const isTokenValid = (token) => {
   }
 };
 
-//Get a nonce for SIWE
-const getNonce = async (address) => {
-  const response = await axios.post(
-    ATLAS_URI,
-    {
-      query: `mutation GetNonce($address: Address!) { nonce(address: $address) }`,
-      variables: { address },
-    },
-    {
-      headers: { "Content-Type": "application/json" },
-    }
-  );
+const isAuthError = (error) => {
+  const message = error?.message?.toLowerCase() || "";
+  return message.includes("auth") || message.includes("unauthorized") || message.includes("token");
+};
 
-  if (response.data.errors) {
-    throw new Error(response.data.errors[0]?.message || "Failed to get nonce");
+const graphqlRequest = async (query, variables = {}, requireAuth = false) => {
+  const token = requireAuth ? getAuthToken() : null;
+  if (requireAuth && (!token || !isTokenValid(token))) {
+    throw new Error("Not authenticated");
   }
 
-  return response.data.data?.nonce || null;
+  const headers = {
+    "Content-Type": "application/json",
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  try {
+    const response = await axios.post(ATLAS_URI, { query, variables }, { headers });
+
+    if (response.data.errors) {
+      const errorMessage = response.data.errors[0]?.message;
+      if (requireAuth && response.data.errors.some(isAuthError)) {
+        clearAuthData();
+      }
+      const error = new Error(errorMessage);
+      error.response = response;
+      throw error;
+    }
+
+    return response.data.data;
+  } catch (error) {
+    if (error.response) {
+      if (requireAuth && (error.response.status === 400 || error.response.status === 401)) {
+        clearAuthData();
+      }
+    }
+    throw error;
+  }
+};
+
+//Get a nonce for SIWE
+const getNonce = async (address) => {
+  const data = await graphqlRequest(
+    `mutation GetNonce($address: Address!) { nonce(address: $address) }`,
+    { address },
+    false
+  );
+  return data?.nonce || null;
 };
 
 //Create a SIWE message following EIP-4361 format
@@ -143,25 +180,16 @@ export const authenticateUser = async ({ web3, address }) => {
   const message = await createSIWEMessage(address, nonce, web3);
   const signature = await web3.eth.personal.sign(message, address);
 
-  const response = await axios.post(
-    ATLAS_URI,
-    {
-      query: `mutation Login($message: String!, $signature: String!) {
-        login(message: $message, signature: $signature)
-      }`,
-      variables: { message, signature },
-    },
-    {
-      headers: { "Content-Type": "application/json" },
-    }
+  const data = await graphqlRequest(
+    `mutation Login($message: String!, $signature: String!) {
+      login(message: $message, signature: $signature)
+    }`,
+    { message, signature },
+    false
   );
 
-  if (response.data.errors) {
-    throw new Error(response.data.errors[0]?.message || "Failed to login");
-  }
-
   //Parse response to get accessToken
-  const loginResult = response.data.data?.login;
+  const loginResult = data?.login;
   let parsedResult;
   try {
     parsedResult = typeof loginResult === "string" ? JSON.parse(loginResult) : loginResult;
@@ -182,156 +210,65 @@ export const fetchUser = async () => {
   }
 
   try {
-    const response = await axios.post(
-      ATLAS_URI,
-      {
-        query: `query GetUser {
-          user {
-            address
-            email
-            isEmailVerified
-            lastEmailUpdatedAt
-            emailUpdateableAt
-          }
-        }`,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
+    const data = await graphqlRequest(
+      `query GetUser {
+        user {
+          address
+          email
+          isEmailVerified
+          lastEmailUpdatedAt
+          emailUpdateableAt
+        }
+      }`,
+      {},
+      true
     );
-
-    if (response.data.errors) {
-      if (
-        response.data.errors.some(
-          (err) =>
-            err.message?.includes("auth") || err.message?.includes("unauthorized") || err.message?.includes("token")
-        )
-      ) {
-        clearAuthData();
-      }
-      return null;
-    }
-
-    return response.data.data?.user || null;
+    return data?.user || null;
   } catch (error) {
-    if (error.response?.status === 400 || error.response?.status === 401) {
-      clearAuthData();
-      return null;
+    //graphqlRequest already handles auth errors and clears auth data
+    if (!error.response || (!isAuthError(error) && error.response?.status !== 400 && error.response?.status !== 401)) {
+      console.error("Error fetching user:", error);
     }
-    console.error("Error fetching user:", error);
     return null;
   }
 };
 
 //Add user
 export const addUser = async (email) => {
-  const token = getAuthToken();
-  if (!token || !isTokenValid(token)) {
-    throw new Error("Not authenticated");
-  }
-
-  const response = await axios.post(
-    ATLAS_URI,
-    {
-      query: `mutation AddUser($settings: AddUserSettingsDto!) {
-        addUser(addUserSettings: $settings)
-      }`,
-      variables: {
-        settings: { email },
-      },
-    },
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        Origin: window.location.origin,
-      },
-    }
+  const data = await graphqlRequest(
+    `mutation AddUser($settings: AddUserSettingsDto!) {
+      addUser(addUserSettings: $settings)
+    }`,
+    { settings: { email } },
+    true
   );
-
-  if (response.data.errors) {
-    const errorMessage = response.data.errors[0]?.message || "Failed to add user";
-    if (
-      response.data.errors.some(
-        (err) =>
-          err.message?.includes("auth") || err.message?.includes("unauthorized") || err.message?.includes("token")
-      )
-    ) {
-      clearAuthData();
-    }
-    throw new Error(errorMessage);
-  }
-
-  return response.data.data?.addUser === true;
+  return data?.addUser === true;
 };
 
 //Update user email
 export const updateEmail = async (newEmail) => {
-  const token = getAuthToken();
-  if (!token || !isTokenValid(token)) {
-    throw new Error("Not authenticated");
-  }
-
-  const response = await axios.post(
-    ATLAS_URI,
-    {
-      query: `mutation UpdateEmail($newEmail: String!) {
-        updateEmail(newEmail: $newEmail)
-      }`,
-      variables: { newEmail },
-    },
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        Origin: window.location.origin,
-      },
-    }
+  const data = await graphqlRequest(
+    `mutation UpdateEmail($newEmail: String!) {
+      updateEmail(newEmail: $newEmail)
+    }`,
+    { newEmail },
+    true
   );
-
-  if (response.data.errors) {
-    const errorMessage = response.data.errors[0]?.message || "Failed to update email";
-    if (
-      response.data.errors.some(
-        (err) =>
-          err.message?.includes("auth") || err.message?.includes("unauthorized") || err.message?.includes("token")
-      )
-    ) {
-      clearAuthData();
-    }
-    throw new Error(errorMessage);
-  }
-
-  return response.data.data?.updateEmail === true;
+  return data?.updateEmail === true;
 };
 
 //Confirm email using token from confirmation link
 export const confirmEmail = async (address, token) => {
-  const response = await axios.post(
-    ATLAS_URI,
-    {
-      query: `mutation ConfirmEmail($confirmEmailInput: ConfirmEmailInput!) {
-        confirmEmail(confirmEmailInput: $confirmEmailInput) {
-          isConfirmed
-          isTokenInvalid
-          isTokenExpired
-        }
-      }`,
-      variables: {
-        confirmEmailInput: { address, token },
-      },
-    },
-    {
-      headers: { "Content-Type": "application/json" },
-    }
+  const data = await graphqlRequest(
+    `mutation ConfirmEmail($confirmEmailInput: ConfirmEmailInput!) {
+      confirmEmail(confirmEmailInput: $confirmEmailInput) {
+        isConfirmed
+        isTokenInvalid
+        isTokenExpired
+      }
+    }`,
+    { confirmEmailInput: { address, token } },
+    false
   );
-
-  if (response.data.errors) {
-    throw new Error(response.data.errors[0]?.message || "Failed to confirm email");
-  }
-
-  return response.data.data?.confirmEmail || null;
+  return data?.confirmEmail || null;
 };
