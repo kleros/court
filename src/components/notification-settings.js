@@ -83,6 +83,7 @@ const NotificationSettingsContent = ({
         <Button type="primary" onClick={onSignIn} loading={isSigningIn} block>
           Sign In
         </Button>
+        {signInError && <Alert closable message={signInError} type="error" />}
       </StyledForm>
     );
   }
@@ -150,7 +151,6 @@ const NotificationSettingsContent = ({
             }
           />
         )}
-        {signInError && <Alert closable message={signInError} type="error" />}
         {updateEmailError && !isUpdatingEmail && <Alert closable message={updateEmailError} type="error" />}
         {updateEmailSuccess && !isUpdatingEmail && !updateEmailError && (
           <Alert closable message="Saved settings." type="success" />

@@ -1,6 +1,11 @@
 import axios from "axios";
 
 const ATLAS_URI = process.env.REACT_APP_ATLAS_URI;
+
+if (!ATLAS_URI) {
+  throw new Error("REACT_APP_ATLAS_URI is not configured");
+}
+
 const TOKEN_STORAGE_KEY = "atlas_auth_token";
 const TOKEN_ACCOUNT_KEY = "atlas_auth_account";
 

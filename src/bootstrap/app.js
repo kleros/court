@@ -140,8 +140,7 @@ export default function App() {
                               //Check if hash contains email confirmation path
                               if (
                                 typeof window !== "undefined" &&
-                                window.location.hash &&
-                                window.location.hash.includes("/settings/email-confirmation")
+                                window.location.hash?.includes("/settings/email-confirmation")
                               ) {
                                 return <EmailConfirmation />;
                               }
