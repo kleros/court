@@ -1,12 +1,20 @@
-import { Alert, Button, Checkbox, Divider, Form, Icon, Input, Popover, Skeleton, Tooltip } from "antd";
+import { Alert, Button, Divider, Form, Input, Popover, Skeleton } from "antd";
 import React, { useCallback, useState } from "react";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { ReactComponent as Mail } from "../assets/images/mail.svg";
 import PropTypes from "prop-types";
 import styled from "styled-components/macro";
-import { accessSettings } from "../bootstrap/api";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
-import { askPermission, subscribeUserToPush } from "../bootstrap/service-worker";
+import {
+  addUser,
+  authenticateUser,
+  clearAuthData,
+  fetchUser,
+  getAuthToken,
+  isTokenForAccount,
+  isTokenValid,
+  updateEmail,
+} from "../bootstrap/atlas-api";
 import useSWR, { mutate } from "swr";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
@@ -19,56 +27,41 @@ const StyledMail = styled(Mail)`
   min-width: 16px;
 `;
 
-const configureRestOfSettings = (settings, key, isSubmitting) => {
-  return Object.keys(settings).reduce((acc, setting) => {
-    const settingKey = `${key}NotificationSetting${setting.charAt(0).toUpperCase() + setting.slice(1)}`;
-    acc[settingKey] = isSubmitting ? { BOOL: settings[setting] || false } : true;
-    return acc;
-  }, {});
-};
-
-const prepareSettings = (
-  dynamicSettings,
-  key,
-  isSubmitting,
-  email,
-  fullName,
-  phone,
-  pushNotifications,
-  pushNotificationsData
-) => {
-  return isSubmitting
-    ? {
-        email: { S: email },
-        fullName: { S: fullName },
-        phone: { S: phone || " " },
-        pushNotifications: { BOOL: pushNotifications || false },
-        pushNotificationsData: {
-          S: pushNotificationsData ? JSON.stringify(pushNotificationsData) : " ",
-        },
-        ...configureRestOfSettings(dynamicSettings, key, true),
-      }
-    : {
-        email: true,
-        fullName: true,
-        phone: true,
-        pushNotifications: true,
-        ...configureRestOfSettings(dynamicSettings, key, false),
-      };
-};
+const StyledAlertContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
 
 const NotificationSettingsContent = ({
-  settingsKey,
-  drizzleState,
+  account,
   form,
   onSubmit,
-  settings,
-  userSettings,
-  loadingUserSettings,
-  loadingUserSettingsPatch,
-  userSettingsPatchState,
+  userData,
+  isLoadingUserEmail,
+  isUpdatingEmail,
+  updateEmailError,
+  updateEmailSuccess,
+  signInError,
+  isAuthenticated,
+  onSignIn,
+  isSigningIn,
+  emailHasChanged,
+  onResendVerification,
+  isResendingVerification,
 }) => {
-  if (drizzleState.account === VIEW_ONLY_ADDRESS) {
+  const userEmail = userData?.email || "";
+  const isEmailVerified = userData?.isEmailVerified || false;
+  const emailUpdateableAt = userData?.emailUpdateableAt ? new Date(userData.emailUpdateableAt) : null;
+  const canUpdateEmail = emailUpdateableAt ? new Date() >= emailUpdateableAt : true;
+  const minutesUntilUpdateable =
+    emailUpdateableAt && !canUpdateEmail ? Math.round((emailUpdateableAt - new Date()) / 60000) : 0;
+  const fieldsError = form.getFieldsError();
+  const hasErrors = Object.keys(fieldsError || {}).some(
+    (fieldName) => fieldsError[fieldName] && fieldsError[fieldName].length > 0
+  );
+
+  if (account === VIEW_ONLY_ADDRESS) {
     return (
       <StyledForm>
         <Divider>No Wallet Detected</Divider>
@@ -83,173 +76,235 @@ const NotificationSettingsContent = ({
     );
   }
 
+  if (!isAuthenticated) {
+    return (
+      <StyledForm>
+        <p>Sign in with your wallet to change your email for notifications.</p>
+        <Button type="primary" onClick={onSignIn} loading={isSigningIn} block>
+          Sign In
+        </Button>
+      </StyledForm>
+    );
+  }
+
   return (
     <StyledForm onSubmit={onSubmit}>
-      <Divider>I wish to be notified when:</Divider>
-      <Skeleton active loading={loadingUserSettings} title={false}>
-        {!loadingUserSettings && (
+      <Skeleton active loading={isLoadingUserEmail} title={false}>
+        {!isLoadingUserEmail && (
           <>
-            {Object.keys(settings).map((s) => (
-              <Form.Item key={s}>
-                {form.getFieldDecorator(s, {
-                  initialValue:
-                    userSettings?.payload?.settings?.Item?.[
-                      `${settingsKey}NotificationSetting${s[0].toUpperCase()}${s.slice(1)}`
-                    ]?.BOOL ?? false,
-                  valuePropName: "checked",
-                })(<Checkbox>{settings[s]}</Checkbox>)}
-              </Form.Item>
-            ))}
-            <Form.Item hasFeedback>
-              {form.getFieldDecorator("fullName", {
-                initialValue: userSettings?.payload?.settings?.Item?.fullName?.S ?? "",
-                rules: [{ message: "Please enter your name.", required: true }],
-              })(<Input placeholder="Name" />)}
-            </Form.Item>
+            <p>This is the email where notifications are sent.</p>
+            {!canUpdateEmail && emailUpdateableAt && (
+              <p>
+                You have recently updated your email. It can be updated again in {minutesUntilUpdateable}{" "}
+                {minutesUntilUpdateable === 1 ? "minute" : "minutes"}.
+              </p>
+            )}
             <Form.Item hasFeedback>
               {form.getFieldDecorator("email", {
-                initialValue: userSettings?.payload?.settings?.Item?.email?.S ?? "",
+                initialValue: userEmail || "",
                 rules: [
                   { message: "Please enter your email.", required: true },
                   { message: "Please enter a valid email.", type: "email" },
                 ],
               })(<Input placeholder="Email" />)}
             </Form.Item>
-            <Form.Item>
-              {form.getFieldDecorator("pushNotifications", {
-                initialValue: userSettings?.payload?.settings?.Item?.pushNotifications?.BOOL ?? false,
-                valuePropName: "checked",
-              })(
-                <Checkbox
-                  onChange={async (e) => {
-                    if (e.target.checked) {
-                      try {
-                        await askPermission();
-                      } catch (err) {
-                        console.error("Notification permission error: ", err);
-                        form.setFieldsValue({ pushNotifications: false });
-                      }
-                    }
-                  }}
-                  placeholder="PushNotifications"
-                >
-                  <div style={{ display: "inline-block" }}>
-                    Push Notifications{" "}
-                    <Tooltip title="Enables browser notifications. When prompted, please grant access.">
-                      <Icon type="question-circle" />
-                    </Tooltip>
-                  </div>
-                </Checkbox>
-              )}
-            </Form.Item>
             <Button
-              disabled={Object.values(form.getFieldsError()).some((v) =>
-                Array.isArray(v) ? v.length > 0 : Boolean(v)
-              )}
+              disabled={hasErrors || isUpdatingEmail || !emailHasChanged || !canUpdateEmail}
               htmlType="submit"
-              loading={loadingUserSettingsPatch}
+              loading={isUpdatingEmail}
               type="primary"
+              block
             >
               Save
             </Button>
           </>
         )}
       </Skeleton>
+
       <Divider />
-      {userSettingsPatchState && !loadingUserSettingsPatch && (
-        <Alert
-          closable
-          message={userSettingsPatchState.error || "Saved settings."}
-          type={userSettingsPatchState.error ? "error" : "success"}
-        />
-      )}
+
+      <StyledAlertContainer>
+        {!isEmailVerified && userEmail && (
+          <Alert
+            message="Email not verified"
+            type="warning"
+            closable
+            description={
+              <>
+                <p>Please verify your email address to receive notifications.</p>
+                {!canUpdateEmail && emailUpdateableAt && (
+                  <p>
+                    You can request a new verification email in {minutesUntilUpdateable}{" "}
+                    {minutesUntilUpdateable === 1 ? "minute" : "minutes"}
+                  </p>
+                )}
+                <Button
+                  size="small"
+                  onClick={onResendVerification}
+                  loading={isResendingVerification}
+                  disabled={!canUpdateEmail}
+                >
+                  Resend verification email
+                </Button>
+              </>
+            }
+          />
+        )}
+        {signInError && <Alert closable message={signInError} type="error" />}
+        {updateEmailError && !isUpdatingEmail && <Alert closable message={updateEmailError} type="error" />}
+        {updateEmailSuccess && !isUpdatingEmail && !updateEmailError && (
+          <Alert closable message="Saved settings." type="success" />
+        )}
+      </StyledAlertContainer>
     </StyledForm>
   );
 };
 
 NotificationSettingsContent.propTypes = {
-  settingsKey: PropTypes.string.isRequired,
-  drizzleState: PropTypes.object.isRequired,
+  account: PropTypes.string.isRequired,
   form: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  settings: PropTypes.object.isRequired,
-  userSettings: PropTypes.object,
-  loadingUserSettings: PropTypes.bool.isRequired,
-  loadingUserSettingsPatch: PropTypes.bool.isRequired,
-  userSettingsPatchState: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]).isRequired,
+  userData: PropTypes.object,
+  isLoadingUserEmail: PropTypes.bool.isRequired,
+  isUpdatingEmail: PropTypes.bool.isRequired,
+  updateEmailError: PropTypes.string,
+  updateEmailSuccess: PropTypes.bool.isRequired,
+  signInError: PropTypes.string,
+  isAuthenticated: PropTypes.bool.isRequired,
+  onSignIn: PropTypes.func.isRequired,
+  isSigningIn: PropTypes.bool.isRequired,
+  emailHasChanged: PropTypes.bool.isRequired,
+  onResendVerification: PropTypes.func.isRequired,
+  isResendingVerification: PropTypes.bool.isRequired,
 };
 
-const NotificationSettings = Form.create()(({ form, settings: { key: settingsKey, ...settings } }) => {
+const NotificationSettings = Form.create()(({ form }) => {
   const { drizzle } = useDrizzle();
   const drizzleState = useDrizzleState((drizzleState) => ({
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
-  const [loadingUserSettingsPatch, setLoadingUserSettingsPatch] = useState(false);
-  const [userSettingsPatchState, setUserSettingsPatchState] = useState(false);
 
-  const { data: userSettings, isLoading: loadingUserSettings } = useSWR(
-    drizzleState.account && settingsKey && ["user-settings", drizzleState.account, settingsKey],
-    async ([_, address, settingsKeyParam]) =>
-      await accessSettings({
-        web3: drizzle.web3,
-        address,
-        settings: prepareSettings(settings, settingsKeyParam, false),
-      }),
-    { errorRetryCount: 0, revalidateOnFocus: false }
+  const [isSigningIn, setIsSigningIn] = useState(false);
+  const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
+  const [isResendingVerification, setIsResendingVerification] = useState(false);
+  const [updateEmailError, setUpdateEmailError] = useState(null);
+  const [updateEmailSuccess, setUpdateEmailSuccess] = useState(false);
+  const [signInError, setSignInError] = useState(null);
+
+  //Check if user is authenticated and has a valid token for the current connected wallet
+  const token = getAuthToken();
+  const isTokenForCurrentWallet = isTokenForAccount(drizzleState.account);
+  const isAuthenticated = token && isTokenForCurrentWallet && isTokenValid(token);
+
+  //Clear auth data if token doesn't match current account
+  if (token && !isTokenForCurrentWallet) {
+    clearAuthData();
+    form.resetFields();
+  }
+
+  //Fetch user email from Atlas if authenticated
+  const { data: userData, isLoading: isLoadingUserEmail } = useSWR(
+    isAuthenticated && drizzleState.account && drizzleState.account !== VIEW_ONLY_ADDRESS
+      ? ["atlas-user", drizzleState.account.toLowerCase()]
+      : null,
+    fetchUser,
+    {
+      errorRetryCount: 0,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      onSuccess: (data) => {
+        if (data?.email) {
+          form.setFieldsValue({ email: data.email });
+        }
+      },
+    }
   );
+
+  //Check if email has changed from original
+  const userEmail = userData?.email || "";
+  const currentEmail = form.getFieldValue("email") || "";
+  const emailHasChanged = userEmail !== currentEmail && currentEmail !== "";
+
+  const handleSignIn = useCallback(async () => {
+    if (!drizzleState.account || drizzleState.account === VIEW_ONLY_ADDRESS || !drizzle.web3) {
+      return;
+    }
+
+    //Clear errors and set loading state
+    setIsSigningIn(true);
+    setSignInError(null);
+
+    try {
+      await authenticateUser({
+        web3: drizzle.web3,
+        address: drizzleState.account,
+      });
+      mutate(["atlas-user", drizzleState.account.toLowerCase()]);
+    } catch (err) {
+      setSignInError(err?.message || "Failed to sign in");
+    } finally {
+      setIsSigningIn(false);
+    }
+  }, [drizzle.web3, drizzleState.account]);
+
+  const handleResendVerification = useCallback(async () => {
+    const email = userData?.email;
+    if (!email || !isAuthenticated || isResendingVerification) return;
+
+    //Clear errors and set loading state
+    setIsResendingVerification(true);
+    setUpdateEmailError(null);
+
+    try {
+      //Resend verification by updating email with the same address
+      await updateEmail(email);
+      setUpdateEmailSuccess(true);
+      mutate(["atlas-user", drizzleState.account.toLowerCase()]);
+    } catch (err) {
+      setUpdateEmailError(err?.message || "Failed to resend verification email");
+    } finally {
+      setIsResendingVerification(false);
+    }
+  }, [userData, isAuthenticated, isResendingVerification, drizzleState.account]);
 
   const onSubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      if (loadingUserSettingsPatch) return;
+      if (isUpdatingEmail || !isAuthenticated) return;
+
       form.validateFieldsAndScroll(async (err, values) => {
         if (!err) {
-          const { email, fullName, phone, pushNotifications, ...rest } = values;
-          let pushNotificationsData;
-          if (pushNotifications) {
-            try {
-              pushNotificationsData = await subscribeUserToPush();
-            } catch (e) {
-              setUserSettingsPatchState({ error: e?.message || "Failed to enable push notifications." });
-              return;
-            }
-          }
-          setLoadingUserSettingsPatch(true);
+          const { email } = values;
+
+          //Clear errors and set loading state
+          setIsUpdatingEmail(true);
+          setUpdateEmailError(null);
+          setUpdateEmailSuccess(false);
+
           try {
-            const result = await accessSettings({
-              patch: true,
-              web3: drizzle.web3,
-              address: drizzleState.account,
-              settings: prepareSettings(
-                rest,
-                settingsKey,
-                true,
-                email,
-                fullName,
-                phone,
-                pushNotifications,
-                pushNotificationsData
-              ),
-            });
-            setUserSettingsPatchState(result);
-            mutate(["user-settings", drizzleState.account, settingsKey]);
+            //Check if user exists (has an email set)
+            const userExists = userData?.email != null;
+
+            //If user doesn't exist, create user, otherwise update the email
+            if (!userExists) {
+              await addUser(email);
+            } else {
+              await updateEmail(email);
+            }
+
+            setUpdateEmailError(null);
+            setUpdateEmailSuccess(true);
+            mutate(["atlas-user", drizzleState.account.toLowerCase()]);
           } catch (err) {
-            console.error(err);
+            setUpdateEmailError(err?.message || "Failed to update email");
+            setUpdateEmailSuccess(false);
           } finally {
-            setLoadingUserSettingsPatch(false);
+            setIsUpdatingEmail(false);
           }
         }
       });
     },
-    [
-      form,
-      settingsKey,
-      drizzle.web3,
-      drizzleState.account,
-      loadingUserSettingsPatch,
-      setLoadingUserSettingsPatch,
-      setUserSettingsPatchState,
-    ]
+    [form, isAuthenticated, isUpdatingEmail, drizzleState.account, userData]
   );
 
   return (
@@ -257,15 +312,21 @@ const NotificationSettings = Form.create()(({ form, settings: { key: settingsKey
       arrowPointAtCenter
       content={
         <NotificationSettingsContent
-          settingsKey={settingsKey}
-          drizzleState={drizzleState}
+          account={drizzleState.account}
           form={form}
           onSubmit={onSubmit}
-          settings={settings}
-          userSettings={userSettings}
-          loadingUserSettings={loadingUserSettings}
-          loadingUserSettingsPatch={loadingUserSettingsPatch}
-          userSettingsPatchState={userSettingsPatchState}
+          userData={userData}
+          isLoadingUserEmail={isLoadingUserEmail}
+          isUpdatingEmail={isUpdatingEmail}
+          updateEmailError={updateEmailError}
+          updateEmailSuccess={updateEmailSuccess}
+          signInError={signInError}
+          isAuthenticated={isAuthenticated}
+          onSignIn={handleSignIn}
+          isSigningIn={isSigningIn}
+          emailHasChanged={emailHasChanged}
+          onResendVerification={handleResendVerification}
+          isResendingVerification={isResendingVerification}
         />
       }
       placement="bottomRight"
@@ -276,11 +337,5 @@ const NotificationSettings = Form.create()(({ form, settings: { key: settingsKey
     </Popover>
   );
 });
-
-NotificationSettings.propTypes = {
-  settings: PropTypes.shape({
-    key: PropTypes.string.isRequired,
-  }).isRequired,
-};
 
 export default NotificationSettings;
