@@ -130,10 +130,8 @@ const graphqlRequest = async (query, variables = {}, requireAuth = false) => {
 
     return response.data.data;
   } catch (error) {
-    if (error.response) {
-      if (requireAuth && (error.response.status === 400 || error.response.status === 401)) {
-        clearAuthData();
-      }
+    if (error.response && requireAuth && error.response.status === 401) {
+      clearAuthData();
     }
     throw error;
   }
