@@ -125,16 +125,28 @@ export default function App() {
                             <StyledTray>
                               <NetworkStatus />
                               <AccountStatus />
-                              <NotificationSettings settings={settings} />
+                              <NotificationSettings />
                             </StyledTray>
                           </StyledTrayCol>
                         </Row>
                       </StyledLayoutHeader>
                       <StyledLayoutContent>
                         <Switch>
-                          <Route exact path="/">
-                            <Home />
-                          </Route>
+                          {/* Handle hash-based email confirmation links (e.g., /#/settings/email-confirmation) */}
+                          <Route
+                            exact
+                            path="/"
+                            render={() => {
+                              //Check if hash contains email confirmation path
+                              if (
+                                typeof window !== "undefined" &&
+                                window.location.hash?.includes("/settings/email-confirmation")
+                              ) {
+                                return <EmailConfirmation />;
+                              }
+                              return <Home />;
+                            }}
+                          />
                           <Route exact path="/courts">
                             <Courts />
                           </Route>
@@ -222,6 +234,10 @@ const ConvertPnk = loadable(() => import(/* webpackPrefetch: true */ "../contain
   fallback: <StyledSpin />,
 });
 
+const EmailConfirmation = loadable(() => import(/* webpackPrefetch: true */ "../components/email-confirmation"), {
+  fallback: <StyledSpin />,
+});
+
 const MenuItems = [
   <Menu.Item key="home">
     <NavLink to="/">Home</NavLink>
@@ -242,15 +258,6 @@ const MenuItems = [
     </a>
   </Menu.Item>,
 ];
-
-const settings = {
-  draw: "When I am drawn as a juror.",
-  appeal: "When a case I ruled is appealed.",
-  key: "court",
-  lose: "When I lose tokens.",
-  win: "When I win arbitration fees.",
-  stake: "When my stakes are changed.",
-};
 
 const StyledLayoutSider = styled(Layout.Sider)`
   height: 100%;
