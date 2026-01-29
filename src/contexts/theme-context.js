@@ -193,7 +193,7 @@ export const darkTheme = {
   pageTitle: "#c4a6e8",
 };
 
-export const ThemeContext = createContext();
+export const ThemeContext = createContext(null);
 
 export const ThemeProvider = ({ children }) => {
   const [persistedTheme, setPersistedTheme] = usePersistedTheme(null);
@@ -230,4 +230,10 @@ ThemeProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export const useTheme = () => useContext(ThemeContext);
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error("useTheme must be used within a ThemeProvider");
+  }
+  return context;
+};

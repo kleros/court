@@ -55,7 +55,6 @@
           "debug"
         ]
       }
-    ],
-    "react/prop-types": "off"
+    ]
   }
 }
