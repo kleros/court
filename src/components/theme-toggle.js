@@ -21,6 +21,11 @@ const ToggleButton = styled.button`
     outline: none;
   }
 
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.primaryColor};
+    outline-offset: 2px;
+  }
+
   svg {
     width: 20px;
     height: 20px;
