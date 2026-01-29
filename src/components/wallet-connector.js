@@ -29,7 +29,7 @@ const StyledWalletItem = styled.div`
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #f5f5f5;
+    background-color: ${({ theme }) => theme.elevatedBackground};
   }
 `;
 

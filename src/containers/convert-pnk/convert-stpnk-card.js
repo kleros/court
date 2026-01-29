@@ -16,17 +16,23 @@ const StyledCard = styled(Card)`
   margin: 20px auto 0;
   max-width: 768px;
   border-radius: 12px;
-  box-shadow: 0px 6px 36px #bc9cff;
+  box-shadow: ${({ theme }) => theme.cardShadow};
+  background: ${({ theme }) => theme.cardBackground};
 
   .ant-card-head {
     border: none;
+    background: ${({ theme }) => theme.cardBackground};
   }
 
   .ant-card-head-title {
     text-align: center;
     font-size: 36px;
-    color: #4d00b4;
+    color: ${({ theme }) => theme.primaryPurple};
     padding-bottom: 0;
+  }
+
+  .ant-card-body {
+    background: ${({ theme }) => theme.cardBackground};
   }
 
   .ant-card-actions {
@@ -62,10 +68,33 @@ const StyledCol = styled.div`
 const StyledButton = styled(Button)`
   border-radius: 3px;
   width: 100%;
+  background: ${({ theme }) => theme.primaryPurple};
+  border-color: ${({ theme }) => theme.primaryPurple};
+  color: ${({ theme }) => theme.textOnPurple};
+
+  &:hover,
+  &:focus {
+    background: ${({ theme }) => theme.secondaryPurple};
+    border-color: ${({ theme }) => theme.secondaryPurple};
+    color: ${({ theme }) => theme.textOnPurple};
+  }
+
+  &[disabled] {
+    background: ${({ theme }) => theme.elevatedBackground};
+    border-color: ${({ theme }) => theme.borderColor};
+    color: ${({ theme }) => theme.disabledColor};
+
+    &:hover,
+    &:focus {
+      background: ${({ theme }) => theme.elevatedBackground};
+      border-color: ${({ theme }) => theme.borderColor};
+      color: ${({ theme }) => theme.disabledColor};
+    }
+  }
 `;
 
 const StyledExplainerText = styled.p`
-  color: rgba(0, 0, 0, 0.45);
+  color: ${({ theme }) => theme.textSecondary};
   font-size: 14px;
   text-align: center;
 `;
@@ -86,7 +115,7 @@ const StyledButtonLink = styled.button.attrs((...rest) => ({ ...rest, type: "but
   cursor: pointer;
   font-weight: inherit;
   display: inline-block;
-  color: #009aff;
+  color: ${({ theme }) => theme.linkColor};
 `;
 
 const StyledCompositeLabel = styled.span`

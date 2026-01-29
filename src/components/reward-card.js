@@ -14,15 +14,18 @@ const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
 const StyledCard = styled(Card)`
   border-radius: 12px;
-  box-shadow: 0px 6px 36px #bc9cff;
+  box-shadow: ${({ theme }) => theme.cardShadow};
   cursor: initial;
   margin: 60px 0 25px 0;
   overflow: hidden;
+  background: ${({ theme }) => theme.cardBackground};
+  border: none;
 
   .ant-card-body {
     position: relative;
     overflow: hidden;
     padding: 7px 16px;
+    background: ${({ theme }) => theme.cardBackground};
 
     @media (max-width: 991px) {
       padding: 18px;
@@ -45,20 +48,20 @@ const StyledDiv = styled.div`
 `;
 
 const StyledDivWhiteSmall = styled(StyledDiv)`
-  color: white;
+  color: ${({ theme }) => theme.textOnPurple};
   font-size: 14px;
   font-weight: 500;
   margin: 0px;
   text-align: center;
 
   @media (max-width: 991px) {
-    color: #4004a3;
+    color: ${({ theme }) => theme.textPrimary};
     text-align: center;
   }
 `;
 
 const StyledDivWhiteLarge = styled(StyledDiv)`
-  color: white;
+  color: ${({ theme }) => theme.textOnPurple};
   font-size: 36px;
   margin: 0px;
   text-align: center;
@@ -69,7 +72,7 @@ const StyledDivWhiteLarge = styled(StyledDiv)`
 
   @media (max-width: 991px) {
     font-size: 42px;
-    color: #4004a3;
+    color: ${({ theme }) => theme.textPrimary};
     text-align: center;
   }
 `;
@@ -101,6 +104,7 @@ const StyledCenterDiv = styled.div`
 const RewardsCol = styled(Col)`
   display: flex;
   gap: 1rem;
+  padding: 12px 16px;
 
   @media (max-width: 991px) {
     justify-content: flex-start;
@@ -132,7 +136,7 @@ const AmountCol = styled(Col)`
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #4004a3;
+  color: ${({ theme }) => theme.textPrimary};
   text-align: center;
 
   @media (max-width: 991px) {
@@ -150,6 +154,10 @@ const StyledPurpleArrowBackground = styled(PurpleArrowBackground)`
   width: calc(33% + 1.5rem + 100px);
   transform: translateX(-100px);
 
+  path {
+    fill: ${({ theme }) => (theme.name === "dark" ? theme.gradientEnd : `url(#paint0_linear)`)};
+  }
+
   @media (max-width: 991px) {
     display: none;
   }
@@ -162,6 +170,10 @@ const StyledLightPurpleArrowBackground = styled(LightPurpleArrowBackground)`
   z-index: 0;
   width: calc(33% + 1.5rem + 100px);
   transform: translateX(100px);
+
+  path {
+    fill: ${({ theme }) => theme.elevatedBackground};
+  }
 
   @media (max-width: 991px) {
     display: none;

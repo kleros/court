@@ -94,15 +94,24 @@ SwitchNetworkButton.propTypes = {
 };
 
 const StyledModal = styled(Modal)`
+  .ant-modal-content {
+    background: ${({ theme }) => theme.componentBackground};
+  }
+
   .ant-modal-header {
     border: none;
+    background: ${({ theme }) => theme.componentBackground};
   }
 
   .ant-modal-title {
     font-size: 36px;
     line-height: 1.33;
     text-align: center;
-    color: #4d00b4;
+    color: ${({ theme }) => theme.textPrimary};
+  }
+
+  .ant-modal-body {
+    color: ${({ theme }) => theme.textSecondary};
   }
 
   .ant-modal-footer {

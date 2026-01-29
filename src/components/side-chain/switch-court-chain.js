@@ -275,9 +275,21 @@ const StyledButtonWrapper = styled.div`
     align-items: center;
   }
 
-  a.ant-btn {
+  a.ant-btn,
+  button.ant-btn {
     padding-top: 0;
     line-height: 28px;
+    border: none;
+    background: transparent;
+    color: ${({ theme }) => theme.textPrimary};
+    transition: opacity 0.2s ease;
+
+    &:hover,
+    &:focus {
+      opacity: 0.7;
+      background: transparent;
+      color: ${({ theme }) => theme.textPrimary};
+    }
 
     @media (max-width: 767.98px) {
       line-height: 44px;
@@ -383,15 +395,28 @@ SideChainCourtModal.defaultProps = {
 };
 
 const StyledModal = styled(Modal)`
+  .ant-modal-content {
+    background: ${({ theme }) => theme.componentBackground};
+  }
+
+  .ant-modal-close-x {
+    color: ${({ theme }) => theme.textPrimary};
+  }
+
   .ant-modal-header {
     border: none;
+    background: ${({ theme }) => theme.componentBackground};
   }
 
   .ant-modal-title {
     font-size: 36px;
     line-height: 1.33;
     text-align: center;
-    color: #4d00b4;
+    color: ${({ theme }) => theme.textPrimary};
+  }
+
+  .ant-modal-body {
+    color: ${({ theme }) => theme.textSecondary};
   }
 
   .ant-modal-footer {
@@ -405,6 +430,27 @@ const StyledModal = styled(Modal)`
 
       > :last-child {
         margin-left: auto;
+      }
+
+      /* Secondary button styling */
+      > button:not(.ant-btn-primary) {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: ${({ theme }) => theme.componentBackground};
+        border: 1px solid ${({ theme }) => theme.primaryPurple};
+        color: ${({ theme }) => theme.primaryPurple};
+
+        .anticon {
+          color: ${({ theme }) => theme.primaryPurple};
+        }
+
+        &:hover,
+        &:focus {
+          background: ${({ theme }) => theme.elevatedBackground};
+          border-color: ${({ theme }) => theme.primaryPurple};
+          color: ${({ theme }) => theme.primaryPurple};
+        }
       }
 
       @media (max-width: 575.98px) {
@@ -422,6 +468,10 @@ const StyledModal = styled(Modal)`
 `;
 
 const StyledExplainer = styled(Typography.Paragraph)`
+  && {
+    color: ${({ theme }) => theme.textSecondary};
+  }
+
   :last-child {
     margin-bottom: 0;
   }

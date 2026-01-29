@@ -199,12 +199,16 @@ const BuyPnkForm = Form.create()(({ form }) => {
 });
 
 const StyledCard = styled(Card)`
-  background: linear-gradient(180deg, #4d00b4 0%, #6500b4 100%);
+  background: linear-gradient(
+    180deg,
+    ${({ theme }) => theme.gradientStart} 0%,
+    ${({ theme }) => theme.gradientEnd} 100%
+  );
   border-radius: 12px;
-  box-shadow: 0px 6px 36px #bc9cff;
+  box-shadow: ${({ theme }) => theme.cardShadow};
   cursor: initial;
   position: relative;
-  color: white;
+  color: ${({ theme }) => theme.textOnPurple};
 
   @media (max-width: 500px) {
     margin-bottom: 20px;
@@ -212,7 +216,7 @@ const StyledCard = styled(Card)`
 
   .ant-card {
     &-head {
-      color: white;
+      color: ${({ theme }) => theme.textOnPurple};
       text-align: center;
     }
 
@@ -223,13 +227,13 @@ const StyledCard = styled(Card)`
 `;
 const StyledFormItem = styled(Form.Item)`
   .ant-form-item-label label {
-    color: white;
+    color: ${({ theme }) => theme.textOnPurple};
   }
 `;
 const StyledInputNumber = styled(InputNumber)`
-  background: rgba(255, 255, 255, 0.3);
+  background: ${({ theme }) => theme.inputOverlayBackground};
   border: none;
-  color: white;
+  color: ${({ theme }) => theme.textOnPurple};
   width: 100%;
 `;
 const StyledInputNumberRight = styled(StyledInputNumber)`
@@ -238,9 +242,9 @@ const StyledInputNumberRight = styled(StyledInputNumber)`
   }
 `;
 const StyledDiv = styled.div`
-  border: 3px solid white;
+  border: 3px solid ${({ theme }) => theme.textOnPurple};
   border-radius: 3px;
-  color: white;
+  color: ${({ theme }) => theme.textOnPurple};
   font-size: 14px;
   margin: 10px 0;
   padding: 10px;
@@ -251,7 +255,7 @@ const StyledPoweredByDiv = styled.div`
   width: 100%;
 
   a {
-    color: white;
+    color: ${({ theme }) => theme.textOnPurple};
     float: right;
     font-size: 12px;
     text-decoration: none;

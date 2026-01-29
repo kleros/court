@@ -108,7 +108,7 @@ export default function Courts() {
 }
 
 const StyledCol = styled(Col)`
-  color: #d09cff;
+  color: ${({ theme }) => theme.borderColor};
   font-size: 24px;
   font-weight: 500;
   line-height: 28px;

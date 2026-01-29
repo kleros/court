@@ -75,12 +75,12 @@ const StyledTitle = styled(Typography.Title)`
 `;
 
 const StyledContent = styled.main`
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.06);
+  background: ${({ theme }) => theme.componentBackground};
+  border: 1px solid ${({ theme }) => theme.borderColor};
+  box-shadow: ${({ theme }) => theme.cardShadow};
   border-radius: 18px;
   padding: 24px 30px;
-  color: rgba(0, 0, 0, 0.45);
+  color: ${({ theme }) => theme.textSecondary};
 
   table {
     width: 100%;
@@ -89,7 +89,7 @@ const StyledContent = styled.main`
 
   thead {
     th {
-      color: rgba(0, 0, 0, 0.45);
+      color: ${({ theme }) => theme.textSecondary};
       text-align: center;
     }
   }
@@ -143,23 +143,23 @@ const StyledContent = styled.main`
     }
 
     tr.primary {
-      color: rgba(0, 0, 0, 0.85);
+      color: ${({ theme }) => theme.textPrimary};
 
       > td.amount,
       > td.token {
-        color: #009aff;
+        color: ${({ theme }) => theme.primaryColor};
       }
     }
 
     tr.warning {
       > td.amount,
       > td.token {
-        color: #faad14;
+        color: ${({ theme }) => theme.warningColor};
       }
     }
 
     td.error {
-      color: #f60c36;
+      color: ${({ theme }) => theme.errorColor};
     }
 
     td.empty::before {

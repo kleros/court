@@ -14,12 +14,13 @@ const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
 const StyledCard = styled(Card)`
   border-radius: 12px;
-  box-shadow: 0px 6px 36px #bc9cff;
+  box-shadow: ${({ theme }) => theme.cardShadow};
   margin: 20px 0 0;
   text-align: center;
+  background: ${({ theme }) => theme.cardBackground};
 
   .ant-card-actions {
-    background: #f5f1fd;
+    background: ${({ theme }) => theme.cardActionsBackground};
     border: none;
     padding: 12px 0px;
 
@@ -35,17 +36,17 @@ const StyledCard = styled(Card)`
 
     .unstake-button {
       background: none;
-      border: 1px solid #4d00b4;
+      border: 1px solid ${({ theme }) => theme.primaryPurple};
       border-radius: 3px;
-      color: #4d00b4;
+      color: ${({ theme }) => theme.primaryPurple};
     }
   }
 
   .ant-card-head {
-    background: #4d00b4;
+    background: ${({ theme }) => theme.cardHeaderBackground};
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
-    color: white;
+    color: ${({ theme }) => theme.textOnPurple};
     height: 40px;
     text-align: left;
   }
@@ -60,40 +61,44 @@ const IconCol = styled(Col)`
   margin-top: 10px;
 `;
 const StakeCol = styled(Col)`
-  color: #4d00b4;
+  color: ${({ theme }) => theme.textPrimary};
   font-size: 14px;
   margin-top: 16px;
   text-align: left;
 
   h3 {
-    color: #4d00b4;
+    color: ${({ theme }) => theme.textPrimary};
     font-size: 24px;
     font-weight: 600;
   }
 `;
 const RewardCol = styled(Col)`
-  color: white;
+  color: ${({ theme }) => theme.textOnPurple};
   font-size: 14px;
   margin-top: 16px;
   text-align: left;
 
   h3 {
-    color: white;
+    color: ${({ theme }) => theme.textOnPurple};
     font-size: 24px;
     font-weight: 600;
   }
 `;
 const InfoBox = styled.div`
-  border: 2px solid #d09cff;
+  border: 2px solid ${({ theme }) => theme.borderColor};
   border-radius: 12px;
   height: 88px;
   margin-bottom: 8px;
 `;
 const StakeBox = styled(InfoBox)`
-  background: #f5f1fd;
+  background: ${({ theme }) => theme.elevatedBackground};
 `;
 const RewardBox = styled(InfoBox)`
-  background: linear-gradient(111.05deg, #4d00b4 45.17%, #6500b4 88.53%);
+  background: linear-gradient(
+    111.05deg,
+    ${({ theme }) => theme.gradientStart} 45.17%,
+    ${({ theme }) => theme.gradientEnd} 88.53%
+  );
 `;
 const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
   const { useCacheCall, useCacheSend } = useDrizzle();

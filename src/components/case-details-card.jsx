@@ -467,11 +467,7 @@ export default function CaseDetailsCard({ ID }) {
             title="Main File"
           />
         );
-      actions.push(
-        <StyledInnerCardActionsTitleDiv className="ternary-color theme-color">
-          Primary Documents
-        </StyledInnerCardActionsTitleDiv>
-      );
+      actions.push(<StyledInnerCardActionsTitleDiv>Primary Documents</StyledInnerCardActionsTitleDiv>);
       return actions;
     }
   }, [metaEvidence]);
@@ -692,16 +688,18 @@ export default function CaseDetailsCard({ ID }) {
                 <StyledInnerCard actions={metaEvidenceActions}>
                   <ReactMarkdown source={metaEvidence.description} />
                   {metaEvidence.evidenceDisplayInterfaceURI && (
-                    <iframe
-                      sandbox={
-                        arbitrableWhitelist[arbitrableChainID]?.includes(dispute.arbitrated.toLowerCase())
-                          ? "allow-scripts allow-same-origin allow-popups"
-                          : "allow-scripts"
-                      }
-                      title="dispute details"
-                      style={{ width: "1px", minWidth: "100%", height: "360px", border: "none" }}
-                      src={evidenceDisplayInterfaceURL}
-                    />
+                    <StyledIframeContainer>
+                      <iframe
+                        sandbox={
+                          arbitrableWhitelist[arbitrableChainID]?.includes(dispute.arbitrated.toLowerCase())
+                            ? "allow-scripts allow-same-origin allow-popups"
+                            : "allow-scripts"
+                        }
+                        title="dispute details"
+                        style={{ width: "1px", minWidth: "100%", height: "360px", border: "none" }}
+                        src={evidenceDisplayInterfaceURL}
+                      />
+                    </StyledIframeContainer>
                   )}
                   {metaEvidence.arbitrableInterfaceURI && (
                     <ArbitrableInterfaceDiv>
@@ -811,15 +809,14 @@ export default function CaseDetailsCard({ ID }) {
       )}
       {showRefuse && dispute && Number(dispute.period) < "3" && !votesData.voted && votesData.drawnInCurrentRound && (
         <>
-          <div style={{ marginTop: "32px" }}>
+          <StyledWarningText>
             If the dispute is failing to load and appears to be broken, in case you have an AdBlock enabled please
             disable it and refresh the page as it may be preventing the correct working of the page. If that is not the
             case, the data for this case is not formatted correctly or has been tampered since the time of its
             submission. Please refresh the page, if the problem persists it is advised to refuse to arbitrate. Please
             cast your vote using button below.
-          </div>
-          <Button
-            style={{ color: "#4d00b4", marginTop: "16px", float: "right" }}
+          </StyledWarningText>
+          <StyledRefuseButton
             disabled={!votesData.canVote}
             ghost={!votesData.canVote}
             id={0}
@@ -827,7 +824,7 @@ export default function CaseDetailsCard({ ID }) {
             size="large"
           >
             {"Refuse to Arbitrate"}
-          </Button>
+          </StyledRefuseButton>
         </>
       )}
     </>
@@ -928,21 +925,23 @@ const VOTE_COMMIT_SALT_KEY =
 
 const StyledCard = styled(Card)`
   border-radius: 12px;
-  box-shadow: 0px 6px 36px #bc9cff;
+  box-shadow: ${({ theme }) => theme.cardShadow};
   cursor: initial;
+  background: ${({ theme }) => theme.cardBackground};
 
   .ant-card {
     &-head {
       margin: 0 46px;
       padding: 0;
       position: relative;
+      background: ${({ theme }) => theme.cardBackground};
 
       @media (max-width: 767px) {
         margin: 0 23px;
       }
 
       &-title {
-        color: #4d00b4;
+        color: ${({ theme }) => theme.textPrimary};
         font-size: 24px;
       }
     }
@@ -957,6 +956,7 @@ const StyledCard = styled(Card)`
 
     &-actions {
       border: none;
+      background: ${({ theme }) => theme.cardActionsBackground};
 
       & > li {
         margin: 0;
@@ -972,23 +972,47 @@ const StyledCard = styled(Card)`
 
 const StyledDiv = styled.div`
   align-items: center;
-  color: white;
+  color: ${({ theme }) => theme.textOnPurple};
   display: flex;
   flex-direction: column;
   font-size: 24px;
   padding: 34px 10px;
+
+  &.secondary-linear-background.theme-linear-background {
+    ${({ theme }) =>
+      theme.name === "dark" &&
+      `
+      background: linear-gradient(to left, ${theme.elevatedBackground}, ${theme.borderColor}) !important;
+    `}
+  }
+
+  &.secondary-background.theme-background {
+    ${({ theme }) =>
+      theme.name === "dark" &&
+      `
+      background: ${theme.elevatedBackground} !important;
+    `}
+  }
 `;
 
 const StyledActionsDiv = styled(StyledDiv)`
   min-height: 250px;
   overflow: hidden;
+
+  &.secondary-linear-background.theme-linear-background {
+    ${({ theme }) =>
+      theme.name === "dark" &&
+      `
+      background: linear-gradient(to left, ${theme.elevatedBackground}, ${theme.borderColor}) !important;
+    `}
+  }
 `;
 
 const StyledRadioGroup = styled(Radio.Group)`
   margin-top: 32px;
   align-self: end;
   label {
-    color: white;
+    color: ${({ theme }) => theme.textOnPurple};
     font-size: 16px;
   }
 `;
@@ -998,9 +1022,9 @@ const SecondaryActionText = styled.div`
 `;
 
 const StyledInputTextArea = styled(Input.TextArea)`
-  background: rgba(255, 255, 255, 0.3);
+  background: ${({ theme }) => theme.inputOverlayBackground};
   border: none;
-  color: white;
+  color: ${({ theme }) => theme.textOnPurple};
   height: 91px !important;
   margin: 24px 0;
   width: 70%;
@@ -1025,7 +1049,7 @@ const StyledButtonsDiv = styled.div`
   }
 
   .ant-checkbox-group-item.ant-checkbox-wrapper span {
-    color: white;
+    color: ${({ theme }) => theme.textOnPurple};
   }
 `;
 
@@ -1035,12 +1059,20 @@ const StyledButton = styled(Button)`
 `;
 
 const StyledPoliciesButton = styled(Button)`
-  border: 1px solid #4d00b4;
+  border: 1px solid ${({ theme }) => theme.primaryPurple};
   border-radius: 3px;
   box-sizing: border-box;
-  color: #4d00b4;
+  color: ${({ theme }) => theme.primaryPurple};
+  background: ${({ theme }) => theme.componentBackground};
   padding-left: 40px;
   position: relative;
+
+  &:hover,
+  &:focus {
+    border-color: ${({ theme }) => theme.primaryPurple};
+    color: ${({ theme }) => theme.primaryPurple};
+    background: ${({ theme }) => theme.elevatedBackground};
+  }
 `;
 
 const GavelLarge = styled(Gavel)`
@@ -1059,7 +1091,7 @@ const StyledDocument = styled(Document)`
   transform: translateY(-50%);
   width: auto;
   path {
-    fill: #4d00b4;
+    fill: ${({ theme }) => theme.primaryPurple};
   }
 `;
 
@@ -1071,30 +1103,35 @@ const StyledBreadcrumbs = styled(Breadcrumbs)`
 `;
 
 const StyledInnerCard = styled(Card)`
-  border: 1px solid #d09cff;
+  border: 1px solid ${({ theme }) => theme.borderColor};
   border-radius: 3px;
   box-sizing: border-box;
   cursor: initial;
   margin-bottom: 38px;
+  background: ${({ theme }) => theme.componentBackground};
 
   &.ant-card {
     .ant-card-head {
       margin: 0 21px 0 17px;
       padding: 0;
+      background: ${({ theme }) => theme.componentBackground};
 
       &-title {
         align-items: center;
         display: flex;
         font-size: 18px;
+        color: ${({ theme }) => theme.textPrimary};
       }
     }
 
     .ant-card-body {
       padding: 21px 20px 42px;
+      background: ${({ theme }) => theme.componentBackground};
+      color: ${({ theme }) => theme.textSecondary};
     }
 
     .ant-card-actions {
-      background: linear-gradient(204.14deg, #ffffff -6.48%, #f5f1fd 45.52%);
+      background: ${({ theme }) => theme.elevatedBackground};
       border: none;
       height: 70px;
       position: relative;
@@ -1106,7 +1143,7 @@ const StyledInnerCard = styled(Card)`
         width: auto !important;
 
         path {
-          fill: #4d00b4;
+          fill: ${({ theme }) => theme.primaryPurple};
         }
 
         &:first-child {
@@ -1142,17 +1179,52 @@ const StyledInnerCardActionsTitleDiv = styled.div`
   width: 168px;
   height: 28px;
   line-height: 28px;
-  background: linear-gradient(204.14deg, #ffffff -6.48%, #f5f1fd 45.52%);
+  background: ${({ theme }) => theme.elevatedBackground};
   border-radius: 6px 6px 0 0;
   text-align: center;
+  color: ${({ theme }) => theme.primaryPurple} !important;
+`;
+
+const StyledIframeContainer = styled.div`
+  background: ${({ theme }) => theme.componentBackground};
+  border: 1px solid ${({ theme }) => theme.borderColor};
+  border-radius: 4px;
+  overflow: hidden;
+
+  iframe {
+    ${({ theme }) =>
+      theme.name === "dark" &&
+      `
+      filter: invert(0.88) hue-rotate(180deg) saturate(1.2) brightness(0.9) contrast(0.9) sepia(0.15);
+    `}
+  }
 `;
 
 const ArbitrableInterfaceDiv = styled.div`
-  border-top: 1px solid #d09cff;
+  border-top: 1px solid ${({ theme }) => theme.borderColor};
   font-size: 18px;
   padding: 20px 0px 5px 0px;
+  color: ${({ theme }) => theme.textSecondary};
 
   a {
-    color: #4d00b4;
+    color: ${({ theme }) => theme.primaryPurple};
   }
+`;
+
+const StyledRefuseButton = styled(Button)`
+  color: ${({ theme }) => theme.primaryPurple};
+  margin-top: 16px;
+  float: right;
+  border-color: ${({ theme }) => theme.primaryPurple};
+
+  &:hover,
+  &:focus {
+    color: ${({ theme }) => theme.primaryPurple};
+    border-color: ${({ theme }) => theme.primaryPurple};
+  }
+`;
+
+const StyledWarningText = styled.div`
+  margin-top: 32px;
+  color: ${({ theme }) => theme.textSecondary};
 `;

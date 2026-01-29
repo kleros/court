@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #4d00b4;
+  background: var(--header-background);
   color: white;
   height: 60px;
   font-size: 14px;

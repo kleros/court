@@ -1,4 +1,4 @@
-import { Col, Divider, Radio, Row, Spin } from "antd";
+import { Col, Radio, Row, Spin } from "antd";
 import React, { useCallback, useState } from "react";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import CaseCard from "../components/case-card";
@@ -109,7 +109,6 @@ export default function Cases() {
         }
         title="My Cases"
       />
-      <Divider />
       <Spin spinning={disputes.loading}>
         <Row gutter={48}>
           {sortedDisputes.length === 0 ? (
@@ -136,16 +135,18 @@ const StyledRadioGroup = styled(Radio.Group)`
   }
 
   .ant-radio-button-wrapper {
-    border: 1px solid #4d00b4 !important;
+    border: 1px solid ${({ theme }) => theme.primaryPurple} !important;
     border-radius: 300px;
-    color: #4d00b4;
+    color: ${({ theme }) => theme.primaryPurple};
+    background: ${({ theme }) => theme.componentBackground};
 
     &:before {
       background-color: transparent;
     }
 
     &-checked {
-      background: #4d00b4 !important;
+      background: ${({ theme }) => theme.primaryPurple} !important;
+      color: ${({ theme }) => theme.textOnPurple} !important;
     }
   }
 
@@ -169,7 +170,7 @@ const StyledRadioButton = styled(Radio.Button)`
 `;
 
 const StyledCol = styled(Col)`
-  color: #d09cff;
+  color: ${({ theme }) => theme.borderColor};
   font-size: 24px;
   font-weight: 500;
   line-height: 28px;

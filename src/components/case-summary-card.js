@@ -5,7 +5,7 @@ import styled from "styled-components/macro";
 import t from "prop-types";
 
 const StyledCaseSummary = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.cardBackground};
   border-radius: 12px;
   display: inline-block;
   margin: 0px 2%;
@@ -13,7 +13,7 @@ const StyledCaseSummary = styled.div`
 `;
 
 const CaseNumber = styled.div`
-  color: #4d00b4;
+  color: ${({ theme }) => theme.textPrimary};
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
@@ -26,11 +26,11 @@ const CaseStatus = styled.div`
 `;
 const CaseSummaryBody = styled.div`
   border-radius: 12px;
-  box-shadow: 0px 6px 36px #bc9cff;
+  box-shadow: ${({ theme }) => theme.cardShadow};
   padding: 13px 21px;
 `;
 const CaseSummaryText = styled.div`
-  color: black;
+  color: ${({ theme }) => theme.textSecondary};
   font-size: 20px;
   font-weight: 500;
   line-height: 23px;
