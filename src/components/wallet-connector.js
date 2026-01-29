@@ -7,14 +7,32 @@ import { detectWallets, connectWallet } from "../bootstrap/wallet-connector";
 const { Text } = Typography;
 
 const StyledModal = styled(Modal)`
-  .ant-modal-body {
-    padding: 0 24px;
-    padding-bottom: 12px;
+  .ant-modal-content {
+    background: ${({ theme }) => theme.componentBackground};
+  }
+
+  .ant-modal-header {
+    background: ${({ theme }) => theme.componentBackground};
+    border-bottom-color: ${({ theme }) => theme.borderColor};
   }
 
   .ant-modal-title {
     text-align: center;
     font-size: 24px;
+    color: ${({ theme }) => theme.textPrimary};
+  }
+
+  .ant-modal-body {
+    padding: 0 24px;
+    padding-bottom: 12px;
+  }
+
+  .ant-list-item {
+    border-bottom-color: ${({ theme }) => theme.borderColor};
+  }
+
+  .ant-typography {
+    color: ${({ theme }) => theme.textPrimary};
   }
 `;
 

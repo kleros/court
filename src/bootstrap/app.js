@@ -423,4 +423,18 @@ const StyledAlert = styled(Alert)`
   margin-top: 24px;
   width: 80%;
   text-align: center;
+  background: ${({ theme }) => theme.alertInfoBackground};
+  border-color: ${({ theme }) => theme.alertInfoBorder};
+
+  .ant-alert-message {
+    color: ${({ theme }) => theme.textPrimary};
+  }
+
+  .ant-alert-description {
+    color: ${({ theme }) => theme.textSecondary};
+  }
+
+  .ant-alert-icon {
+    color: ${({ theme }) => theme.primaryColor};
+  }
 `;
