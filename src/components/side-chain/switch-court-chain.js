@@ -493,6 +493,7 @@ const StyledResponsiveBannerButton = styled(Button).attrs((props) => ({
   height: auto;
   padding: 0;
   font-weight: 600;
+  border: none;
 
   :hover,
   :focus,
