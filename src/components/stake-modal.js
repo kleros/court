@@ -261,7 +261,7 @@ StakeModalForm.propTypes = {
 };
 
 const StyledModal = styled(Modal)`
-  max-width: 90%;
+  max-width: calc(100vw - 32px);
 
   .ant-modal {
     &-content {
@@ -272,6 +272,10 @@ const StyledModal = styled(Modal)`
 
     &-body {
       padding: 35px 41px;
+
+      @media (max-width: 575px) {
+        padding: 24px 16px;
+      }
     }
 
     &-header {
@@ -290,6 +294,10 @@ const StyledModal = styled(Modal)`
     &-footer {
       border: none;
       padding: 0px 41px 35px 41px;
+
+      @media (max-width: 575px) {
+        padding: 0px 16px 24px 16px;
+      }
 
       div {
         display: flex;

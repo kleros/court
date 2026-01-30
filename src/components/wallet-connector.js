@@ -7,6 +7,8 @@ import { detectWallets, connectWallet } from "../bootstrap/wallet-connector";
 const { Text } = Typography;
 
 const StyledModal = styled(Modal)`
+  max-width: calc(100vw - 32px);
+
   .ant-modal-content {
     background: ${({ theme }) => theme.componentBackground};
   }
@@ -25,6 +27,10 @@ const StyledModal = styled(Modal)`
   .ant-modal-body {
     padding: 0 24px;
     padding-bottom: 12px;
+
+    @media (max-width: 575px) {
+      padding: 0 16px 12px;
+    }
   }
 
   .ant-list-item {

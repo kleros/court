@@ -323,6 +323,8 @@ function useDepositTokens(depositTokens) {
 }
 
 const StyledModal = styled(Modal)`
+  max-width: calc(100vw - 32px);
+
   .ant-modal-content {
     background: ${({ theme }) => theme.componentBackground};
   }
@@ -337,6 +339,10 @@ const StyledModal = styled(Modal)`
     line-height: 1.33;
     text-align: center;
     color: ${({ theme }) => theme.textPrimary};
+
+    @media (max-width: 575px) {
+      font-size: 24px;
+    }
   }
 
   .ant-modal-body {
@@ -347,9 +353,14 @@ const StyledModal = styled(Modal)`
     border: none;
     padding: 10px 24px;
 
+    @media (max-width: 575px) {
+      padding: 10px 16px;
+    }
+
     > div {
       display: flex;
       gap: 16px;
+      flex-wrap: wrap;
 
       > button {
         min-width: 72px;
@@ -358,11 +369,22 @@ const StyledModal = styled(Modal)`
       > button:last-of-type {
         margin-left: auto;
       }
+
+      @media (max-width: 575px) {
+        > button:last-of-type {
+          margin-left: 0;
+          width: 100%;
+        }
+      }
     }
   }
 `;
 
-const StyledExplainer = styled(Typography.Paragraph)``;
+const StyledExplainer = styled(Typography.Paragraph)`
+  && {
+    color: ${({ theme }) => theme.textSecondary};
+  }
+`;
 
 const StyledDivider = styled(Divider).attrs((p) => ({
   ...p,

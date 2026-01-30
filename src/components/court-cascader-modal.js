@@ -224,6 +224,7 @@ const StyledModal = styled(Modal)`
   isolation: isolate;
   padding-bottom: 0;
   width: 90% !important;
+  max-width: calc(100vw - 32px);
   height: 90vh;
 
   h1 {

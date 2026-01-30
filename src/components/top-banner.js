@@ -53,6 +53,11 @@ const StyledCard = styled(Card)`
   min-height: 88px;
   padding: 0px 9.375vw;
 
+  @media (max-width: 768px) {
+    margin: 0 -16px 24px -16px;
+    padding: 0px 16px;
+  }
+
   .ant-card-body {
     padding: 24px 0;
   }

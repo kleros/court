@@ -85,6 +85,7 @@
     text-align: center;
     flex-direction: column;
     height: auto;
+    padding: 18px 16px;
   }
 
   .footer-left,

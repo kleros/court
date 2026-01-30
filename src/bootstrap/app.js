@@ -323,6 +323,12 @@ const StyledTrayCol = styled(Col)`
   align-items: center;
   justify-content: flex-end;
   height: 64px;
+
+  @media (max-width: 575px) {
+    height: auto;
+    min-height: 64px;
+    padding: 8px 0;
+  }
 `;
 
 const StyledMenu = styled(Menu)`
@@ -366,12 +372,20 @@ const StyledLayoutContent = styled(Layout.Content)`
   // The header takes exactly 64px
   min-height: calc(100vh - 64px);
   padding: 0px 9.375vw 120px 9.375vw;
+
+  @media (max-width: 768px) {
+    padding: 0px 16px 80px 16px;
+  }
 `;
 
 const StyledLayoutHeader = styled(Layout.Header)`
   height: auto;
   line-height: initial;
   background-color: ${({ theme }) => theme.headerBackground};
+
+  @media (max-width: 575px) {
+    padding: 0 16px;
+  }
 `;
 
 const StyledTray = styled.div`
@@ -381,6 +395,12 @@ const StyledTray = styled.div`
 
   > * {
     min-width: 0;
+  }
+
+  @media (max-width: 575px) {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
   }
 `;
 

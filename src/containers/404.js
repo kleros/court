@@ -38,6 +38,10 @@ const StyledDiv = styled.div`
   min-height: ${(props) => (props.Web3 ? "100vh" : "calc(100vh - 64px - 56px)")};
   ${(props) => !props.Web3 && "margin: 0 -9.375vw -62px;"}
   background: ${({ theme }) => theme.bodyBackground};
+
+  @media (max-width: 768px) {
+    ${(props) => !props.Web3 && "margin: 0 -16px -62px;"}
+  }
 `;
 
 const StyledAcropolis = styled(Acropolis)`
@@ -104,6 +108,10 @@ const StyledInfoDiv = styled.div`
   padding: 0 9.375vw 62px;
   text-align: center;
   background: ${({ theme }) => theme.bodyBackground};
+
+  @media (max-width: 768px) {
+    padding: 0 16px 62px;
+  }
 `;
 
 const Styled404Div = styled.div`

@@ -937,7 +937,7 @@ const StyledCard = styled(Card)`
       background: ${({ theme }) => theme.cardBackground};
 
       @media (max-width: 767px) {
-        margin: 0 23px;
+        margin: 0 16px;
       }
 
       &-title {
@@ -950,7 +950,7 @@ const StyledCard = styled(Card)`
       padding: 44px 46px 23px;
 
       @media (max-width: 767px) {
-        padding: 44px 23px 23px;
+        padding: 44px 16px 16px;
       }
     }
 

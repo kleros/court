@@ -94,6 +94,8 @@ SwitchNetworkButton.propTypes = {
 };
 
 const StyledModal = styled(Modal)`
+  max-width: calc(100vw - 32px);
+
   .ant-modal-content {
     background: ${({ theme }) => theme.componentBackground};
   }
@@ -108,6 +110,10 @@ const StyledModal = styled(Modal)`
     line-height: 1.33;
     text-align: center;
     color: ${({ theme }) => theme.textPrimary};
+
+    @media (max-width: 575px) {
+      font-size: 24px;
+    }
   }
 
   .ant-modal-body {
