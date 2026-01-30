@@ -200,7 +200,7 @@ export const ThemeProvider = ({ children }) => {
   const [themeName, setThemeName] = useState("light");
 
   useEffect(() => {
-    if (persistedTheme) {
+    if (persistedTheme === "light" || persistedTheme === "dark") {
       setThemeName(persistedTheme);
     } else if (window.matchMedia?.("(prefers-color-scheme: dark)").matches) {
       setThemeName("dark");

@@ -373,7 +373,7 @@ const StyledCascader = styled(Cascader)`
 
     ul:nth-child(3n) {
       .ant-cascader-menu-item-active {
-        background: ${({ theme }) => theme.primaryColor};
+        background: ${({ theme }) => theme.primaryPurple};
       }
     }
 
