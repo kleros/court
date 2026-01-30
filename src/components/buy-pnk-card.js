@@ -242,7 +242,7 @@ const StyledInputNumberRight = styled(StyledInputNumber)`
   }
 `;
 const StyledDiv = styled.div`
-  border: 3px solid ${({ theme }) => theme.textOnPurple};
+  border: 2px solid ${({ theme }) => (theme.name === "dark" ? theme.borderColor : theme.textOnPurple)};
   border-radius: 3px;
   color: ${({ theme }) => theme.textOnPurple};
   font-size: 14px;
@@ -264,4 +264,12 @@ const StyledPoweredByDiv = styled.div`
 const StyledButton = styled(Button)`
   border-radius: 3px;
   width: 100%;
+
+  &[disabled],
+  &[disabled]:hover,
+  &[disabled]:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.45);
+  }
 `;

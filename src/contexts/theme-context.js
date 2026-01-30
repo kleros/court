@@ -145,7 +145,7 @@ export const darkTheme = {
   menuDarkBackground: "#4a3d6e",
   menuDarkItemActive: "#6ea8d8",
   spinDotColor: "#6ea8d8",
-  dividerColor: "#4a3d6e",
+  dividerColor: "rgba(255, 255, 255, 0.08)",
   // Icon fills
   hexagonFill: "#6b5895",
   primaryFill: "#6ea8d8",

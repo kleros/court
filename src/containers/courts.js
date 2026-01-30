@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import styled from "styled-components/macro";
 import { Link } from "react-router-dom";
-import { Button, Col, Divider, Row, Spin } from "antd";
+import { Button, Col, Row, Spin } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import SwitchCourtChain from "../components/side-chain/switch-court-chain";
@@ -67,10 +67,17 @@ export default function Courts() {
         <Row gutter={40}>
           {juror &&
             (juror.subcourtIDs.filter((ID) => ID !== "0").length === 0 ? (
-              <>
-                <Divider />
-                <StyledCol>You have not joined any courts yet.</StyledCol>
-              </>
+              <StyledEmptyState>
+                <StyledEmptyStateIcon>
+                  <span role="img" aria-label="scales of justice">
+                    ⚖️
+                  </span>
+                </StyledEmptyStateIcon>
+                <StyledEmptyStateTitle>You have not joined any courts yet</StyledEmptyStateTitle>
+                <StyledEmptyStateDescription>
+                  Click &ldquo;Join a Court&rdquo; above to stake PNK and start earning rewards as a juror.
+                </StyledEmptyStateDescription>
+              </StyledEmptyState>
             ) : (
               [...new Set(juror.subcourtIDs)]
                 .filter((ID) => ID !== "0")
@@ -107,12 +114,38 @@ export default function Courts() {
   );
 }
 
-const StyledCol = styled(Col)`
-  color: ${({ theme }) => theme.borderColor};
-  font-size: 24px;
-  font-weight: 500;
-  line-height: 28px;
+const StyledEmptyState = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  margin: 24px auto;
+  max-width: 540px;
+  background: ${({ theme }) => theme.elevatedBackground};
+  border: 1px solid ${({ theme }) => theme.borderColor};
+  border-radius: 12px;
   text-align: center;
+`;
+
+const StyledEmptyStateIcon = styled.div`
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: ${({ theme }) => (theme.name === "dark" ? 0.9 : 0.7)};
+`;
+
+const StyledEmptyStateTitle = styled.h3`
+  color: ${({ theme }) => theme.textPrimary};
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+`;
+
+const StyledEmptyStateDescription = styled.p`
+  color: ${({ theme }) => theme.textSecondary};
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.5;
 `;
 
 const StyledButtonBar = styled.div`

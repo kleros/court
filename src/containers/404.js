@@ -110,7 +110,7 @@ const Styled404Div = styled.div`
   font-size: 88px;
   font-weight: bold;
   line-height: 112px;
-  color: ${({ theme }) => theme.primaryColor};
+  color: ${({ theme }) => theme.pageTitle};
 `;
 
 const StyledMessageLine2 = styled.div`
@@ -128,6 +128,6 @@ const StyledSpin = styled(Spin)`
   margin: 16px 0;
 
   .ant-spin-dot-item {
-    background-color: ${({ theme }) => theme.primaryColor};
+    background-color: ${({ theme }) => theme.accentPurple};
   }
 `;

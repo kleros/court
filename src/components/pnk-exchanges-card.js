@@ -16,23 +16,25 @@ import styled from "styled-components/macro";
 const StyledExchangeCard = styled.a`
   align-items: center;
   justify-content: center;
-  background: ${({ theme }) => theme.cardBackground};
+  background: ${({ theme }) => theme.whiteBackground};
   border-radius: 12px;
   box-shadow: ${({ theme }) => theme.cardShadow};
+  border: 1px solid ${({ theme }) => theme.borderColor};
   display: flex;
   height: 40px;
   padding: 40px 26px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: ${({ theme }) => (theme.name === "dark" ? "0px 6px 24px rgba(0, 0, 0, 0.6)" : theme.cardShadow)};
+  }
 
   svg,
   img {
     vertical-align: middle;
     max-width: 80%;
     max-height: 70px;
-    ${({ theme }) =>
-      theme.name === "dark" &&
-      `
-      filter: invert(1) hue-rotate(180deg);
-    `}
   }
 `;
 

@@ -351,6 +351,11 @@ const StyledCascader = styled(Cascader)`
     ul:nth-child(1) {
       background: ${({ theme }) => theme.secondaryPurple};
       border-radius: 0px;
+
+      /* First column always has purple bg, so loading icons should be white */
+      .ant-cascader-menu-item-loading-icon .anticon {
+        color: ${({ theme }) => theme.textOnPurple};
+      }
     }
 
     ul:nth-child(3n + 1) {
@@ -368,6 +373,24 @@ const StyledCascader = styled(Cascader)`
     ul:nth-child(3n) {
       .ant-cascader-menu-item-active {
         background: ${({ theme }) => theme.primaryColor};
+      }
+    }
+
+    /* Loading spinner colors for all menu items */
+    .ant-cascader-menu-item-loading-icon {
+      .anticon-loading,
+      .anticon-loading svg,
+      .anticon {
+        color: ${({ theme }) => theme.textSecondary};
+      }
+    }
+
+    /* Loading spinner in active items should be white */
+    .ant-cascader-menu-item-active .ant-cascader-menu-item-loading-icon {
+      .anticon-loading,
+      .anticon-loading svg,
+      .anticon {
+        color: ${({ theme }) => theme.textOnPurple};
       }
     }
   }
