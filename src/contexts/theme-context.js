@@ -111,7 +111,7 @@ export const darkTheme = {
   elevatedBackground: "#2d2541",
   cardBackground: "#221b2e",
   cardShadow: "0px 4px 20px rgba(0, 0, 0, 0.5)",
-  headerBackground: "#221b2e",
+  headerBackground: "#1e1829",
   cardHeaderBackground: "#2a2340",
   cardActionsBackground: "#2d2541",
   borderColor: "#3d3456",

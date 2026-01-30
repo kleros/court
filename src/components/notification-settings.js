@@ -25,6 +25,14 @@ const StyledForm = styled(Form)`
   p {
     color: ${({ theme }) => theme.textSecondary};
   }
+
+  a {
+    color: ${({ theme }) => theme.linkColor};
+  }
+
+  .ant-divider-inner-text {
+    color: ${({ theme }) => theme.textSecondary};
+  }
 `;
 
 const StyledMail = styled(Mail)`

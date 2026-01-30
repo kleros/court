@@ -285,6 +285,10 @@ const GlobalStyle = createGlobalStyle`
     border-top-color: ${({ theme }) => theme.dividerColor} !important;
   }
 
+  .ant-divider-inner-text {
+    color: ${({ theme }) => theme.textSecondary};
+  }
+
   /* Ant Design Skeleton Overrides */
   .ant-skeleton-content .ant-skeleton-title,
   .ant-skeleton-content .ant-skeleton-paragraph > li,

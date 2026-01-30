@@ -101,4 +101,13 @@ const StyledIdentity = styled.div`
 
 const StyledViewOnlyDiv = styled.div`
   max-width: 360px;
+  color: ${({ theme }) => theme.textSecondary};
+
+  p {
+    color: ${({ theme }) => theme.textSecondary};
+  }
+
+  a {
+    color: ${({ theme }) => theme.linkColor};
+  }
 `;
