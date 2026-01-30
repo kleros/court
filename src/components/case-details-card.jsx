@@ -1195,7 +1195,7 @@ const StyledIframeContainer = styled.div`
     ${({ theme }) =>
       theme.name === "dark" &&
       `
-      filter: invert(0.88) hue-rotate(180deg) saturate(1.2) brightness(0.9) contrast(0.9) sepia(0.15);
+      filter: invert(0.9) hue-rotate(200deg) saturate(0.8) brightness(0.85) contrast(0.95);
     `}
   }
 `;
