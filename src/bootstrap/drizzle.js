@@ -123,7 +123,7 @@ function createDrizzle({ fallbackChainId, customProvider } = {}) {
  * such param in links to make sure the user will be redirected to the
  * right case on the right network.
  *
- * If the user e-mail client opens the link in a brower that is not
+ * If the user e-mail client opens the link in a browser that is not
  * web3-ready, this will guarantee that the Drizzle fallback URL points
  * them to the right network.
  *
