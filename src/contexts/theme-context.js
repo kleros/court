@@ -208,6 +208,8 @@ export const ThemeProvider = ({ children }) => {
   }, [persistedTheme]);
 
   useEffect(() => {
+    // Set on both html and body for CSS selector compatibility
+    document.documentElement.setAttribute("data-theme", themeName);
     document.body.setAttribute("data-theme", themeName);
   }, [themeName]);
 

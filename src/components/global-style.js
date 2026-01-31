@@ -30,7 +30,13 @@ const GlobalStyle = createGlobalStyle`
   body {
     background-color: ${({ theme }) => theme.bodyBackground};
     color: ${({ theme }) => theme.textSecondary};
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 1s ease, color 1s ease;
+  }
+
+  /* Ant Design Layout Overrides */
+  .ant-layout {
+    background: ${({ theme }) => theme.bodyBackground};
+    transition: background-color 1s ease;
   }
 
   /* Ant Design Card Overrides */
