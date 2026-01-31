@@ -16,13 +16,18 @@ export default function createWatchToken({ getChainParams }) {
     const tokenParams = getChainParams(chainId)?.tokens ?? {};
     const tokenData = tokenParams[token];
 
-    if (tokenData && !isAssetWatched({ ...tokenData, chainId })) {
-      try {
-        await addToken(provider, tokenData);
-        storeWatchedAsset({ ...tokenData, chainId });
-      } catch (err) {
-        console.warn(`Error when adding token ${token}:`, err);
-      }
+    if (!tokenData || isAssetWatched({ ...tokenData, chainId })) {
+      return;
+    }
+
+    // Store BEFORE calling addToken - if user refreshes during wallet popup,
+    // we don't want to prompt again
+    storeWatchedAsset({ ...tokenData, chainId });
+
+    try {
+      await addToken(provider, tokenData);
+    } catch (err) {
+      console.warn(`Error when adding token ${token}:`, err);
     }
   };
 }
