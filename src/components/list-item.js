@@ -4,7 +4,7 @@ import styled from "styled-components/macro";
 import { List } from "antd";
 
 const StyledListItem = styled(List.Item)`
-  color: #4004a3;
+  color: ${({ theme }) => theme.textPrimary};
   font-weight: bold;
   padding-left: 19px;
   padding-right: 19px;

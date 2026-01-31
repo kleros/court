@@ -5,20 +5,20 @@ import styled from "styled-components";
 import EvidenceCard from "./evidence-card";
 
 const StyledHeaderCol = styled(Col)`
-  color: #4d00b4;
+  color: ${({ theme }) => theme.textPrimary};
   font-size: 18px;
   font-weight: 500;
   line-height: 21px;
 `;
 const StyledDividerCol = styled(Col)`
-  border-right: 1px solid #4d00b4;
+  border-right: 1px solid ${({ theme }) => theme.primaryPurple};
   height: 30px;
   width: 50%;
 `;
 const EventDiv = styled.div`
-  background: #4d00b4;
+  background: ${({ theme }) => theme.primaryPurple};
   border-radius: 300px;
-  color: white;
+  color: ${({ theme }) => theme.textOnPurple};
   font-size: 12px;
   font-weight: 500;
   line-height: 14px;
@@ -29,7 +29,7 @@ const EventDiv = styled.div`
   width: 135px;
 `;
 const ScrollText = styled.div`
-  color: #009aff;
+  color: ${({ theme }) => theme.primaryColor};
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;

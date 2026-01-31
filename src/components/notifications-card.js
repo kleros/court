@@ -92,13 +92,13 @@ const StyledBellContainer = styled.div`
     height: 30px;
     width: 30px;
     path {
-      fill: #fff;
+      fill: ${({ theme }) => theme.textOnPurple};
     }
   }
 `;
 
 const StyledListItem = styled(ListItem)`
-  border: 1px solid #d09cff;
+  border: 1px solid ${({ theme }) => theme.borderColor};
   padding: 12px 30px;
 
   .ant-list-item-extra {
@@ -120,7 +120,7 @@ const StyledNotificationText = styled.div`
 `;
 
 const StyledAlertContainer = styled.div`
-  background: #009aff;
+  background: ${({ theme }) => theme.primaryColor};
   border-radius: 50%;
   height: 25px;
   width: 25px;
@@ -132,7 +132,7 @@ const StyledAlertContainer = styled.div`
     top: 4px;
     width: 15px;
     path {
-      fill: #fff;
+      fill: ${({ theme }) => theme.textOnPurple};
     }
   }
 `;

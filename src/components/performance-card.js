@@ -21,7 +21,7 @@ const StyledDiv = styled.div`
   }
 `;
 const StyledText = styled.div`
-  color: #4004a3;
+  color: ${({ theme }) => theme.textPrimary};
   font-size: 18px;
   margin-top: 15px;
   text-align: center;

@@ -1,17 +1,21 @@
-import { Button, Col, Row } from 'antd'
-import React from 'react'
-import styled from 'styled-components'
-import stakeImg from '../assets/images/stake-kleros-logo.png'
-import { ReactComponent as Hexagon } from '../assets/images/hexagon.svg'
+import { Button, Col, Row } from "antd";
+import React from "react";
+import styled from "styled-components";
+import stakeImg from "../assets/images/stake-kleros-logo.png";
+import { ReactComponent as Hexagon } from "../assets/images/hexagon.svg";
 
 const StyledOTCCard = styled.div`
-  background: linear-gradient(111.31deg, #4d00b4 19.55%, #6500b4 40.51%);
+  background: linear-gradient(
+    111.31deg,
+    ${({ theme }) => theme.gradientStart} 19.55%,
+    ${({ theme }) => theme.gradientEnd} 40.51%
+  );
   border-radius: 12px;
-  color: #ffffff;
+  color: ${({ theme }) => theme.textOnPurple};
   min-height: 100px;
   padding: 24px;
   width: 100%;
-`
+`;
 const StyledPrefixDiv = styled.div`
   left: 29px;
   position: absolute;
@@ -21,31 +25,49 @@ const StyledPrefixDiv = styled.div`
   @media (max-width: 991px) {
     top: 33px;
   }
-`
+`;
 const IconDiv = styled.div`
   margin-top: 15px;
-`
+`;
 const ButtonDiv = styled.div`
   margin-top: 30px;
   @media (max-width: 991px) {
     margin-bottom: 30px;
   }
-`
+`;
 const StyledTextSmall = styled.div`
   font-size: 14px;
   font-weight: 500;
   margin: 0px;
   text-align: left;
-`
+`;
 const StyledTextLarge = styled.div`
   font-size: 24px;
   margin: 0px;
   text-align: left;
-`
+`;
 const StyledButton = styled(Button)`
-  margin-top: '12px';
-  max-width: '150px';
-`
+  margin-top: "12px";
+  max-width: "150px";
+
+  &.ant-btn-primary {
+    background-color: transparent;
+    border: 2px solid ${({ theme }) => theme.textOnPurple};
+    color: ${({ theme }) => theme.textOnPurple};
+
+    &:hover,
+    &:focus {
+      background-color: ${({ theme }) => theme.buttonHoverOverlay};
+      border-color: ${({ theme }) => theme.textOnPurple};
+      color: ${({ theme }) => theme.textOnPurple};
+    }
+
+    a {
+      color: ${({ theme }) => theme.textOnPurple} !important;
+      text-decoration: none;
+    }
+  }
+`;
 
 const OTCCard = () => (
   <StyledOTCCard>
@@ -60,12 +82,9 @@ const OTCCard = () => (
       </Col>
       <Col lg={16} offset={1}>
         <IconDiv>
-          <StyledTextLarge>
-            If you're interested in acquiring PNK tokens OTC, get in touch
-          </StyledTextLarge>
+          <StyledTextLarge>If you&apos;re interested in acquiring PNK tokens OTC, get in touch</StyledTextLarge>
           <StyledTextSmall>
-            In order to ensure fair token distribution, tokens are sold to
-            buyers at prices reflected by the market.
+            In order to ensure fair token distribution, tokens are sold to buyers at prices reflected by the market.
           </StyledTextSmall>
         </IconDiv>
       </Col>
@@ -80,6 +99,6 @@ const OTCCard = () => (
       </Col>
     </Row>
   </StyledOTCCard>
-)
+);
 
-export default OTCCard
+export default OTCCard;

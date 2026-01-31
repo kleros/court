@@ -12,7 +12,7 @@ import useGetDraws from "../hooks/use-get-draws";
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
 const StyledDiv = styled.div`
-  background: whitesmoke;
+  background: ${({ theme }) => theme.elevatedBackground};
   padding: 30px 22px;
   position: relative;
   text-align: center;

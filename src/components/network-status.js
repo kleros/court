@@ -76,12 +76,14 @@ const networkStatusToBadgeStatus = {
 
 const StyledMenu = styled(Menu)`
   border-radius: 4px;
+  background: ${({ theme }) => theme.componentBackground};
+  border: 1px solid ${({ theme }) => theme.borderColor};
 `;
 
 const StyledBadge = styled(Badge)`
   white-space: nowrap;
   cursor: pointer;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: ${({ theme }) => theme.headerSkeletonBase};
   border-radius: 24px;
   padding: 8px 12px;
   font-weight: 400;
@@ -89,19 +91,19 @@ const StyledBadge = styled(Badge)`
 
   :hover,
   :focus {
-    background-color: rgba(255, 255, 255, 0.25);
+    background-color: ${({ theme }) => theme.headerSkeletonHighlight};
   }
 
   &.initialized {
-    color: #52c41a;
+    color: ${({ theme }) => theme.successColor};
   }
 
   &.initializing {
-    color: #faad14;
+    color: ${({ theme }) => theme.warningColor};
   }
 
   &.failed {
-    color: #f5222d;
+    color: ${({ theme }) => theme.errorColor};
   }
 
   .ant-badge-status-dot {
@@ -110,7 +112,7 @@ const StyledBadge = styled(Badge)`
   }
 
   .ant-badge-status-text {
-    color: #fff;
+    color: ${({ theme }) => theme.textOnPurple};
   }
 `;
 
@@ -129,9 +131,9 @@ const StyledSkeleton = styled(Skeleton)`
       border-radius: 4px;
       background-image: linear-gradient(
         90deg,
-        rgba(242, 242, 242, 0.25) 25%,
-        rgba(230, 230, 230, 0.25) 37%,
-        rgba(242, 242, 242, 0.25) 63%
+        ${({ theme }) => theme.headerSkeletonBase} 25%,
+        ${({ theme }) => theme.headerSkeletonHighlight} 37%,
+        ${({ theme }) => theme.headerSkeletonBase} 63%
       ) !important;
     }
   }

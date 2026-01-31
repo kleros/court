@@ -158,18 +158,53 @@ const StyledButtonBar = styled.div`
 const StyledButton = styled(Button)`
   box-shadow: none;
   text-shadow: none;
+
+  &.ant-btn-secondary,
+  &[type="secondary"] {
+    background: ${({ theme }) => theme.componentBackground};
+    border: 1px solid ${({ theme }) => theme.primaryPurple};
+    color: ${({ theme }) => theme.primaryPurple};
+
+    &:hover,
+    &:focus {
+      background: ${({ theme }) => theme.elevatedBackground};
+      border-color: ${({ theme }) => theme.primaryPurple};
+      color: ${({ theme }) => theme.primaryPurple};
+    }
+  }
 `;
 
 const StyledClaimButton = styled(StyledButton)`
-  background-color: #9013fe;
-  border: none;
+  &&& {
+    background: ${({ theme }) =>
+      theme.name === "dark"
+        ? `linear-gradient(111.6deg, #7b4bc4 20%, #9b6dd8 80%)`
+        : `linear-gradient(111.6deg, ${theme.gradientStart} 46.25%, ${theme.gradientEnd} 96.25%)`};
+    border: none;
+    color: ${({ theme }) => theme.textOnPurple};
 
-  :hover,
-  :focus {
-    background-color: #a541fe;
-  }
+    span {
+      color: ${({ theme }) => theme.textOnPurple};
+    }
 
-  :active {
-    background-color: #6601be;
+    &:hover,
+    &:focus {
+      background: ${({ theme }) =>
+        theme.name === "dark"
+          ? `linear-gradient(111.6deg, #9b6dd8 20%, #7b4bc4 80%)`
+          : `linear-gradient(111.6deg, ${theme.gradientEnd} 46.25%, ${theme.gradientStart} 96.25%)`};
+      color: ${({ theme }) => theme.textOnPurple};
+
+      span {
+        color: ${({ theme }) => theme.textOnPurple};
+      }
+    }
+
+    &:active {
+      background: ${({ theme }) =>
+        `linear-gradient(111.6deg, ${theme.gradientStart} 46.25%, ${theme.gradientEnd} 96.25%)`};
+      filter: brightness(0.9);
+      color: ${({ theme }) => theme.textOnPurple};
+    }
   }
 `;

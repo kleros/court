@@ -15,16 +15,20 @@ const StyledCard = styled(Card)`
 
   .ant-card {
     &-body {
-      background: white;
+      background: ${({ theme }) => theme.cardBackground};
       border-radius: 12px;
-      box-shadow: 0px 6px 36px #bc9cff;
+      box-shadow: ${({ theme }) => theme.cardShadow};
       padding: 0;
     }
     &-head {
-      background: linear-gradient(111.6deg, #4d00b4 46.25%, #6500b4 96.25%);
+      background: linear-gradient(
+        111.6deg,
+        ${({ theme }) => theme.gradientStart} 46.25%,
+        ${({ theme }) => theme.gradientEnd} 96.25%
+      );
       border-top-left-radius: 12px;
       border-top-right-radius: 12px;
-      color: white;
+      color: ${({ theme }) => theme.textOnPurple};
       margin: 0 0 11px;
     }
   }
@@ -79,7 +83,7 @@ const StyledUnderline = styled(Underline)`
   width: 100%;
 `;
 const StyledDivider = styled.div`
-  border-bottom: 1px solid #d09cff;
+  border-bottom: 1px solid ${({ theme }) => theme.borderColor};
   margin: 0;
   width: 100%;
 `;
@@ -91,12 +95,12 @@ const StyledTooltipDiv = styled.span`
   right: 18px;
   top: 42.5px;
   .ant-tooltip-arrow {
-    border-top-color: #009aff;
+    border-top-color: ${({ theme }) => theme.primaryColor};
   }
 
   .ant-tooltip-inner {
-    background-color: #009aff;
-    color: white;
+    background-color: ${({ theme }) => theme.primaryColor};
+    color: ${({ theme }) => theme.textOnPurple};
     min-width: 200px;
     padding: 16px;
     white-space: break-spaces;

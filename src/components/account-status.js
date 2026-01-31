@@ -33,9 +33,9 @@ const StyledAccountStatus = styled.button`
   gap: 8px;
   align-items: center;
   cursor: pointer;
-  color: white;
+  color: ${({ theme }) => theme.textOnPurple};
   border: none;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: ${({ theme }) => theme.headerSkeletonBase};
   border-radius: 24px;
   padding: 8px 12px;
   font-weight: 400;
@@ -43,7 +43,7 @@ const StyledAccountStatus = styled.button`
 
   :hover,
   :focus {
-    background-color: rgba(255, 255, 255, 0.25);
+    background-color: ${({ theme }) => theme.headerSkeletonHighlight};
   }
 
   .address {

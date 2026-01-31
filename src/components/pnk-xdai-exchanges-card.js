@@ -5,18 +5,24 @@ import styled from "styled-components/macro";
 const StyledExchangeCard = styled.a`
   align-items: center;
   justify-content: center;
-  background: white;
+  background: ${({ theme }) => theme.cardBackground};
   border-radius: 12px;
-  box-shadow: 0px 6px 36px #bc9cff;
+  box-shadow: ${({ theme }) => theme.cardShadow};
   display: flex;
   height: 40px;
   padding: 40px 26px;
+  overflow: hidden;
 
   svg,
   img {
     vertical-align: middle;
     max-width: 80%;
     max-height: 70px;
+    ${({ theme }) =>
+      theme.name === "dark" &&
+      `
+      filter: invert(1) hue-rotate(180deg);
+    `}
   }
 `;
 

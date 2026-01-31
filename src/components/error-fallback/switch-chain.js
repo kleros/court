@@ -50,18 +50,21 @@ const StyledModal = styled(Modal)`
     width: 80%;
     left: 50%;
     transform: translateX(-50%);
+    background: ${({ theme }) => theme.componentBackground};
   }
   .ant-modal-body {
     border-radius: 0.5rem;
+    background: ${({ theme }) => theme.componentBackground};
   }
 
   h2 {
     margin: 0 0 5px 0;
     font-size: 14px;
+    color: ${({ theme }) => theme.textPrimary};
   }
 
   p {
-    color: #3c424299;
+    color: ${({ theme }) => theme.textMutedLight};
     font-size: 11px;
   }
   @media only screen and (min-width: 768px) {
@@ -77,7 +80,7 @@ const StyledModal = styled(Modal)`
     }
 
     p {
-      color: #3c424299;
+      color: ${({ theme }) => theme.textMutedLight};
       font-size: 14px;
     }
   }
@@ -87,6 +90,18 @@ const StyledButton = styled(Button)`
   width: 100%;
   height: 50px;
   font-size: 14px;
+  background: ${({ theme }) => theme.primaryColor};
+  border-color: ${({ theme }) => theme.primaryColor};
+  color: ${({ theme }) => theme.primaryButtonText};
+
+  &:hover,
+  &:focus {
+    background: ${({ theme }) => theme.primaryColor};
+    border-color: ${({ theme }) => theme.primaryColor};
+    color: ${({ theme }) => theme.primaryButtonText};
+    filter: brightness(1.1);
+  }
+
   @media only screen and (min-width: 768px) {
     font-size: 20px;
   }
@@ -98,8 +113,8 @@ const StyledWrapper = styled.ul`
   margin: 0 0 20px 0;
   overflow: auto;
   list-style-type: none;
-  border: 1px solid #ededed;
-  background: #e9dfed73;
+  border: 1px solid ${({ theme }) => theme.borderColor};
+  background: ${({ theme }) => theme.elevatedBackground};
   border-radius: 10px;
   ::-webkit-scrollbar {
     display: none;
@@ -112,12 +127,12 @@ const StyledLine = styled.li`
   font-size: 14px;
   border-radius: 10px;
   cursor: pointer;
-  background: ${(props) => props.isActive && "#999cff"};
-  color: ${(props) => props.isActive && "white"};
+  background: ${({ isActive, theme }) => isActive && theme.selectActiveBackground};
+  color: ${({ isActive, theme }) => isActive && theme.textOnPurple};
 
   &:hover {
-    background: ${(props) => !props.isActive && "#e3cfee"};
-    color: ${(props) => !props.isActive && "#4d50b4"};
+    background: ${({ isActive, theme }) => !isActive && theme.selectHoverBackground};
+    color: ${({ isActive, theme }) => !isActive && theme.selectHoverText};
   }
 
   @media only screen and (min-width: 768px) {
@@ -126,12 +141,12 @@ const StyledLine = styled.li`
     font-size: 18px;
     border-radius: 10px;
     cursor: pointer;
-    background: ${(props) => props.isActive && "#999cff"};
-    color: ${(props) => props.isActive && "white"};
+    background: ${({ isActive, theme }) => isActive && theme.selectActiveBackground};
+    color: ${({ isActive, theme }) => isActive && theme.textOnPurple};
 
     &:hover {
-      background: ${(props) => !props.isActive && "#e3cfee"};
-      color: ${(props) => !props.isActive && "#4d50b4"};
+      background: ${({ isActive, theme }) => !isActive && theme.selectHoverBackground};
+      color: ${({ isActive, theme }) => !isActive && theme.selectHoverText};
     }
   }
 `;

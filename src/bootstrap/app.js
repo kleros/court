@@ -14,6 +14,9 @@ import WalletConnector from "../components/wallet-connector";
 import { getLastConnectedWalletProvider, detectWalletsAsync } from "../bootstrap/wallet-connector";
 import Footer from "../components/footer";
 import NotificationSettings from "../components/notification-settings";
+import ThemeToggle from "../components/theme-toggle";
+import GlobalStyle from "../components/global-style";
+import { ThemeProvider } from "../contexts/theme-context";
 import { ChainIdProvider } from "../hooks/use-chain-id";
 import ChainChangeWatcher from "./chain-change-watcher";
 import { DrizzleProvider, Initializer, createDrizzle, detectRequiredChainId, useDrizzle } from "./drizzle";
@@ -65,25 +68,34 @@ export default function App() {
   };
 
   if (checkingProvider) {
-    return <StyledSpin tip="Checking wallet…" />;
+    return (
+      <ThemeProvider>
+        <GlobalStyle />
+        <StyledSpin tip="Checking wallet…" />
+      </ThemeProvider>
+    );
   }
 
   if (!customDrizzle) {
-    //User hasn’t connected a wallet yet - show simple placeholder screen with wallet selector.
+    //User hasn't connected a wallet yet - show simple placeholder screen with wallet selector.
     return (
-      <StyledContainer>
-        <StyledAlert
-          message="Wallet required"
-          description="Please connect a wallet for the best experience on Kleros Court."
-          type="info"
-        />
-        <WalletConnector onProviderConnected={handleWalletConnected} />
-      </StyledContainer>
+      <ThemeProvider>
+        <GlobalStyle />
+        <StyledContainer>
+          <StyledAlert
+            message="Wallet required"
+            description="Please connect a wallet for the best experience on Kleros Court."
+            type="info"
+          />
+          <WalletConnector onProviderConnected={handleWalletConnected} />
+        </StyledContainer>
+      </ThemeProvider>
     );
   }
 
   return (
-    <>
+    <ThemeProvider>
+      <GlobalStyle />
       <Helmet>
         <title>Kleros · Court</title>
         <link href="https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i,700,700i" rel="stylesheet" />
@@ -126,6 +138,7 @@ export default function App() {
                               <NetworkStatus />
                               <AccountStatus />
                               <NotificationSettings />
+                              <ThemeToggle />
                             </StyledTray>
                           </StyledTrayCol>
                         </Row>
@@ -180,7 +193,7 @@ export default function App() {
           </DrizzleChainIdProvider>
         </Initializer>
       </DrizzleProvider>
-    </>
+    </ThemeProvider>
   );
 }
 
@@ -199,6 +212,14 @@ const StyledSpin = styled(Spin)`
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
+
+  .ant-spin-dot-item {
+    background-color: ${({ theme }) => theme.primaryPurple};
+  }
+
+  .ant-spin-text {
+    color: ${({ theme }) => theme.textPrimary};
+  }
 `;
 
 const C404 = loadable(() => import(/* webpackPrefetch: true */ "../containers/404"), {
@@ -263,7 +284,7 @@ const StyledLayoutSider = styled(Layout.Sider)`
   height: 100%;
   position: fixed;
   z-index: 2000;
-  background-color: #4d00b4;
+  background-color: ${({ theme }) => theme.headerBackground};
 
   @media (min-width: 768px) {
     display: none;
@@ -273,7 +294,7 @@ const StyledLayoutSider = styled(Layout.Sider)`
     right: -50px;
     top: 12px;
     width: 50px;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: ${({ theme }) => theme.menuTriggerBackground};
   }
 
   .ant-menu-dark {
@@ -302,6 +323,12 @@ const StyledTrayCol = styled(Col)`
   align-items: center;
   justify-content: flex-end;
   height: 64px;
+
+  @media (max-width: 575px) {
+    height: auto;
+    min-height: 64px;
+    padding: 8px 0;
+  }
 `;
 
 const StyledMenu = styled(Menu)`
@@ -315,11 +342,16 @@ const StyledMenu = styled(Menu)`
 
   && {
     .ant-menu-item > a {
-      color: rgba(255, 255, 255, 0.85);
+      color: ${({ theme }) => theme.textOnPurple};
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+      opacity: 0.85;
 
-      &.hover,
-      &.focus {
-        color: rgba(255, 255, 255, 1);
+      &:hover,
+      &:focus {
+        color: ${({ theme }) => theme.textOnPurple};
+        text-decoration: none;
+        opacity: 0.7;
       }
     }
 
@@ -327,23 +359,33 @@ const StyledMenu = styled(Menu)`
       background-color: transparent !important;
 
       > a {
-        color: rgba(255, 255, 255, 1);
+        color: ${({ theme }) => theme.textOnPurple};
+        text-decoration: none;
+        opacity: 1;
       }
     }
   }
 `;
 
 const StyledLayoutContent = styled(Layout.Content)`
-  background: #f2e3ff;
+  background: ${({ theme }) => theme.bodyBackground};
   // The header takes exactly 64px
   min-height: calc(100vh - 64px);
   padding: 0px 9.375vw 120px 9.375vw;
+
+  @media (max-width: 768px) {
+    padding: 0px 16px 80px 16px;
+  }
 `;
 
 const StyledLayoutHeader = styled(Layout.Header)`
   height: auto;
   line-height: initial;
-  background-color: #4d00b4;
+  background-color: ${({ theme }) => theme.headerBackground};
+
+  @media (max-width: 575px) {
+    padding: 0 16px;
+  }
 `;
 
 const StyledTray = styled.div`
@@ -353,6 +395,12 @@ const StyledTray = styled.div`
 
   > * {
     min-width: 0;
+  }
+
+  @media (max-width: 575px) {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
   }
 `;
 
@@ -387,7 +435,7 @@ const StyledContainer = styled.div`
   align-items: center;
   min-height: 100vh;
   width: 100%;
-  background: #f2e3ff;
+  background: ${({ theme }) => theme.bodyBackground};
   gap: 24px;
 `;
 
@@ -395,4 +443,18 @@ const StyledAlert = styled(Alert)`
   margin-top: 24px;
   width: 80%;
   text-align: center;
+  background: ${({ theme }) => theme.alertInfoBackground};
+  border-color: ${({ theme }) => theme.alertInfoBorder};
+
+  .ant-alert-message {
+    color: ${({ theme }) => theme.textPrimary};
+  }
+
+  .ant-alert-description {
+    color: ${({ theme }) => theme.textSecondary};
+  }
+
+  .ant-alert-icon {
+    color: ${({ theme }) => theme.primaryColor};
+  }
 `;

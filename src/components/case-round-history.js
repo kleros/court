@@ -172,9 +172,10 @@ const StyledRadioGroup = styled(Radio.Group)`
   width: 100%;
 
   .ant-radio-button-wrapper {
-    border: 1px solid #4d00b4 !important;
+    border: 1px solid ${({ theme }) => theme.primaryPurple} !important;
     border-radius: 300px !important;
-    color: #4d00b4;
+    color: ${({ theme }) => theme.primaryPurple};
+    background: ${({ theme }) => theme.componentBackground};
     margin-bottom: 15px;
     text-align: center;
     width: 95%;
@@ -184,12 +185,13 @@ const StyledRadioGroup = styled(Radio.Group)`
     }
 
     &-checked {
-      background: #4d00b4 !important;
+      background: ${({ theme }) => theme.primaryPurple} !important;
+      color: ${({ theme }) => theme.textOnPurple} !important;
     }
   }
 
   .ant-radio-button-wrapper-disabled.ant-radio-button-wrapper-checked {
-    background: #e6e6e6 !important;
+    background: ${({ theme }) => theme.disabledColor} !important;
   }
 `;
 
@@ -198,10 +200,10 @@ const Box = styled.div`
 `;
 
 const RoundSelectBox = styled(Box)`
-  border-bottom: 1px solid #4d00b4;
+  border-bottom: 1px solid ${({ theme }) => theme.primaryPurple};
 
   h3 {
-    color: #4d00b4;
+    color: ${({ theme }) => theme.textPrimary};
     font-size: 14px;
     font-weight: 500;
     line-height: 16px;
@@ -212,7 +214,7 @@ const RoundSelectBox = styled(Box)`
 
 const RulingOptionsBox = styled(Box)`
   h3 {
-    color: #4d00b4;
+    color: ${({ theme }) => theme.textPrimary};
     font-size: 14px;
     font-weight: 500;
     line-height: 16px;
@@ -222,15 +224,16 @@ const RulingOptionsBox = styled(Box)`
 `;
 
 const JustificationsBox = styled(Box)`
-  border-left: 1px solid #4d00b4;
+  border-left: 1px solid ${({ theme }) => theme.primaryPurple};
   height: 100%;
   text-align: center;
+  color: ${({ theme }) => theme.textSecondary};
   @media (max-width: 768px) {
     border-left: none;
-    border-top: 1px solid #4d00b4;
+    border-top: 1px solid ${({ theme }) => theme.primaryPurple};
   }
   h2 {
-    color: #4d00b4;
+    color: ${({ theme }) => theme.textPrimary};
     font-size: 24px;
     font-weight: 500;
     line-height: 28px;
@@ -254,4 +257,5 @@ const ScrollBarContainer = styled.div`
 const JustificationText = styled.div`
   max-height: 300px;
   overflow: auto;
+  color: ${({ theme }) => theme.textSecondary};
 `;

@@ -21,6 +21,18 @@ const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
 const StyledForm = styled(Form)`
   max-width: 250px;
+
+  p {
+    color: ${({ theme }) => theme.textSecondary};
+  }
+
+  a {
+    color: ${({ theme }) => theme.linkColor};
+  }
+
+  .ant-divider-inner-text {
+    color: ${({ theme }) => theme.textSecondary};
+  }
 `;
 
 const StyledMail = styled(Mail)`
