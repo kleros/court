@@ -12,7 +12,8 @@ const ToggleButton = styled.button`
   align-items: center;
   justify-content: center;
   padding: 8px;
-  border-radius: 4px;
+  margin-left: -10px;
+  border-radius: 50%;
   transition: background-color 0.2s ease;
 
   &:hover {
