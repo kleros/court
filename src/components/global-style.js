@@ -27,6 +27,10 @@ const GlobalStyle = createGlobalStyle`
     --header-background: ${({ theme }) => theme.headerBackground};
   }
 
+  html {
+    background-color: ${({ theme }) => theme.bodyBackground} !important;
+  }
+
   body {
     background-color: ${({ theme }) => theme.bodyBackground};
     color: ${({ theme }) => theme.textSecondary};
@@ -471,6 +475,24 @@ const GlobalStyle = createGlobalStyle`
   .rrui__tooltip {
     background: ${({ theme }) => theme.tooltipBackground} !important;
     color: ${({ theme }) => theme.tooltipColor} !important;
+  }
+
+  /* Ant Design Tooltip Overrides */
+  .ant-tooltip-inner {
+    background-color: ${({ theme }) => theme.tooltipBackground} !important;
+    color: ${({ theme }) => theme.tooltipColor} !important;
+  }
+
+  .ant-tooltip-arrow::before {
+    background-color: ${({ theme }) => theme.tooltipBackground} !important;
+  }
+
+  .ant-tooltip-arrow-content {
+    background-color: ${({ theme }) => theme.tooltipBackground} !important;
+  }
+
+  .ant-tooltip {
+    --antd-arrow-background-color: ${({ theme }) => theme.tooltipBackground};
   }
 
   /* Ant Design Select Dropdown Overrides */

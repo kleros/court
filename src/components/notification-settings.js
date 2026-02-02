@@ -37,6 +37,13 @@ const StyledForm = styled(Form)`
 
 const StyledMail = styled(Mail)`
   min-width: 16px;
+  cursor: pointer;
+  transition: transform 0.3s ease, opacity 0.2s ease;
+
+  &:hover {
+    transform: rotate(15deg);
+    opacity: 0.7;
+  }
 `;
 
 const StyledAlertContainer = styled.div`

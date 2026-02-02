@@ -342,16 +342,14 @@ const StyledMenu = styled(Menu)`
 
   && {
     .ant-menu-item > a {
-      color: ${({ theme }) => theme.textOnPurple};
+      color: ${({ theme }) => theme.textOnPurple}99;
       text-decoration: none;
-      transition: opacity 0.2s ease;
-      opacity: 0.85;
+      transition: color 0.2s ease;
 
       &:hover,
       &:focus {
         color: ${({ theme }) => theme.textOnPurple};
         text-decoration: none;
-        opacity: 0.7;
       }
     }
 
@@ -361,7 +359,6 @@ const StyledMenu = styled(Menu)`
       > a {
         color: ${({ theme }) => theme.textOnPurple};
         text-decoration: none;
-        opacity: 1;
       }
     }
   }
@@ -422,6 +419,11 @@ const StyledClickaway = styled.div`
 const LogoNavLink = styled(NavLink)`
   display: inline-block;
   max-width: 120px;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.7;
+  }
 
   > svg {
     display: block;
