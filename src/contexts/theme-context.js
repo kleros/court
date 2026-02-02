@@ -147,14 +147,14 @@ export const darkTheme = {
   spinDotColor: "#5faddb",
   dividerColor: "rgba(255, 255, 255, 0.08)",
   // Icon fills
-  hexagonFill: "#6b5895",
+  hexagonFill: "#4a3d6e",
   primaryFill: "#5faddb",
   // Overlay colors
   buttonHoverOverlay: "rgba(255, 255, 255, 0.1)",
   headerSkeletonBase: "rgba(255, 255, 255, 0.15)",
   headerSkeletonHighlight: "rgba(255, 255, 255, 0.25)",
   // Accent colors
-  accentPurple: "#6b5895",
+  accentPurple: "#4a3d6e",
   // Input focus
   inputFocusBorder: "#9b7bcf",
   // Warning colors (for alerts)
