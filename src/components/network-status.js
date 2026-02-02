@@ -131,9 +131,9 @@ const StyledSkeleton = styled(Skeleton)`
       border-radius: 4px;
       background-image: linear-gradient(
         90deg,
-        ${({ theme }) => theme.headerSkeletonBase} 25%,
-        ${({ theme }) => theme.headerSkeletonHighlight} 37%,
-        ${({ theme }) => theme.headerSkeletonBase} 63%
+        ${({ theme }) => theme.skeletonColor} 25%,
+        ${({ theme }) => theme.skeletonHighlight} 37%,
+        ${({ theme }) => theme.skeletonColor} 63%
       ) !important;
     }
   }

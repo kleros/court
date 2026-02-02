@@ -300,30 +300,48 @@ const GlobalStyle = createGlobalStyle`
   }
 
   /* Ant Design Skeleton Overrides */
-  .ant-skeleton-content .ant-skeleton-title,
-  .ant-skeleton-content .ant-skeleton-paragraph > li,
-  .ant-skeleton-title,
-  .ant-skeleton-paragraph > li,
-  .ant-skeleton-avatar,
-  .ant-skeleton-button,
-  .ant-skeleton-input {
+  /* Non-active skeleton base color */
+  .ant-skeleton:not(.ant-skeleton-active) .ant-skeleton-content .ant-skeleton-title,
+  .ant-skeleton:not(.ant-skeleton-active) .ant-skeleton-content .ant-skeleton-paragraph > li,
+  .ant-skeleton:not(.ant-skeleton-active) .ant-skeleton-avatar,
+  .ant-skeleton:not(.ant-skeleton-active) .ant-skeleton-button,
+  .ant-skeleton:not(.ant-skeleton-active) .ant-skeleton-input {
     background: ${({ theme }) => theme.skeletonColor} !important;
   }
 
-  .ant-skeleton-active .ant-skeleton-content .ant-skeleton-title,
-  .ant-skeleton-active .ant-skeleton-content .ant-skeleton-paragraph > li,
-  .ant-skeleton-active .ant-skeleton-title,
-  .ant-skeleton-active .ant-skeleton-paragraph > li,
-  .ant-skeleton-active .ant-skeleton-avatar,
-  .ant-skeleton-active .ant-skeleton-button,
-  .ant-skeleton-active .ant-skeleton-input {
+  /* Active skeleton with animation - override Ant Design's default gradient colors */
+  .ant-skeleton.ant-skeleton-active .ant-skeleton-content .ant-skeleton-title,
+  .ant-skeleton.ant-skeleton-active .ant-skeleton-content .ant-skeleton-paragraph > li,
+  .ant-skeleton.ant-skeleton-active .ant-skeleton-avatar {
     background: linear-gradient(
       90deg,
       ${({ theme }) => theme.skeletonColor} 25%,
       ${({ theme }) => theme.skeletonHighlight} 37%,
       ${({ theme }) => theme.skeletonColor} 63%
     ) !important;
+    background-size: 400% 100% !important;
+    animation: ant-skeleton-loading 1.4s ease infinite !important;
+  }
+
+
+  .ant-card-loading-content .ant-card-loading-block {
+    background: linear-gradient(
+      90deg,
+      ${({ theme }) => theme.skeletonColor} 25%,
+      ${({ theme }) => theme.skeletonHighlight} 37%,
+      ${({ theme }) => theme.skeletonColor} 63%
+    );
     background-size: 400% 100%;
+    animation: card-loading 1.4s ease infinite;
+  }
+
+  @keyframes card-loading {
+    0% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0 50%;
+    }
   }
 
   /* Ant Design Spin Overrides */

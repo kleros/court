@@ -130,8 +130,8 @@ export const darkTheme = {
   warningColor: "#ffc53d",
   infoColor: "#5faddb",
   disabledColor: "rgba(255, 255, 255, 0.25)",
-  skeletonColor: "#1e1a28",
-  skeletonHighlight: "#2d2840",
+  skeletonColor: "#2d2840",
+  skeletonHighlight: "#3d3456",
   scrollbarTrack: "#1e1a28",
   scrollbarThumb: "#3d3456",
   modalMask: "rgba(0, 0, 0, 0.8)",
@@ -151,8 +151,8 @@ export const darkTheme = {
   primaryFill: "#5faddb",
   // Overlay colors
   buttonHoverOverlay: "rgba(255, 255, 255, 0.1)",
-  headerSkeletonBase: "rgba(255, 255, 255, 0.15)",
-  headerSkeletonHighlight: "rgba(255, 255, 255, 0.25)",
+  headerSkeletonBase: "#2d2840",
+  headerSkeletonHighlight: "#3d3456",
   // Accent colors
   accentPurple: "#4a3d6e",
   // Input focus
