@@ -122,7 +122,7 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
             }}
             title="Unstake all of your PNK from this court?"
           >
-            <Button type="secondary">Unstake All</Button>
+            <Button className="ant-btn-secondary">Unstake All</Button>
           </Popconfirm>,
           <Button key="button" className="stake-button" onClick={onStakeClick} type="primary">
             Stake

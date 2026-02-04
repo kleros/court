@@ -588,7 +588,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .ant-cascader-menu-item:hover {
-    background: ${({ theme }) => theme.elevatedBackground};
+    background: ${({ theme }) => theme.tableRowHover};
   }
 
   /* Ant Design Notification Overrides */
