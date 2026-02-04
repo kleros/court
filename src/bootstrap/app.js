@@ -114,18 +114,18 @@ export default function App() {
                     <SmartContractWalletWarning />
                     <StyledLayoutHeader>
                       <StyledHeaderRow>
-                        <MobileDropdown>
-                          <Dropdown overlay={<Menu>{MenuItems}</Menu>} trigger={["click"]} placement="bottomLeft">
-                            <HamburgerButton>
-                              <MenuOutlined />
-                            </HamburgerButton>
-                          </Dropdown>
-                        </MobileDropdown>
-                        <StyledLogoCol>
+                        <LeftGroup>
+                          <MobileDropdown>
+                            <Dropdown overlay={<Menu>{MenuItems}</Menu>} trigger={["click"]} placement="bottomLeft">
+                              <HamburgerButton type="button" aria-label="Open menu">
+                                <MenuOutlined />
+                              </HamburgerButton>
+                            </Dropdown>
+                          </MobileDropdown>
                           <LogoNavLink to="/">
                             <Logo />
                           </LogoNavLink>
-                        </StyledLogoCol>
+                        </LeftGroup>
                         <DesktopMenu mode="horizontal" theme="dark">
                           {MenuItems}
                         </DesktopMenu>
@@ -277,10 +277,11 @@ const StyledHeaderRow = styled.div`
     padding: 8px 16px;
     flex-wrap: wrap;
     row-gap: 8px;
+    justify-content: space-between;
   }
 `;
 
-const StyledLogoCol = styled.div`
+const LeftGroup = styled.div`
   display: flex;
   align-items: center;
   flex-shrink: 0;
@@ -359,8 +360,6 @@ const StyledTrayCol = styled.div`
   margin-left: auto;
 
   @media (max-width: 960px) {
-    width: 100%;
-    justify-content: flex-start;
     margin-left: 0;
   }
 `;
