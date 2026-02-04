@@ -32,13 +32,7 @@ const StyledCard = styled(Card)`
       font-size: 14px;
       height: 40px;
       min-width: 110px;
-    }
-
-    .unstake-button {
-      background: none;
-      border: 1px solid ${({ theme }) => theme.primaryPurple};
       border-radius: 3px;
-      color: ${({ theme }) => theme.primaryPurple};
     }
   }
 
@@ -139,7 +133,7 @@ const CourtCard = ({ ID, onClick, onStakeClick: _onStakeClick }) => {
             }}
             title="Unstake all of your PNK from this court?"
           >
-            <Button className="unstake-button">Unstake All</Button>
+            <Button type="secondary">Unstake All</Button>
           </Popconfirm>,
           <Button key="button" className="stake-button" onClick={onStakeClick} type="primary">
             Stake

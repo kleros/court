@@ -395,28 +395,14 @@ SideChainCourtModal.defaultProps = {
 };
 
 const StyledModal = styled(Modal)`
-  .ant-modal-content {
-    background: ${({ theme }) => theme.componentBackground};
-  }
-
-  .ant-modal-close-x {
-    color: ${({ theme }) => theme.textPrimary};
-  }
-
   .ant-modal-header {
     border: none;
-    background: ${({ theme }) => theme.componentBackground};
   }
 
   .ant-modal-title {
     font-size: 36px;
     line-height: 1.33;
     text-align: center;
-    color: ${({ theme }) => theme.textPrimary};
-  }
-
-  .ant-modal-body {
-    color: ${({ theme }) => theme.textSecondary};
   }
 
   .ant-modal-footer {
@@ -432,23 +418,12 @@ const StyledModal = styled(Modal)`
         margin-left: auto;
       }
 
-      /* Secondary button styling */
       > button:not(.ant-btn-primary) {
         display: flex;
         align-items: center;
         gap: 4px;
-        background: ${({ theme }) => theme.componentBackground};
-        border: 1px solid ${({ theme }) => theme.primaryPurple};
-        color: ${({ theme }) => theme.primaryPurple};
 
         .anticon {
-          color: ${({ theme }) => theme.primaryPurple};
-        }
-
-        &:hover,
-        &:focus {
-          background: ${({ theme }) => theme.elevatedBackground};
-          border-color: ${({ theme }) => theme.primaryPurple};
           color: ${({ theme }) => theme.primaryPurple};
         }
       }
@@ -456,11 +431,11 @@ const StyledModal = styled(Modal)`
       @media (max-width: 575.98px) {
         > button,
         > a {
-          width 100%;
+          width: 100%;
         }
 
         > :last-child {
-          margin-left: none;
+          margin-left: 0;
         }
       }
     }
@@ -488,6 +463,7 @@ const StyledResponsiveBannerButton = styled(Button).attrs((props) => ({
   ...props,
   type: props.type ?? "link",
 }))`
+  background: transparent;
   color: inherit;
   line-height: inherit;
   height: auto;
@@ -498,6 +474,7 @@ const StyledResponsiveBannerButton = styled(Button).attrs((props) => ({
   :hover,
   :focus,
   :active {
+    background: transparent;
     color: inherit;
 
     &&& > span {

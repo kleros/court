@@ -267,7 +267,6 @@ const StyledModal = styled(Modal)`
     &-content {
       border-top-left-radius: 12px;
       border-top-right-radius: 12px;
-      background: ${({ theme }) => theme.componentBackground};
     }
 
     &-body {
@@ -311,24 +310,7 @@ const StyledModal = styled(Modal)`
       }
 
       .ant-btn {
-        background: none;
-        border: 1px solid ${({ theme }) => theme.primaryPurple};
         border-radius: 3px;
-        color: ${({ theme }) => theme.primaryPurple};
-
-        &-primary {
-          background: ${({ theme }) => theme.primaryColor};
-          border: 1px solid ${({ theme }) => theme.primaryColor};
-          color: ${({ theme }) => theme.primaryButtonText};
-        }
-
-        &-primary:hover,
-        &-primary:focus {
-          background: ${({ theme }) => theme.primaryColor};
-          border: 1px solid ${({ theme }) => theme.primaryColor};
-          color: ${({ theme }) => theme.primaryButtonText};
-          filter: brightness(1.1);
-        }
 
         &-primary:disabled {
           background: grey;

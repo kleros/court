@@ -49,15 +49,4 @@ const StyledButton = styled(Button)`
   width: 100%;
   height: 50px;
   font-size: 20px;
-  background: ${({ theme }) => theme.primaryColor};
-  border-color: ${({ theme }) => theme.primaryColor};
-  color: ${({ theme }) => theme.primaryButtonText};
-
-  &:hover,
-  &:focus {
-    background: ${({ theme }) => theme.primaryColor};
-    border-color: ${({ theme }) => theme.primaryColor};
-    color: ${({ theme }) => theme.primaryButtonText};
-    filter: brightness(1.1);
-  }
 `;

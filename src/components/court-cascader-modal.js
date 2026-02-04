@@ -259,7 +259,6 @@ const StyledModal = styled(Modal)`
       height: 100%;
       border-top-left-radius: 6px;
       border-top-right-radius: 6px;
-      background: ${({ theme }) => theme.componentBackground};
     }
 
     &-title {

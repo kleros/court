@@ -14,24 +14,15 @@ import { klerosboardSubgraph } from "../bootstrap/subgraph";
 const StyledModal = styled(Modal)`
   max-width: calc(100vw - 32px);
 
-  .ant-modal-content {
-    background: ${({ theme }) => theme.componentBackground};
-  }
-
   .ant-modal-body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: ${({ theme }) => theme.textSecondary};
     padding: 56px;
 
     @media (max-width: 575px) {
       padding: 32px 16px;
     }
-  }
-
-  .ant-modal-close-x {
-    color: ${({ theme }) => theme.textSecondary};
   }
 `;
 

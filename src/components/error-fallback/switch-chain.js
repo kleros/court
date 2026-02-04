@@ -50,11 +50,10 @@ const StyledModal = styled(Modal)`
     width: 80%;
     left: 50%;
     transform: translateX(-50%);
-    background: ${({ theme }) => theme.componentBackground};
   }
+
   .ant-modal-body {
     border-radius: 0.5rem;
-    background: ${({ theme }) => theme.componentBackground};
   }
 
   h2 {
@@ -67,20 +66,17 @@ const StyledModal = styled(Modal)`
     color: ${({ theme }) => theme.textMutedLight};
     font-size: 11px;
   }
+
   @media only screen and (min-width: 768px) {
     .ant-modal-content {
       width: 30rem;
-      left: 50%;
-      transform: translateX(-50%);
     }
 
     h2 {
-      margin: 0 0 5px 0;
       font-size: 20px;
     }
 
     p {
-      color: ${({ theme }) => theme.textMutedLight};
       font-size: 14px;
     }
   }
@@ -90,17 +86,6 @@ const StyledButton = styled(Button)`
   width: 100%;
   height: 50px;
   font-size: 14px;
-  background: ${({ theme }) => theme.primaryColor};
-  border-color: ${({ theme }) => theme.primaryColor};
-  color: ${({ theme }) => theme.primaryButtonText};
-
-  &:hover,
-  &:focus {
-    background: ${({ theme }) => theme.primaryColor};
-    border-color: ${({ theme }) => theme.primaryColor};
-    color: ${({ theme }) => theme.primaryButtonText};
-    filter: brightness(1.1);
-  }
 
   @media only screen and (min-width: 768px) {
     font-size: 20px;
@@ -136,17 +121,6 @@ const StyledLine = styled.li`
   }
 
   @media only screen and (min-width: 768px) {
-    padding: 10px 14px;
-    margin: 0 0 8px 0;
     font-size: 18px;
-    border-radius: 10px;
-    cursor: pointer;
-    background: ${({ isActive, theme }) => isActive && theme.selectActiveBackground};
-    color: ${({ isActive, theme }) => isActive && theme.textOnPurple};
-
-    &:hover {
-      background: ${({ isActive, theme }) => !isActive && theme.selectHoverBackground};
-      color: ${({ isActive, theme }) => !isActive && theme.selectHoverText};
-    }
   }
 `;

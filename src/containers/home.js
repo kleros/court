@@ -158,20 +158,6 @@ const StyledButtonBar = styled.div`
 const StyledButton = styled(Button)`
   box-shadow: none;
   text-shadow: none;
-
-  &.ant-btn-secondary,
-  &[type="secondary"] {
-    background: ${({ theme }) => theme.componentBackground};
-    border: 1px solid ${({ theme }) => theme.primaryPurple};
-    color: ${({ theme }) => theme.primaryPurple};
-
-    &:hover,
-    &:focus {
-      background: ${({ theme }) => theme.elevatedBackground};
-      border-color: ${({ theme }) => theme.primaryPurple};
-      color: ${({ theme }) => theme.primaryPurple};
-    }
-  }
 `;
 
 const StyledClaimButton = styled(StyledButton)`

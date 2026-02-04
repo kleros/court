@@ -1058,21 +1058,10 @@ const StyledButton = styled(Button)`
   margin: 20px 5px 15px;
 `;
 
-const StyledPoliciesButton = styled(Button)`
-  border: 1px solid ${({ theme }) => theme.primaryPurple};
+const StyledPoliciesButton = styled(Button).attrs({ type: "secondary" })`
   border-radius: 3px;
-  box-sizing: border-box;
-  color: ${({ theme }) => theme.primaryPurple};
-  background: ${({ theme }) => theme.componentBackground};
   padding-left: 40px;
   position: relative;
-
-  &:hover,
-  &:focus {
-    border-color: ${({ theme }) => theme.primaryPurple};
-    color: ${({ theme }) => theme.primaryPurple};
-    background: ${({ theme }) => theme.elevatedBackground};
-  }
 `;
 
 const GavelLarge = styled(Gavel)`
@@ -1211,17 +1200,9 @@ const ArbitrableInterfaceDiv = styled.div`
   }
 `;
 
-const StyledRefuseButton = styled(Button)`
-  color: ${({ theme }) => theme.primaryPurple};
+const StyledRefuseButton = styled(Button).attrs({ type: "secondary" })`
   margin-top: 16px;
   float: right;
-  border-color: ${({ theme }) => theme.primaryPurple};
-
-  &:hover,
-  &:focus {
-    color: ${({ theme }) => theme.primaryPurple};
-    border-color: ${({ theme }) => theme.primaryPurple};
-  }
 `;
 
 const StyledWarningText = styled.div`

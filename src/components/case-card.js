@@ -47,13 +47,6 @@ const StyledCard = styled(Card)`
       height: 40px;
       min-width: 110px;
     }
-
-    .unstake-button {
-      background: none;
-      border: 1px solid ${({ theme }) => theme.primaryPurple};
-      border-radius: 3px;
-      color: ${({ theme }) => theme.primaryPurple};
-    }
   }
 
   .ant-card-head {

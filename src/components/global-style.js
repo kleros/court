@@ -205,8 +205,16 @@ const GlobalStyle = createGlobalStyle`
 
   /* Ant Design Button Overrides */
   .ant-btn {
+    background: ${({ theme }) => theme.componentBackground};
     border-color: ${({ theme }) => theme.borderColor};
     color: ${({ theme }) => theme.textSecondary};
+  }
+
+  .ant-btn:hover,
+  .ant-btn:focus {
+    background: ${({ theme }) => theme.elevatedBackground};
+    border-color: ${({ theme }) => theme.primaryPurple};
+    color: ${({ theme }) => theme.primaryPurple};
   }
 
   .ant-btn-primary {
@@ -228,6 +236,13 @@ const GlobalStyle = createGlobalStyle`
     color: ${({ theme }) => theme.textSecondary};
   }
 
+  .ant-btn-default:hover,
+  .ant-btn-default:focus {
+    background: ${({ theme }) => theme.elevatedBackground};
+    border-color: ${({ theme }) => theme.primaryPurple};
+    color: ${({ theme }) => theme.primaryPurple};
+  }
+
   .ant-btn-secondary,
   .ant-btn[type="secondary"] {
     background: ${({ theme }) => theme.componentBackground};
@@ -242,6 +257,18 @@ const GlobalStyle = createGlobalStyle`
     background: ${({ theme }) => theme.elevatedBackground};
     border-color: ${({ theme }) => theme.primaryPurple};
     color: ${({ theme }) => theme.primaryPurple};
+  }
+
+  .ant-btn-link {
+    background: transparent;
+    border: none;
+    color: ${({ theme }) => theme.linkColor};
+  }
+
+  .ant-btn-link:hover,
+  .ant-btn-link:focus {
+    background: transparent;
+    color: ${({ theme }) => theme.primaryColor};
   }
 
   /* Ant Design Table Overrides */
