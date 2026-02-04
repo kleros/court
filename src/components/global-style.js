@@ -417,6 +417,14 @@ const GlobalStyle = createGlobalStyle`
     color: ${({ theme }) => theme.textPrimary};
   }
 
+  .ant-alert-description {
+    color: ${({ theme }) => theme.textSecondary};
+  }
+
+  .ant-alert-icon {
+    color: ${({ theme }) => theme.primaryColor};
+  }
+
   .ant-alert-close-icon {
     color: ${({ theme }) => theme.textSecondary};
   }
@@ -473,19 +481,32 @@ const GlobalStyle = createGlobalStyle`
   /* Ant Design Dropdown/Menu Overrides */
   .ant-dropdown-menu,
   .ant-dropdown .ant-menu {
-    background: ${({ theme }) => theme.componentBackground};
+    background: ${({ theme }) => theme.componentBackground} !important;
+    border: 1px solid ${({ theme }) => theme.borderColor} !important;
   }
 
   .ant-dropdown-menu-item,
   .ant-dropdown .ant-menu-item {
-    color: ${({ theme }) => theme.textPrimary};
+    color: ${({ theme }) => theme.textPrimary} !important;
+  }
+
+  .ant-dropdown-menu-item a,
+  .ant-dropdown .ant-menu-item a {
+    color: inherit !important;
+    text-decoration: none !important;
   }
 
   .ant-dropdown-menu-item:hover,
   .ant-dropdown .ant-menu-item:hover,
   .ant-dropdown .ant-menu-item-active {
-    background: ${({ theme }) => theme.elevatedBackground};
-    color: ${({ theme }) => theme.textPrimary};
+    background: ${({ theme }) => theme.elevatedBackground} !important;
+    color: ${({ theme }) => theme.primaryColor} !important;
+  }
+
+  .ant-dropdown-menu-item:hover a,
+  .ant-dropdown .ant-menu-item:hover a,
+  .ant-dropdown .ant-menu-item-active a {
+    color: ${({ theme }) => theme.primaryColor} !important;
   }
 
   /* Scrollbar Styling */

@@ -4,7 +4,8 @@ import React, { useState, useEffect } from "react";
 import t from "prop-types";
 import loadable from "@loadable/component";
 import styled from "styled-components/macro";
-import { Alert, Col, Layout, Menu, Row, Spin } from "antd";
+import { Alert, Dropdown, Layout, Menu, Spin } from "antd";
+import { MenuOutlined } from "@ant-design/icons";
 import { Helmet } from "react-helmet";
 import { BrowserRouter, NavLink, Route, Switch, useParams } from "react-router-dom";
 import { ReactComponent as Logo } from "../assets/images/kleros-logo-flat-light.svg";
@@ -25,7 +26,6 @@ import SwitchChainFallback from "../components/error-fallback/switch-chain";
 import SmartContractWalletWarning from "../components/smart-contract-wallet-warning";
 
 export default function App() {
-  const [isMenuClosed, setIsMenuClosed] = useState(true);
   const [customDrizzle, setCustomDrizzle] = useState(null);
   const [checkingProvider, setCheckingProvider] = useState(true);
 
@@ -112,80 +112,71 @@ export default function App() {
                 <BrowserRouter>
                   <Layout>
                     <SmartContractWalletWarning />
-                    <StyledLayoutSider
-                      breakpoint="md"
-                      collapsedWidth="0"
-                      collapsed={isMenuClosed}
-                      onClick={() => setIsMenuClosed((previousState) => !previousState)}
-                    >
-                      <Menu theme="dark">{MenuItems}</Menu>
-                    </StyledLayoutSider>
-                    <Layout>
-                      <StyledLayoutHeader>
-                        <Row>
-                          <StyledLogoCol lg={4} md={4} sm={12} xs={0}>
-                            <LogoNavLink to="/">
-                              <Logo />
-                            </LogoNavLink>
-                          </StyledLogoCol>
-                          <Col lg={14} md={12} xs={0} style={{ padding: "0 16px" }}>
-                            <StyledMenu mode="horizontal" theme="dark">
-                              {MenuItems}
-                            </StyledMenu>
-                          </Col>
-                          <StyledTrayCol lg={6} md={8} sm={12} xs={24}>
-                            <StyledTray>
-                              <NetworkStatus />
-                              <AccountStatus />
-                              <NotificationSettings />
-                              <ThemeToggle />
-                            </StyledTray>
-                          </StyledTrayCol>
-                        </Row>
-                      </StyledLayoutHeader>
-                      <StyledLayoutContent>
-                        <Switch>
-                          {/* Handle hash-based email confirmation links (e.g., /#/settings/email-confirmation) */}
-                          <Route
-                            exact
-                            path="/"
-                            render={() => {
-                              //Check if hash contains email confirmation path
-                              if (
-                                typeof window !== "undefined" &&
-                                window.location.hash?.includes("/settings/email-confirmation")
-                              ) {
-                                return <EmailConfirmation />;
-                              }
-                              return <Home />;
-                            }}
-                          />
-                          <Route exact path="/courts">
-                            <Courts />
-                          </Route>
-                          <Route exact path="/cases">
-                            <Cases />
-                          </Route>
-                          <Route exact path="/cases/:ID">
-                            <Case />
-                          </Route>
-                          <Route exact path="/tokens">
-                            <Tokens />
-                          </Route>
-                          <Route exact path="/convert-pnk">
-                            <ConvertPnk />
-                          </Route>
-                          <Route path="*">
-                            <C404 />
-                          </Route>
-                        </Switch>
-                      </StyledLayoutContent>
-                      <Footer />
-                      <StyledClickaway
-                        isMenuClosed={isMenuClosed}
-                        onClick={isMenuClosed ? null : () => setIsMenuClosed(true)}
-                      />
-                    </Layout>
+                    <StyledLayoutHeader>
+                      <StyledHeaderRow>
+                        <MobileDropdown>
+                          <Dropdown overlay={<Menu>{MenuItems}</Menu>} trigger={["click"]} placement="bottomLeft">
+                            <HamburgerButton>
+                              <MenuOutlined />
+                            </HamburgerButton>
+                          </Dropdown>
+                        </MobileDropdown>
+                        <StyledLogoCol>
+                          <LogoNavLink to="/">
+                            <Logo />
+                          </LogoNavLink>
+                        </StyledLogoCol>
+                        <DesktopMenu mode="horizontal" theme="dark">
+                          {MenuItems}
+                        </DesktopMenu>
+                        <StyledTrayCol>
+                          <StyledTray>
+                            <NetworkStatus />
+                            <AccountStatus />
+                            <NotificationSettings />
+                            <ThemeToggle />
+                          </StyledTray>
+                        </StyledTrayCol>
+                      </StyledHeaderRow>
+                    </StyledLayoutHeader>
+                    <StyledLayoutContent>
+                      <Switch>
+                        {/* Handle hash-based email confirmation links (e.g., /#/settings/email-confirmation) */}
+                        <Route
+                          exact
+                          path="/"
+                          render={() => {
+                            //Check if hash contains email confirmation path
+                            if (
+                              typeof window !== "undefined" &&
+                              window.location.hash?.includes("/settings/email-confirmation")
+                            ) {
+                              return <EmailConfirmation />;
+                            }
+                            return <Home />;
+                          }}
+                        />
+                        <Route exact path="/courts">
+                          <Courts />
+                        </Route>
+                        <Route exact path="/cases">
+                          <Cases />
+                        </Route>
+                        <Route exact path="/cases/:ID">
+                          <Case />
+                        </Route>
+                        <Route exact path="/tokens">
+                          <Tokens />
+                        </Route>
+                        <Route exact path="/convert-pnk">
+                          <ConvertPnk />
+                        </Route>
+                        <Route path="*">
+                          <C404 />
+                        </Route>
+                      </Switch>
+                    </StyledLayoutContent>
+                    <Footer />
                   </Layout>
                 </BrowserRouter>
               </ErrorBoundary>
@@ -215,10 +206,6 @@ const StyledSpin = styled(Spin)`
 
   .ant-spin-dot-item {
     background-color: ${({ theme }) => theme.primaryPurple};
-  }
-
-  .ant-spin-text {
-    color: ${({ theme }) => theme.textPrimary};
   }
 `;
 
@@ -280,61 +267,32 @@ const MenuItems = [
   </Menu.Item>,
 ];
 
-const StyledLayoutSider = styled(Layout.Sider)`
-  height: 100%;
-  position: fixed;
-  z-index: 2000;
-  background-color: ${({ theme }) => theme.headerBackground};
-
-  @media (min-width: 768px) {
-    display: none;
-  }
-
-  .ant-layout-sider-zero-width-trigger {
-    right: -50px;
-    top: 12px;
-    width: 50px;
-    background-color: ${({ theme }) => theme.menuTriggerBackground};
-  }
-
-  .ant-menu-dark {
-    background: transparent;
-  }
-`;
-
-const StyledLogoCol = styled(Col)`
+const StyledHeaderRow = styled.div`
   display: flex;
   align-items: center;
-  height: 64px;
+  min-height: 64px;
+  padding: 0 9.375vw;
 
-  @media (max-width: 769.98px) {
-    padding-left: 1rem;
-  }
-
-  @media (max-width: 575px) {
-    &.ant-col-xs-0 {
-      display: none;
-    }
+  @media (max-width: 960px) {
+    padding: 8px 16px;
+    flex-wrap: wrap;
+    row-gap: 8px;
   }
 `;
 
-const StyledTrayCol = styled(Col)`
+const StyledLogoCol = styled.div`
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  height: 64px;
-
-  @media (max-width: 575px) {
-    height: auto;
-    min-height: 64px;
-    padding: 8px 0;
-  }
+  flex-shrink: 0;
 `;
 
-const StyledMenu = styled(Menu)`
+const DesktopMenu = styled(Menu)`
+  flex: 1;
   font-weight: 500;
   line-height: 64px !important;
   text-align: center;
+  border-bottom: none !important;
+  justify-content: center;
 
   &.ant-menu-dark {
     background-color: transparent;
@@ -362,15 +320,57 @@ const StyledMenu = styled(Menu)`
       }
     }
   }
+
+  @media (max-width: 960px) {
+    display: none;
+  }
+`;
+
+const MobileDropdown = styled.div`
+  display: none;
+
+  @media (max-width: 960px) {
+    display: block;
+    margin-right: 12px;
+  }
+`;
+
+const HamburgerButton = styled.button`
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.textOnPurple};
+  font-size: 24px;
+
+  &:hover {
+    opacity: 0.7;
+  }
+`;
+
+const StyledTrayCol = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  margin-left: auto;
+
+  @media (max-width: 960px) {
+    width: 100%;
+    justify-content: flex-start;
+    margin-left: 0;
+  }
 `;
 
 const StyledLayoutContent = styled(Layout.Content)`
   background: ${({ theme }) => theme.bodyBackground};
-  // The header takes exactly 64px
   min-height: calc(100vh - 64px);
   padding: 0px 9.375vw 120px 9.375vw;
 
-  @media (max-width: 768px) {
+  @media (max-width: 960px) {
     padding: 0px 16px 80px 16px;
   }
 `;
@@ -379,10 +379,7 @@ const StyledLayoutHeader = styled(Layout.Header)`
   height: auto;
   line-height: initial;
   background-color: ${({ theme }) => theme.headerBackground};
-
-  @media (max-width: 575px) {
-    padding: 0 16px;
-  }
+  padding: 0;
 `;
 
 const StyledTray = styled.div`
@@ -394,26 +391,10 @@ const StyledTray = styled.div`
     min-width: 0;
   }
 
-  @media (max-width: 575px) {
+  @media (max-width: 960px) {
     flex-wrap: wrap;
-    justify-content: flex-end;
     gap: 0.5rem;
   }
-`;
-
-const StyledClickaway = styled.div`
-  position: fixed;
-  z-index: 1000;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: black;
-  opacity: ${(properties) => (properties.isMenuClosed ? 0 : 0.4)};
-  pointer-events: ${(properties) => (properties.isMenuClosed ? "none" : "auto")};
-  transition: opacity 0.3s;
 `;
 
 const LogoNavLink = styled(NavLink)`
@@ -447,16 +428,4 @@ const StyledAlert = styled(Alert)`
   text-align: center;
   background: ${({ theme }) => theme.alertInfoBackground};
   border-color: ${({ theme }) => theme.alertInfoBorder};
-
-  .ant-alert-message {
-    color: ${({ theme }) => theme.textPrimary};
-  }
-
-  .ant-alert-description {
-    color: ${({ theme }) => theme.textSecondary};
-  }
-
-  .ant-alert-icon {
-    color: ${({ theme }) => theme.primaryColor};
-  }
 `;
