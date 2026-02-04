@@ -172,22 +172,9 @@ const StyledRadioGroup = styled(Radio.Group)`
   width: 100%;
 
   .ant-radio-button-wrapper {
-    border: 1px solid ${({ theme }) => theme.primaryPurple} !important;
-    border-radius: 300px !important;
-    color: ${({ theme }) => theme.primaryPurple};
-    background: ${({ theme }) => theme.componentBackground};
     margin-bottom: 15px;
     text-align: center;
     width: 95%;
-
-    &:before {
-      background-color: transparent;
-    }
-
-    &-checked {
-      background: ${({ theme }) => theme.primaryPurple} !important;
-      color: ${({ theme }) => theme.textOnPurple} !important;
-    }
   }
 
   .ant-radio-button-wrapper-disabled.ant-radio-button-wrapper-checked {

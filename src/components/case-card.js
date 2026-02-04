@@ -15,15 +15,13 @@ import ETHAmount from "./eth-amount";
 
 const { useDrizzle } = drizzleReactHooks;
 
-const StyledCard = styled(Card)`
+const StyledCard = styled(Card).attrs({ className: "purple-header-card" })`
   border-radius: 12px;
   box-shadow: ${({ theme }) => theme.cardShadow};
   margin: 20px 0 0;
   text-align: center;
-  background: ${({ theme }) => theme.cardBackground};
 
   .ant-card-actions {
-    background: ${({ theme }) => theme.cardActionsBackground};
     border: none;
     padding: 12px 24px;
 
@@ -47,15 +45,6 @@ const StyledCard = styled(Card)`
       height: 40px;
       min-width: 110px;
     }
-  }
-
-  .ant-card-head {
-    background: ${({ theme }) => theme.cardHeaderBackground};
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    color: ${({ theme }) => theme.textOnPurple};
-    height: 40px;
-    text-align: left;
   }
 `;
 const StyledPrefixDiv = styled.div`

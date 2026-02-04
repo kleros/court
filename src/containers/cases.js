@@ -133,34 +133,6 @@ const StyledRadioGroup = styled(Radio.Group)`
   @media (max-width: 575.98px) {
     flex-wrap: wrap;
   }
-
-  .ant-radio-button-wrapper {
-    border: 1px solid ${({ theme }) => theme.primaryPurple} !important;
-    border-radius: 300px;
-    color: ${({ theme }) => theme.primaryPurple};
-    background: ${({ theme }) => theme.componentBackground};
-
-    &:before {
-      background-color: transparent;
-    }
-
-    &-checked {
-      background: ${({ theme }) => theme.primaryPurple} !important;
-      color: ${({ theme }) => theme.textOnPurple} !important;
-    }
-  }
-
-  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
-    box-shadow: none;
-
-    :focus-within {
-      outline: none;
-    }
-
-    ::before {
-      display: none;
-    }
-  }
 `;
 
 const StyledRadioButton = styled(Radio.Button)`

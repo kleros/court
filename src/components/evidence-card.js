@@ -5,7 +5,6 @@ import { getAddressUrl, getTransactionUrl } from "../helpers/block-explorer";
 import Attachment from "./attachment";
 
 const StyledCard = styled(Card)`
-  background: ${({ theme }) => theme.cardBackground};
   border-radius: 12px;
   box-shadow: ${({ theme }) => theme.cardShadow};
 

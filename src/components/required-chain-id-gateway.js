@@ -119,7 +119,6 @@ const StyledCard = styled(Card)`
   max-width: 768px;
   border-radius: 12px;
   box-shadow: ${({ theme }) => theme.cardShadow};
-  background: ${({ theme }) => theme.cardBackground};
 
   .ant-card-actions {
     background: none;

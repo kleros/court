@@ -598,6 +598,55 @@ const GlobalStyle = createGlobalStyle`
     border-top-color: ${({ theme }) => theme.borderColor};
   }
 
+  /* Ant Design Radio Button Overrides */
+  .ant-radio-button-wrapper {
+    border: 1px solid ${({ theme }) => theme.primaryPurple} !important;
+    border-radius: 300px !important;
+    color: ${({ theme }) => theme.primaryPurple};
+    background: ${({ theme }) => theme.componentBackground};
+
+    &:before {
+      background-color: transparent !important;
+    }
+
+    &:not(:first-child)::before {
+      display: none !important;
+    }
+
+    &:hover {
+      color: ${({ theme }) => theme.primaryPurple};
+    }
+  }
+
+  .ant-radio-button-wrapper-checked {
+    background: ${({ theme }) => theme.primaryPurple} !important;
+    color: ${({ theme }) => theme.textOnPurple} !important;
+    border-color: ${({ theme }) => theme.primaryPurple} !important;
+  }
+
+  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+    box-shadow: none !important;
+
+    &:hover {
+      background: ${({ theme }) => theme.primaryPurple} !important;
+      color: ${({ theme }) => theme.textOnPurple} !important;
+    }
+
+    &:focus-within {
+      outline: none;
+    }
+  }
+
+  /* Purple header card style - for cards with purple headers */
+  .purple-header-card .ant-card-head {
+    background: ${({ theme }) => theme.cardHeaderBackground};
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    color: ${({ theme }) => theme.textOnPurple};
+    height: 40px;
+    text-align: left;
+  }
+
   /* Secondary background overrides (bottom bar in case details, etc.) */
   .secondary-background.theme-background,
   .secondary-background .theme-background,

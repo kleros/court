@@ -18,14 +18,12 @@ const StyledCard = styled(Card)`
   cursor: initial;
   margin: 60px 0 25px 0;
   overflow: hidden;
-  background: ${({ theme }) => theme.cardBackground};
   border: none;
 
   .ant-card-body {
     position: relative;
     overflow: hidden;
     padding: 7px 16px;
-    background: ${({ theme }) => theme.cardBackground};
 
     @media (max-width: 991px) {
       padding: 18px;

@@ -16,7 +16,6 @@ const StyledCard = styled(Card)`
   cursor: initial;
   margin: 60px 0 25px 0;
   overflow: hidden;
-  background: ${({ theme }) => theme.cardBackground};
 
   .ant-card-body {
     position: relative;
