@@ -55,30 +55,14 @@ const GlobalStyle = createGlobalStyle`
     border-bottom-color: ${({ theme }) => theme.borderColor};
   }
 
-  .ant-card-body {
-    color: ${({ theme }) => theme.textSecondary};
-  }
-
   /* Ant Design Modal Overrides */
-  .ant-modal-content {
+  .ant-modal-content,
+  .ant-modal-header {
     background: ${({ theme }) => theme.componentBackground};
   }
 
   .ant-modal-header {
-    background: ${({ theme }) => theme.componentBackground};
     border-bottom-color: ${({ theme }) => theme.borderColor};
-  }
-
-  .ant-modal-title {
-    color: ${({ theme }) => theme.textPrimary};
-  }
-
-  .ant-modal-close-x {
-    color: ${({ theme }) => theme.textSecondary};
-  }
-
-  .ant-modal-body {
-    color: ${({ theme }) => theme.textSecondary};
   }
 
   .ant-modal-footer {
@@ -93,10 +77,6 @@ const GlobalStyle = createGlobalStyle`
   .ant-popover-title {
     color: ${({ theme }) => theme.textPrimary};
     border-bottom-color: ${({ theme }) => theme.borderColor};
-  }
-
-  .ant-popover-inner-content {
-    color: ${({ theme }) => theme.textSecondary};
   }
 
   .ant-popover-arrow {
@@ -120,67 +100,44 @@ const GlobalStyle = createGlobalStyle`
     }
   }
 
-  .ant-popover-message {
-    color: ${({ theme }) => theme.textSecondary};
-  }
-
-  .ant-popover-message-title {
-    color: ${({ theme }) => theme.textSecondary};
-  }
-
   /* Ant Design Form Overrides */
-  .ant-form-item-label > label {
-    color: ${({ theme }) => theme.textPrimary};
-  }
-
   .ant-input {
     background: ${({ theme }) => theme.inputBackground};
     border-color: ${({ theme }) => theme.inputBorder};
     color: ${({ theme }) => theme.textPrimary};
-  }
 
-  .ant-input:hover,
-  .ant-input:focus {
-    border-color: ${({ theme }) => theme.inputFocusBorder};
-  }
+    &:hover,
+    &:focus {
+      border-color: ${({ theme }) => theme.inputFocusBorder};
+    }
 
-  .ant-input::placeholder {
-    color: ${({ theme }) => theme.textLight};
+    &::placeholder {
+      color: ${({ theme }) => theme.textLight};
+    }
   }
 
   /* Input affixes (icons, clear button) */
   .ant-input-affix-wrapper {
     background: ${({ theme }) => theme.inputBackground} !important;
+    border-color: ${({ theme }) => theme.inputBorder};
     color: ${({ theme }) => theme.textPrimary};
+
+    &:hover,
+    &:focus,
+    &:focus-within {
+      border-color: ${({ theme }) => theme.inputFocusBorder};
+    }
   }
 
   .ant-input-affix-wrapper .ant-input {
     background: transparent !important;
-    color: ${({ theme }) => theme.textPrimary};
   }
 
-  .ant-input-suffix,
-  .ant-input-prefix {
-    color: ${({ theme }) => theme.textSecondary};
-  }
-
-  .ant-input-clear-icon {
-    color: ${({ theme }) => theme.textSecondary};
-  }
-
-  /* Form validation feedback */
+  /* Form validation/feedback states */
   .ant-form-item-has-error .ant-input,
-  .ant-form-item-has-error .ant-input:hover,
-  .ant-form-item-has-error .ant-input:focus,
   .ant-form-item-has-error .ant-input-affix-wrapper,
-  .ant-form-item-has-error .ant-input-affix-wrapper:hover,
-  .ant-form-item-has-error .ant-input-affix-wrapper:focus,
   .has-error .ant-input,
-  .has-error .ant-input-affix-wrapper {
-    background: ${({ theme }) => theme.inputBackground} !important;
-    color: ${({ theme }) => theme.textPrimary};
-  }
-
+  .has-error .ant-input-affix-wrapper,
   .ant-form-item-has-feedback .ant-input-affix-wrapper,
   .has-feedback .ant-input-affix-wrapper {
     background: ${({ theme }) => theme.inputBackground} !important;
@@ -190,6 +147,12 @@ const GlobalStyle = createGlobalStyle`
     background: ${({ theme }) => theme.inputBackground};
     border-color: ${({ theme }) => theme.inputBorder};
     color: ${({ theme }) => theme.textPrimary};
+
+    &:hover,
+    &:focus,
+    &:focus-within {
+      border-color: ${({ theme }) => theme.inputFocusBorder};
+    }
   }
 
   .ant-input-number-input {
@@ -197,10 +160,34 @@ const GlobalStyle = createGlobalStyle`
     color: ${({ theme }) => theme.textPrimary};
   }
 
+  .ant-input-number-handler-wrap {
+    background: ${({ theme }) => theme.componentBackground};
+    border-left-color: ${({ theme }) => theme.inputFocusBorder};
+  }
+
+  .ant-input-number-handler {
+    color: ${({ theme }) => theme.textSecondary};
+    border-top-color: ${({ theme }) => theme.inputFocusBorder};
+
+    &:hover {
+      color: ${({ theme }) => theme.primaryPurple};
+    }
+  }
+
+  .ant-input-number-handler-up-inner,
+  .ant-input-number-handler-down-inner {
+    color: inherit;
+  }
+
   .ant-select-selection {
     background: ${({ theme }) => theme.inputBackground};
     border-color: ${({ theme }) => theme.inputBorder};
     color: ${({ theme }) => theme.textSecondary};
+
+    &:hover,
+    &:focus {
+      border-color: ${({ theme }) => theme.inputFocusBorder};
+    }
   }
 
   /* Ant Design Button Overrides */
@@ -221,26 +208,14 @@ const GlobalStyle = createGlobalStyle`
     background: ${({ theme }) => theme.primaryColor};
     border-color: ${({ theme }) => theme.primaryColor};
     color: ${({ theme }) => theme.primaryButtonText};
-  }
 
-  .ant-btn-primary:hover,
-  .ant-btn-primary:focus {
-    background: ${({ theme }) => theme.primaryColor};
-    border-color: ${({ theme }) => theme.primaryColor};
-    color: ${({ theme }) => theme.primaryButtonText};
-    filter: brightness(1.1);
-  }
-
-  .ant-btn-default {
-    background: ${({ theme }) => theme.componentBackground};
-    color: ${({ theme }) => theme.textSecondary};
-  }
-
-  .ant-btn-default:hover,
-  .ant-btn-default:focus {
-    background: ${({ theme }) => theme.elevatedBackground};
-    border-color: ${({ theme }) => theme.primaryPurple};
-    color: ${({ theme }) => theme.primaryPurple};
+    &:hover,
+    &:focus {
+      background: ${({ theme }) => theme.primaryColor};
+      border-color: ${({ theme }) => theme.primaryColor};
+      color: ${({ theme }) => theme.primaryButtonText};
+      filter: brightness(1.1);
+    }
   }
 
   .ant-btn-secondary,
@@ -248,27 +223,22 @@ const GlobalStyle = createGlobalStyle`
     background: ${({ theme }) => theme.componentBackground};
     border: 1px solid ${({ theme }) => theme.primaryPurple};
     color: ${({ theme }) => theme.primaryPurple};
-  }
 
-  .ant-btn-secondary:hover,
-  .ant-btn-secondary:focus,
-  .ant-btn[type="secondary"]:hover,
-  .ant-btn[type="secondary"]:focus {
-    background: ${({ theme }) => theme.elevatedBackground};
-    border-color: ${({ theme }) => theme.primaryPurple};
-    color: ${({ theme }) => theme.primaryPurple};
+    &:hover,
+    &:focus {
+      background: ${({ theme }) => theme.elevatedBackground};
+    }
   }
 
   .ant-btn-link {
     background: transparent;
     border: none;
     color: ${({ theme }) => theme.linkColor};
-  }
 
-  .ant-btn-link:hover,
-  .ant-btn-link:focus {
-    background: transparent;
-    color: ${({ theme }) => theme.primaryColor};
+    &:hover,
+    &:focus {
+      color: ${({ theme }) => theme.primaryColor};
+    }
   }
 
   /* Ant Design Table Overrides */
@@ -297,33 +267,16 @@ const GlobalStyle = createGlobalStyle`
     color: ${({ theme }) => theme.textSecondary};
   }
 
-  .ant-list-item-meta-title {
-    color: ${({ theme }) => theme.textPrimary};
-  }
-
-  .ant-list-item-meta-description {
-    color: ${({ theme }) => theme.textSecondary};
-  }
-
   /* Ant Design Divider Overrides */
   .ant-divider {
-    border-top-color: ${({ theme }) => theme.dividerColor} !important;
     border-color: ${({ theme }) => theme.dividerColor} !important;
     background: ${({ theme }) => theme.dividerColor};
     color: ${({ theme }) => theme.textLight};
-  }
 
-  .ant-divider-horizontal {
-    border-top-color: ${({ theme }) => theme.dividerColor} !important;
-  }
-
-  .ant-divider::before,
-  .ant-divider::after {
-    border-top-color: ${({ theme }) => theme.dividerColor} !important;
-  }
-
-  .ant-divider-inner-text {
-    color: ${({ theme }) => theme.textSecondary};
+    &::before,
+    &::after {
+      border-top-color: ${({ theme }) => theme.dividerColor} !important;
+    }
   }
 
   /* Ant Design Skeleton Overrides */
@@ -350,7 +303,6 @@ const GlobalStyle = createGlobalStyle`
     animation: ant-skeleton-loading 1.4s ease infinite !important;
   }
 
-
   .ant-card-loading-content .ant-card-loading-block {
     background: linear-gradient(
       90deg,
@@ -372,16 +324,8 @@ const GlobalStyle = createGlobalStyle`
   }
 
   /* Ant Design Spin Overrides */
-  .ant-spin {
-    color: ${({ theme }) => theme.textPrimary};
-  }
-
   .ant-spin-dot-item {
     background-color: ${({ theme }) => theme.accentPurple};
-  }
-
-  .ant-spin-text {
-    color: ${({ theme }) => theme.textPrimary};
   }
 
   .ant-spin-container::after {
@@ -389,10 +333,6 @@ const GlobalStyle = createGlobalStyle`
   }
 
   /* Ant Design Alert Overrides */
-  .ant-alert {
-    color: ${({ theme }) => theme.textSecondary};
-  }
-
   .ant-alert-error {
     background: ${({ theme }) => theme.alertErrorBackground};
     border-color: ${({ theme }) => theme.alertErrorBorder};
@@ -413,37 +353,16 @@ const GlobalStyle = createGlobalStyle`
     border-color: ${({ theme }) => theme.alertSuccessBorder};
   }
 
-  .ant-alert-message {
-    color: ${({ theme }) => theme.textPrimary};
-  }
-
-  .ant-alert-description {
-    color: ${({ theme }) => theme.textSecondary};
-  }
-
   .ant-alert-icon {
     color: ${({ theme }) => theme.primaryColor};
   }
 
-  .ant-alert-close-icon {
-    color: ${({ theme }) => theme.textSecondary};
-  }
-
   /* Ant Design Breadcrumb Overrides */
-  .ant-breadcrumb-link,
-  .ant-breadcrumb-separator {
-    color: ${({ theme }) => theme.textSecondary};
-  }
-
   .ant-breadcrumb-link a {
     color: ${({ theme }) => theme.linkColor};
   }
 
   /* Ant Design Steps Overrides */
-  .ant-steps-item-title {
-    color: ${({ theme }) => theme.textSecondary};
-  }
-
   .ant-steps-item-description {
     color: ${({ theme }) => theme.textLight};
   }
@@ -458,24 +377,9 @@ const GlobalStyle = createGlobalStyle`
     border-bottom-color: ${({ theme }) => theme.borderColor};
   }
 
-  .ant-collapse-header {
-    color: ${({ theme }) => theme.textPrimary};
-  }
-
   .ant-collapse-content {
     background: ${({ theme }) => theme.componentBackground};
     border-top-color: ${({ theme }) => theme.borderColor};
-    color: ${({ theme }) => theme.textSecondary};
-  }
-
-  /* Ant Design Timeline Overrides */
-  .ant-timeline-item-content {
-    color: ${({ theme }) => theme.textSecondary};
-  }
-
-  /* Ant Design Progress Overrides */
-  .ant-progress-text {
-    color: ${({ theme }) => theme.textSecondary};
   }
 
   /* Ant Design Dropdown/Menu Overrides */
@@ -522,37 +426,31 @@ const GlobalStyle = createGlobalStyle`
   ::-webkit-scrollbar-thumb {
     background: ${({ theme }) => theme.scrollbarThumb};
     border-radius: 4px;
-  }
 
-  ::-webkit-scrollbar-thumb:hover {
-    background: ${({ theme }) => theme.primaryPurple};
+    &:hover {
+      background: ${({ theme }) => theme.primaryPurple};
+    }
   }
 
   /* Links */
   a {
     color: ${({ theme }) => theme.linkColor};
+    text-decoration: none;
+
+    &:hover {
+      color: ${({ theme }) => theme.linkColor};
+      filter: brightness(1.2);
+    }
   }
 
-  a:hover {
-    color: ${({ theme }) => theme.primaryColor};
-  }
-
-  /* Custom tooltip (rrui) */
-  .rrui__tooltip {
+  /* Tooltip Overrides */
+  .rrui__tooltip,
+  .ant-tooltip-inner {
     background: ${({ theme }) => theme.tooltipBackground} !important;
     color: ${({ theme }) => theme.tooltipColor} !important;
   }
 
-  /* Ant Design Tooltip Overrides */
-  .ant-tooltip-inner {
-    background-color: ${({ theme }) => theme.tooltipBackground} !important;
-    color: ${({ theme }) => theme.tooltipColor} !important;
-  }
-
-  .ant-tooltip-arrow::before {
-    background-color: ${({ theme }) => theme.tooltipBackground} !important;
-  }
-
+  .ant-tooltip-arrow::before,
   .ant-tooltip-arrow-content {
     background-color: ${({ theme }) => theme.tooltipBackground} !important;
   }
@@ -564,10 +462,6 @@ const GlobalStyle = createGlobalStyle`
   /* Ant Design Select Dropdown Overrides */
   .ant-select-dropdown {
     background-color: ${({ theme }) => theme.componentBackground};
-  }
-
-  .ant-select-dropdown-menu-item {
-    color: ${({ theme }) => theme.textSecondary};
   }
 
   .ant-select-dropdown-menu-item:hover {
@@ -583,34 +477,14 @@ const GlobalStyle = createGlobalStyle`
     border-right-color: ${({ theme }) => theme.borderColor};
   }
 
-  .ant-cascader-menu-item {
-    color: ${({ theme }) => theme.textSecondary};
-  }
-
   .ant-cascader-menu-item:hover {
     background: ${({ theme }) => theme.tableRowHover};
   }
 
   /* Ant Design Notification Overrides */
-  .ant-notification-notice {
-    background: ${({ theme }) => theme.componentBackground};
-    color: ${({ theme }) => theme.textSecondary};
-  }
-
-  .ant-notification-notice-message {
-    color: ${({ theme }) => theme.textPrimary};
-  }
-
-  .ant-notification-notice-close,
-  .ant-notification-close-icon,
-  .ant-notification-notice-close .anticon {
-    color: ${({ theme }) => theme.textPrimary};
-  }
-
-  /* Ant Design Message Overrides */
+  .ant-notification-notice,
   .ant-message-notice-content {
     background: ${({ theme }) => theme.componentBackground};
-    color: ${({ theme }) => theme.textPrimary};
   }
 
   /* Ant Design Card Actions */
@@ -626,6 +500,12 @@ const GlobalStyle = createGlobalStyle`
     color: ${({ theme }) => theme.primaryPurple};
     background: ${({ theme }) => theme.componentBackground};
 
+    &:hover,
+    &:focus {
+      background: ${({ theme }) => theme.elevatedBackground};
+      color: ${({ theme }) => theme.primaryPurple};
+    }
+
     &:before {
       background-color: transparent !important;
     }
@@ -633,28 +513,19 @@ const GlobalStyle = createGlobalStyle`
     &:not(:first-child)::before {
       display: none !important;
     }
-
-    &:hover {
-      color: ${({ theme }) => theme.primaryPurple};
-    }
   }
 
   .ant-radio-button-wrapper-checked {
     background: ${({ theme }) => theme.primaryPurple} !important;
     color: ${({ theme }) => theme.textOnPurple} !important;
     border-color: ${({ theme }) => theme.primaryPurple} !important;
-  }
 
-  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
-    box-shadow: none !important;
+    &:not(.ant-radio-button-wrapper-disabled) {
+      box-shadow: none !important;
 
-    &:hover {
-      background: ${({ theme }) => theme.primaryPurple} !important;
-      color: ${({ theme }) => theme.textOnPurple} !important;
-    }
-
-    &:focus-within {
-      outline: none;
+      &:focus-within {
+        outline: none;
+      }
     }
   }
 
@@ -681,14 +552,50 @@ const GlobalStyle = createGlobalStyle`
     background: linear-gradient(to left, ${({ theme }) => theme.gradientStart}, ${({ theme }) => theme.gradientEnd});
   }
 
+  /* Consolidated text color overrides */
+  .ant-modal-title,
+  .ant-spin,
+  .ant-spin-text,
+  .ant-collapse-header,
+  .ant-alert-message,
+  .ant-notification-notice-message,
+  .ant-notification-notice-close,
+  .ant-notification-close-icon,
+  .ant-message-notice-content,
+  .ant-form-item-label > label,
+  .ant-list-item-meta-title {
+    color: ${({ theme }) => theme.textPrimary};
+  }
+
+  .ant-card-body,
+  .ant-modal-close-x,
+  .ant-modal-body,
+  .ant-popover-inner-content,
+  .ant-popover-message,
+  .ant-popover-message-title,
+  .ant-input-suffix,
+  .ant-input-prefix,
+  .ant-input-clear-icon,
+  .ant-list-item-meta-description,
+  .ant-divider-inner-text,
+  .ant-alert,
+  .ant-alert-description,
+  .ant-alert-close-icon,
+  .ant-breadcrumb-link,
+  .ant-breadcrumb-separator,
+  .ant-steps-item-title,
+  .ant-timeline-item-content,
+  .ant-progress-text,
+  .ant-select-dropdown-menu-item,
+  .ant-cascader-menu-item {
+    color: ${({ theme }) => theme.textSecondary};
+  }
+
   /* Icon fills - hexagon and other SVG icons */
   svg.ternary-fill path,
   .ternary-fill path,
   .ternary-fill .theme-fill,
-  .ternary-fill.theme-fill {
-    fill: ${({ theme }) => theme.hexagonFill} !important;
-  }
-
+  .ternary-fill.theme-fill,
   svg.secondary-fill path,
   .secondary-fill path,
   .secondary-fill .theme-fill,

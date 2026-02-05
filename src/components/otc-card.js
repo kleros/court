@@ -47,8 +47,8 @@ const StyledTextLarge = styled.div`
   text-align: left;
 `;
 const StyledButton = styled(Button)`
-  margin-top: "12px";
-  max-width: "150px";
+  margin-top: 12px;
+  max-width: 150px;
 
   &.ant-btn-primary {
     background-color: transparent;
@@ -58,12 +58,10 @@ const StyledButton = styled(Button)`
     &:hover,
     &:focus {
       background-color: ${({ theme }) => theme.buttonHoverOverlay};
-      border-color: ${({ theme }) => theme.textOnPurple};
-      color: ${({ theme }) => theme.textOnPurple};
     }
 
     a {
-      color: ${({ theme }) => theme.textOnPurple} !important;
+      color: inherit !important;
       text-decoration: none;
     }
   }

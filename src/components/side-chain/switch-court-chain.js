@@ -287,8 +287,6 @@ const StyledButtonWrapper = styled.div`
     &:hover,
     &:focus {
       opacity: 0.7;
-      background: transparent;
-      color: ${({ theme }) => theme.textPrimary};
     }
 
     @media (max-width: 767.98px) {

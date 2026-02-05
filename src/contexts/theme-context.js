@@ -5,162 +5,222 @@ import createPersistedState from "use-persisted-state";
 
 const usePersistedTheme = createPersistedState("@kleros/court/theme");
 
+// Light theme base colors
+const lightBase = {
+  blue: "#009aff",
+  purple: "#4d00b4",
+  purpleDeep: "#4004a3",
+  purpleBright: "#6500b4",
+  purpleAccent: "#9013fe",
+  purpleLight: "#ead6fe",
+  white: "#ffffff",
+  grayLight: "#d9d9d9",
+  grayMuted: "#4a4a4a",
+  lavender: "#f5f1fd",
+  lavenderLight: "#f2e3ff",
+  pinkBorder: "#d09cff",
+  blackAlpha65: "rgba(0, 0, 0, 0.65)",
+  blueLight: "#e6f7ff",
+  green: "#52c41a",
+  greenBright: "#00c42b",
+  greenBrighter: "#00e632",
+  red: "#f5222d",
+  redBright: "#f60c36",
+  yellow: "#faad14",
+};
+
 export const lightTheme = {
   name: "light",
-  primaryColor: "#009aff",
-  primaryPurple: "#4d00b4",
-  secondaryPurple: "#4004a3",
-  tertiaryPurple: "#6500b4",
-  quaternaryPurple: "#ead6fe",
-  bodyBackground: "#f2e3ff",
-  componentBackground: "#ffffff",
-  elevatedBackground: "#f5f1fd",
-  cardBackground: "#ffffff",
+  // Primary colors
+  primaryColor: lightBase.blue,
+  primaryPurple: lightBase.purple,
+  secondaryPurple: lightBase.purpleDeep,
+  tertiaryPurple: lightBase.purpleBright,
+  quaternaryPurple: lightBase.purpleLight,
+  accentPurple: lightBase.purpleAccent,
+  // Backgrounds
+  bodyBackground: lightBase.lavenderLight,
+  componentBackground: lightBase.white,
+  elevatedBackground: lightBase.lavender,
+  cardBackground: lightBase.white,
   cardShadow: "0px 6px 36px #bc9cff",
-  headerBackground: "#4d00b4",
-  cardHeaderBackground: "#4d00b4",
-  cardActionsBackground: "#f5f1fd",
-  borderColor: "#d09cff",
-  borderColorBase: "#d9d9d9",
-  textPrimary: "#4004a3",
-  textSecondary: "rgba(0, 0, 0, 0.65)",
+  headerBackground: lightBase.purple,
+  cardHeaderBackground: lightBase.purple,
+  cardActionsBackground: lightBase.lavender,
+  whiteBackground: lightBase.white,
+  popoverBackground: lightBase.white,
+  inputBackground: lightBase.white,
+  tableHeaderBackground: "#fafafa",
+  tableRowHover: lightBase.blueLight,
+  // Borders
+  borderColor: lightBase.pinkBorder,
+  inputBorder: lightBase.grayLight,
+  inputFocusBorder: lightBase.purpleAccent,
+  // Text
+  textPrimary: lightBase.purpleDeep,
+  textSecondary: lightBase.blackAlpha65,
   textLight: "rgba(0, 0, 0, 0.45)",
-  textOnPurple: "#ffffff",
-  primaryButtonText: "#ffffff",
-  whiteBackground: "#ffffff",
-  gradientStart: "#4d00b4",
-  gradientEnd: "#6500b4",
-  linkColor: "#009aff",
-  successColor: "#52c41a",
-  errorColor: "#f5222d",
-  warningColor: "#faad14",
-  infoColor: "#009aff",
+  textOnPurple: lightBase.white,
+  primaryButtonText: lightBase.white,
+  mutedText: lightBase.grayMuted,
+  textMutedLight: "rgba(60, 66, 66, 0.6)",
   disabledColor: "rgba(0, 0, 0, 0.25)",
+  // Links & status
+  linkColor: lightBase.blue,
+  successColor: lightBase.green,
+  errorColor: lightBase.red,
+  warningColor: lightBase.yellow,
+  infoColor: lightBase.blue,
+  dangerColor: lightBase.redBright,
+  successGreen: lightBase.greenBright,
+  successGreenBright: lightBase.greenBrighter,
+  // Gradients
+  gradientStart: lightBase.purple,
+  gradientEnd: lightBase.purpleBright,
+  bannerGradientStart: lightBase.lavenderLight,
+  bannerGradientEnd: lightBase.white,
+  // Skeleton
   skeletonColor: "#f2f2f2",
   skeletonHighlight: "#e8e8e8",
-  scrollbarTrack: "#f5f1fd",
-  scrollbarThumb: "#d09cff",
-  modalMask: "rgba(0, 0, 0, 0.65)",
-  popoverBackground: "#ffffff",
-  tooltipBackground: "#d9d9d9",
-  tooltipColor: "#4a4a4a",
-  inputBackground: "#ffffff",
-  inputBorder: "#d9d9d9",
-  tableHeaderBackground: "#fafafa",
-  tableRowHover: "#e6f7ff",
-  menuDarkBackground: "#4d00b4",
-  menuDarkItemActive: "#009aff",
-  spinDotColor: "#009aff",
-  dividerColor: "rgba(0, 0, 0, 0.06)",
-  // Icon fills
-  hexagonFill: "#4004a3",
-  primaryFill: "#009aff",
-  // Overlay colors
+  // Scrollbar
+  scrollbarTrack: lightBase.lavender,
+  scrollbarThumb: lightBase.pinkBorder,
+  // Overlays
+  modalMask: lightBase.blackAlpha65,
   buttonHoverOverlay: "rgba(255, 255, 255, 0.1)",
   headerSkeletonBase: "rgba(255, 255, 255, 0.15)",
   headerSkeletonHighlight: "rgba(255, 255, 255, 0.25)",
-  // Accent colors
-  accentPurple: "#9013fe",
-  // Input focus
-  inputFocusBorder: "#9013fe",
-  // Warning colors (for alerts)
+  menuTriggerBackground: "rgba(0, 0, 0, 0.2)",
+  inputOverlayBackground: "rgba(255, 255, 255, 0.3)",
+  // Tooltips
+  tooltipBackground: lightBase.grayLight,
+  tooltipColor: lightBase.grayMuted,
+  // Divider
+  dividerColor: "rgba(0, 0, 0, 0.06)",
+  // Icon fills
+  hexagonFill: lightBase.purpleDeep,
+  primaryFill: lightBase.blue,
+  // Alerts
   warningBackground: "#fff3cd",
   warningBorderColor: "#ffeeba",
-  // Alert backgrounds and borders
   alertErrorBackground: "#fff2f0",
   alertErrorBorder: "#ffccc7",
   alertWarningBackground: "#fffbe6",
   alertWarningBorder: "#ffe58f",
-  alertInfoBackground: "#e6f7ff",
+  alertInfoBackground: lightBase.blueLight,
   alertInfoBorder: "#91d5ff",
   alertSuccessBackground: "#f6ffed",
   alertSuccessBorder: "#b7eb8f",
-  // Status colors
-  dangerColor: "#f60c36",
-  successGreen: "#00c42b",
-  successGreenBright: "#00e632",
-  // Muted text
-  mutedText: "#4a4a4a",
-  // Announcement banner
-  announcementBackground: "#9013fe",
-  // Select/List item states
+  // Announcement
+  announcementBackground: lightBase.purpleAccent,
+  // Select states
   selectActiveBackground: "#999cff",
   selectHoverBackground: "#e3cfee",
   selectHoverText: "#4d50b4",
-  textMutedLight: "rgba(60, 66, 66, 0.6)",
-  // Overlay inputs on gradient backgrounds
-  inputOverlayBackground: "rgba(255, 255, 255, 0.3)",
-  // Top banner gradient
-  bannerGradientStart: "#f2e3ff",
-  bannerGradientEnd: "#ffffff",
-  // Menu trigger overlay
-  menuTriggerBackground: "rgba(0, 0, 0, 0.2)",
   // Page titles
-  pageTitle: "#4d00b4",
+  pageTitle: lightBase.purple,
+};
+
+// Dark theme base colors
+const darkBase = {
+  blue: "#5faddb",
+  purple: "#8a6cb8",
+  purpleMid: "#4a3d6e",
+  purpleDark: "#3d3456",
+  purpleDarker: "#2d2545",
+  purpleLight: "#c4a6e8",
+  purpleFocus: "#9b7bcf",
+  white: "#ffffff",
+  textLight: "#e8e6ed",
+  textLightAlpha: "rgba(232, 230, 237, 0.5)",
+  whiteOverlay: "rgba(255, 255, 255, 0.1)",
+  grayMuted: "#a0a0a0",
+  bgDark: "#13101a",
+  bgCard: "#1e1a28",
+  bgElevated: "#2d2840",
+  bgCardBody: "#252032",
+  bgHeader: "#1a1625",
+  green: "#52c41a",
+  greenBright: "#00c42b",
+  greenBrighter: "#00e632",
+  red: "#ff6b6b",
+  yellow: "#ffc53d",
 };
 
 export const darkTheme = {
   name: "dark",
-  primaryColor: "#5faddb",
-  primaryPurple: "#8a6cb8",
-  secondaryPurple: "#4a3d6e",
-  tertiaryPurple: "#3d3456",
-  quaternaryPurple: "#2d2545",
-  bodyBackground: "#13101a",
-  componentBackground: "#1e1a28",
-  elevatedBackground: "#2d2840",
-  cardBackground: "#252032",
+  // Primary colors
+  primaryColor: darkBase.blue,
+  primaryPurple: darkBase.purple,
+  secondaryPurple: darkBase.purpleMid,
+  tertiaryPurple: darkBase.purpleDark,
+  quaternaryPurple: darkBase.purpleDarker,
+  accentPurple: darkBase.purpleMid,
+  // Backgrounds
+  bodyBackground: darkBase.bgDark,
+  componentBackground: darkBase.bgCard,
+  elevatedBackground: darkBase.bgElevated,
+  cardBackground: darkBase.bgCardBody,
   cardShadow: "0px 4px 20px rgba(0, 0, 0, 0.5)",
-  headerBackground: "#1a1625",
-  cardHeaderBackground: "#2d2840",
-  cardActionsBackground: "#2d2840",
-  borderColor: "#3d3456",
-  borderColorBase: "#3d3456",
-  textPrimary: "#e8e6ed",
+  headerBackground: darkBase.bgHeader,
+  cardHeaderBackground: darkBase.bgElevated,
+  cardActionsBackground: darkBase.bgElevated,
+  whiteBackground: darkBase.bgCard,
+  popoverBackground: darkBase.bgCard,
+  inputBackground: darkBase.bgCard,
+  tableHeaderBackground: darkBase.bgElevated,
+  tableRowHover: darkBase.purpleDark,
+  // Borders
+  borderColor: darkBase.purpleDark,
+  inputBorder: darkBase.purpleDark,
+  inputFocusBorder: darkBase.purpleFocus,
+  // Text
+  textPrimary: darkBase.textLight,
   textSecondary: "rgba(232, 230, 237, 0.7)",
-  textLight: "rgba(232, 230, 237, 0.5)",
-  textOnPurple: "#ffffff",
+  textLight: darkBase.textLightAlpha,
+  textOnPurple: darkBase.white,
   primaryButtonText: "#1a1423",
-  whiteBackground: "#1e1a28",
-  gradientStart: "#2d2840",
-  gradientEnd: "#2d2840",
-  linkColor: "#5faddb",
-  successColor: "#52c41a",
-  errorColor: "#ff6b6b",
-  warningColor: "#ffc53d",
-  infoColor: "#5faddb",
+  mutedText: darkBase.grayMuted,
+  textMutedLight: darkBase.textLightAlpha,
   disabledColor: "rgba(255, 255, 255, 0.25)",
-  skeletonColor: "#2d2840",
-  skeletonHighlight: "#3d3456",
-  scrollbarTrack: "#1e1a28",
-  scrollbarThumb: "#3d3456",
+  // Links & status
+  linkColor: darkBase.blue,
+  successColor: darkBase.green,
+  errorColor: darkBase.red,
+  warningColor: darkBase.yellow,
+  infoColor: darkBase.blue,
+  dangerColor: darkBase.red,
+  successGreen: darkBase.greenBright,
+  successGreenBright: darkBase.greenBrighter,
+  // Gradients
+  gradientStart: darkBase.bgElevated,
+  gradientEnd: darkBase.bgElevated,
+  bannerGradientStart: darkBase.bgElevated,
+  bannerGradientEnd: darkBase.bgCard,
+  // Skeleton
+  skeletonColor: darkBase.bgElevated,
+  skeletonHighlight: darkBase.purpleDark,
+  // Scrollbar
+  scrollbarTrack: darkBase.bgCard,
+  scrollbarThumb: darkBase.purpleDark,
+  // Overlays
   modalMask: "rgba(0, 0, 0, 0.8)",
-  popoverBackground: "#1e1a28",
-  tooltipBackground: "#2d2840",
-  tooltipColor: "#e8e6ed",
-  inputBackground: "#1e1a28",
-  inputBorder: "#3d3456",
-  tableHeaderBackground: "#2d2840",
-  tableRowHover: "#3d3456",
-  menuDarkBackground: "#4a3d6e",
-  menuDarkItemActive: "#5faddb",
-  spinDotColor: "#5faddb",
+  buttonHoverOverlay: darkBase.whiteOverlay,
+  headerSkeletonBase: darkBase.bgElevated,
+  headerSkeletonHighlight: darkBase.purpleDark,
+  menuTriggerBackground: darkBase.whiteOverlay,
+  inputOverlayBackground: "rgba(255, 255, 255, 0.2)",
+  // Tooltips
+  tooltipBackground: darkBase.bgElevated,
+  tooltipColor: darkBase.textLight,
+  // Divider
   dividerColor: "rgba(255, 255, 255, 0.08)",
   // Icon fills
-  hexagonFill: "#4a3d6e",
-  primaryFill: "#5faddb",
-  // Overlay colors
-  buttonHoverOverlay: "rgba(255, 255, 255, 0.1)",
-  headerSkeletonBase: "#2d2840",
-  headerSkeletonHighlight: "#3d3456",
-  // Accent colors
-  accentPurple: "#4a3d6e",
-  // Input focus
-  inputFocusBorder: "#9b7bcf",
-  // Warning colors (for alerts)
-  warningBackground: "#3d3456",
+  hexagonFill: darkBase.purpleMid,
+  primaryFill: darkBase.blue,
+  // Alerts
+  warningBackground: darkBase.purpleDark,
   warningBorderColor: "#524a6e",
-  // Alert backgrounds and borders
   alertErrorBackground: "#2d1f1f",
   alertErrorBorder: "#5c3636",
   alertWarningBackground: "#2d2a1f",
@@ -169,28 +229,14 @@ export const darkTheme = {
   alertInfoBorder: "#36505c",
   alertSuccessBackground: "#1f2d1f",
   alertSuccessBorder: "#365c36",
-  // Status colors
-  dangerColor: "#ff6b6b",
-  successGreen: "#00c42b",
-  successGreenBright: "#00e632",
-  // Muted text
-  mutedText: "#a0a0a0",
-  // Announcement banner
-  announcementBackground: "#4a3d6e",
-  // Select/List item states
+  // Announcement
+  announcementBackground: darkBase.purpleMid,
+  // Select states
   selectActiveBackground: "#6b5895",
-  selectHoverBackground: "#3d3456",
-  selectHoverText: "#e8e6ed",
-  textMutedLight: "rgba(232, 230, 237, 0.5)",
-  // Overlay inputs on gradient backgrounds
-  inputOverlayBackground: "rgba(255, 255, 255, 0.2)",
-  // Top banner gradient
-  bannerGradientStart: "#2d2840",
-  bannerGradientEnd: "#1e1a28",
-  // Menu trigger overlay
-  menuTriggerBackground: "rgba(255, 255, 255, 0.1)",
+  selectHoverBackground: darkBase.purpleDark,
+  selectHoverText: darkBase.textLight,
   // Page titles
-  pageTitle: "#c4a6e8",
+  pageTitle: darkBase.purpleLight,
 };
 
 export const ThemeContext = createContext(null);

@@ -76,20 +76,12 @@ const StyledButton = styled(Button)`
   &:focus {
     background: ${({ theme }) => theme.secondaryPurple};
     border-color: ${({ theme }) => theme.secondaryPurple};
-    color: ${({ theme }) => theme.textOnPurple};
   }
 
   &[disabled] {
     background: ${({ theme }) => theme.elevatedBackground};
     border-color: ${({ theme }) => theme.borderColor};
     color: ${({ theme }) => theme.disabledColor};
-
-    &:hover,
-    &:focus {
-      background: ${({ theme }) => theme.elevatedBackground};
-      border-color: ${({ theme }) => theme.borderColor};
-      color: ${({ theme }) => theme.disabledColor};
-    }
   }
 `;
 

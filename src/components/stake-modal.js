@@ -337,7 +337,7 @@ const StyledForm = styled(Form)`
       height: 40px;
 
       input {
-        border: 1px solid ${({ theme }) => theme.borderColor};
+        border: none;
         border-radius: 3px;
         box-sizing: border-box;
         color: ${({ theme }) => theme.textPrimary};
@@ -345,7 +345,7 @@ const StyledForm = styled(Form)`
         font-weight: 500;
         height: 40px;
         line-height: 21px;
-        background: ${({ theme }) => theme.inputBackground};
+        background: transparent;
       }
     }
 

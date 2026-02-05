@@ -49,7 +49,6 @@ const StyledClaimButton = styled(Button)`
     &:hover,
     &:focus {
       background-color: ${({ theme }) => theme.secondaryPurple};
-      color: ${({ theme }) => theme.textOnPurple};
     }
   }
 
@@ -57,12 +56,6 @@ const StyledClaimButton = styled(Button)`
     background-color: ${({ theme }) => theme.elevatedBackground};
     color: ${({ theme }) => theme.disabledColor};
     border: none;
-
-    &:hover,
-    &:focus {
-      background-color: ${({ theme }) => theme.elevatedBackground};
-      color: ${({ theme }) => theme.disabledColor};
-    }
   }
 `;
 

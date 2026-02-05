@@ -170,7 +170,7 @@ const StyledClaimButton = styled(StyledButton)`
     color: ${({ theme }) => theme.textOnPurple};
 
     span {
-      color: ${({ theme }) => theme.textOnPurple};
+      color: inherit;
     }
 
     &:hover,
@@ -179,18 +179,12 @@ const StyledClaimButton = styled(StyledButton)`
         theme.name === "dark"
           ? `linear-gradient(111.6deg, #9b6dd8 20%, #7b4bc4 80%)`
           : `linear-gradient(111.6deg, ${theme.gradientEnd} 46.25%, ${theme.gradientStart} 96.25%)`};
-      color: ${({ theme }) => theme.textOnPurple};
-
-      span {
-        color: ${({ theme }) => theme.textOnPurple};
-      }
     }
 
     &:active {
       background: ${({ theme }) =>
         `linear-gradient(111.6deg, ${theme.gradientStart} 46.25%, ${theme.gradientEnd} 96.25%)`};
       filter: brightness(0.9);
-      color: ${({ theme }) => theme.textOnPurple};
     }
   }
 `;
