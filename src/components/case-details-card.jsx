@@ -956,7 +956,7 @@ const StyledCard = styled(Card)`
 
     &-actions {
       border: none;
-      background: ${({ theme }) => theme.cardActionsBackground};
+      background: ${({ theme }) => theme.elevatedBackground};
 
       & > li {
         margin: 0;

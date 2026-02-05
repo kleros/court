@@ -108,6 +108,6 @@ const StyledViewOnlyDiv = styled.div`
   }
 
   a {
-    color: ${({ theme }) => theme.linkColor};
+    color: ${({ theme }) => theme.primaryColor};
   }
 `;

@@ -74,7 +74,7 @@ const StyledUnclaimedAmount = styled.div`
 
 const StyledReadMoreLink = styled.div`
   font-size: 18px;
-  color: ${({ theme }) => theme.linkColor};
+  color: ${({ theme }) => theme.primaryColor};
 `;
 
 const StyledHr = styled.hr`

@@ -3,27 +3,7 @@ import { createGlobalStyle } from "styled-components";
 const GlobalStyle = createGlobalStyle`
   /* CSS Custom Properties for LESS compatibility */
   :root {
-    --primary-color: ${({ theme }) => theme.primaryColor};
-    --primary-purple: ${({ theme }) => theme.primaryPurple};
-    --secondary-purple: ${({ theme }) => theme.secondaryPurple};
-    --tertiary-purple: ${({ theme }) => theme.tertiaryPurple};
-    --body-background: ${({ theme }) => theme.bodyBackground};
-    --component-background: ${({ theme }) => theme.componentBackground};
-    --elevated-background: ${({ theme }) => theme.elevatedBackground};
-    --card-shadow: ${({ theme }) => theme.cardShadow};
-    --text-primary: ${({ theme }) => theme.textPrimary};
-    --text-secondary: ${({ theme }) => theme.textSecondary};
-    --text-light: ${({ theme }) => theme.textLight};
     --text-on-purple: ${({ theme }) => theme.textOnPurple};
-    --border-color: ${({ theme }) => theme.borderColor};
-    --link-color: ${({ theme }) => theme.linkColor};
-    --success-color: ${({ theme }) => theme.successColor};
-    --error-color: ${({ theme }) => theme.errorColor};
-    --warning-color: ${({ theme }) => theme.warningColor};
-    --hexagon-fill: ${({ theme }) => theme.hexagonFill};
-    --primary-fill: ${({ theme }) => theme.primaryFill};
-    --input-focus-border: ${({ theme }) => theme.inputFocusBorder};
-    --accent-purple: ${({ theme }) => theme.accentPurple};
     --header-background: ${({ theme }) => theme.headerBackground};
   }
 
@@ -233,7 +213,7 @@ const GlobalStyle = createGlobalStyle`
   .ant-btn-link {
     background: transparent;
     border: none;
-    color: ${({ theme }) => theme.linkColor};
+    color: ${({ theme }) => theme.primaryColor};
 
     &:hover,
     &:focus {
@@ -359,7 +339,7 @@ const GlobalStyle = createGlobalStyle`
 
   /* Ant Design Breadcrumb Overrides */
   .ant-breadcrumb-link a {
-    color: ${({ theme }) => theme.linkColor};
+    color: ${({ theme }) => theme.primaryColor};
   }
 
   /* Ant Design Steps Overrides */
@@ -424,7 +404,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   ::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.scrollbarThumb};
+    background: ${({ theme }) => theme.borderColor};
     border-radius: 4px;
 
     &:hover {
@@ -434,11 +414,11 @@ const GlobalStyle = createGlobalStyle`
 
   /* Links */
   a {
-    color: ${({ theme }) => theme.linkColor};
+    color: ${({ theme }) => theme.primaryColor};
     text-decoration: none;
 
     &:hover {
-      color: ${({ theme }) => theme.linkColor};
+      color: ${({ theme }) => theme.primaryColor};
       filter: brightness(1.2);
     }
   }
@@ -489,7 +469,7 @@ const GlobalStyle = createGlobalStyle`
 
   /* Ant Design Card Actions */
   .ant-card-actions {
-    background: ${({ theme }) => theme.cardActionsBackground};
+    background: ${({ theme }) => theme.elevatedBackground};
     border-top-color: ${({ theme }) => theme.borderColor};
   }
 
@@ -600,14 +580,14 @@ const GlobalStyle = createGlobalStyle`
   .secondary-fill path,
   .secondary-fill .theme-fill,
   .secondary-fill.theme-fill {
-    fill: ${({ theme }) => theme.hexagonFill} !important;
+    fill: ${({ theme }) => theme.secondaryPurple} !important;
   }
 
   svg.primary-fill path,
   .primary-fill path,
   .primary-fill .theme-fill,
   .primary-fill.theme-fill {
-    fill: ${({ theme }) => theme.primaryFill} !important;
+    fill: ${({ theme }) => theme.primaryColor} !important;
   }
 `;
 

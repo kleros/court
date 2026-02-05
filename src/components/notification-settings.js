@@ -27,7 +27,7 @@ const StyledForm = styled(Form)`
   }
 
   a {
-    color: ${({ theme }) => theme.linkColor};
+    color: ${({ theme }) => theme.primaryColor};
   }
 
   .ant-divider-inner-text {

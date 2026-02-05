@@ -13,14 +13,14 @@ export default function AnnouncementBanner({ message = "Kleros Court is now avai
 
   return isAlertVisible
     ? createPortal(
-        <StyledAlert banner closable showIcon={false} onClose={() => setAlertVisible(false)} message={message} />,
-        bannerRoot
-      )
+      <StyledAlert banner closable showIcon={false} onClose={() => setAlertVisible(false)} message={message} />,
+      bannerRoot
+    )
     : null;
 }
 
 const StyledAlert = styled(Alert)`
-  background-color: ${({ theme }) => theme.announcementBackground};
+  background-color: ${({ theme }) => theme.accentPurple};
 
   .ant-alert-message {
     display: block;

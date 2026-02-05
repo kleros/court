@@ -107,7 +107,7 @@ const StyledButtonLink = styled.button.attrs((...rest) => ({ ...rest, type: "but
   cursor: pointer;
   font-weight: inherit;
   display: inline-block;
-  color: ${({ theme }) => theme.linkColor};
+  color: ${({ theme }) => theme.primaryColor};
 `;
 
 const StyledCompositeLabel = styled.span`
