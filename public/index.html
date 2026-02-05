@@ -20,6 +20,39 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Kleros · Court</title>
+    <!-- Prevent white flash on dark mode - set background before JS loads -->
+    <script>
+      (function () {
+        var theme;
+        try {
+          theme = JSON.parse(localStorage.getItem("@kleros/court/theme"));
+        } catch (e) {}
+        if (!theme && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          theme = "dark";
+        }
+        if (theme === "dark") {
+          document.documentElement.style.backgroundColor = "#13101a";
+          document.documentElement.style.colorScheme = "dark";
+        } else {
+          document.documentElement.style.backgroundColor = "#f2e3ff";
+        }
+      })();
+    </script>
+    <style>
+      /* Prevent FOUC - set initial background based on theme */
+      html {
+        background-color: #f2e3ff; /* Light mode default */
+      }
+      @media (prefers-color-scheme: dark) {
+        html:not([data-theme="light"]) {
+          background-color: #13101a;
+        }
+      }
+      body,
+      .ant-layout {
+        background: inherit !important;
+      }
+    </style>
     <!-- Hotjar Tracking Code for court.kleros.io -->
     <script>
       (function (h, o, t, j, a, r) {

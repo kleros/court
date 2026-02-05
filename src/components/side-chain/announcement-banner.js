@@ -13,27 +13,29 @@ export default function AnnouncementBanner({ message = "Kleros Court is now avai
 
   return isAlertVisible
     ? createPortal(
-        <StyledAlert banner closable showIcon={false} onClose={() => setAlertVisible(false)} message={message} />,
-        bannerRoot
-      )
+      <StyledAlert banner closable showIcon={false} onClose={() => setAlertVisible(false)} message={message} />,
+      bannerRoot
+    )
     : null;
 }
 
 const StyledAlert = styled(Alert)`
-  background-color: #9013fe;
+  background-color: ${({ theme }) => theme.accentPurple};
 
   .ant-alert-message {
     display: block;
-    color: white;
+    color: ${({ theme }) => theme.textOnPurple};
     text-align: center;
   }
 
   .anticon-close {
-    color: rgba(255, 255, 255, 0.85);
+    color: ${({ theme }) => theme.textOnPurple};
+    opacity: 0.85;
 
     :focus,
     :hover {
-      color: rgba(255, 255, 255, 1);
+      color: ${({ theme }) => theme.textOnPurple};
+      opacity: 1;
       filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
     }
   }

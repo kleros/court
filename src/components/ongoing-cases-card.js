@@ -18,38 +18,38 @@ const StyledDiv = styled.div`
 `;
 
 const StyledPending = styled.div`
-  color: #4a4a4a;
+  color: ${({ theme }) => theme.mutedText};
   svg {
     height: 12px;
     path {
-      fill: #4a4a4a;
+      fill: ${({ theme }) => theme.mutedText};
     }
   }
 `;
 const StyledVoting = styled.div`
-  color: #009aff;
+  color: ${({ theme }) => theme.primaryColor};
   svg {
     height: 12px;
     path {
-      fill: #009aff;
+      fill: ${({ theme }) => theme.primaryColor};
     }
   }
 `;
 const StyledExecuted = styled.div`
-  color: #f60c36;
+  color: ${({ theme }) => theme.dangerColor};
   svg {
     height: 12px;
     path {
-      fill: #f60c36;
+      fill: ${({ theme }) => theme.dangerColor};
     }
   }
 `;
 const StyledAppealed = styled.div`
-  color: #f60c36;
+  color: ${({ theme }) => theme.dangerColor};
   svg {
     height: 12px;
     path {
-      fill: #f60c36;
+      fill: ${({ theme }) => theme.dangerColor};
     }
   }
 `;
@@ -58,7 +58,7 @@ const StyledGavelContainer = styled.div`
     height: 30px;
     width: 30px;
     path {
-      fill: #fff;
+      fill: ${({ theme }) => theme.textOnPurple};
     }
   }
 `;

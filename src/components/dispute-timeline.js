@@ -77,18 +77,18 @@ DisputeTimeline.propTypes = {
 const StyledDisputeTimeline = styled.div``;
 
 const Period = styled(Col)`
-  ${({ past, current }) => {
+  ${({ past, current, theme }) => {
     if (past) {
       return `
-        color: rgba(0, 0, 0, 0.45);
+        color: ${theme.textLight};
       `;
     } else if (current) {
       return `
-        color: rgba(0, 0, 0, 0.85);
+        color: ${theme.textPrimary};
       `;
     } else {
       return `
-        color: rgba(0, 0, 0, 0.25);
+        color: ${theme.disabledColor};
       `;
     }
   }}
@@ -97,11 +97,11 @@ const Period = styled(Col)`
 
   &::before {
     text-align: center;
-    color: #ccc;
+    color: ${({ theme }) => theme.borderColor};
     height: 1.5rem;
     width: 1.5rem;
     border-radius: 50%;
-    border: 1px solid #ccc;
+    border: 1px solid ${({ theme }) => theme.borderColor};
     display: inline-block;
     margin-right: 16px;
     font-size: 12px;
@@ -110,18 +110,18 @@ const Period = styled(Col)`
     margin-top: 0.15rem;
     margin-bottom: auto;
     vertical-align: baseline;
-    ${({ past, current, content }) => {
+    ${({ past, current, content, theme }) => {
       if (past) {
         return `
           content: "✓";
-          border-color: #009aff;
-          color: #009aff;
+          border-color: ${theme.primaryColor};
+          color: ${theme.primaryColor};
         `;
       } else if (current) {
         return `
           content: "${content.toString()}";
-          background-color: #009aff;
-          color: white;
+          background-color: ${theme.primaryColor};
+          color: ${theme.textOnPurple};
           border: none;
         `;
       } else {
@@ -134,7 +134,7 @@ const Period = styled(Col)`
 `;
 
 const Separator = styled(Col)`
-  ${({ past }) => `border: 1px ${past ? "#009aff" : "#ccc"} solid;`}
+  ${({ past, theme }) => `border: 1px ${past ? theme.primaryColor : theme.borderColor} solid;`}
   height: 1px;
   margin: auto 16px;
 `;

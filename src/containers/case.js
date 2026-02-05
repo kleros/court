@@ -223,7 +223,8 @@ const StyledButton = styled(Button)`
 `;
 
 const ResolvedTag = styled.div`
-  border: 1px solid;
+  border: 1px solid ${({ theme }) => theme.primaryPurple};
+  color: ${({ theme }) => theme.primaryPurple};
   border-radius: 3px;
   float: right;
   margin-right: 50px;

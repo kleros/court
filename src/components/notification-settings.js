@@ -21,10 +21,29 @@ const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
 const StyledForm = styled(Form)`
   max-width: 250px;
+
+  p {
+    color: ${({ theme }) => theme.textSecondary};
+  }
+
+  a {
+    color: ${({ theme }) => theme.primaryColor};
+  }
+
+  .ant-divider-inner-text {
+    color: ${({ theme }) => theme.textSecondary};
+  }
 `;
 
 const StyledMail = styled(Mail)`
   min-width: 16px;
+  cursor: pointer;
+  transition: transform 0.3s ease, opacity 0.2s ease;
+
+  &:hover {
+    transform: rotate(15deg);
+    opacity: 0.7;
+  }
 `;
 
 const StyledAlertContainer = styled.div`

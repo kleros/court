@@ -261,7 +261,7 @@ StakeModalForm.propTypes = {
 };
 
 const StyledModal = styled(Modal)`
-  max-width: 90%;
+  max-width: calc(100vw - 32px);
 
   .ant-modal {
     &-content {
@@ -271,10 +271,14 @@ const StyledModal = styled(Modal)`
 
     &-body {
       padding: 35px 41px;
+
+      @media (max-width: 575px) {
+        padding: 24px 16px;
+      }
     }
 
     &-header {
-      background: #4d00b4;
+      background: ${({ theme }) => theme.cardHeaderBackground};
       border-top-left-radius: 12px;
       border-top-right-radius: 12px;
       height: 55px;
@@ -282,13 +286,17 @@ const StyledModal = styled(Modal)`
     }
 
     &-title {
-      color: white;
+      color: ${({ theme }) => theme.textOnPurple};
       font-size: 18px;
     }
 
     &-footer {
       border: none;
       padding: 0px 41px 35px 41px;
+
+      @media (max-width: 575px) {
+        padding: 0px 16px 24px 16px;
+      }
 
       div {
         display: flex;
@@ -302,16 +310,7 @@ const StyledModal = styled(Modal)`
       }
 
       .ant-btn {
-        background: none;
-        border: 1px solid #4d00b4;
         border-radius: 3px;
-        color: #4d00b4;
-
-        &-primary {
-          background: #009aff;
-          border: 1px solid #009aff;
-          color: white;
-        }
 
         &-primary:disabled {
           background: grey;
@@ -327,7 +326,7 @@ const StyledForm = styled(Form)`
       line-height: 30px;
 
       label {
-        color: #4d00b4 !important;
+        color: ${({ theme }) => theme.textPrimary} !important;
         font-size: 14px;
         font-weight: 500;
         line-height: 16px;
@@ -338,26 +337,27 @@ const StyledForm = styled(Form)`
       height: 40px;
 
       input {
-        border: 1px solid #d09cff;
+        border: none;
         border-radius: 3px;
         box-sizing: border-box;
-        color: #4d00b4;
+        color: ${({ theme }) => theme.textPrimary};
         font-size: 18px;
         font-weight: 500;
         height: 40px;
         line-height: 21px;
+        background: transparent;
       }
     }
 
     .ant-form-extra {
-      color: #4d00b4;
+      color: ${({ theme }) => theme.textPrimary};
       font-size: 12px;
       font-style: italic;
       line-height: 14px;
     }
 
     .agreement-text {
-      color: #4d00b4;
+      color: ${({ theme }) => theme.textPrimary};
       font-size: 14px;
       line-height: 16px;
       padding-left: 12px;
@@ -388,22 +388,26 @@ const StyledRow = styled(Row)`
 `;
 
 const AvailableStake = styled.div`
-  background: linear-gradient(164.87deg, #4d00b4 23.35%, #6500b4 62.96%);
-  border: 4px solid #d09cff;
+  background: linear-gradient(
+    164.87deg,
+    ${({ theme }) => theme.gradientStart} 23.35%,
+    ${({ theme }) => theme.gradientEnd} 62.96%
+  );
+  border: 4px solid ${({ theme }) => theme.borderColor};
   border-radius: 12px;
   box-sizing: border-box;
-  color: white;
+  color: ${({ theme }) => theme.textOnPurple};
   padding: 30px 0;
   text-align: center;
   width: 100%;
 `;
 
 const AmountBox = styled.div`
-  background: white;
-  border: 4px solid #d09cff;
+  background: ${({ theme }) => theme.componentBackground};
+  border: 4px solid ${({ theme }) => theme.borderColor};
   border-radius: 12px;
   box-sizing: border-box;
-  color: #4d00b4;
+  color: ${({ theme }) => theme.textPrimary};
   padding: 23px 30px;
   text-align: center;
   width: 100%;

@@ -1,14 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
-
 import styled from "styled-components/macro";
-import { ReactComponent as Acropolis } from "../assets/images/acropolis.svg";
+import StyledAcropolis from "../components/styled-acropolis";
 
 const ErrorFallbackLayout = ({ children }) => {
   return (
-    <StyledDiv className="quaternary-background theme-background">
+    <StyledDiv>
       <StyledAcropolis />
-      {children}
+      <StyledContent>{children}</StyledContent>
     </StyledDiv>
   );
 };
@@ -21,9 +20,16 @@ ErrorFallbackLayout.propTypes = {
 const StyledDiv = styled.div`
   height: 100vh;
   width: 100vw;
+  display: flex;
+  flex-direction: column;
+  background: ${({ theme }) => theme.bodyBackground};
 `;
 
-const StyledAcropolis = styled(Acropolis)`
-  height: auto;
-  width: 100%;
+const StyledContent = styled.div`
+  flex: 1;
+  background: ${({ theme }) => theme.bodyBackground};
+  padding: 24px;
+  text-align: center;
+  color: ${({ theme }) => theme.textPrimary};
 `;
+

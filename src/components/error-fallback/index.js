@@ -32,8 +32,16 @@ const StyledAlert = styled(Alert)`
   position: fixed;
   top: 50%;
   transform: translate(-50%, -50%);
+  background: ${({ theme }) => theme.alertErrorBackground};
+  border-color: ${({ theme }) => theme.alertErrorBorder};
+
   .ant-alert-message {
     margin-bottom: 20px;
+    color: ${({ theme }) => theme.textPrimary};
+  }
+
+  .ant-alert-description {
+    color: ${({ theme }) => theme.textSecondary};
   }
 `;
 

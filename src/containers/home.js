@@ -161,15 +161,30 @@ const StyledButton = styled(Button)`
 `;
 
 const StyledClaimButton = styled(StyledButton)`
-  background-color: #9013fe;
-  border: none;
+  &&& {
+    background: ${({ theme }) =>
+      theme.name === "dark"
+        ? `linear-gradient(111.6deg, #7b4bc4 20%, #9b6dd8 80%)`
+        : `linear-gradient(111.6deg, ${theme.gradientStart} 46.25%, ${theme.gradientEnd} 96.25%)`};
+    border: none;
+    color: ${({ theme }) => theme.textOnPurple};
 
-  :hover,
-  :focus {
-    background-color: #a541fe;
-  }
+    span {
+      color: inherit;
+    }
 
-  :active {
-    background-color: #6601be;
+    &:hover,
+    &:focus {
+      background: ${({ theme }) =>
+        theme.name === "dark"
+          ? `linear-gradient(111.6deg, #9b6dd8 20%, #7b4bc4 80%)`
+          : `linear-gradient(111.6deg, ${theme.gradientEnd} 46.25%, ${theme.gradientStart} 96.25%)`};
+    }
+
+    &:active {
+      background: ${({ theme }) =>
+        `linear-gradient(111.6deg, ${theme.gradientStart} 46.25%, ${theme.gradientEnd} 96.25%)`};
+      filter: brightness(0.9);
+    }
   }
 `;

@@ -5,9 +5,8 @@ import { getAddressUrl, getTransactionUrl } from "../helpers/block-explorer";
 import Attachment from "./attachment";
 
 const StyledCard = styled(Card)`
-  background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0px 6px 36px #bc9cff;
+  box-shadow: ${({ theme }) => theme.cardShadow};
 
   > .ant-card-body {
     padding-top: 12px !important;
@@ -15,14 +14,14 @@ const StyledCard = styled(Card)`
 `;
 
 const StyledTitle = styled.div`
-  color: #4d00b4;
+  color: ${({ theme }) => theme.textPrimary};
   font-size: 18px;
   font-weight: 500;
   line-height: 21px;
 `;
 
 const StyledDescription = styled.div`
-  color: #000000;
+  color: ${({ theme }) => theme.textSecondary};
   font-size: 14px;
   line-height: 16px;
   margin-bottom: 12px;
@@ -35,7 +34,7 @@ const StyledDescription = styled.div`
 `;
 
 const StyledFooter = styled.div`
-  background: #f5f1fd;
+  background: ${({ theme }) => theme.elevatedBackground};
   margin: 0 -46px -23px -46px;
   min-height: 60px;
 
@@ -49,7 +48,7 @@ const StyledFooterBody = styled.div`
 `;
 
 const StyledSubmitter = styled.div`
-  color: #4d00b4;
+  color: ${({ theme }) => theme.textPrimary};
   font-size: 14px;
   font-weight: 500;
 `;
@@ -59,8 +58,8 @@ const StyledTime = styled.div`
 `;
 
 const ErrorStyledCard = styled(StyledCard)`
-  background: #fff3cd;
-  border-color: #ffeeba;
+  background: ${({ theme }) => theme.warningBackground};
+  border-color: ${({ theme }) => theme.warningBorderColor};
 `;
 
 const truncateAddress = (address) =>

@@ -224,34 +224,35 @@ const StyledModal = styled(Modal)`
   isolation: isolate;
   padding-bottom: 0;
   width: 90% !important;
+  max-width: calc(100vw - 32px);
   height: 90vh;
 
   h1 {
     font-size: 20px;
     font-weight: bolder;
-    color: #4d00b4;
+    color: ${({ theme }) => theme.textPrimary};
   }
 
   h2 {
     font-size: 18px;
     font-weight: bolder;
-    color: #4d00b4;
+    color: ${({ theme }) => theme.textPrimary};
   }
 
   h3 {
     font-size: 16px;
     font-weight: bolder;
-    color: #4d00b4;
+    color: ${({ theme }) => theme.textPrimary};
   }
 
   .ant-modal {
     &-header {
       border: none;
-      background: #4004a3;
+      background: ${({ theme }) => theme.secondaryPurple};
     }
 
     &-close-icon svg {
-      fill: white;
+      fill: ${({ theme }) => theme.textOnPurple};
     }
 
     &-content {
@@ -262,12 +263,12 @@ const StyledModal = styled(Modal)`
 
     &-title {
       text-align: center;
-      color: #ffffff;
+      color: ${({ theme }) => theme.textOnPurple};
       font-size: 20px;
     }
 
     &-body {
-      background: whitesmoke;
+      background: ${({ theme }) => theme.elevatedBackground};
       height: 286px;
       overflow: hidden;
       position: relative;
@@ -281,7 +282,7 @@ const StyledModal = styled(Modal)`
 
     &-footer {
       border: none;
-      color: #4d00b4;
+      color: ${({ theme }) => theme.textPrimary};
       padding: 0;
       text-align: left;
       height: calc(90vh - 400px);
@@ -290,7 +291,7 @@ const StyledModal = styled(Modal)`
 `;
 
 const SelectButtonArea = styled.div`
-  background: #4004a3;
+  background: ${({ theme }) => theme.secondaryPurple};
   padding: 0;
   display: flex;
   align-items: center;
@@ -311,7 +312,7 @@ const StyledCascader = styled(Cascader)`
   display: none;
 
   & ~ div .popupClassName {
-    background: whitesmoke;
+    background: ${({ theme }) => theme.elevatedBackground};
     width: 100%;
     border-radius: 0;
     left: 0 !important;
@@ -334,9 +335,9 @@ const StyledCascader = styled(Cascader)`
         white-space: normal;
 
         &-active {
-          color: white;
+          color: ${({ theme }) => theme.textOnPurple};
           .anticon {
-            color: white;
+            color: ${({ theme }) => theme.textOnPurple};
           }
         }
 
@@ -348,25 +349,48 @@ const StyledCascader = styled(Cascader)`
     }
 
     ul:nth-child(1) {
-      background: #4004a3;
+      background: ${({ theme }) => theme.secondaryPurple};
       border-radius: 0px;
+
+      /* First column always has purple bg, so loading icons should be white */
+      .ant-cascader-menu-item-loading-icon .anticon {
+        color: ${({ theme }) => theme.textOnPurple};
+      }
     }
 
     ul:nth-child(3n + 1) {
       .ant-cascader-menu-item-active {
-        background: #1e075f;
+        background: ${({ theme }) => theme.secondaryPurple};
       }
     }
 
     ul:nth-child(3n + 2) {
       .ant-cascader-menu-item-active {
-        background: #9013fe;
+        background: ${({ theme }) => theme.accentPurple};
       }
     }
 
     ul:nth-child(3n) {
       .ant-cascader-menu-item-active {
-        background: #009aff;
+        background: ${({ theme }) => theme.primaryPurple};
+      }
+    }
+
+    /* Loading spinner colors for all menu items */
+    .ant-cascader-menu-item-loading-icon {
+      .anticon-loading,
+      .anticon-loading svg,
+      .anticon {
+        color: ${({ theme }) => theme.textSecondary};
+      }
+    }
+
+    /* Loading spinner in active items should be white */
+    .ant-cascader-menu-item-active .ant-cascader-menu-item-loading-icon {
+      .anticon-loading,
+      .anticon-loading svg,
+      .anticon {
+        color: ${({ theme }) => theme.textOnPurple};
       }
     }
   }

@@ -275,9 +275,19 @@ const StyledButtonWrapper = styled.div`
     align-items: center;
   }
 
-  a.ant-btn {
+  a.ant-btn,
+  button.ant-btn {
     padding-top: 0;
     line-height: 28px;
+    border: none;
+    background: transparent;
+    color: ${({ theme }) => theme.textPrimary};
+    transition: opacity 0.2s ease;
+
+    &:hover,
+    &:focus {
+      opacity: 0.7;
+    }
 
     @media (max-width: 767.98px) {
       line-height: 44px;
@@ -391,7 +401,6 @@ const StyledModal = styled(Modal)`
     font-size: 36px;
     line-height: 1.33;
     text-align: center;
-    color: #4d00b4;
   }
 
   .ant-modal-footer {
@@ -407,14 +416,24 @@ const StyledModal = styled(Modal)`
         margin-left: auto;
       }
 
+      > button:not(.ant-btn-primary) {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        .anticon {
+          color: ${({ theme }) => theme.primaryPurple};
+        }
+      }
+
       @media (max-width: 575.98px) {
         > button,
         > a {
-          width 100%;
+          width: 100%;
         }
 
         > :last-child {
-          margin-left: none;
+          margin-left: 0;
         }
       }
     }
@@ -422,6 +441,10 @@ const StyledModal = styled(Modal)`
 `;
 
 const StyledExplainer = styled(Typography.Paragraph)`
+  && {
+    color: ${({ theme }) => theme.textSecondary};
+  }
+
   :last-child {
     margin-bottom: 0;
   }
@@ -438,15 +461,18 @@ const StyledResponsiveBannerButton = styled(Button).attrs((props) => ({
   ...props,
   type: props.type ?? "link",
 }))`
+  background: transparent;
   color: inherit;
   line-height: inherit;
   height: auto;
   padding: 0;
   font-weight: 600;
+  border: none;
 
   :hover,
   :focus,
   :active {
+    background: transparent;
     color: inherit;
 
     &&& > span {

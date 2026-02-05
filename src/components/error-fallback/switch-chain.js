@@ -51,6 +51,7 @@ const StyledModal = styled(Modal)`
     left: 50%;
     transform: translateX(-50%);
   }
+
   .ant-modal-body {
     border-radius: 0.5rem;
   }
@@ -58,26 +59,24 @@ const StyledModal = styled(Modal)`
   h2 {
     margin: 0 0 5px 0;
     font-size: 14px;
+    color: ${({ theme }) => theme.textPrimary};
   }
 
   p {
-    color: #3c424299;
+    color: ${({ theme }) => theme.textMutedLight};
     font-size: 11px;
   }
+
   @media only screen and (min-width: 768px) {
     .ant-modal-content {
       width: 30rem;
-      left: 50%;
-      transform: translateX(-50%);
     }
 
     h2 {
-      margin: 0 0 5px 0;
       font-size: 20px;
     }
 
     p {
-      color: #3c424299;
       font-size: 14px;
     }
   }
@@ -87,6 +86,7 @@ const StyledButton = styled(Button)`
   width: 100%;
   height: 50px;
   font-size: 14px;
+
   @media only screen and (min-width: 768px) {
     font-size: 20px;
   }
@@ -98,8 +98,8 @@ const StyledWrapper = styled.ul`
   margin: 0 0 20px 0;
   overflow: auto;
   list-style-type: none;
-  border: 1px solid #ededed;
-  background: #e9dfed73;
+  border: 1px solid ${({ theme }) => theme.borderColor};
+  background: ${({ theme }) => theme.elevatedBackground};
   border-radius: 10px;
   ::-webkit-scrollbar {
     display: none;
@@ -112,26 +112,15 @@ const StyledLine = styled.li`
   font-size: 14px;
   border-radius: 10px;
   cursor: pointer;
-  background: ${(props) => props.isActive && "#999cff"};
-  color: ${(props) => props.isActive && "white"};
+  background: ${({ isActive, theme }) => isActive && theme.selectActiveBackground};
+  color: ${({ isActive, theme }) => isActive && theme.textOnPurple};
 
   &:hover {
-    background: ${(props) => !props.isActive && "#e3cfee"};
-    color: ${(props) => !props.isActive && "#4d50b4"};
+    background: ${({ isActive, theme }) => !isActive && theme.selectHoverBackground};
+    color: ${({ isActive, theme }) => !isActive && theme.selectHoverText};
   }
 
   @media only screen and (min-width: 768px) {
-    padding: 10px 14px;
-    margin: 0 0 8px 0;
     font-size: 18px;
-    border-radius: 10px;
-    cursor: pointer;
-    background: ${(props) => props.isActive && "#999cff"};
-    color: ${(props) => props.isActive && "white"};
-
-    &:hover {
-      background: ${(props) => !props.isActive && "#e3cfee"};
-      color: ${(props) => !props.isActive && "#4d50b4"};
-    }
   }
 `;

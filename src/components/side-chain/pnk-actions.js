@@ -229,11 +229,7 @@ function GetSideChainPnkModal({ defaultVisible }) {
       <StyledExplainer>
         To be able to stake on Kleros Court, first you need to get some {xPnkTokenSymbol}.
       </StyledExplainer>
-      <div
-        css={`
-          text-align: center;
-        `}
-      >
+      <div style={{ textAlign: "center" }}>
         <Link
           to="/tokens"
           style={{
@@ -327,6 +323,8 @@ function useDepositTokens(depositTokens) {
 }
 
 const StyledModal = styled(Modal)`
+  max-width: calc(100vw - 32px);
+
   .ant-modal-header {
     border: none;
   }
@@ -335,16 +333,24 @@ const StyledModal = styled(Modal)`
     font-size: 36px;
     line-height: 1.33;
     text-align: center;
-    color: #4d00b4;
+
+    @media (max-width: 575px) {
+      font-size: 24px;
+    }
   }
 
   .ant-modal-footer {
     border: none;
     padding: 10px 24px;
 
+    @media (max-width: 575px) {
+      padding: 10px 16px;
+    }
+
     > div {
       display: flex;
       gap: 16px;
+      flex-wrap: wrap;
 
       > button {
         min-width: 72px;
@@ -353,11 +359,22 @@ const StyledModal = styled(Modal)`
       > button:last-of-type {
         margin-left: auto;
       }
+
+      @media (max-width: 575px) {
+        > button:last-of-type {
+          margin-left: 0;
+          width: 100%;
+        }
+      }
     }
   }
 `;
 
-const StyledExplainer = styled(Typography.Paragraph)``;
+const StyledExplainer = styled(Typography.Paragraph)`
+  && {
+    color: ${({ theme }) => theme.textSecondary};
+  }
+`;
 
 const StyledDivider = styled(Divider).attrs((p) => ({
   ...p,
@@ -370,15 +387,15 @@ const StyledDivider = styled(Divider).attrs((p) => ({
 `;
 
 const StyledPulseButton = styled(Button)`
-  background-color: #00c42b;
-  border-color: #00c42b;
+  background-color: ${({ theme }) => theme.successGreen};
+  border-color: ${({ theme }) => theme.successGreen};
   box-shadow: 0 0 0 rgba(26, 255, 76, 0.4), 2px 2px 8px rgba(0, 0, 0, 0.5);
   animation: pulse 2s infinite;
 
   :hover,
   :focus {
-    background-color: #00e632;
-    border-color: #00e632;
+    background-color: ${({ theme }) => theme.successGreenBright};
+    border-color: ${({ theme }) => theme.successGreenBright};
   }
 
   @keyframes pulse {

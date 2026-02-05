@@ -62,6 +62,6 @@ const StyledSwitchNetworkMessage = styled.div`
   text-align: center;
 
   ${StyledParagraph} {
-    color: rgba(0, 0, 0, 0.45);
+    color: ${({ theme }) => theme.textLight};
   }
 `;

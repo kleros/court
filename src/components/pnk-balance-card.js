@@ -12,7 +12,7 @@ const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 
 const StyledCard = styled(Card)`
   border-radius: 12px;
-  box-shadow: 0px 6px 36px #bc9cff;
+  box-shadow: ${({ theme }) => theme.cardShadow};
   cursor: initial;
   margin: 60px 0 25px 0;
   overflow: hidden;
@@ -29,23 +29,23 @@ const StyledCard = styled(Card)`
 `;
 
 const StyledDiv = styled.div`
-  color: #4004a3;
+  color: ${({ theme }) => theme.textPrimary};
   font-weight: bold;
   margin-top: 8px;
 `;
 
 const StyledDivWhiteSmall = styled(StyledDiv)`
-  color: white;
+  color: ${({ theme }) => theme.textOnPurple};
   font-size: 14px;
   margin-top: 8px;
 
   @media (max-width: 991px) {
-    color: #4004a3;
+    color: ${({ theme }) => theme.textPrimary};
   }
 `;
 
 const StyledDivWhiteLarge = styled(StyledDiv)`
-  color: white;
+  color: ${({ theme }) => theme.textOnPurple};
   font-size: 36px;
   margin: 0px;
 
@@ -54,12 +54,12 @@ const StyledDivWhiteLarge = styled(StyledDiv)`
   }
 
   @media (max-width: 991px) {
-    color: #4004a3;
+    color: ${({ theme }) => theme.textPrimary};
   }
 `;
 
 const StyledCenterDiv = styled.div`
-  color: #4004a3;
+  color: ${({ theme }) => theme.textPrimary};
   font-size: 36px;
   font-weight: bold;
 
@@ -69,15 +69,15 @@ const StyledCenterDiv = styled.div`
 `;
 
 const StyledBottomDiv = styled.div`
-  color: #4004a3;
+  color: ${({ theme }) => theme.textPrimary};
   font-size: 14px;
   font-weight: bold;
 
   &.white {
-    color: white;
+    color: ${({ theme }) => theme.textOnPurple};
 
     @media (max-width: 991px) {
-      color: #4004a3;
+      color: ${({ theme }) => theme.textPrimary};
     }
   }
 `;
@@ -90,6 +90,10 @@ const StyledPurpleArrowBackground = styled(PurpleArrowBackground)`
   z-index: 0;
   width: calc(33% + 1.5rem + 100px);
   transform: translateX(-100px);
+
+  path {
+    fill: ${({ theme }) => (theme.name === "dark" ? theme.gradientEnd : `url(#paint0_linear)`)};
+  }
 
   @media (max-width: 991px) {
     display: none;
@@ -104,6 +108,10 @@ const StyledLightPurpleArrowBackground = styled(LightPurpleArrowBackground)`
   z-index: 0;
   width: calc(33% + 1.5rem + 100px);
   transform: translateX(100px);
+
+  path {
+    fill: ${({ theme }) => theme.elevatedBackground};
+  }
 
   @media (max-width: 991px) {
     display: none;

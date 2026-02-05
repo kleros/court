@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Modal, Button, Spin } from "antd";
+import styled from "styled-components/macro";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import MerkleRedeem from "@kleros/pnk-merkle-drop-contracts/deployments/mainnet/MerkleRedeem.json";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
@@ -9,6 +10,78 @@ import { ReactComponent as RightArrow } from "../assets/images/right-arrow.svg";
 import useChainId from "../hooks/use-chain-id";
 import ETHAmount from "./eth-amount";
 import { klerosboardSubgraph } from "../bootstrap/subgraph";
+
+const StyledModal = styled(Modal)`
+  max-width: calc(100vw - 32px);
+
+  .ant-modal-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 56px;
+
+    @media (max-width: 575px) {
+      padding: 32px 16px;
+    }
+  }
+`;
+
+const StyledInfoBox = styled.div`
+  font-size: 24px;
+  border: 1px solid ${({ theme }) => theme.borderColor};
+  box-shadow: ${({ theme }) => theme.cardShadow};
+  border-radius: 18px;
+  padding: 24px 32px;
+  width: 100%;
+  margin-top: 24px;
+  margin-bottom: 24px;
+  background: ${({ theme }) => theme.componentBackground};
+`;
+
+const StyledClaimButton = styled(Button)`
+  margin-top: 40px;
+
+  &.ant-btn-primary {
+    background-color: ${({ theme }) => theme.primaryPurple};
+    border: none;
+    color: ${({ theme }) => theme.textOnPurple};
+
+    &:hover,
+    &:focus {
+      background-color: ${({ theme }) => theme.secondaryPurple};
+    }
+  }
+
+  &.ant-btn-primary[disabled] {
+    background-color: ${({ theme }) => theme.elevatedBackground};
+    color: ${({ theme }) => theme.disabledColor};
+    border: none;
+  }
+`;
+
+const StyledClaimAmount = styled.div`
+  font-size: 64px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.primaryPurple};
+  margin-bottom: 24px;
+`;
+
+const StyledUnclaimedAmount = styled.div`
+  color: ${({ theme }) => theme.primaryPurple};
+  font-weight: 500;
+  text-align: right;
+`;
+
+const StyledReadMoreLink = styled.div`
+  font-size: 18px;
+  color: ${({ theme }) => theme.primaryColor};
+`;
+
+const StyledHr = styled.hr`
+  width: 100%;
+  border: 1px solid ${({ theme }) => theme.dividerColor};
+  margin-bottom: 32px;
+`;
 
 const ipfsEndpoint = "https://cdn.kleros.link";
 
@@ -308,14 +381,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
   };
 
   return (
-    <Modal
-      bodyStyle={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        color: "black",
-        padding: "56px",
-      }}
+    <StyledModal
       centered
       keyboard
       okText={<>Claim Your PNK Tokens</>}
@@ -330,14 +396,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       {modalState >= 1 && (
         <div style={{ fontSize: "24px", marginTop: "24px" }}>{modalState === 1 ? "Claiming" : "🎉 Claimed 🎉"}</div>
       )}
-      <div
-        style={{
-          fontSize: "64px",
-          fontWeight: "500",
-          color: "#9013FE",
-          marginBottom: "24px",
-        }}
-      >
+      <StyledClaimAmount>
         {claims.length > 0 &&
           claimStatus.length > 0 &&
           (modalState === 2 ? (
@@ -345,7 +404,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
           ) : (
             <ETHAmount amount={getTotalClaimable(claims)} decimals={0} tokenSymbol="PNK" />
           ))}
-      </div>
+      </StyledClaimAmount>
       {modalState === 0 && (
         <>
           <div style={{ fontSize: "24px", fontWeight: "400" }}>
@@ -361,18 +420,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
             As a Kleros Juror, you will earn PNK for staking in Court.
           </div>
 
-          <div
-            style={{
-              fontSize: "24px",
-              border: "1px solid rgba(0, 0, 0, 0.1)",
-              boxShadow: "0px 2px 3px  rgba(0, 0, 0, 0.06)",
-              borderRadius: "18px",
-              padding: "24px 32px",
-              width: "100%",
-              marginTop: "24px",
-              marginBottom: "24px",
-            }}
-          >
+          <StyledInfoBox>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <div>Total Rewarded PNK:</div>
               <div style={{ fontWeight: "500", textAlign: "right" }}>
@@ -381,32 +429,18 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
             </div>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <div>Unclaimed:</div>
-              <div
-                style={{
-                  color: "#9013FE",
-                  fontWeight: "500",
-                  textAlign: "right",
-                }}
-              >
+              <StyledUnclaimedAmount>
                 <ETHAmount amount={claims && getTotalClaimable(claims)} decimals={0} tokenSymbol="PNK" />
-              </div>
+              </StyledUnclaimedAmount>
             </div>
-          </div>
+          </StyledInfoBox>
         </>
       )}
-      {modalState >= 1 && (
-        <hr
-          style={{
-            width: "100%",
-            border: "1px solid rgba(0,0,0,0.1",
-            marginBottom: "32px",
-          }}
-        />
-      )}
+      {modalState >= 1 && <StyledHr />}
       {modalState === 2 && (
         <div style={{ fontSize: "18px", fontWeight: "400" }}> Thank you for being part of the community! </div>
       )}
-      <div style={{ fontSize: "18px", color: "#009AFF" }}>
+      <StyledReadMoreLink>
         {modalState === 0 && (
           <a
             href="https://blog.kleros.io/the-launch-of-the-kleros-juror-incentive-program/"
@@ -437,33 +471,18 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
             <RightArrow style={{ marginLeft: "4px", verticalAlign: "middle" }} />
           </a>
         )}
-      </div>
+      </StyledReadMoreLink>
       {modalState === 0 && claims && (
-        <Button
+        <StyledClaimButton
           onClick={handleClaim}
           size="large"
           type="primary"
-          style={
-            !claims || Number(drizzle.web3.utils.fromWei(getTotalClaimable(claims))).toFixed(0) < 1
-              ? {
-                  marginTop: "40px",
-                  border: "none",
-                  color: "#CCC",
-                  backgroundColor: "#fafafa",
-                }
-              : {
-                  marginTop: "40px",
-                  backgroundColor: "#9013FE",
-                  color: "white",
-                  border: "none",
-                }
-          }
           disabled={!claims || Number(drizzle.web3.utils.fromWei(getTotalClaimable(claims))).toFixed(0) < 1}
         >
           <span>Claim Your PNK Tokens</span>
-        </Button>
+        </StyledClaimButton>
       )}
-    </Modal>
+    </StyledModal>
   );
 };
 

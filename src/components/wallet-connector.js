@@ -7,14 +7,23 @@ import { detectWallets, connectWallet } from "../bootstrap/wallet-connector";
 const { Text } = Typography;
 
 const StyledModal = styled(Modal)`
-  .ant-modal-body {
-    padding: 0 24px;
-    padding-bottom: 12px;
-  }
+  max-width: calc(100vw - 32px);
 
   .ant-modal-title {
     text-align: center;
     font-size: 24px;
+  }
+
+  .ant-modal-body {
+    padding: 0 24px 12px;
+
+    @media (max-width: 575px) {
+      padding: 0 16px 12px;
+    }
+  }
+
+  .ant-typography {
+    color: ${({ theme }) => theme.textPrimary};
   }
 `;
 
@@ -29,7 +38,7 @@ const StyledWalletItem = styled.div`
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #f5f5f5;
+    background-color: ${({ theme }) => theme.elevatedBackground};
   }
 `;
 
