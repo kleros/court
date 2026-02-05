@@ -84,7 +84,7 @@ const GlobalStyle = createGlobalStyle`
   .ant-input {
     background: ${({ theme }) => theme.inputBackground};
     border-color: ${({ theme }) => theme.inputBorder};
-    color: ${({ theme }) => theme.textPrimary};
+    color: ${({ theme }) => theme.textSecondary};
 
     &:hover,
     &:focus {
@@ -137,7 +137,7 @@ const GlobalStyle = createGlobalStyle`
 
   .ant-input-number-input {
     background: transparent;
-    color: ${({ theme }) => theme.textPrimary};
+    color: ${({ theme }) => theme.textSecondary};
   }
 
   .ant-input-number-handler-wrap {

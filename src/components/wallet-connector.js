@@ -21,6 +21,10 @@ const StyledModal = styled(Modal)`
       padding: 0 16px 12px;
     }
   }
+
+  .ant-typography {
+    color: ${({ theme }) => theme.textPrimary};
+  }
 `;
 
 const StyledWalletItem = styled.div`

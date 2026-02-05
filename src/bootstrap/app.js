@@ -427,4 +427,8 @@ const StyledAlert = styled(Alert)`
   text-align: center;
   background: ${({ theme }) => theme.alertInfoBackground};
   border-color: ${({ theme }) => theme.alertInfoBorder};
+
+  .ant-alert-message {
+    color: ${({ theme }) => theme.textPrimary};
+  }
 `;

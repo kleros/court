@@ -126,6 +126,10 @@ const StyledEmptyState = styled.div`
   border: 1px solid ${({ theme }) => theme.borderColor};
   border-radius: 12px;
   text-align: center;
+
+  @media (max-width: 576px) {
+    margin: 24px;
+  }
 `;
 
 const StyledEmptyStateIcon = styled.div`

@@ -998,14 +998,6 @@ const StyledDiv = styled.div`
 const StyledActionsDiv = styled(StyledDiv)`
   min-height: 250px;
   overflow: hidden;
-
-  &.secondary-linear-background.theme-linear-background {
-    ${({ theme }) =>
-      theme.name === "dark" &&
-      `
-      background: linear-gradient(to left, ${theme.elevatedBackground}, ${theme.borderColor}) !important;
-    `}
-  }
 `;
 
 const StyledRadioGroup = styled(Radio.Group)`

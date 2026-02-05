@@ -18,6 +18,7 @@ const lightBase = {
   lavender: "#f5f1fd",
   lavenderLight: "#f2e3ff",
   pinkBorder: "#d09cff",
+  blackAlpha15: "rgba(0, 0, 0, 0.15)",
   blackAlpha65: "rgba(0, 0, 0, 0.65)",
   blueLight: "#e6f7ff",
   green: "#52c41a",
@@ -79,7 +80,7 @@ export const lightTheme = {
   // Scrollbar
   scrollbarTrack: lightBase.lavender,
   // Overlays
-  modalMask: lightBase.blackAlpha65,
+  modalMask: lightBase.blackAlpha15,
   buttonHoverOverlay: "rgba(255, 255, 255, 0.1)",
   headerSkeletonBase: "rgba(255, 255, 255, 0.15)",
   headerSkeletonHighlight: "rgba(255, 255, 255, 0.25)",
