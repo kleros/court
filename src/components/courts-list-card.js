@@ -38,7 +38,13 @@ const CourtsListCard = ({ apy, setActiveSubcourtID }) => {
 
   const loading = !names || names.some((n) => n === undefined);
   return (
-    <TitledListCard loading={loading} prefix={names && names.length} title="Courts" apy={apy}>
+    <TitledListCard
+      loading={loading}
+      prefix={names && names.length}
+      title="Courts"
+      apy={apy}
+      useApyLoadingSkeleton={true}
+    >
       {!loading &&
         (names.length > 0 ? (
           names.map((n) => (

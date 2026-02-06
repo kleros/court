@@ -1,4 +1,4 @@
-import { Card, Tooltip } from "antd";
+import { Card, Skeleton, Tooltip } from "antd";
 import React, { Fragment, useEffect, useState } from "react";
 import { ReactComponent as Hexagon } from "../assets/images/hexagon.svg";
 import { ReactComponent as Question } from "../assets/images/question-circle.svg";
@@ -107,7 +107,20 @@ const StyledTooltipDiv = styled.span`
   }
 `;
 
-const TitledListCard = ({ children, loading, prefix, title, apy }) => {
+const StyledSkeleton = styled(Skeleton)`
+  position: absolute;
+  right: 18px;
+  top: 42.5px;
+  width: fit-content;
+  height: fit-content;
+
+  .ant-skeleton-title {
+    width: 100px;
+    margin: 0;
+  }
+`;
+
+const TitledListCard = ({ children, loading, prefix, title, apy, useApyLoadingSkeleton }) => {
   const chainId = useChainId();
   const [realApy, setRealApy] = useState(undefined);
 
@@ -124,24 +137,26 @@ const TitledListCard = ({ children, loading, prefix, title, apy }) => {
       loading={loading}
       title={
         <>
-          {realApy && (
-            <Tooltip
-              title="The current rate. Subject to change depending on total staked amount."
-              getPopupContainer={(triggerNode) => triggerNode}
-            >
-              <StyledTooltipDiv>
-                {`${realApy.toFixed(2)}% APY`}
-                <Question
-                  style={{
-                    verticalAlign: "text-bottom",
-                    marginLeft: "8px",
-                    height: "19px",
-                    width: "auto",
-                  }}
-                />
-              </StyledTooltipDiv>
-            </Tooltip>
-          )}
+          <StyledSkeleton active loading={useApyLoadingSkeleton && !realApy} paragraph={false}>
+            {realApy && (
+              <Tooltip
+                title="The current rate. Subject to change depending on total staked amount."
+                getPopupContainer={(triggerNode) => triggerNode}
+              >
+                <StyledTooltipDiv>
+                  {`${realApy.toFixed(2)}% APY`}
+                  <Question
+                    style={{
+                      verticalAlign: "text-bottom",
+                      marginLeft: "8px",
+                      height: "19px",
+                      width: "auto",
+                    }}
+                  />
+                </StyledTooltipDiv>
+              </Tooltip>
+            )}
+          </StyledSkeleton>
 
           <Hexagon className="ternary-fill" />
           <StyledPrefixDiv>{prefix}</StyledPrefixDiv>
@@ -173,12 +188,14 @@ TitledListCard.propTypes = {
   prefix: PropTypes.node,
   title: PropTypes.node.isRequired,
   apy: PropTypes.number,
+  useApyLoadingSkeleton: PropTypes.bool,
 };
 
 TitledListCard.defaultProps = {
   children: null,
   loading: false,
   prefix: null,
+  useApyLoadingSkeleton: false,
 };
 
 export default TitledListCard;

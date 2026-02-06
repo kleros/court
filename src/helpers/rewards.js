@@ -2,6 +2,7 @@ import { BigNumber, ethers } from "ethers";
 import PNKAbi from "../assets/contracts/pinakion.json";
 import Web3 from "web3";
 import { klerosboardSubgraph } from "../bootstrap/subgraph";
+import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 
 const CLAIM_MODAL_URL = "https://raw.githubusercontent.com/kleros/court/master/src/components/claim-modal.js";
 
@@ -156,7 +157,8 @@ export async function getLastMonthReward() {
 export async function getStakingReward(chainId, totalStaked) {
   if (!totalStaked) return 0;
 
-  const web3 = new Web3("https://eth.llamarpc.com");
+  const MAINNET_RPC = getReadOnlyRpcUrl(1);
+  const web3 = new Web3(MAINNET_RPC);
   const pnkContract = new web3.eth.Contract(PNKAbi.abi, process.env.REACT_APP_PINAKION_ADDRESS);
   const totalSupply = await pnkContract.methods.totalSupply().call();
 

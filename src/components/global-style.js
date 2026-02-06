@@ -273,11 +273,26 @@ const GlobalStyle = createGlobalStyle`
   .ant-skeleton.ant-skeleton-active .ant-skeleton-content .ant-skeleton-title,
   .ant-skeleton.ant-skeleton-active .ant-skeleton-content .ant-skeleton-paragraph > li,
   .ant-skeleton.ant-skeleton-active .ant-skeleton-avatar {
-    background: linear-gradient(
+    background-image: linear-gradient(
       90deg,
       ${({ theme }) => theme.skeletonColor} 25%,
       ${({ theme }) => theme.skeletonHighlight} 37%,
       ${({ theme }) => theme.skeletonColor} 63%
+    ) !important;
+    background-size: 400% 100% !important;
+    animation: ant-skeleton-loading 1.4s ease infinite !important;
+  }
+
+  /* Skeleton in card head (e.g. APY) uses header colors so it reads clean on purple gradient */
+  .ant-card-head .ant-skeleton:not(.ant-skeleton-active) .ant-skeleton-content .ant-skeleton-title {
+    background: ${({ theme }) => theme.headerSkeletonBase} !important;
+  }
+  .ant-card-head .ant-skeleton.ant-skeleton-active .ant-skeleton-content .ant-skeleton-title {
+    background-image: linear-gradient(
+      90deg,
+      ${({ theme }) => theme.headerSkeletonBase} 25%,
+      ${({ theme }) => theme.headerSkeletonHighlight} 37%,
+      ${({ theme }) => theme.headerSkeletonBase} 63%
     ) !important;
     background-size: 400% 100% !important;
     animation: ant-skeleton-loading 1.4s ease infinite !important;
