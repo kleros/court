@@ -692,7 +692,7 @@ export default function CaseDetailsCard({ ID }) {
                       <iframe
                         sandbox={
                           arbitrableWhitelist[arbitrableChainID]?.includes(dispute.arbitrated.toLowerCase())
-                            ? "allow-scripts allow-same-origin allow-popups"
+                            ? "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
                             : "allow-scripts"
                         }
                         title="dispute details"
