@@ -34,7 +34,7 @@ export default function RequiredChainIdModal({ requiredChainId }) {
         <>
           {isSupportedSideChain(requiredChainId) ? (
             <StyledExplainer>
-              To go to the Kleros Side-Chain Court, please click the button bellow or switch to {networkName} on
+              To go to the Kleros Side-Chain Court, please click the button below or switch to {networkName} on
               MetaMask.
             </StyledExplainer>
           ) : (
