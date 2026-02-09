@@ -62,7 +62,11 @@ MultiTransactionStatus.propTypes = {
 
 const isTxComplete = (tx) => tx.state === TxState.Mined || tx.state === "skipped";
 
-const StyledSteps = styled(Steps)``;
+const StyledSteps = styled(Steps)`
+  .ant-steps-item-title {
+    color: ${({ theme }) => theme.textSecondary} !important;
+  }
+`;
 
 const StyledStep = styled(Steps.Step)`
   &.skipped {

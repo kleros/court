@@ -19,7 +19,7 @@ export default function RequiredChainIdModal({ requiredChainId }) {
 
   return (
     <StyledModal
-      visible
+      visible={hasAccount}
       centered
       width={640}
       footer={
@@ -30,24 +30,19 @@ export default function RequiredChainIdModal({ requiredChainId }) {
       title={`Switch to ${networkName}`}
       onCancel={() => cleanRequiredChainId()}
     >
-      {hasAccount ? (
-        isSupportedSideChain(requiredChainId) ? (
-          <StyledExplainer>
-            To go to the Kleros Side-Chain Court, please click the button bellow or switch to {networkName} on MetaMask.
-          </StyledExplainer>
-        ) : (
-          <StyledExplainer>
-            To go back to the main Kleros Court, please switch to {networkName} on MetaMask.
-          </StyledExplainer>
-        )
-      ) : (
-        <StyledExplainer>
-          You need an{" "}
-          <a href="https://ethereum.org/en/wallets/" target="_blank" rel="noreferrer noopener">
-            Ethereum Wallet
-          </a>{" "}
-          to be able to switch to {networkName}.
-        </StyledExplainer>
+      {hasAccount && (
+        <>
+          {isSupportedSideChain(requiredChainId) ? (
+            <StyledExplainer>
+              To go to the Kleros Side-Chain Court, please click the button below or switch to {networkName} on
+              MetaMask.
+            </StyledExplainer>
+          ) : (
+            <StyledExplainer>
+              To go back to the main Kleros Court, please switch to {networkName} on MetaMask.
+            </StyledExplainer>
+          )}
+        </>
       )}
     </StyledModal>
   );
@@ -119,4 +114,5 @@ const StyledModal = styled(Modal)`
 
 const StyledExplainer = styled(Typography.Paragraph)`
   text-align: center;
+  color: ${({ theme }) => theme.textSecondary};
 `;

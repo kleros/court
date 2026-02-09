@@ -218,7 +218,7 @@ const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max })
                 )}
               </Form.Item>
               {shouldShowMaxStakeAlert ? (
-                <Alert
+                <StyledAlert
                   closable
                   type="info"
                   message="Tip"
@@ -240,7 +240,7 @@ const StakeModalForm = Form.create()(({ ID, form, onCancel, stakedTokens, max })
           )}
         </Skeleton>
         {status && status !== "pending" && (
-          <Alert
+          <StyledAlert
             closable
             message={
               status === "success"
@@ -411,4 +411,14 @@ const AmountBox = styled.div`
   padding: 23px 30px;
   text-align: center;
   width: 100%;
+`;
+
+const StyledAlert = styled(Alert)`
+  .ant-alert-message {
+    color: ${({ theme }) => theme.textPrimary};
+  }
+
+  .anticon-close {
+    color: ${({ theme }) => theme.textSecondary};
+  }
 `;

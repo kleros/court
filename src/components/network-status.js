@@ -8,6 +8,8 @@ import useChainId from "../hooks/use-chain-id";
 import { chainIdToNetworkShortName } from "../helpers/networks";
 import { requestSwitchChain } from "../api/side-chain";
 import { useDrizzle } from "../bootstrap/drizzle";
+import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import { useSetRequiredChainId } from "./required-chain-id-gateway";
 
 const { useDrizzleState } = drizzleReactHooks;
 
@@ -19,16 +21,25 @@ const switchableChains = {
 
 function SwitchChainMenu() {
   const { drizzle } = useDrizzle();
+  const { account } = useDrizzleState((drizzleState) => ({
+    account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
+  }));
   const chainId = useChainId();
+  const setRequiredChainId = useSetRequiredChainId();
 
   const handleSwitchChain = async (targetChainId) => {
     if (targetChainId === chainId) return; // Already on this chain
 
-    try {
-      await requestSwitchChain(drizzle.web3.currentProvider, targetChainId);
-    } catch (error) {
-      console.error("Failed to switch chain:", error);
-      message.error({ content: "Failed to switch network. Please try again.", key: "switch-chain" });
+    if (account === VIEW_ONLY_ADDRESS) {
+      setRequiredChainId(targetChainId, { location: "/" });
+      window.location.reload();
+    } else {
+      try {
+        await requestSwitchChain(drizzle.web3.currentProvider, targetChainId);
+      } catch (error) {
+        console.error("Failed to switch chain:", error);
+        message.error({ content: "Failed to switch network. Please try again.", key: "switch-chain" });
+      }
     }
   };
 

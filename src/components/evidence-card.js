@@ -1,7 +1,8 @@
-import { Card, Col, Row } from "antd";
 import React from "react";
+import PropTypes from "prop-types";
 import styled from "styled-components";
-import { getAddressUrl, getTransactionUrl } from "../helpers/block-explorer";
+import { getAddressUrl } from "../helpers/block-explorer";
+import { Card, Col, Row } from "antd";
 import Attachment from "./attachment";
 
 const StyledCard = styled(Card)`
@@ -111,15 +112,7 @@ const EvidenceCard = ({ evidence, metaEvidence, chainId }) => {
                 <a href={getAddressUrl(chainId, evidence.submittedBy)} rel="noopener noreferrer" target="_blank">
                   {metaEvidence?.aliases?.[evidence.submittedBy] || truncateAddress(evidence.submittedBy)}
                 </a>
-                <StyledTime>
-                  <a
-                    href={getTransactionUrl(chainId, evidence.transactionHash)}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    {displayDateUTC(submittedAtDate)}
-                  </a>
-                </StyledTime>
+                <StyledTime>{displayDateUTC(submittedAtDate)}</StyledTime>
               </StyledSubmitter>
             </Col>
             <Col lg={1}>
@@ -133,3 +126,9 @@ const EvidenceCard = ({ evidence, metaEvidence, chainId }) => {
 };
 
 export default EvidenceCard;
+
+EvidenceCard.propTypes = {
+  evidence: PropTypes.object.isRequired,
+  metaEvidence: PropTypes.object,
+  chainId: PropTypes.number.isRequired,
+};
