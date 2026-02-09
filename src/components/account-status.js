@@ -12,16 +12,18 @@ export default function AccountStatus() {
     account: drizzleState.accounts[0],
   }));
 
+  if (account === VIEW_ONLY_ADDRESS) {
+    return null;
+  }
+
   return (
     <AccountDetailsPopup
       pinakion
       trigger={
         <StyledAccountStatus>
-          {account !== VIEW_ONLY_ADDRESS ? (
-            <span className="address">
-              <ETHAddress address={account} withLink={false} />
-            </span>
-          ) : null}
+          <span className="address">
+            <ETHAddress address={account} withLink={false} />
+          </span>
         </StyledAccountStatus>
       }
     />
