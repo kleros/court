@@ -1,7 +1,6 @@
 import { Drizzle, generateStore } from "@drizzle/store";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import Web3 from "web3";
-import Kleros from "../assets/contracts/kleros.json";
 import KlerosLiquid from "../assets/contracts/kleros-liquid.json";
 import KlerosLiquidExtraViews from "../assets/contracts/kleros-liquid-extra-views.json";
 import Pinakion from "../assets/contracts/pinakion.json";
@@ -17,15 +16,6 @@ const defaultOptions = {
     11155111, // Sepolia
   ],
   contracts: [
-    {
-      ...Kleros,
-      networks: {
-        1: { address: process.env.REACT_APP_KLEROS_ADDRESS },
-        100: { address: process.env.REACT_APP_KLEROS_XDAI_ADDRESS },
-        10200: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
-        11155111: { address: "0x00000000219ab540356cbb839cbe05303d7705fa" }, // Dummy address for coping with Drizzle errors.
-      },
-    },
     {
       ...KlerosLiquid,
       networks: {
