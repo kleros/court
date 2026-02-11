@@ -26,7 +26,11 @@ function useReloadOnChainChanged() {
   const previousChainId = usePrevious(chainId);
 
   useEffect(() => {
-    if (chainId !== undefined && previousChainId !== undefined && chainId !== previousChainId) {
+    const chainChanged = chainId !== undefined && previousChainId !== undefined && chainId !== previousChainId;
+    const newChainIsSupported = chainId !== undefined && supportedChainIds.includes(chainId);
+
+    //Only reload if the chain has changed and is supported
+    if (chainChanged && newChainIsSupported) {
       window.location.reload();
     }
   }, [previousChainId, chainId]);
