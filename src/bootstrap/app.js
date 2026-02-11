@@ -28,7 +28,7 @@ import SmartContractWalletWarning from "../components/smart-contract-wallet-warn
 import TestErrorBoundaryButton from "../components/test-error-boundary-button";
 
 function ErrorBoundaryFallback() {
-  return <DefaultFallback onClick={Sentry.showReportDialog} />;
+  return <DefaultFallback onClick={() => Sentry.showReportDialog({ eventId: Sentry.lastEventId() })} />;
 }
 
 export default function App() {
