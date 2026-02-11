@@ -21,9 +21,15 @@ import { ThemeProvider } from "../contexts/theme-context";
 import { ChainIdProvider } from "../hooks/use-chain-id";
 import ChainChangeWatcher from "./chain-change-watcher";
 import { DrizzleProvider, Initializer, createDrizzle, detectRequiredChainId, useDrizzle } from "./drizzle";
+import * as Sentry from "@sentry/react";
 import ErrorBoundary from "../components/error-boundary";
-import SwitchChainFallback from "../components/error-fallback/switch-chain";
+import DefaultFallback from "../components/error-fallback";
 import SmartContractWalletWarning from "../components/smart-contract-wallet-warning";
+import TestErrorBoundaryButton from "../components/test-error-boundary-button";
+
+function ErrorBoundaryFallback() {
+  return <DefaultFallback onClick={Sentry.showReportDialog} />;
+}
 
 export default function App() {
   const [customDrizzle, setCustomDrizzle] = useState(null);
@@ -108,9 +114,10 @@ export default function App() {
         >
           <DrizzleChainIdProvider>
             <ChainChangeWatcher>
-              <ErrorBoundary fallback={SwitchChainFallback}>
+              <ErrorBoundary fallback={ErrorBoundaryFallback}>
                 <BrowserRouter>
                   <Layout>
+                    <TestErrorBoundaryButton />
                     <SmartContractWalletWarning />
                     <StyledLayoutHeader>
                       <StyledHeaderRow>
