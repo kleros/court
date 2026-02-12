@@ -16,11 +16,11 @@ const StyledPopover = styled(({ className, ...rest }) => (
 ))`
   .ant-popover {
     &-inner {
-      border: 1px solid;
+      border: 1px solid ${({ theme }) => theme.primaryPurple};
     }
 
     &-title {
-      color: inherit;
+      color: ${({ theme }) => theme.primaryPurple};
     }
   }
 `;
@@ -36,14 +36,14 @@ const Attachment = ({ URI, description, extension: _extension, previewURI, title
   let extension;
   if (!_extension && URI) extension = `.${URI.split(".").pop()}`;
   else extension = `.${_extension}`;
+  if (!URI) return null;
   let Component;
-  if (!URI) Component = Document;
-  else if (isPDF(extension)) Component = PDF;
+  if (isPDF(extension)) Component = PDF;
   else if (isTextPath(extension)) Component = Document;
   else if (isImage(extension)) Component = Image;
   else if (isVideo(extension)) Component = Video;
   else Component = Link;
-  Component = <Component className="ternary-fill theme-fill" />;
+  Component = <Component className="primary-purple-fill theme-fill" />;
   // No popover
   if (!title && !description) {
     if (URI)
@@ -58,7 +58,7 @@ const Attachment = ({ URI, description, extension: _extension, previewURI, title
   return (
     <StyledPopover
       arrowPointAtCenter
-      className="ternary-border-color theme-border-color ternary-color theme-color"
+      className=""
       content={
         previewURI ? (
           <>

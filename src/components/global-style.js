@@ -604,6 +604,13 @@ const GlobalStyle = createGlobalStyle`
   .primary-fill.theme-fill {
     fill: ${({ theme }) => theme.primaryColor} !important;
   }
+
+  svg.primary-purple-fill path,
+  .primary-purple-fill path,
+  .primary-purple-fill .theme-fill,
+  .primary-purple-fill.theme-fill {
+    fill: ${({ theme }) => theme.primaryPurple} !important;
+  }
 `;
 
 export default GlobalStyle;
