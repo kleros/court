@@ -11,3 +11,5 @@ export const chainIdToNetworkShortName = {
   10200: "Chiado",
   11155111: "Sepolia",
 };
+
+export const supportedChainIds = Object.keys(chainIdToNetworkShortName).map(Number);
