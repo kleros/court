@@ -58,6 +58,7 @@ const arbitrableWhitelist = {
     "0xeF2Ae6961Ec7F2105bc2693Bc32fA7b7386B2f59", // RealitioForeignArbitrationProxyWithAppeals (Ethereum)
     "0x32bcDC9776692679CfBBf8350BAd67Da13FaaA3F", // RealitioForeignArbitrationProxyWithAppeals (Ethereum)
     "0xa4AC94C4fa65Bb352eFa30e3408e64F72aC857bc", // PoH V2
+    "0x5aAF9E23A11440F8C1Ad6D2E2e5109C7e52CC672", // Seer Market registry on Curate
   ].map((address) => address.toLowerCase()),
   11155111: [
     "0x73E4F71e5ecE8d1319807DC7cd2EAA9Fda8F5182",
