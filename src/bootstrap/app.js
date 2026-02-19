@@ -22,7 +22,7 @@ import { ChainIdProvider } from "../hooks/use-chain-id";
 import ChainChangeWatcher from "./chain-change-watcher";
 import { DrizzleProvider, Initializer, createDrizzle, detectRequiredChainId, useDrizzle } from "./drizzle";
 import ErrorBoundary from "../components/error-boundary";
-import SwitchChainFallback from "../components/error-fallback/switch-chain";
+import DefaultFallback from "../components/error-fallback";
 import SmartContractWalletWarning from "../components/smart-contract-wallet-warning";
 
 export default function App() {
@@ -108,7 +108,7 @@ export default function App() {
         >
           <DrizzleChainIdProvider>
             <ChainChangeWatcher>
-              <ErrorBoundary fallback={SwitchChainFallback}>
+              <ErrorBoundary fallback={DefaultFallback}>
                 <BrowserRouter>
                   <Layout>
                     <SmartContractWalletWarning />

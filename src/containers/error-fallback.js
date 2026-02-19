@@ -32,4 +32,3 @@ const StyledContent = styled.div`
   text-align: center;
   color: ${({ theme }) => theme.textPrimary};
 `;
-
