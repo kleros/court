@@ -1,31 +1,21 @@
 import React from "react";
-import { Alert, Button } from "antd";
-import PropTypes from "prop-types";
-
+import { Alert } from "antd";
 import ErrorFallbackLayout from "../../containers/error-fallback";
 import styled from "styled-components/macro";
 
-const DefaultFallback = ({ onClick }) => {
+const DefaultFallback = () => {
   return (
     <ErrorFallbackLayout>
       <StyledAlert
         banner
-        description={
-          <StyledButton onClick={onClick} type="primary">
-            Report Feedback
-          </StyledButton>
-        }
         message="An unexpected error occurred in Athens."
+        description="Please contact support if the problem persists."
         type="error"
       />
     </ErrorFallbackLayout>
   );
 };
 export default DefaultFallback;
-
-DefaultFallback.propTypes = {
-  onClick: PropTypes.func,
-};
 
 const StyledAlert = styled(Alert)`
   left: 50%;
@@ -34,6 +24,7 @@ const StyledAlert = styled(Alert)`
   transform: translate(-50%, -50%);
   background: ${({ theme }) => theme.alertErrorBackground};
   border-color: ${({ theme }) => theme.alertErrorBorder};
+  border-radius: 10px;
 
   .ant-alert-message {
     margin-bottom: 20px;
@@ -43,10 +34,4 @@ const StyledAlert = styled(Alert)`
   .ant-alert-description {
     color: ${({ theme }) => theme.textSecondary};
   }
-`;
-
-const StyledButton = styled(Button)`
-  width: 100%;
-  height: 50px;
-  font-size: 20px;
 `;

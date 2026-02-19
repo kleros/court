@@ -12,4 +12,4 @@ Sentry.init({
   integrations: [new BrowserTracing()],
 });
 
-Sentry.withErrorBoundary(App, { fallback: <DefaultFallback onClick={Sentry.showReportDialog} /> });
+Sentry.withErrorBoundary(App, { fallback: <DefaultFallback /> });
