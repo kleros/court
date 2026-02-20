@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import t from "prop-types";
 import loadable from "@loadable/component";
 import styled from "styled-components/macro";
-import { Alert, Dropdown, Layout, Menu, Spin } from "antd";
+import { Alert, Dropdown, Layout, Spin } from "antd";
 import { MenuOutlined } from "@ant-design/icons";
 import { Helmet } from "react-helmet";
 import { BrowserRouter, NavLink, Route, Switch, useParams } from "react-router-dom";
@@ -24,6 +24,7 @@ import { DrizzleProvider, Initializer, createDrizzle, detectRequiredChainId, use
 import ErrorBoundary from "../components/error-boundary";
 import DefaultFallback from "../components/error-fallback";
 import SmartContractWalletWarning from "../components/smart-contract-wallet-warning";
+import { DesktopMenu, MobileMenu } from "../components/menu";
 
 export default function App() {
   const [customDrizzle, setCustomDrizzle] = useState(null);
@@ -116,7 +117,7 @@ export default function App() {
                       <StyledHeaderRow>
                         <LeftGroup>
                           <MobileDropdown>
-                            <Dropdown overlay={<Menu>{MenuItems}</Menu>} trigger={["click"]} placement="bottomLeft">
+                            <Dropdown overlay={<MobileMenu />} trigger={["click"]} placement="bottomLeft">
                               <HamburgerButton type="button" aria-label="Open menu">
                                 <MenuOutlined />
                               </HamburgerButton>
@@ -126,9 +127,7 @@ export default function App() {
                             <Logo />
                           </LogoNavLink>
                         </LeftGroup>
-                        <DesktopMenu mode="horizontal" theme="dark">
-                          {MenuItems}
-                        </DesktopMenu>
+                        <DesktopMenu />
                         <StyledTrayCol>
                           <StyledTray>
                             <NetworkStatus />
@@ -246,27 +245,6 @@ const EmailConfirmation = loadable(() => import(/* webpackPrefetch: true */ "../
   fallback: <StyledSpin />,
 });
 
-const MenuItems = [
-  <Menu.Item key="home">
-    <NavLink to="/">Home</NavLink>
-  </Menu.Item>,
-  <Menu.Item key="courts">
-    <NavLink to="/courts">Courts</NavLink>
-  </Menu.Item>,
-  <Menu.Item key="cases">
-    <NavLink to="/cases">My Cases</NavLink>
-  </Menu.Item>,
-  <Menu.Item key="guide">
-    <a
-      href="https://blog.kleros.io/become-a-juror-blockchain-dispute-resolution-on-ethereum/"
-      rel="noopener noreferrer"
-      target="_blank"
-    >
-      Guide
-    </a>
-  </Menu.Item>,
-];
-
 const StyledHeaderRow = styled.div`
   display: flex;
   align-items: center;
@@ -285,46 +263,6 @@ const LeftGroup = styled.div`
   display: flex;
   align-items: center;
   flex-shrink: 0;
-`;
-
-const DesktopMenu = styled(Menu)`
-  flex: 1;
-  font-weight: 500;
-  line-height: 64px !important;
-  text-align: center;
-  border-bottom: none !important;
-  justify-content: center;
-
-  &.ant-menu-dark {
-    background-color: transparent;
-  }
-
-  && {
-    .ant-menu-item > a {
-      color: ${({ theme }) => theme.textOnPurple}99;
-      text-decoration: none;
-      transition: color 0.2s ease;
-
-      &:hover,
-      &:focus {
-        color: ${({ theme }) => theme.textOnPurple};
-        text-decoration: none;
-      }
-    }
-
-    .ant-menu-item-selected {
-      background-color: transparent !important;
-
-      > a {
-        color: ${({ theme }) => theme.textOnPurple};
-        text-decoration: none;
-      }
-    }
-  }
-
-  @media (max-width: 960px) {
-    display: none;
-  }
 `;
 
 const MobileDropdown = styled.div`
