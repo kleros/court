@@ -26,14 +26,17 @@ const MenuItems = [
 
 function useMenuSelectKey() {
   const { pathname } = useLocation();
-  return pathname === "/courts" ? "courts" : pathname === "/cases" || pathname.startsWith("/cases/") ? "cases" : "home";
+  if (pathname === "/") return "home";
+  if (pathname === "/courts" || pathname.startsWith("/courts/")) return "courts";
+  if (pathname === "/cases" || pathname.startsWith("/cases/")) return "cases";
+  return null;
 }
 
 export function MobileMenu() {
   const selectedKey = useMenuSelectKey();
 
   return (
-    <Menu selectedKeys={[selectedKey]} theme="dark">
+    <Menu selectedKeys={selectedKey ? [selectedKey] : []} theme="dark">
       {MenuItems}
     </Menu>
   );
@@ -83,7 +86,7 @@ export function DesktopMenu() {
   const selectedKey = useMenuSelectKey();
 
   return (
-    <StyledDesktopMenu mode="horizontal" theme="dark" selectedKeys={[selectedKey]}>
+    <StyledDesktopMenu mode="horizontal" theme="dark" selectedKeys={selectedKey ? [selectedKey] : []}>
       {MenuItems}
     </StyledDesktopMenu>
   );
