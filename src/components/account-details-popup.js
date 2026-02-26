@@ -1,9 +1,11 @@
 import React, { useMemo } from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
-import { List, Popover, Spin, Divider } from "antd";
+import { Button, List, Popover, Spin, Divider } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import { disconnectWallet } from "../bootstrap/wallet-connector";
+import { FALLBACK_CHAIN_ID_STORAGE_KEY } from "../bootstrap/drizzle";
 import ETHAddress from "./eth-address";
 import ETHAmount from "./eth-amount";
 import Identicon from "./identicon";
@@ -58,6 +60,21 @@ export default function AccountDetailsPopup({ trigger, pinakion, className }) {
                 </List.Item>
               </Spin>
             )}
+            <Button
+              type="link"
+              danger
+              block
+              onClick={() => {
+                //Save fallback chain before disconnecting, otherwise the stored fallback chain might different and after disconnecting the user could be redirected to another chain.
+                if (chainId) {
+                  window.localStorage.setItem(FALLBACK_CHAIN_ID_STORAGE_KEY, chainId);
+                }
+                disconnectWallet();
+                window.location.reload();
+              }}
+            >
+              Disconnect
+            </Button>
           </List>
         ) : (
           <StyledViewOnlyDiv>
