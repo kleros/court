@@ -90,8 +90,11 @@ export function getLastConnectedWalletProvider() {
   return null;
 }
 
-export function disconnectWallet() {
+export function disconnectWallet(chainId) {
   if (typeof window !== "undefined" && window.localStorage) {
+    if (chainId) {
+      window.localStorage.setItem(FALLBACK_CHAIN_ID_STORAGE_KEY, chainId);
+    }
     window.localStorage.removeItem(STORAGE_KEY_LAST_WALLET_ID);
   }
 }
