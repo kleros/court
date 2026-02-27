@@ -59,15 +59,7 @@ export default function AccountDetailsPopup({ trigger, pinakion, className }) {
                 </List.Item>
               </Spin>
             )}
-            <Button
-              type="link"
-              danger
-              block
-              onClick={() => {
-                disconnectWallet(chainId);
-                window.location.reload();
-              }}
-            >
+            <Button type="link" danger block onClick={() => disconnectWallet(chainId)}>
               Disconnect
             </Button>
           </List>

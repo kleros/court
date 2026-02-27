@@ -96,6 +96,7 @@ export function disconnectWallet(chainId) {
       window.localStorage.setItem(FALLBACK_CHAIN_ID_STORAGE_KEY, chainId);
     }
     window.localStorage.removeItem(STORAGE_KEY_LAST_WALLET_ID);
+    window.location.reload();
   }
 }
 
