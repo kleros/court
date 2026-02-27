@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import t from "prop-types";
 import { Button, Modal, List, message, Typography, Avatar, Alert } from "antd";
 import styled from "styled-components/macro";
+import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { detectWallets, connectWallet } from "../bootstrap/wallet-connector";
+import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+
+const { useDrizzleState } = drizzleReactHooks;
 
 const { Text } = Typography;
 
@@ -42,7 +45,11 @@ const StyledWalletItem = styled.div`
   }
 `;
 
-export default function WalletConnector({ onProviderConnected }) {
+export default function WalletConnector() {
+  const { account = VIEW_ONLY_ADDRESS } = useDrizzleState((s) => ({
+    account: s.accounts[0],
+  }));
+
   const [modalVisible, setModalVisible] = useState(false);
   const [wallets, setWallets] = useState([]);
   const [error, setError] = useState(null);
@@ -67,15 +74,10 @@ export default function WalletConnector({ onProviderConnected }) {
     message.loading({ content: "Connecting wallet…", key: msgKey, duration: 0 });
 
     try {
-      const provider = await connectWallet(walletId);
+      await connectWallet(walletId);
       message.success({ content: "Wallet connected successfully!", key: msgKey });
       setModalVisible(false);
-
-      if (typeof onProviderConnected === "function" && provider) {
-        onProviderConnected(provider);
-      } else if (typeof window !== "undefined" && typeof window.location?.reload === "function") {
-        window.location.reload();
-      }
+      window.location.reload();
     } catch (err) {
       setError(err.message);
       message.error({ content: err.message, key: msgKey });
@@ -83,6 +85,8 @@ export default function WalletConnector({ onProviderConnected }) {
       setConnecting(false);
     }
   };
+
+  if (account !== VIEW_ONLY_ADDRESS) return null;
 
   return (
     <>
@@ -98,17 +102,21 @@ export default function WalletConnector({ onProviderConnected }) {
         closable={false}
         onCancel={closeModal}
       >
-        <List
-          dataSource={wallets}
-          renderItem={(wallet) => (
-            <List.Item>
-              <StyledWalletItem onClick={() => !connecting && handleConnect(wallet.id)}>
-                <Avatar src={wallet.icon} />
-                <Text strong>{wallet.name}</Text>
-              </StyledWalletItem>
-            </List.Item>
-          )}
-        />
+        {wallets.length === 0 ? (
+          <StyledEmptyText>No wallets detected.</StyledEmptyText>
+        ) : (
+          <List
+            dataSource={wallets}
+            renderItem={(wallet) => (
+              <List.Item>
+                <StyledWalletItem onClick={() => !connecting && handleConnect(wallet.id)}>
+                  <Avatar src={wallet.icon} />
+                  <Text strong>{wallet.name}</Text>
+                </StyledWalletItem>
+              </List.Item>
+            )}
+          />
+        )}
 
         {error && <Alert message={error} type="error" />}
       </StyledModal>
@@ -116,6 +124,8 @@ export default function WalletConnector({ onProviderConnected }) {
   );
 }
 
-WalletConnector.propTypes = {
-  onProviderConnected: t.func,
-};
+const StyledEmptyText = styled(Text)`
+  display: block;
+  padding: 24px 16px;
+  text-align: center;
+`;

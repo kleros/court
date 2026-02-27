@@ -1,3 +1,5 @@
+import { FALLBACK_CHAIN_ID_STORAGE_KEY } from "./drizzle";
+
 let hasRequestedEip6963Announcements = false;
 const discoveredWalletIDs = new Set();
 const eip6963WalletsCache = [];
@@ -85,8 +87,20 @@ export function getLastConnectedWalletProvider() {
     }
   }
 
-  //Fallback
-  return wallets[0].provider;
+  return null;
+}
+
+export function disconnectWallet(chainId) {
+  if (typeof window === "undefined") return;
+
+  if (window.localStorage) {
+    if (chainId) {
+      window.localStorage.setItem(FALLBACK_CHAIN_ID_STORAGE_KEY, chainId);
+    }
+    window.localStorage.removeItem(STORAGE_KEY_LAST_WALLET_ID);
+  }
+
+  window.location.reload();
 }
 
 //Connect to a specific wallet
@@ -110,6 +124,19 @@ export async function connectWallet(walletId) {
 
     if (typeof window !== "undefined" && window.localStorage) {
       window.localStorage.setItem(STORAGE_KEY_LAST_WALLET_ID, wallet.id);
+    }
+
+    //If the user was browsing a specific chain in view mode, try to switch to it, so user remains in the chain he was.
+    const fallbackChainId = window.localStorage?.getItem(FALLBACK_CHAIN_ID_STORAGE_KEY);
+    if (fallbackChainId) {
+      try {
+        await wallet.provider.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: `0x${Number(fallbackChainId).toString(16)}` }],
+        });
+      } catch (_) {
+        //Ignore. The wallet may not support this chain or the user may have rejected it.
+      }
     }
 
     return wallet.provider;

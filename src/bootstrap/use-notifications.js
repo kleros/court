@@ -14,7 +14,7 @@ const networkIDData = {
   },
   100: {
     name: "_XDAI",
-    provider: "https://rpc.gnosischain.com",
+    provider: process.env.REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL,
     nativeToken: "xDAI",
     pnkToken: "stPNK",
     fromBlock: process.env.REACT_APP_KLEROS_LIQUID_XDAI_BLOCK_NUMBER
@@ -23,7 +23,7 @@ const networkIDData = {
   },
   10200: {
     name: "_CHIADO",
-    provider: "https://rpc.chiadochain.net",
+    provider: process.env.REACT_APP_WEB3_FALLBACK_CHIADO_HTTPS_URL,
     nativeToken: "xDAI",
     pnkToken: "PNK",
     fromBlock: process.env.REACT_APP_KLEROS_LIQUID_CHIADO_BLOCK_NUMBER
@@ -32,7 +32,7 @@ const networkIDData = {
   },
   11155111: {
     name: "_SEPOLIA",
-    provider: "https://sepolia.infura.io/v3/498250ed13a94a6bbdd646ee97e9f64c",
+    provider: process.env.REACT_APP_WEB3_FALLBACK_SEPOLIA_HTTPS_URL,
     nativeToken: "ETH",
     pnkToken: "PNK",
     fromBlock: process.env.REACT_APP_KLEROS_LIQUID_SEPOLIA_BLOCK_NUMBER

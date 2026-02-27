@@ -1,9 +1,10 @@
 import React, { useMemo } from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
-import { List, Popover, Spin, Divider } from "antd";
+import { Button, List, Popover, Spin, Divider } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import { disconnectWallet } from "../bootstrap/wallet-connector";
 import ETHAddress from "./eth-address";
 import ETHAmount from "./eth-amount";
 import Identicon from "./identicon";
@@ -58,6 +59,9 @@ export default function AccountDetailsPopup({ trigger, pinakion, className }) {
                 </List.Item>
               </Spin>
             )}
+            <Button type="link" danger block onClick={() => disconnectWallet(chainId)}>
+              Disconnect
+            </Button>
           </List>
         ) : (
           <StyledViewOnlyDiv>

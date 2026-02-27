@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import t from "prop-types";
 import loadable from "@loadable/component";
 import styled from "styled-components/macro";
-import { Alert, Dropdown, Layout, Spin } from "antd";
+import { Dropdown, Layout, Spin } from "antd";
 import { MenuOutlined } from "@ant-design/icons";
 import { Helmet } from "react-helmet";
 import { BrowserRouter, NavLink, Route, Switch, useParams } from "react-router-dom";
@@ -40,20 +40,24 @@ export default function App() {
         //No wallets found, enter view mode
         if (wallets.length === 0) {
           setCustomDrizzle(createDrizzle({ fallbackChainId: detectRequiredChainId() }));
-          setCheckingProvider(false);
           return;
         }
 
-        //Wallets found, check for existing connection, otherwise force connection
+        //Wallets found, check for existing connection
         const provider = getLastConnectedWalletProvider();
         if (provider?.request) {
           const accounts = await provider.request({ method: "eth_accounts" });
           if (accounts && accounts.length > 0) {
             handleWalletConnected(provider);
+            return;
           }
         }
+
+        //Wallets available but not connected — enter view mode
+        setCustomDrizzle(createDrizzle({ fallbackChainId: detectRequiredChainId() }));
       } catch (err) {
         console.warn("Auto-detect provider failed", err);
+        setCustomDrizzle(createDrizzle({ fallbackChainId: detectRequiredChainId() }));
       } finally {
         setCheckingProvider(false);
       }
@@ -68,28 +72,11 @@ export default function App() {
     }
   };
 
-  if (checkingProvider) {
+  if (checkingProvider || !customDrizzle) {
     return (
       <ThemeProvider>
         <GlobalStyle />
-        <StyledSpin tip="Checking wallet…" />
-      </ThemeProvider>
-    );
-  }
-
-  if (!customDrizzle) {
-    //User hasn't connected a wallet yet - show simple placeholder screen with wallet selector.
-    return (
-      <ThemeProvider>
-        <GlobalStyle />
-        <StyledContainer>
-          <StyledAlert
-            message="Wallet required"
-            description="Please connect a wallet for the best experience on Kleros Court."
-            type="info"
-          />
-          <WalletConnector onProviderConnected={handleWalletConnected} />
-        </StyledContainer>
+        <StyledSpin tip="Loading…" />
       </ThemeProvider>
     );
   }
@@ -132,6 +119,7 @@ export default function App() {
                           <StyledTray>
                             <NetworkStatus />
                             <AccountStatus />
+                            <WalletConnector />
                             <NotificationSettings />
                             <ThemeToggle />
                           </StyledTray>
@@ -346,27 +334,5 @@ const LogoNavLink = styled(NavLink)`
   > svg {
     display: block;
     width: 100%;
-  }
-`;
-
-const StyledContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-  width: 100%;
-  background: ${({ theme }) => theme.bodyBackground};
-  gap: 24px;
-`;
-
-const StyledAlert = styled(Alert)`
-  margin-top: 24px;
-  width: 80%;
-  text-align: center;
-  background: ${({ theme }) => theme.alertInfoBackground};
-  border-color: ${({ theme }) => theme.alertInfoBorder};
-
-  .ant-alert-message {
-    color: ${({ theme }) => theme.textPrimary};
   }
 `;

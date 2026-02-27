@@ -123,7 +123,7 @@ function createDrizzle({ fallbackChainId, customProvider } = {}) {
  *
  * Users with web3 support will not be affected.
  */
-const STORAGE_KEY = "@@kleros/court/fallback-chain-id";
+export const FALLBACK_CHAIN_ID_STORAGE_KEY = "@@kleros/court/fallback-chain-id";
 const DEFAULT_FALLBACK_CHAIN_ID = 1;
 
 const extractFromQueryString = (param, search) => {
@@ -138,7 +138,7 @@ const extractFromQueryString = (param, search) => {
 };
 
 const detectRequiredChainId = () => {
-  const fromStorage = Number.parseInt(window?.localStorage?.getItem(STORAGE_KEY), 10);
+  const fromStorage = Number.parseInt(window?.localStorage?.getItem(FALLBACK_CHAIN_ID_STORAGE_KEY), 10);
   const fromQueryString = Number.parseInt(
     extractFromQueryString("requiredChainId", window?.location?.search ?? ""),
     10
@@ -151,7 +151,7 @@ const detectRequiredChainId = () => {
     : DEFAULT_FALLBACK_CHAIN_ID;
 
   if (Number.isNaN(fromStorage) || fromStorage !== fromQueryString) {
-    window.localStorage.setItem(STORAGE_KEY, chainId);
+    window.localStorage.setItem(FALLBACK_CHAIN_ID_STORAGE_KEY, chainId);
   }
 
   return chainId;
