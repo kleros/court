@@ -91,13 +91,16 @@ export function getLastConnectedWalletProvider() {
 }
 
 export function disconnectWallet(chainId) {
-  if (typeof window !== "undefined" && window.localStorage) {
+  if (typeof window === "undefined") return;
+
+  if (window.localStorage) {
     if (chainId) {
       window.localStorage.setItem(FALLBACK_CHAIN_ID_STORAGE_KEY, chainId);
     }
     window.localStorage.removeItem(STORAGE_KEY_LAST_WALLET_ID);
-    window.location.reload();
   }
+
+  window.location.reload();
 }
 
 //Connect to a specific wallet
