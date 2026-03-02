@@ -46,7 +46,14 @@ export default function App() {
         //Wallets found, check for existing connection
         const provider = getLastConnectedWalletProvider();
         if (provider?.request) {
-          const accounts = await provider.request({ method: "eth_accounts" });
+          let accounts = await provider.request({ method: "eth_accounts" });
+
+          //Some mobile dApp browsers (e.g. TrustWallet) don't persist connections across page reloads, which causes problems connecting as we're forced to reload because of drizzle.
+          //So, if we have a stored wallet ID but eth_accounts returns empty, request accounts to re-establish the connection.
+          if (!accounts || accounts.length === 0) {
+            accounts = await provider.request({ method: "eth_requestAccounts" });
+          }
+
           if (accounts && accounts.length > 0) {
             handleWalletConnected(provider);
             return;
