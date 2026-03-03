@@ -1,5 +1,6 @@
 import {
   BASE_REALITY_ADDRESSES,
+  BASE_SEPOLIA_REALITY_ADDRESSES,
   GNOSIS_CHIADO_REALITY_ADDRESSES,
   GNOSIS_REALITY_ADDRESSES,
   MAINNET_REALITY_ADDRESSES,
@@ -77,7 +78,7 @@ const arbitrableWhitelist = {
   10200: [...GNOSIS_CHIADO_REALITY_ADDRESSES].map((address) => address.toLowerCase()),
   11155420: [...OPTIMISM_SEPOLIA_REALITY_ADDRESSES].map((address) => address.toLowerCase()),
   8453: [...BASE_REALITY_ADDRESSES].map((address) => address.toLowerCase()),
-  84532: [].map((address) => address.toLowerCase()),
+  84532: [...BASE_SEPOLIA_REALITY_ADDRESSES].map((address) => address.toLowerCase()),
 };
 
 export default arbitrableWhitelist;

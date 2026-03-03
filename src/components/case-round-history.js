@@ -5,6 +5,7 @@ import { Col, Radio, Row, Skeleton } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { useDataloader } from "../bootstrap/dataloader";
 import useChainId from "../hooks/use-chain-id";
+import { getRtALabel } from "../helpers/answer-labels";
 import ScrollBar from "./scroll-bar";
 import axios from "axios";
 import useSWR from "swr";
@@ -93,7 +94,7 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
                   <Row>
                     <Col lg={24}>
                       <Radio.Button size="large" value={"0"}>
-                        Refuse to Arbitrate
+                        {getRtALabel(metaEvidence?.arbitrableChainID ?? chainId, dispute.arbitrated)}
                       </Radio.Button>
                     </Col>
                     {metaEvidence &&
