@@ -94,7 +94,10 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
                   <Row>
                     <Col lg={24}>
                       <Radio.Button size="large" value={"0"}>
-                        {getRtALabel(metaEvidence?.arbitrableChainID ?? chainId, dispute.arbitrated)}
+                        {getRtALabel(
+                          metaEvidence?.arbitrableChainID ?? metaEvidence?.arbitratorChainID ?? chainId,
+                          dispute.arbitrated
+                        )}
                       </Radio.Button>
                     </Col>
                     {metaEvidence &&
