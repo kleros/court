@@ -5,10 +5,10 @@ import { Col, Radio, Row, Skeleton } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { useDataloader } from "../bootstrap/dataloader";
 import useChainId from "../hooks/use-chain-id";
-import { getRtALabel } from "../helpers/answer-labels";
 import ScrollBar from "./scroll-bar";
 import axios from "axios";
 import useSWR from "swr";
+import { RTA_LABEL } from "../temp/answer-string";
 
 const { useDrizzle } = drizzleReactHooks;
 
@@ -94,10 +94,7 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
                   <Row>
                     <Col lg={24}>
                       <Radio.Button size="large" value={"0"}>
-                        {getRtALabel(
-                          metaEvidence?.arbitrableChainID ?? metaEvidence?.arbitratorChainID ?? chainId,
-                          dispute.arbitrated
-                        )}
+                        {RTA_LABEL}
                       </Radio.Button>
                     </Col>
                     {metaEvidence &&
@@ -179,6 +176,9 @@ const StyledRadioGroup = styled(Radio.Group)`
     margin-bottom: 15px;
     text-align: center;
     width: 95%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .ant-radio-button-wrapper-disabled.ant-radio-button-wrapper-checked {
