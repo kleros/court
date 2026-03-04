@@ -176,6 +176,9 @@ const StyledRadioGroup = styled(Radio.Group)`
     margin-bottom: 15px;
     text-align: center;
     width: 95%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .ant-radio-button-wrapper-disabled.ant-radio-button-wrapper-checked {
