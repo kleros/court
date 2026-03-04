@@ -28,8 +28,7 @@ import EvidenceTimeline from "./evidence-timeline";
 import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 import useGetDraws from "../hooks/use-get-draws";
 import arbitrableWhitelist from "../temp/arbitrable-whitelist";
-import { getAnswerString } from "../temp/answer-string";
-import { getRtALabel } from "../helpers/answer-labels";
+import { getAnswerString, RTA_LABEL } from "../temp/answer-string";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const { toBN, soliditySha3 } = Web3.utils;
@@ -193,11 +192,11 @@ const RevealVoteButton = ({ onRevealClick, votesData, dispute }) => {
   );
 };
 
-const AnswerDisplay = ({ msg, vote, rulingOptions, uintDisplayMode, rtaLabel = "Refuse to Arbitrate" }) => (
+const AnswerDisplay = ({ msg, vote, rulingOptions, uintDisplayMode }) => (
   <>
     {msg}
     {vote === "0"
-      ? rtaLabel
+      ? RTA_LABEL
       : (rulingOptions && getAnswerString(rulingOptions, vote, uintDisplayMode)) || "Unknown Choice"}
     &rdquo;.
   </>
@@ -478,10 +477,6 @@ export default function CaseDetailsCard({ ID }) {
     metaEvidence,
     arbitratorChainID,
   ]);
-  const rtaLabel = useMemo(() => getRtALabel(arbitrableChainID, dispute?.arbitrated), [
-    arbitrableChainID,
-    dispute?.arbitrated,
-  ]);
 
   useEffect(() => {
     if (
@@ -562,7 +557,6 @@ export default function CaseDetailsCard({ ID }) {
                               msg="You voted for: &ldquo;"
                               rulingOptions={metaEvidence.rulingOptions}
                               vote={votesData.voted}
-                              rtaLabel={rtaLabel}
                               {...{ uintDisplayMode }}
                             />
                           </div>
@@ -583,7 +577,6 @@ export default function CaseDetailsCard({ ID }) {
                         msg="The winner in this case was: &ldquo;"
                         rulingOptions={metaEvidence.rulingOptions}
                         vote={votesData.currentRuling}
-                        rtaLabel={rtaLabel}
                         {...{ uintDisplayMode }}
                       />
                     </SecondaryActionText>
@@ -595,7 +588,6 @@ export default function CaseDetailsCard({ ID }) {
                           msg="You committed to: "
                           rulingOptions={metaEvidence.rulingOptions}
                           vote={committedVote}
-                          rtaLabel={rtaLabel}
                           {...{ uintDisplayMode }}
                         />
                       </SecondaryActionText>
@@ -647,7 +639,7 @@ export default function CaseDetailsCard({ ID }) {
                         onClick={onVoteClick}
                         size="large"
                       >
-                        {rtaLabel}
+                        {RTA_LABEL}
                       </Button>
                     ) : null}
                   </div>
@@ -809,7 +801,6 @@ export default function CaseDetailsCard({ ID }) {
                 msg="You successfully voted for "
                 rulingOptions={metaEvidence.rulingOptions}
                 vote={votesData.voted}
-                rtaLabel={rtaLabel}
                 {...{ uintDisplayMode }}
               />
             </div>
@@ -832,7 +823,7 @@ export default function CaseDetailsCard({ ID }) {
             onClick={onVoteClick}
             size="large"
           >
-            {rtaLabel}
+            {RTA_LABEL}
           </StyledRefuseButton>
         </>
       )}
@@ -869,7 +860,6 @@ AnswerDisplay.propTypes = {
   rulingOptions: PropTypes.object.isRequired,
   vote: PropTypes.string.isRequired,
   uintDisplayMode: PropTypes.string,
-  rtaLabel: PropTypes.string,
 };
 
 realitioLibQuestionFormatter.minNumber = realitioLibQuestionFormatter.minNumber.bind({

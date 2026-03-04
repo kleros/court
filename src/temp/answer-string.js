@@ -3,6 +3,8 @@ import * as realitioLibQuestionFormatter from "@reality.eth/reality-eth-lib/form
 import Web3 from "web3";
 const { toBN } = Web3.utils;
 
+export const RTA_LABEL = "Refuse to Arbitrate / Invalid";
+
 export const getAnswerString = (rulingOptions, vote, uintDisplayMode = "dec") => {
   const questionJson = {
     decimals: rulingOptions.precision,
