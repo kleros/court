@@ -1,4 +1,4 @@
-import { Alert, Button, Divider, Form, Input, Popover, Skeleton } from "antd";
+import { Alert, Button, Divider, Form, Input, message, Popover, Skeleton } from "antd";
 import React, { useCallback, useEffect, useState } from "react";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { ReactComponent as Mail } from "../assets/images/mail.svg";
@@ -322,6 +322,7 @@ const NotificationSettings = Form.create()(({ form }) => {
       if (!deleted) {
         throw new Error("Failed to unsubscribe");
       }
+      message.success("You have been unsubscribed from email notifications.");
       clearAuthData();
       mutate(["atlas-user", drizzleState.account.toLowerCase()]);
     } catch (err) {
