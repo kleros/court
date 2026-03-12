@@ -1,4 +1,4 @@
-import { Alert, Button, Divider, Form, Input, Popover, Skeleton } from "antd";
+import { Alert, Button, Divider, Form, Input, message, Popover, Skeleton } from "antd";
 import React, { useCallback, useEffect, useState } from "react";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { ReactComponent as Mail } from "../assets/images/mail.svg";
@@ -9,6 +9,7 @@ import {
   addUser,
   authenticateUser,
   clearAuthData,
+  deleteUser,
   fetchUser,
   getAuthToken,
   isTokenForAccount,
@@ -52,6 +53,16 @@ const StyledAlertContainer = styled.div`
   gap: 8px;
 `;
 
+const StyledAlert = styled(Alert)`
+  .ant-alert-message {
+    color: ${({ theme }) => theme.textPrimary};
+  }
+
+  .anticon-close {
+    color: ${({ theme }) => theme.textSecondary};
+  }
+`;
+
 const NotificationSettingsContent = ({
   account,
   form,
@@ -68,6 +79,9 @@ const NotificationSettingsContent = ({
   emailHasChanged,
   onResendVerification,
   isResendingVerification,
+  onUnsubscribe,
+  isUnsubscribing,
+  unsubscribeError,
 }) => {
   const userEmail = userData?.email || "";
   const isEmailVerified = userData?.isEmailVerified || false;
@@ -102,7 +116,7 @@ const NotificationSettingsContent = ({
         <Button type="primary" onClick={onSignIn} loading={isSigningIn} block>
           Sign In
         </Button>
-        {signInError && <Alert closable message={signInError} type="error" />}
+        {signInError && <StyledAlert closable message={signInError} type="error" />}
       </StyledForm>
     );
   }
@@ -128,8 +142,16 @@ const NotificationSettingsContent = ({
                 ],
               })(<Input placeholder="Email" />)}
             </Form.Item>
+
             <Button
-              disabled={hasErrors || isUpdatingEmail || !emailHasChanged || !canUpdateEmail}
+              disabled={
+                hasErrors ||
+                isUpdatingEmail ||
+                isResendingVerification ||
+                isUnsubscribing ||
+                !emailHasChanged ||
+                !canUpdateEmail
+              }
               htmlType="submit"
               loading={isUpdatingEmail}
               type="primary"
@@ -137,6 +159,20 @@ const NotificationSettingsContent = ({
             >
               Save
             </Button>
+
+            {userEmail && (
+              <Button
+                className="mt-2"
+                type="danger"
+                htmlType="button"
+                block
+                loading={isUnsubscribing}
+                disabled={isUnsubscribing || isUpdatingEmail || isResendingVerification}
+                onClick={onUnsubscribe}
+              >
+                Unsubscribe
+              </Button>
+            )}
           </>
         )}
       </Skeleton>
@@ -145,7 +181,7 @@ const NotificationSettingsContent = ({
 
       <StyledAlertContainer>
         {!isEmailVerified && userEmail && (
-          <Alert
+          <StyledAlert
             message="Email not verified"
             type="warning"
             closable
@@ -162,7 +198,7 @@ const NotificationSettingsContent = ({
                   size="small"
                   onClick={onResendVerification}
                   loading={isResendingVerification}
-                  disabled={!canUpdateEmail}
+                  disabled={!canUpdateEmail || isUpdatingEmail || isUnsubscribing}
                 >
                   Resend verification email
                 </Button>
@@ -170,10 +206,11 @@ const NotificationSettingsContent = ({
             }
           />
         )}
-        {updateEmailError && !isUpdatingEmail && <Alert closable message={updateEmailError} type="error" />}
+        {updateEmailError && !isUpdatingEmail && <StyledAlert closable message={updateEmailError} type="error" />}
         {updateEmailSuccess && !isUpdatingEmail && !updateEmailError && (
-          <Alert closable message="Saved settings." type="success" />
+          <StyledAlert closable message="Saved settings." type="success" />
         )}
+        {unsubscribeError && !isUnsubscribing && <StyledAlert closable message={unsubscribeError} type="error" />}
       </StyledAlertContainer>
     </StyledForm>
   );
@@ -195,6 +232,9 @@ NotificationSettingsContent.propTypes = {
   emailHasChanged: PropTypes.bool.isRequired,
   onResendVerification: PropTypes.func.isRequired,
   isResendingVerification: PropTypes.bool.isRequired,
+  onUnsubscribe: PropTypes.func.isRequired,
+  isUnsubscribing: PropTypes.bool.isRequired,
+  unsubscribeError: PropTypes.string,
 };
 
 const NotificationSettings = Form.create()(({ form }) => {
@@ -206,9 +246,11 @@ const NotificationSettings = Form.create()(({ form }) => {
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
   const [isResendingVerification, setIsResendingVerification] = useState(false);
+  const [isUnsubscribing, setIsUnsubscribing] = useState(false);
   const [updateEmailError, setUpdateEmailError] = useState(null);
   const [updateEmailSuccess, setUpdateEmailSuccess] = useState(false);
   const [signInError, setSignInError] = useState(null);
+  const [unsubscribeError, setUnsubscribeError] = useState(null);
 
   //Check if user is authenticated and has a valid token for the current connected wallet
   const token = getAuthToken();
@@ -268,9 +310,31 @@ const NotificationSettings = Form.create()(({ form }) => {
     }
   }, [drizzle.web3, drizzleState.account]);
 
+  const handleUnsubscribe = useCallback(async () => {
+    if (!isAuthenticated || !userEmail || isUpdatingEmail || isResendingVerification || isUnsubscribing) return;
+
+    //Clear errors and set loading state
+    setIsUnsubscribing(true);
+    setUnsubscribeError(null);
+
+    try {
+      const deleted = await deleteUser();
+      if (!deleted) {
+        throw new Error("Failed to unsubscribe");
+      }
+      message.success("You have been unsubscribed from email notifications.");
+      clearAuthData();
+      mutate(["atlas-user", drizzleState.account.toLowerCase()]);
+    } catch (err) {
+      setUnsubscribeError(err?.message || "Failed to unsubscribe");
+    } finally {
+      setIsUnsubscribing(false);
+    }
+  }, [isAuthenticated, drizzleState.account, userEmail, isUpdatingEmail, isResendingVerification, isUnsubscribing]);
+
   const handleResendVerification = useCallback(async () => {
     const email = userData?.email;
-    if (!email || !isAuthenticated || isResendingVerification) return;
+    if (!email || !isAuthenticated || isResendingVerification || isUpdatingEmail || isUnsubscribing) return;
 
     //Clear errors and set loading state
     setIsResendingVerification(true);
@@ -286,12 +350,12 @@ const NotificationSettings = Form.create()(({ form }) => {
     } finally {
       setIsResendingVerification(false);
     }
-  }, [userData, isAuthenticated, isResendingVerification, drizzleState.account]);
+  }, [userData, isAuthenticated, isResendingVerification, isUpdatingEmail, isUnsubscribing, drizzleState.account]);
 
   const onSubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      if (isUpdatingEmail || !isAuthenticated) return;
+      if (isUpdatingEmail || isResendingVerification || isUnsubscribing || !isAuthenticated) return;
 
       form.validateFieldsAndScroll(async (err, values) => {
         if (!err) {
@@ -325,7 +389,7 @@ const NotificationSettings = Form.create()(({ form }) => {
         }
       });
     },
-    [form, isAuthenticated, isUpdatingEmail, drizzleState.account, userData]
+    [form, isAuthenticated, isUpdatingEmail, isResendingVerification, isUnsubscribing, drizzleState.account, userData]
   );
 
   return (
@@ -348,6 +412,9 @@ const NotificationSettings = Form.create()(({ form }) => {
           emailHasChanged={emailHasChanged}
           onResendVerification={handleResendVerification}
           isResendingVerification={isResendingVerification}
+          onUnsubscribe={handleUnsubscribe}
+          isUnsubscribing={isUnsubscribing}
+          unsubscribeError={unsubscribeError}
         />
       }
       placement="bottomRight"
