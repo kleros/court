@@ -144,7 +144,14 @@ const NotificationSettingsContent = ({
             </Form.Item>
 
             <Button
-              disabled={hasErrors || isUpdatingEmail || isUnsubscribing || !emailHasChanged || !canUpdateEmail}
+              disabled={
+                hasErrors ||
+                isUpdatingEmail ||
+                isResendingVerification ||
+                isUnsubscribing ||
+                !emailHasChanged ||
+                !canUpdateEmail
+              }
               htmlType="submit"
               loading={isUpdatingEmail}
               type="primary"
@@ -191,7 +198,7 @@ const NotificationSettingsContent = ({
                   size="small"
                   onClick={onResendVerification}
                   loading={isResendingVerification}
-                  disabled={!canUpdateEmail}
+                  disabled={!canUpdateEmail || isUpdatingEmail || isUnsubscribing}
                 >
                   Resend verification email
                 </Button>
@@ -326,7 +333,7 @@ const NotificationSettings = Form.create()(({ form }) => {
 
   const handleResendVerification = useCallback(async () => {
     const email = userData?.email;
-    if (!email || !isAuthenticated || isResendingVerification) return;
+    if (!email || !isAuthenticated || isResendingVerification || isUpdatingEmail || isUnsubscribing) return;
 
     //Clear errors and set loading state
     setIsResendingVerification(true);
@@ -342,12 +349,12 @@ const NotificationSettings = Form.create()(({ form }) => {
     } finally {
       setIsResendingVerification(false);
     }
-  }, [userData, isAuthenticated, isResendingVerification, drizzleState.account]);
+  }, [userData, isAuthenticated, isResendingVerification, isUpdatingEmail, isUnsubscribing, drizzleState.account]);
 
   const onSubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      if (isUpdatingEmail || !isAuthenticated) return;
+      if (isUpdatingEmail || isResendingVerification || isUnsubscribing || !isAuthenticated) return;
 
       form.validateFieldsAndScroll(async (err, values) => {
         if (!err) {
@@ -381,7 +388,7 @@ const NotificationSettings = Form.create()(({ form }) => {
         }
       });
     },
-    [form, isAuthenticated, isUpdatingEmail, drizzleState.account, userData]
+    [form, isAuthenticated, isUpdatingEmail, isResendingVerification, isUnsubscribing, drizzleState.account, userData]
   );
 
   return (
