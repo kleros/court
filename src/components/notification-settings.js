@@ -160,7 +160,7 @@ const NotificationSettingsContent = ({
                 htmlType="button"
                 block
                 loading={isUnsubscribing}
-                disabled={isUnsubscribing}
+                disabled={isUnsubscribing || isUpdatingEmail || isResendingVerification}
                 onClick={onUnsubscribe}
               >
                 Unsubscribe
@@ -304,14 +304,17 @@ const NotificationSettings = Form.create()(({ form }) => {
   }, [drizzle.web3, drizzleState.account]);
 
   const handleUnsubscribe = useCallback(async () => {
-    if (!isAuthenticated || !userEmail) return;
+    if (!isAuthenticated || !userEmail || isUpdatingEmail || isResendingVerification || isUnsubscribing) return;
 
     //Clear errors and set loading state
     setIsUnsubscribing(true);
     setUnsubscribeError(null);
 
     try {
-      await deleteUser();
+      const deleted = await deleteUser();
+      if (!deleted) {
+        throw new Error("Failed to unsubscribe");
+      }
       clearAuthData();
       mutate(["atlas-user", drizzleState.account.toLowerCase()]);
     } catch (err) {
@@ -319,7 +322,7 @@ const NotificationSettings = Form.create()(({ form }) => {
     } finally {
       setIsUnsubscribing(false);
     }
-  }, [isAuthenticated, drizzleState.account, userEmail]);
+  }, [isAuthenticated, drizzleState.account, userEmail, isUpdatingEmail, isResendingVerification, isUnsubscribing]);
 
   const handleResendVerification = useCallback(async () => {
     const email = userData?.email;
