@@ -248,6 +248,18 @@ export const addUser = async (email) => {
   return data?.addUser === true;
 };
 
+//Delete user
+export const deleteUser = async () => {
+  const data = await graphqlRequest(
+    `mutation deleteUser {
+      deleteUser
+    }`,
+    {},
+    true
+  );
+  return data?.deleteUser === true;
+};
+
 //Update user email
 export const updateEmail = async (newEmail) => {
   const data = await graphqlRequest(

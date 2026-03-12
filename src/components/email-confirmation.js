@@ -16,6 +16,10 @@ const Container = styled.div`
 const StyledAlert = styled(Alert)`
   max-width: 500px;
   height: fit-content;
+
+  .ant-alert-message {
+    color: ${({ theme }) => theme.textPrimary};
+  }
 `;
 
 export default function EmailConfirmation() {
