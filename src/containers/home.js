@@ -101,9 +101,9 @@ export default function Home() {
                 Buy PNK
               </StyledButton>
             </Link>
-            <a href="/pnk-rewards.html" target="_blank" rel="noopener noreferrer">
+            <a href="/staking-rewards.html" target="_blank" rel="noopener noreferrer">
               <StyledButton size="large" type="secondary">
-                See PNK Rewards
+                Staking Rewards
               </StyledButton>
             </a>
             <Link to="/courts">

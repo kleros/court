@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PNK Rewards - Kleros Court</title>
+    <title>Staking Rewards - Kleros Court</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -561,7 +561,7 @@
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
-          a.download = "kleros_pnk_rewards.xlsx";
+          a.download = "kleros_staking_rewards.xlsx";
           a.click();
           setTimeout(() => URL.revokeObjectURL(url), 1000);
         }
@@ -603,7 +603,7 @@
                     WebkitTextFillColor: "transparent",
                   }}
                 >
-                  PNK Rewards
+                  Staking Rewards
                 </span>
                 <span style={{ fontSize: 11, color: "#6c6c8a" }}>Kleros Court</span>
               </div>
