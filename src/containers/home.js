@@ -106,6 +106,11 @@ export default function Home() {
                 See Courts
               </StyledButton>
             </Link>
+            <a href="/pnk-rewards.html" target="_blank" rel="noopener noreferrer">
+              <StyledButton size="large" type="default">
+                See PNK Rewards
+              </StyledButton>
+            </a>
           </StyledButtonBar>
         }
       />

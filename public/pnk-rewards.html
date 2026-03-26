@@ -138,18 +138,23 @@
       }
 
       // Spreadsheet-like table component
+      const PAGE_SIZE = 100;
+
       function SpreadsheetTable({ rows, columns }) {
         const [sortCol, setSortCol] = useState(null);
         const [sortAsc, setSortAsc] = useState(false);
         const [search, setSearch] = useState("");
+        const [page, setPage] = useState(0);
 
         const filtered = useMemo(() => {
+          setPage(0);
           if (!search) return rows;
           const q = search.toLowerCase();
           return rows.filter((r) => r.Address.toLowerCase().includes(q));
         }, [rows, search]);
 
         const sorted = useMemo(() => {
+          setPage(0);
           if (sortCol === null) return filtered;
           const col = columns[sortCol];
           return [...filtered].sort((a, b) => {
@@ -159,6 +164,9 @@
             return sortAsc ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
           });
         }, [filtered, sortCol, sortAsc, columns]);
+
+        const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
+        const pageRows = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
         function handleSort(i) {
           if (sortCol === i) setSortAsc(!sortAsc);
@@ -230,7 +238,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  {sorted.slice(0, 500).map((row, ri) => (
+                  {pageRows.map((row, ri) => (
                     <tr
                       key={ri}
                       style={{
@@ -274,9 +282,92 @@
                   ))}
                 </tbody>
               </table>
-              {sorted.length > 500 && (
-                <div style={{ padding: 12, textAlign: "center", fontSize: 11, color: "#6c6c8a" }}>
-                  Showing 500 of {sorted.length.toLocaleString()} rows. Download the XLSX for the full dataset.
+              {totalPages > 1 && (
+                <div
+                  style={{
+                    padding: "10px 14px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    borderTop: "1px solid rgba(108,92,231,0.1)",
+                    fontSize: 11,
+                    color: "#6c6c8a",
+                  }}
+                >
+                  <span>
+                    {(page * PAGE_SIZE + 1).toLocaleString()}–
+                    {Math.min((page + 1) * PAGE_SIZE, sorted.length).toLocaleString()} of{" "}
+                    {sorted.length.toLocaleString()}
+                  </span>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    <button
+                      onClick={() => setPage(0)}
+                      disabled={page === 0}
+                      style={{
+                        padding: "4px 8px",
+                        fontSize: 11,
+                        fontFamily: "inherit",
+                        cursor: page === 0 ? "default" : "pointer",
+                        background: "rgba(255,255,255,0.05)",
+                        color: page === 0 ? "#3a3a4a" : "#a29bfe",
+                        border: "1px solid rgba(108,92,231,0.2)",
+                        borderRadius: 4,
+                      }}
+                    >
+                      &#171;
+                    </button>
+                    <button
+                      onClick={() => setPage((p) => Math.max(0, p - 1))}
+                      disabled={page === 0}
+                      style={{
+                        padding: "4px 10px",
+                        fontSize: 11,
+                        fontFamily: "inherit",
+                        cursor: page === 0 ? "default" : "pointer",
+                        background: "rgba(255,255,255,0.05)",
+                        color: page === 0 ? "#3a3a4a" : "#a29bfe",
+                        border: "1px solid rgba(108,92,231,0.2)",
+                        borderRadius: 4,
+                      }}
+                    >
+                      &#8249;
+                    </button>
+                    <span style={{ padding: "4px 10px", fontSize: 11, color: "#a29bfe" }}>
+                      {page + 1} / {totalPages}
+                    </span>
+                    <button
+                      onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                      disabled={page >= totalPages - 1}
+                      style={{
+                        padding: "4px 10px",
+                        fontSize: 11,
+                        fontFamily: "inherit",
+                        cursor: page >= totalPages - 1 ? "default" : "pointer",
+                        background: "rgba(255,255,255,0.05)",
+                        color: page >= totalPages - 1 ? "#3a3a4a" : "#a29bfe",
+                        border: "1px solid rgba(108,92,231,0.2)",
+                        borderRadius: 4,
+                      }}
+                    >
+                      &#8250;
+                    </button>
+                    <button
+                      onClick={() => setPage(totalPages - 1)}
+                      disabled={page >= totalPages - 1}
+                      style={{
+                        padding: "4px 8px",
+                        fontSize: 11,
+                        fontFamily: "inherit",
+                        cursor: page >= totalPages - 1 ? "default" : "pointer",
+                        background: "rgba(255,255,255,0.05)",
+                        color: page >= totalPages - 1 ? "#3a3a4a" : "#a29bfe",
+                        border: "1px solid rgba(108,92,231,0.2)",
+                        borderRadius: 4,
+                      }}
+                    >
+                      &#187;
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
