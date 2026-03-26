@@ -101,16 +101,16 @@ export default function Home() {
                 Buy PNK
               </StyledButton>
             </Link>
-            <Link to="/courts">
-              <StyledButton size="large" type="primary">
-                See Courts
-              </StyledButton>
-            </Link>
             <a href="/pnk-rewards.html" target="_blank" rel="noopener noreferrer">
               <StyledButton size="large" type="secondary">
                 See PNK Rewards
               </StyledButton>
             </a>
+            <Link to="/courts">
+              <StyledButton size="large" type="primary">
+                See Courts
+              </StyledButton>
+            </Link>
           </StyledButtonBar>
         }
       />
