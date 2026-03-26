@@ -107,7 +107,7 @@ export default function Home() {
               </StyledButton>
             </Link>
             <a href="/pnk-rewards.html" target="_blank" rel="noopener noreferrer">
-              <StyledButton size="large" type="default">
+              <StyledButton size="large" type="secondary">
                 See PNK Rewards
               </StyledButton>
             </a>

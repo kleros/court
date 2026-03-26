@@ -147,14 +147,12 @@
         const [page, setPage] = useState(0);
 
         const filtered = useMemo(() => {
-          setPage(0);
           if (!search) return rows;
           const q = search.toLowerCase();
           return rows.filter((r) => r.Address.toLowerCase().includes(q));
         }, [rows, search]);
 
         const sorted = useMemo(() => {
-          setPage(0);
           if (sortCol === null) return filtered;
           const col = columns[sortCol];
           return [...filtered].sort((a, b) => {
@@ -164,6 +162,11 @@
             return sortAsc ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
           });
         }, [filtered, sortCol, sortAsc, columns]);
+
+        // Reset to first page when data, search, or sort changes
+        useEffect(() => {
+          setPage(0);
+        }, [rows, search, sortCol, sortAsc]);
 
         const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
         const pageRows = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
@@ -560,7 +563,7 @@
           a.href = url;
           a.download = "kleros_pnk_rewards.xlsx";
           a.click();
-          URL.revokeObjectURL(url);
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
         }
 
         // ETA calculation
