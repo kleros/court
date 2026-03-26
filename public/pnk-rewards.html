@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PNK Rewards - Kleros Court</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: #0a0a12;
+        color: #e0e0ec;
+        font-family: "JetBrains Mono", "Fira Code", "SF Mono", monospace;
+      }
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.03);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(108, 92, 231, 0.3);
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(108, 92, 231, 0.5);
+      }
+      @media (max-width: 600px) {
+        .header {
+          flex-direction: column !important;
+          align-items: flex-start !important;
+          padding: 14px 16px !important;
+        }
+        .header-right {
+          width: 100%;
+          justify-content: space-between !important;
+        }
+        .search-bar {
+          flex-direction: column !important;
+          align-items: stretch !important;
+        }
+        .search-input {
+          width: 100% !important;
+        }
+        .tab-bar button {
+          padding: 8px 12px !important;
+          font-size: 10px !important;
+        }
+        .table-wrap {
+          padding: 10px 10px !important;
+        }
+        .footer {
+          flex-direction: column !important;
+          padding: 8px 16px !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useRef, useCallback, useEffect, useMemo } = React;
+
+      const IPFS = "https://cdn.kleros.link/ipfs/";
+      const CLAIM_MODAL_URL = "https://raw.githubusercontent.com/kleros/court/master/src/components/claim-modal.js";
+
+      function parseSnapshotsFromSource(source) {
+        const mainnetMatch = source.match(/\b1:\s*\{[^}]*?snapshots:\s*\[([\s\S]*?)\]/);
+        const gnosisMatch = source.match(/\b100:\s*\{[^}]*?snapshots:\s*\[([\s\S]*?)\]/);
+        function extractPaths(block) {
+          if (!block) return [];
+          const paths = [];
+          const re = /"([^"]+\.json)"/g;
+          let m;
+          while ((m = re.exec(block)) !== null) paths.push(m[1]);
+          return paths;
+        }
+        function toSnapshot(path) {
+          const filename = path.split("/").pop();
+          const dateMatch = filename.match(/(\d{4}-\d{2})/);
+          return { path, label: dateMatch ? dateMatch[1] : "Pre 2021-03" };
+        }
+        return {
+          mainnet: extractPaths(mainnetMatch?.[1]).map(toSnapshot),
+          gnosis: extractPaths(gnosisMatch?.[1]).map(toSnapshot),
+        };
+      }
+
+      function hexToDecimal(hex) {
+        if (!hex) return 0;
+        const clean = hex.startsWith("0x") ? hex.slice(2) : hex;
+        if (clean.length === 0) return 0;
+        try {
+          const val = BigInt("0x" + clean);
+          const whole = val / BigInt("1000000000000000000");
+          const frac = val % BigInt("1000000000000000000");
+          const fracStr = frac.toString().padStart(18, "0").replace(/0+$/, "");
+          if (fracStr.length === 0) return Number(whole);
+          return parseFloat(whole.toString() + "." + fracStr);
+        } catch {
+          return 0;
+        }
+      }
+
+      function extractClaims(data) {
+        const claims = {};
+        if (!data?.merkleTree?.claims) return claims;
+        for (const [addr, info] of Object.entries(data.merkleTree.claims)) {
+          const hex = info?.value?.hex;
+          if (hex) claims[addr] = hexToDecimal(hex);
+        }
+        return claims;
+      }
+
+      async function fetchSnapshot(path, retries = 3) {
+        for (let i = 0; i < retries; i++) {
+          try {
+            const r = await fetch(IPFS + path);
+            if (!r.ok) throw new Error("HTTP " + r.status);
+            return await r.json();
+          } catch (e) {
+            if (i === retries - 1) throw e;
+            await new Promise((res) => setTimeout(res, 1000 * (i + 1)));
+          }
+        }
+      }
+
+      function formatPNK(n) {
+        return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      // Spreadsheet-like table component
+      function SpreadsheetTable({ rows, columns }) {
+        const [sortCol, setSortCol] = useState(null);
+        const [sortAsc, setSortAsc] = useState(false);
+        const [search, setSearch] = useState("");
+
+        const filtered = useMemo(() => {
+          if (!search) return rows;
+          const q = search.toLowerCase();
+          return rows.filter((r) => r.Address.toLowerCase().includes(q));
+        }, [rows, search]);
+
+        const sorted = useMemo(() => {
+          if (sortCol === null) return filtered;
+          const col = columns[sortCol];
+          return [...filtered].sort((a, b) => {
+            const va = a[col.key],
+              vb = b[col.key];
+            if (typeof va === "number") return sortAsc ? va - vb : vb - va;
+            return sortAsc ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
+          });
+        }, [filtered, sortCol, sortAsc, columns]);
+
+        function handleSort(i) {
+          if (sortCol === i) setSortAsc(!sortAsc);
+          else {
+            setSortCol(i);
+            setSortAsc(false);
+          }
+        }
+
+        return (
+          <div>
+            <div className="search-bar" style={{ marginBottom: 10, display: "flex", alignItems: "center", gap: 12 }}>
+              <input
+                className="search-input"
+                type="text"
+                placeholder="Search address..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(108,92,231,0.2)",
+                  borderRadius: 6,
+                  padding: "8px 12px",
+                  color: "#e0e0ec",
+                  fontFamily: "inherit",
+                  fontSize: 12,
+                  width: 340,
+                  outline: "none",
+                }}
+              />
+              <span style={{ fontSize: 11, color: "#6c6c8a", whiteSpace: "nowrap" }}>
+                {filtered.length.toLocaleString()} address{filtered.length !== 1 ? "es" : ""}
+              </span>
+            </div>
+            <div style={{ overflowX: "auto", borderRadius: 8, border: "1px solid rgba(108,92,231,0.15)" }}>
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  fontSize: 12,
+                  minWidth: columns.length * 160,
+                }}
+              >
+                <thead>
+                  <tr>
+                    {columns.map((col, i) => (
+                      <th
+                        key={i}
+                        onClick={() => handleSort(i)}
+                        style={{
+                          padding: "10px 14px",
+                          textAlign: col.align || "left",
+                          background: "rgba(108,92,231,0.1)",
+                          color: "#a29bfe",
+                          cursor: "pointer",
+                          userSelect: "none",
+                          whiteSpace: "nowrap",
+                          borderBottom: "1px solid rgba(108,92,231,0.2)",
+                          fontWeight: 600,
+                          fontSize: 11,
+                          letterSpacing: 0.5,
+                          position: "sticky",
+                          top: 0,
+                        }}
+                      >
+                        {col.label} {sortCol === i ? (sortAsc ? " ▲" : " ▼") : ""}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sorted.slice(0, 500).map((row, ri) => (
+                    <tr
+                      key={ri}
+                      style={{
+                        background: ri % 2 === 0 ? "transparent" : "rgba(255,255,255,0.015)",
+                      }}
+                    >
+                      {columns.map((col, ci) => (
+                        <td
+                          key={ci}
+                          style={{
+                            padding: "7px 14px",
+                            textAlign: col.align || "left",
+                            borderBottom: "1px solid rgba(255,255,255,0.03)",
+                            color: ci === 0 ? "#c0c0d0" : row[col.key] > 0 ? "#e0e0ec" : "#3a3a4a",
+                            fontVariantNumeric: "tabular-nums",
+                            fontSize: ci === 0 ? 11 : 12,
+                          }}
+                        >
+                          {typeof row[col.key] === "number" ? (
+                            formatPNK(row[col.key])
+                          ) : ci === 0 ? (
+                            <span
+                              style={{
+                                display: "inline-block",
+                                maxWidth: "min(42ch, 50vw)",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                                verticalAlign: "bottom",
+                              }}
+                              title={row[col.key]}
+                            >
+                              {row[col.key]}
+                            </span>
+                          ) : (
+                            row[col.key]
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {sorted.length > 500 && (
+                <div style={{ padding: 12, textAlign: "center", fontSize: 11, color: "#6c6c8a" }}>
+                  Showing 500 of {sorted.length.toLocaleString()} rows. Download the XLSX for the full dataset.
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      function App() {
+        const [phase, setPhase] = useState("loading"); // loading | fetching | done | error
+        const [progress, setProgress] = useState({ done: 0, total: 0, current: "", startTime: 0 });
+        const [errors, setErrors] = useState([]);
+        const [monthData, setMonthData] = useState(null);
+        const [grandTotals, setGrandTotals] = useState(null);
+        const [activeTab, setActiveTab] = useState("Summary");
+        const [tabList, setTabList] = useState(["Summary"]);
+        const [sourceError, setSourceError] = useState(null);
+
+        // Auto-start everything on mount
+        useEffect(() => {
+          startPipeline();
+        }, []);
+
+        async function startPipeline() {
+          setPhase("loading");
+          setErrors([]);
+
+          // Step 1: fetch snapshot list from GitHub
+          let snapshots;
+          try {
+            const r = await fetch(CLAIM_MODAL_URL);
+            if (!r.ok) throw new Error("HTTP " + r.status);
+            const source = await r.text();
+            snapshots = parseSnapshotsFromSource(source);
+            if (snapshots.mainnet.length === 0 && snapshots.gnosis.length === 0) {
+              throw new Error("Could not parse any snapshots from claim-modal.js");
+            }
+          } catch (e) {
+            setSourceError(e.message);
+            setPhase("error");
+            return;
+          }
+
+          // Step 2: fetch all IPFS snapshots
+          setPhase("fetching");
+          const allSnapshots = [
+            ...snapshots.mainnet.map((s) => ({ ...s, chain: "Mainnet" })),
+            ...snapshots.gnosis.map((s) => ({ ...s, chain: "Gnosis" })),
+          ];
+          const total = allSnapshots.length;
+          const startTime = Date.now();
+          setProgress({ done: 0, total, current: "Starting...", startTime });
+
+          const md = {};
+          const gt = {};
+          const errs = [];
+          const CONCURRENCY = 5;
+
+          for (let i = 0; i < total; i += CONCURRENCY) {
+            const batch = allSnapshots.slice(i, i + CONCURRENCY);
+            const results = await Promise.allSettled(
+              batch.map(async (snap) => {
+                setProgress((p) => ({ ...p, current: snap.chain + " " + snap.label }));
+                const data = await fetchSnapshot(snap.path);
+                return { snap, data };
+              })
+            );
+
+            for (const r of results) {
+              if (r.status === "fulfilled") {
+                const { snap, data } = r.value;
+                const claims = extractClaims(data);
+                if (!md[snap.label]) md[snap.label] = { mainnet: {}, gnosis: {} };
+                const chainKey = snap.chain === "Mainnet" ? "mainnet" : "gnosis";
+                for (const [addr, amt] of Object.entries(claims)) {
+                  if (amt > 0) md[snap.label][chainKey][addr] = amt;
+                }
+                for (const [addr, amt] of Object.entries(claims)) {
+                  if (amt <= 0) continue;
+                  if (!gt[addr]) gt[addr] = { mainnet: 0, gnosis: 0 };
+                  gt[addr][chainKey] += amt;
+                }
+              } else {
+                const snap = batch[results.indexOf(r)];
+                errs.push(snap.chain + " " + snap.label + ": " + (r.reason?.message || "unknown"));
+              }
+            }
+            setProgress((p) => ({ ...p, done: Math.min(i + CONCURRENCY, total) }));
+          }
+
+          const sorted = Object.keys(md).sort((a, b) => {
+            if (a === "Pre 2021-03") return 1;
+            if (b === "Pre 2021-03") return -1;
+            return b.localeCompare(a);
+          });
+
+          setMonthData(md);
+          setGrandTotals(gt);
+          setTabList(["Summary", ...sorted]);
+          setActiveTab("Summary");
+          setErrors(errs);
+          setPhase("done");
+        }
+
+        // Build rows for current tab
+        const currentRows = useMemo(() => {
+          if (!grandTotals || !monthData) return [];
+          if (activeTab === "Summary") {
+            return Object.entries(grandTotals)
+              .map(([addr, t]) => ({
+                Address: addr,
+                "Mainnet PNK": Math.round(t.mainnet * 100) / 100,
+                "Gnosis PNK": Math.round(t.gnosis * 100) / 100,
+                "Grand Total": Math.round((t.mainnet + t.gnosis) * 100) / 100,
+              }))
+              .sort((a, b) => b["Grand Total"] - a["Grand Total"]);
+          }
+          const { mainnet, gnosis } = monthData[activeTab] || { mainnet: {}, gnosis: {} };
+          const allAddrs = new Set([...Object.keys(mainnet), ...Object.keys(gnosis)]);
+          return [...allAddrs]
+            .map((addr) => {
+              const m = mainnet[addr] || 0;
+              const g = gnosis[addr] || 0;
+              return {
+                Address: addr,
+                "Mainnet PNK": Math.round(m * 100) / 100,
+                "Gnosis PNK": Math.round(g * 100) / 100,
+                "Total PNK": Math.round((m + g) * 100) / 100,
+              };
+            })
+            .sort((a, b) => (b["Total PNK"] || 0) - (a["Total PNK"] || 0));
+        }, [activeTab, grandTotals, monthData]);
+
+        const currentColumns = useMemo(() => {
+          if (activeTab === "Summary")
+            return [
+              { key: "Address", label: "Address", align: "left" },
+              { key: "Mainnet PNK", label: "Mainnet PNK", align: "right" },
+              { key: "Gnosis PNK", label: "Gnosis PNK", align: "right" },
+              { key: "Grand Total", label: "Grand Total", align: "right" },
+            ];
+          return [
+            { key: "Address", label: "Address", align: "left" },
+            { key: "Mainnet PNK", label: "Mainnet PNK", align: "right" },
+            { key: "Gnosis PNK", label: "Gnosis PNK", align: "right" },
+            { key: "Total PNK", label: "Total PNK", align: "right" },
+          ];
+        }, [activeTab]);
+
+        function downloadXLSX() {
+          if (!grandTotals || !monthData) return;
+          const wb = XLSX.utils.book_new();
+
+          const summaryRows = Object.entries(grandTotals)
+            .map(([addr, t]) => ({
+              Address: addr,
+              "Total Mainnet PNK": Math.round(t.mainnet * 100) / 100,
+              "Total Gnosis PNK": Math.round(t.gnosis * 100) / 100,
+              "Grand Total PNK": Math.round((t.mainnet + t.gnosis) * 100) / 100,
+            }))
+            .sort((a, b) => b["Grand Total PNK"] - a["Grand Total PNK"]);
+          const sws = XLSX.utils.json_to_sheet(summaryRows);
+          sws["!cols"] = [{ wch: 44 }, { wch: 20 }, { wch: 20 }, { wch: 20 }];
+          XLSX.utils.book_append_sheet(wb, sws, "Summary");
+
+          for (const label of tabList.slice(1)) {
+            const { mainnet, gnosis } = monthData[label];
+            const allAddrs = new Set([...Object.keys(mainnet), ...Object.keys(gnosis)]);
+            if (allAddrs.size === 0) continue;
+            const rows = [...allAddrs]
+              .map((addr) => {
+                const m = mainnet[addr] || 0;
+                const g = gnosis[addr] || 0;
+                return {
+                  Address: addr,
+                  "Mainnet PNK": Math.round(m * 100) / 100,
+                  "Gnosis PNK": Math.round(g * 100) / 100,
+                  "Total PNK": Math.round((m + g) * 100) / 100,
+                };
+              })
+              .sort((a, b) => b["Total PNK"] - a["Total PNK"]);
+            const ws = XLSX.utils.json_to_sheet(rows);
+            ws["!cols"] = [{ wch: 44 }, { wch: 18 }, { wch: 18 }, { wch: 18 }];
+            XLSX.utils.book_append_sheet(wb, ws, label.slice(0, 31));
+          }
+
+          const buf = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+          const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "kleros_pnk_rewards.xlsx";
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+
+        // ETA calculation
+        const eta = useMemo(() => {
+          if (phase !== "fetching" || progress.done === 0) return null;
+          const elapsed = (Date.now() - progress.startTime) / 1000;
+          const perItem = elapsed / progress.done;
+          const remaining = perItem * (progress.total - progress.done);
+          if (remaining < 60) return Math.ceil(remaining) + "s";
+          return Math.ceil(remaining / 60) + "m " + Math.ceil(remaining % 60) + "s";
+        }, [phase, progress]);
+
+        const pct = progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0;
+
+        return (
+          <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+            {/* Header */}
+            <div
+              className="header"
+              style={{
+                padding: "20px 28px",
+                borderBottom: "1px solid rgba(108,92,231,0.15)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: 12,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
+                <span
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 700,
+                    background: "linear-gradient(90deg, #a29bfe, #6c5ce7, #fd79a8)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
+                >
+                  PNK Rewards
+                </span>
+                <span style={{ fontSize: 11, color: "#6c6c8a" }}>Kleros Court</span>
+              </div>
+              <div className="header-right" style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                {phase === "done" && (
+                  <button
+                    onClick={downloadXLSX}
+                    style={{
+                      padding: "8px 16px",
+                      fontSize: 12,
+                      fontFamily: "inherit",
+                      background: "linear-gradient(135deg, #6c5ce7, #a29bfe)",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: 6,
+                      cursor: "pointer",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Download XLSX
+                  </button>
+                )}
+                {phase === "done" && (
+                  <span style={{ fontSize: 10, color: "#6c6c8a" }}>
+                    {Object.keys(grandTotals).length.toLocaleString()} addresses &middot; {tabList.length - 1} months
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Loading / Fetching state */}
+            {(phase === "loading" || phase === "fetching") && (
+              <div
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 40,
+                  gap: 20,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 15,
+                    color: "#a29bfe",
+                    fontWeight: 600,
+                  }}
+                >
+                  {phase === "loading" ? "Fetching snapshot list from GitHub..." : "Fetching snapshots from IPFS..."}
+                </div>
+                {phase === "fetching" && (
+                  <div style={{ width: 400, maxWidth: "90%" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        fontSize: 12,
+                        marginBottom: 8,
+                        color: "#8888aa",
+                      }}
+                    >
+                      <span>
+                        {progress.done}/{progress.total}
+                      </span>
+                      <span>{eta ? "~" + eta + " remaining" : pct + "%"}</span>
+                    </div>
+                    <div
+                      style={{ height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 3, overflow: "hidden" }}
+                    >
+                      <div
+                        style={{
+                          height: "100%",
+                          width: pct + "%",
+                          background: "linear-gradient(90deg, #6c5ce7, #fd79a8)",
+                          borderRadius: 3,
+                          transition: "width 0.3s ease",
+                        }}
+                      />
+                    </div>
+                    {progress.current && (
+                      <div style={{ fontSize: 11, color: "#6c6c8a", marginTop: 8, textAlign: "center" }}>
+                        {progress.current}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Error state */}
+            {phase === "error" && (
+              <div
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 40,
+                  gap: 16,
+                }}
+              >
+                <div style={{ color: "#fd79a8", fontWeight: 600, fontSize: 16 }}>Failed to load data</div>
+                <div style={{ fontSize: 12, color: "#ff7675" }}>{sourceError}</div>
+                <button
+                  onClick={() => {
+                    setPhase("loading");
+                    startPipeline();
+                  }}
+                  style={{
+                    padding: "10px 24px",
+                    fontSize: 13,
+                    fontFamily: "inherit",
+                    background: "linear-gradient(135deg, #6c5ce7, #a29bfe)",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 8,
+                    cursor: "pointer",
+                  }}
+                >
+                  Retry
+                </button>
+              </div>
+            )}
+
+            {/* Spreadsheet view */}
+            {phase === "done" && (
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                {/* Tab bar */}
+                <div
+                  className="tab-bar"
+                  style={{
+                    display: "flex",
+                    overflowX: "auto",
+                    borderBottom: "1px solid rgba(108,92,231,0.15)",
+                    background: "rgba(255,255,255,0.02)",
+                    flexShrink: 0,
+                  }}
+                >
+                  {tabList.map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      style={{
+                        padding: "10px 18px",
+                        fontSize: 11,
+                        fontFamily: "inherit",
+                        background: activeTab === tab ? "rgba(108,92,231,0.15)" : "transparent",
+                        color: activeTab === tab ? "#a29bfe" : "#6c6c8a",
+                        border: "none",
+                        borderBottom: activeTab === tab ? "2px solid #6c5ce7" : "2px solid transparent",
+                        cursor: "pointer",
+                        whiteSpace: "nowrap",
+                        fontWeight: activeTab === tab ? 600 : 400,
+                        transition: "all 0.15s ease",
+                      }}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Table */}
+                <div className="table-wrap" style={{ flex: 1, overflow: "auto", padding: "16px 20px" }}>
+                  <SpreadsheetTable rows={currentRows} columns={currentColumns} />
+                </div>
+
+                {/* Fetch errors */}
+                {errors.length > 0 && (
+                  <div
+                    style={{
+                      padding: "8px 20px",
+                      fontSize: 10,
+                      color: "#ff7675",
+                      background: "rgba(255,118,117,0.06)",
+                      borderTop: "1px solid rgba(255,118,117,0.15)",
+                    }}
+                  >
+                    {errors.length} snapshot{errors.length > 1 ? "s" : ""} failed to load (skipped)
+                  </div>
+                )}
+
+                {/* Footer */}
+                <div
+                  className="footer"
+                  style={{
+                    padding: "10px 20px",
+                    fontSize: 10,
+                    color: "#33334a",
+                    borderTop: "1px solid rgba(108,92,231,0.1)",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: 8,
+                  }}
+                >
+                  <span>Snapshot hashes fetched live from kleros/court master branch</span>
+                  <span>Tip: Use "Download XLSX" to import into Google Sheets or Excel</span>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>
