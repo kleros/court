@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Staking Rewards - Kleros Court</title>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone@7.26.10/babel.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <style>
       * {
@@ -67,7 +67,7 @@
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const { useState, useRef, useCallback, useEffect, useMemo } = React;
+      const { useState, useEffect, useMemo } = React;
 
       const IPFS = "https://cdn.kleros.link/ipfs/";
       const CLAIM_MODAL_URL = "https://raw.githubusercontent.com/kleros/court/master/src/components/claim-modal.js";
@@ -211,8 +211,14 @@
                   borderCollapse: "collapse",
                   fontSize: 12,
                   minWidth: columns.length * 160,
+                  tableLayout: "fixed",
                 }}
               >
+                <colgroup>
+                  {columns.map((col, i) => (
+                    <col key={i} style={{ width: i === 0 ? "40%" : 60 / (columns.length - 1) + "%" }} />
+                  ))}
+                </colgroup>
                 <thead>
                   <tr>
                     {columns.map((col, i) => (
