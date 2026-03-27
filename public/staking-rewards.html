@@ -86,7 +86,7 @@
         function toSnapshot(path) {
           const filename = path.split("/").pop();
           const dateMatch = filename.match(/(\d{4}-\d{2})/);
-          return { path, label: dateMatch ? dateMatch[1] : "Pre 2021-03" };
+          return { path, label: dateMatch ? dateMatch[1] : "2021-01 & 02" };
         }
         return {
           mainnet: extractPaths(mainnetMatch?.[1]).map(toSnapshot),
@@ -467,8 +467,8 @@
           }
 
           const sorted = Object.keys(md).sort((a, b) => {
-            if (a === "Pre 2021-03") return 1;
-            if (b === "Pre 2021-03") return -1;
+            if (a === "2021-01 & 02") return 1;
+            if (b === "2021-01 & 02") return -1;
             return b.localeCompare(a);
           });
 
