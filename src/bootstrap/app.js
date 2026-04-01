@@ -50,7 +50,10 @@ export default function App() {
 
           //Some mobile dApp browsers (e.g. TrustWallet) don't persist connections across page reloads, which causes problems connecting as we're forced to reload because of drizzle.
           //So, if we have a stored wallet ID but eth_accounts returns empty, request accounts to re-establish the connection.
-          if (!accounts || accounts.length === 0) {
+          //Only do this on mobile browsers to avoid triggering wallet extension unlock popups on desktop.
+          //Detection method is based on https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Browser_detection_using_the_user_agent
+          const isMobile = /Mobi/i.test(navigator.userAgent);
+          if (isMobile && (!accounts || accounts.length === 0)) {
             accounts = await provider.request({ method: "eth_requestAccounts" });
           }
 
