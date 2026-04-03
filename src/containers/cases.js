@@ -4,6 +4,7 @@ import { drizzleReactHooks } from "@drizzle/react-plugin";
 import CaseCard from "../components/case-card";
 import TopBanner from "../components/top-banner";
 import RequiredChainIdGateway from "../components/required-chain-id-gateway";
+import RequiredChainIdModal from "../components/required-chain-id-modal";
 import styled from "styled-components/macro";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import useChainId from "../hooks/use-chain-id";
@@ -92,9 +93,8 @@ export default function Cases() {
   const filteredDisputes = disputes[["votePending", "active", "executed"][filter]];
   const sortedDisputes = [...filteredDisputes].sort((a, b) => a.status - b.status);
 
-  //RequiredChainIdGateway is used here just to clean the requiredChainId query parameter when the user is on the wrong network
-  return (
-    <RequiredChainIdGateway>
+  const content = (
+    <>
       <TopBanner
         description="Select a case you have been drawn in, study the evidence, and vote."
         extra={
@@ -124,6 +124,19 @@ export default function Cases() {
           )}
         </Row>
       </Spin>
+    </>
+  );
+
+  return (
+    <RequiredChainIdGateway
+      renderOnMismatch={({ requiredChainId }) => (
+        <>
+          {content}
+          <RequiredChainIdModal requiredChainId={requiredChainId} />
+        </>
+      )}
+    >
+      {content}
     </RequiredChainIdGateway>
   );
 }
