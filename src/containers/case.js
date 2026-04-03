@@ -6,7 +6,7 @@ import CaseDetailsCard from "../components/case-details-card.jsx";
 import ETHAmount from "../components/eth-amount";
 import TimeAgo from "../components/time-ago";
 import TopBanner from "../components/top-banner";
-import RequiredChainIdGateway from "../components/required-chain-id-gateway";
+import RequiredChainIdGateway, { useSetRequiredChainId } from "../components/required-chain-id-gateway";
 import RequiredChainIdModal from "../components/required-chain-id-modal";
 import styled from "styled-components/macro";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
@@ -56,6 +56,7 @@ export default function Case() {
   const dispute = useCacheCall("KlerosLiquid", "disputes", ID);
   const dispute2 = useCacheCall("KlerosLiquid", "getDispute", ID);
   const chainId = useChainId();
+  const setRequiredChainId = useSetRequiredChainId();
   const draws = useGetDraws(chainId, `address: "${drizzleState.account}", disputeID: ${ID}`);
 
   const disputeData = useCacheCall(["KlerosLiquid"], (call) => {
@@ -108,13 +109,18 @@ export default function Case() {
   if (error) return <C404 />;
 
   async function handleChainSwitchToMainnet() {
-    try {
-      await window.ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0x1" }],
-      });
-    } catch (error) {
-      console.error("Error switching chains:", error);
+    if (drizzleState.account === VIEW_ONLY_ADDRESS) {
+      setRequiredChainId(1);
+      window.location.reload();
+    } else {
+      try {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: "0x1" }],
+        });
+      } catch (error) {
+        console.error("Error switching chains:", error);
+      }
     }
   }
 
@@ -124,7 +130,7 @@ export default function Case() {
         <Modal
           title="Dispute Not Found"
           visible={true}
-          closable={false}
+          closable={true}
           footer={[
             <Button key="switch" type="primary" onClick={handleChainSwitchToMainnet}>
               Switch to Mainnet

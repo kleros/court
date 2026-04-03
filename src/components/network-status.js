@@ -31,7 +31,7 @@ function SwitchChainMenu() {
     if (targetChainId === chainId) return; // Already on this chain
 
     if (account === VIEW_ONLY_ADDRESS) {
-      setRequiredChainId(targetChainId, { location: "/" });
+      setRequiredChainId(targetChainId);
       window.location.reload();
     } else {
       try {
