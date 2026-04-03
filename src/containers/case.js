@@ -34,6 +34,7 @@ export default function Case() {
 
   //Do what was done in app.js loadable() here, so we can avoid using a fallback drizzle there
   const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(true);
 
   useEffect(() => {
     //Avoid setting state after component is unmounted
@@ -105,10 +106,15 @@ export default function Case() {
     );
   }, [disputeData.deadline]);
 
+  useEffect(() => {
+    if (isDisputeTooOld && chainId !== 1) setIsModalOpen(true);
+  }, [isDisputeTooOld, chainId]);
+
   //Fallback to the 404 like the loadable() in app.js used to do
   if (error) return <C404 />;
 
   async function handleChainSwitchToMainnet() {
+    setIsModalOpen(false);
     if (drizzleState.account === VIEW_ONLY_ADDRESS) {
       setRequiredChainId(1);
       window.location.reload();
@@ -129,8 +135,8 @@ export default function Case() {
       return (
         <Modal
           title="Dispute Not Found"
-          visible={true}
-          closable={true}
+          visible={isModalOpen}
+          onCancel={() => setIsModalOpen(false)}
           footer={[
             <Button key="switch" type="primary" onClick={handleChainSwitchToMainnet}>
               Switch to Mainnet
