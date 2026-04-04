@@ -179,16 +179,16 @@ export async function getStakingReward(chainId, totalStaked) {
 
   const { lastMonthReward, adjustedSupplyInEther } = await getSnapshotRewardAndSupply();
 
-  let effectiveSupply = adjustedSupplyInEther;
+  let adjustedSupply = adjustedSupplyInEther;
 
   // Fallback for old snapshots without KIP-86 adjustedSupply: use on-chain totalSupply
-  if (!effectiveSupply) {
+  if (!adjustedSupply) {
     const MAINNET_RPC = getReadOnlyRpcUrl(1);
     const web3 = new Web3(MAINNET_RPC);
     const pnkContract = new web3.eth.Contract(PNKAbi.abi, process.env.REACT_APP_PINAKION_ADDRESS);
     const totalSupply = await pnkContract.methods.totalSupply().call();
     /* global BigInt */
-    effectiveSupply = Number(ethers.utils.formatUnits(String(BigInt(totalSupply)), "ether"));
+    adjustedSupply = Number(ethers.utils.formatUnits(String(BigInt(totalSupply)), "ether"));
   }
 
   const chainRewardPercentage = chainId === "100" ? 0.1 : 0.9; // Reward splitted by court
@@ -196,7 +196,7 @@ export async function getStakingReward(chainId, totalStaked) {
   const totalStakedAllChains = await getTotalStakedAllChains();
 
   // Calculate global staking rate (uses KIP-86 adjusted supply when available)
-  const currentStakedRate = totalStakedAllChains / effectiveSupply;
+  const currentStakedRate = totalStakedAllChains / adjustedSupply;
 
   // Apply KIP-78 formula: chainReward = chainPercentage * lastReward * (1 + target - stakedRate)
   const chainReward = chainRewardPercentage * lastMonthReward * (1 + target - currentStakedRate);
