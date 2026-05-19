@@ -10,6 +10,7 @@ import RequiredChainIdGateway, { useSetRequiredChainId } from "../components/req
 import RequiredChainIdModal from "../components/required-chain-id-modal";
 import styled from "styled-components/macro";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import { requestSwitchChain } from "../api/side-chain";
 import useChainId from "../hooks/use-chain-id";
 import useGetDraws from "../hooks/use-get-draws";
 import { chainIdToNetworkName } from "../helpers/networks";
@@ -120,10 +121,7 @@ export default function Case() {
       window.location.reload();
     } else {
       try {
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0x1" }],
-        });
+        await requestSwitchChain(drizzle.web3.currentProvider, 1);
       } catch (error) {
         console.error("Error switching chains:", error);
       }

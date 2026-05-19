@@ -93,6 +93,13 @@ function createDrizzle({ fallbackChainId, customProvider } = {}) {
 
   if (customProvider) {
     web3Instance = customProvider instanceof Web3 ? customProvider : new Web3(customProvider);
+
+    //Some wallets (e.g. Rabby on mainnet) might cause problems obtaining the chain ID, which will
+    //cascade into problems getting the contracts on a given chain, causing the app to crash.
+    //This is because Drizzle defaults to `web3.eth.net.getId()` to bind contract addresses for a specific chain,
+    //and on failure there are no contracts, causing crashes in useCacheCall consumers, for instance.
+    //Binding `getId` to `getChainId`, which is more recent and reliable on providers, works around this.
+    web3Instance.eth.net.getId = web3Instance.eth.getChainId.bind(web3Instance.eth);
   } else {
     const fallbackUrl = chainIdToFallbackUrl[fallbackChainId];
     if (fallbackUrl) {
