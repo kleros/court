@@ -276,7 +276,7 @@ const normalizeEvidenceJSON = (json) => {
   const normalized = { ...json };
 
   //Many PoH cases have an evidence format mismatch.
-  //It uses the `evidence` field for the attached file URI instead of the fileURI field directly.
+  //It uses the `evidence` field for the attached file URI instead of the `fileURI` field directly.
   if (!normalized.fileURI && normalized.evidence) {
     normalized.fileURI = normalized.evidence;
   }
