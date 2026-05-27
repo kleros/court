@@ -271,6 +271,18 @@ export const useDataloader = Object.keys(dataloaders).reduce((acc, f) => {
   return acc;
 }, {});
 
+const normalizeEvidenceJSON = (json) => {
+  if (!json || typeof json !== "object" || Array.isArray(json)) return json;
+  const normalized = { ...json };
+
+  //Many PoH cases have an evidence format mismatch.
+  //It uses the `evidence` field for the attached file URI instead of the `fileURI` field directly.
+  if (!normalized.fileURI && normalized.evidence) {
+    normalized.fileURI = normalized.evidence;
+  }
+  return normalized;
+};
+
 const evidenceFetcher = async ([subgraph, disputeId]) => {
   const evidence = await axios
     .post(
@@ -305,8 +317,9 @@ const evidenceFetcher = async ([subgraph, disputeId]) => {
             if (fileRes.status !== 200)
               throw new Error(`HTTP Error: Unable to fetch file at ${uri}. Returned status code ${fileRes.status}`);
 
+            const evidenceJSON = normalizeEvidenceJSON(fileRes.data);
             return {
-              evidenceJSON: fileRes.data,
+              evidenceJSON,
               submittedAt: evidenceItem.creationTime,
               submittedBy: evidenceItem.sender,
             };
