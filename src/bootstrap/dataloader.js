@@ -272,7 +272,7 @@ export const useDataloader = Object.keys(dataloaders).reduce((acc, f) => {
 }, {});
 
 const normalizeEvidenceJSON = (json) => {
-  if (!json) return json;
+  if (!json || typeof json !== "object" || Array.isArray(json)) return json;
   const normalized = { ...json };
 
   //Many PoH cases have an evidence format mismatch.
