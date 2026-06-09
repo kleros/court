@@ -10,6 +10,7 @@ import { ReactComponent as Image } from "../assets/images/image.svg";
 import { ReactComponent as Link } from "../assets/images/link.svg";
 import { ReactComponent as PDF } from "../assets/images/pdf.svg";
 import { ReactComponent as Video } from "../assets/images/video.svg";
+import { isSafeNavigationUrl } from "../utils/urlValidation";
 
 const StyledPopover = styled(({ className, ...rest }) => (
   <Popover className={className} overlayClassName={className} {...rest} />
@@ -44,15 +45,19 @@ const Attachment = ({ URI, description, extension: _extension, previewURI, title
   else if (isVideo(extension)) Component = Video;
   else Component = Link;
   Component = <Component className="primary-purple-fill theme-fill" />;
+
+  const href = URI.replace(/^\/ipfs\//, "https://cdn.kleros.link/ipfs/");
+  const LinkedComponent = isSafeNavigationUrl(href) ? (
+    <a href={href} rel="noopener noreferrer" target="_blank">
+      {Component}
+    </a>
+  ) : (
+    Component
+  );
+
   // No popover
   if (!title && !description) {
-    if (URI)
-      return (
-        <a href={URI.replace(/^\/ipfs\//, "https://cdn.kleros.link/ipfs/")} rel="noopener noreferrer" target="_blank">
-          {Component}
-        </a>
-      );
-    return Component;
+    return LinkedComponent;
   }
 
   return (
@@ -72,13 +77,7 @@ const Attachment = ({ URI, description, extension: _extension, previewURI, title
       }
       title={title}
     >
-      {URI ? (
-        <a href={URI.replace(/^\/ipfs\//, "https://cdn.kleros.link/ipfs/")} rel="noopener noreferrer" target="_blank">
-          {Component}
-        </a>
-      ) : (
-        Component
-      )}
+      {LinkedComponent}
     </StyledPopover>
   );
 };

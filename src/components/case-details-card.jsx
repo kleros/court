@@ -29,6 +29,7 @@ import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 import useGetDraws from "../hooks/use-get-draws";
 import arbitrableWhitelist from "../temp/arbitrable-whitelist";
 import { getAnswerString, RTA_LABEL } from "../temp/answer-string";
+import { isSafeNavigationUrl } from "../utils/urlValidation";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
 const { toBN, soliditySha3 } = Web3.utils;
@@ -504,6 +505,7 @@ export default function CaseDetailsCard({ ID }) {
       const { _v = "0" } = metaEvidence;
 
       let url = normalizeIPFSUri(evidenceDisplayInterfaceURI);
+      if (!isSafeNavigationUrl(url)) return null;
 
       const injectedParams = {
         disputeID: ID,
@@ -686,8 +688,10 @@ export default function CaseDetailsCard({ ID }) {
             <Row>
               <Col span={24}>
                 <StyledInnerCard actions={metaEvidenceActions}>
+                  {/* ReactMarkdown 4 escapes HTML by default. Changing this or bumping the major
+                      version without sanitizing the output could expose us to XSS attacks. */}
                   <ReactMarkdown source={metaEvidence.description} />
-                  {metaEvidence.evidenceDisplayInterfaceURI && (
+                  {evidenceDisplayInterfaceURL && (
                     <StyledIframeContainer>
                       <iframe
                         sandbox={
@@ -701,7 +705,7 @@ export default function CaseDetailsCard({ ID }) {
                       />
                     </StyledIframeContainer>
                   )}
-                  {metaEvidence.arbitrableInterfaceURI && (
+                  {metaEvidence.arbitrableInterfaceURI && isSafeNavigationUrl(metaEvidence.arbitrableInterfaceURI) && (
                     <ArbitrableInterfaceDiv>
                       <a href={metaEvidence.arbitrableInterfaceURI} target="_blank" rel="noopener noreferrer">
                         <Icon type="double-right" style={{ marginRight: "5px" }} />
