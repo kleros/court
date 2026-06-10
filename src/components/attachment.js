@@ -1,7 +1,7 @@
 import React from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
-import { Divider, Popover } from "antd";
+import { Divider, Popover, Tooltip } from "antd";
 import isImage from "is-image";
 import isTextPath from "is-text-path";
 import isVideo from "is-video";
@@ -10,6 +10,7 @@ import { ReactComponent as Image } from "../assets/images/image.svg";
 import { ReactComponent as Link } from "../assets/images/link.svg";
 import { ReactComponent as PDF } from "../assets/images/pdf.svg";
 import { ReactComponent as Video } from "../assets/images/video.svg";
+import { isSafeNavigationUrl } from "../utils/urlValidation";
 
 const StyledPopover = styled(({ className, ...rest }) => (
   <Popover className={className} overlayClassName={className} {...rest} />
@@ -29,6 +30,11 @@ const StyledIFrame = styled.iframe`
   margin-top: -8px;
   width: 300px;
 `;
+const DisabledAttachment = styled.span`
+  cursor: not-allowed;
+  display: inline-flex;
+  opacity: 0.5;
+`;
 
 const isPDF = (extension) => extension.toLowerCase() === ".pdf";
 
@@ -44,15 +50,31 @@ const Attachment = ({ URI, description, extension: _extension, previewURI, title
   else if (isVideo(extension)) Component = Video;
   else Component = Link;
   Component = <Component className="primary-purple-fill theme-fill" />;
+
+  const href = URI.replace(/^\/ipfs\//, "https://cdn.kleros.link/ipfs/");
+
+  // Unsafe attachment URL still indicate that a file was attached,
+  // but render it as a disabled, non-clickable icon with an explanation.
+  if (!isSafeNavigationUrl(href)) {
+    return (
+      <Tooltip
+        overlayStyle={{ wordBreak: "break-all" }}
+        title={`This attachment link was flagged as unsafe and has been disabled: "${href}"`}
+      >
+        <DisabledAttachment>{Component}</DisabledAttachment>
+      </Tooltip>
+    );
+  }
+
+  const LinkedComponent = (
+    <a href={href} rel="noopener noreferrer" target="_blank">
+      {Component}
+    </a>
+  );
+
   // No popover
   if (!title && !description) {
-    if (URI)
-      return (
-        <a href={URI.replace(/^\/ipfs\//, "https://cdn.kleros.link/ipfs/")} rel="noopener noreferrer" target="_blank">
-          {Component}
-        </a>
-      );
-    return Component;
+    return LinkedComponent;
   }
 
   return (
@@ -72,13 +94,7 @@ const Attachment = ({ URI, description, extension: _extension, previewURI, title
       }
       title={title}
     >
-      {URI ? (
-        <a href={URI.replace(/^\/ipfs\//, "https://cdn.kleros.link/ipfs/")} rel="noopener noreferrer" target="_blank">
-          {Component}
-        </a>
-      ) : (
-        Component
-      )}
+      {LinkedComponent}
     </StyledPopover>
   );
 };
