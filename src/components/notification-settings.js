@@ -53,6 +53,11 @@ const StyledAlertContainer = styled.div`
   gap: 8px;
 `;
 
+const StyledConfirmUnsubscribeButtons = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
 const StyledAlert = styled(Alert)`
   .ant-alert-message {
     color: ${({ theme }) => theme.textPrimary};
@@ -82,6 +87,9 @@ const NotificationSettingsContent = ({
   onUnsubscribe,
   isUnsubscribing,
   unsubscribeError,
+  isConfirmingUnsubscribe,
+  onStartUnsubscribe,
+  onCancelUnsubscribe,
 }) => {
   const userEmail = userData?.email || "";
   const isEmailVerified = userData?.isEmailVerified || false;
@@ -160,19 +168,46 @@ const NotificationSettingsContent = ({
               Save
             </Button>
 
-            {userEmail && (
-              <Button
-                className="mt-2"
-                type="danger"
-                htmlType="button"
-                block
-                loading={isUnsubscribing}
-                disabled={isUnsubscribing || isUpdatingEmail || isResendingVerification}
-                onClick={onUnsubscribe}
-              >
-                Unsubscribe
-              </Button>
-            )}
+            {userEmail &&
+              (isConfirmingUnsubscribe ? (
+                <StyledAlert
+                  className="mt-2"
+                  message="Unsubscribe from all notifications?"
+                  type="warning"
+                  description={
+                    <>
+                      <p>You will stop receiving notifications from all Kleros Products until you subscribe again.</p>
+                      <StyledConfirmUnsubscribeButtons>
+                        <Button size="small" htmlType="button" disabled={isUnsubscribing} onClick={onCancelUnsubscribe}>
+                          Cancel
+                        </Button>
+                        <Button
+                          size="small"
+                          type="danger"
+                          htmlType="button"
+                          loading={isUnsubscribing}
+                          disabled={isUnsubscribing || isUpdatingEmail || isResendingVerification}
+                          onClick={onUnsubscribe}
+                        >
+                          Confirm unsubscribe
+                        </Button>
+                      </StyledConfirmUnsubscribeButtons>
+                    </>
+                  }
+                />
+              ) : (
+                <Button
+                  className="mt-2"
+                  type="danger"
+                  htmlType="button"
+                  block
+                  loading={isUnsubscribing}
+                  disabled={isUnsubscribing || isUpdatingEmail || isResendingVerification}
+                  onClick={onStartUnsubscribe}
+                >
+                  Unsubscribe
+                </Button>
+              ))}
           </>
         )}
       </Skeleton>
@@ -235,6 +270,9 @@ NotificationSettingsContent.propTypes = {
   onUnsubscribe: PropTypes.func.isRequired,
   isUnsubscribing: PropTypes.bool.isRequired,
   unsubscribeError: PropTypes.string,
+  isConfirmingUnsubscribe: PropTypes.bool.isRequired,
+  onStartUnsubscribe: PropTypes.func.isRequired,
+  onCancelUnsubscribe: PropTypes.func.isRequired,
 };
 
 const NotificationSettings = Form.create()(({ form }) => {
@@ -247,6 +285,7 @@ const NotificationSettings = Form.create()(({ form }) => {
   const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
   const [isResendingVerification, setIsResendingVerification] = useState(false);
   const [isUnsubscribing, setIsUnsubscribing] = useState(false);
+  const [isConfirmingUnsubscribe, setIsConfirmingUnsubscribe] = useState(false);
   const [updateEmailError, setUpdateEmailError] = useState(null);
   const [updateEmailSuccess, setUpdateEmailSuccess] = useState(false);
   const [signInError, setSignInError] = useState(null);
@@ -323,6 +362,7 @@ const NotificationSettings = Form.create()(({ form }) => {
         throw new Error("Failed to unsubscribe");
       }
       message.success("You have been unsubscribed from email notifications.");
+      setIsConfirmingUnsubscribe(false);
       clearAuthData();
       mutate(["atlas-user", drizzleState.account.toLowerCase()]);
     } catch (err) {
@@ -415,6 +455,9 @@ const NotificationSettings = Form.create()(({ form }) => {
           onUnsubscribe={handleUnsubscribe}
           isUnsubscribing={isUnsubscribing}
           unsubscribeError={unsubscribeError}
+          isConfirmingUnsubscribe={isConfirmingUnsubscribe}
+          onStartUnsubscribe={() => setIsConfirmingUnsubscribe(true)}
+          onCancelUnsubscribe={() => setIsConfirmingUnsubscribe(false)}
         />
       }
       placement="bottomRight"

@@ -198,6 +198,19 @@ const GlobalStyle = createGlobalStyle`
     }
   }
 
+  .ant-btn-danger {
+    background: ${({ theme }) => theme.componentBackground};
+    border-color: ${({ theme }) => theme.borderColor};
+    color: ${({ theme }) => theme.errorColor};
+
+    &:hover,
+    &:focus {
+      background: ${({ theme }) => theme.errorColor};
+      border-color: ${({ theme }) => theme.errorColor};
+      color: ${({ theme }) => theme.primaryButtonText};
+    }
+  }
+
   .ant-btn-secondary,
   .ant-btn[type="secondary"] {
     background: ${({ theme }) => theme.componentBackground};
