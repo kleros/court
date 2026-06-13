@@ -78,7 +78,7 @@
     "iframe": "^1.0.0",
     "iframe-resizer-react": "^1.1.0",
     "is-image": "^2.0.0",
-    "is-text-path": "^1.0.1",
+    "is-text-path": "^3.0.0",
     "is-video": "^1.0.1",
     "javascript-time-ago": "^1.0.32",
     "polished": "^2.3.0",

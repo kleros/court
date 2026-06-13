@@ -10539,6 +10539,13 @@ is-text-path@^1.0.1:
   dependencies:
     text-extensions "^1.0.0"
 
+is-text-path@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/is-text-path/-/is-text-path-3.0.0.tgz#621bf3c47fe4aba4ecf60bba3f2ba87bd435e4f7"
+  integrity sha512-YDo1N1cIQk//DX044+mzBUEGtrJiqguXMmv//7xGBohWm3Aa8W69qyHEAOkZd5fJKQndmejVn6hB1t+oDHHLFw==
+  dependencies:
+    text-extensions "^3.0.0"
+
 is-typed-array@^1.1.10, is-typed-array@^1.1.9:
   version "1.1.10"
   resolved "https://registry.npmjs.org/is-typed-array/-/is-typed-array-1.1.10.tgz"
@@ -17603,6 +17610,11 @@ text-extensions@^1.0.0:
   version "1.9.0"
   resolved "https://registry.npmjs.org/text-extensions/-/text-extensions-1.9.0.tgz"
   integrity sha512-wiBrwC1EhBelW12Zy26JeOUkQ5mRu+5o8rpsJk5+2t+Y5vE7e842qtZDQ2g1NpX/29HdyFeJ4nSIhI47ENSxlQ==
+
+text-extensions@^3.0.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/text-extensions/-/text-extensions-3.1.0.tgz#69a71f6eaa493b9272941430348d4f956c1088e9"
+  integrity sha512-anOjtXr8OT5w4vc/2mP4AYTCE0GWc/21icGmaHtBHnI7pN7o01a/oqG9m06/rGzoAsDm/WNzggBpqptuCmRlZQ==
 
 text-table@0.2.0, text-table@^0.2.0:
   version "0.2.0"
