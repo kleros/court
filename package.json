@@ -64,7 +64,7 @@
     "@drizzle/react-plugin": "^1.5.3",
     "@drizzle/store": "^1.5.3",
     "@kleros/pnk-merkle-drop-contracts": "^0.1.0",
-    "@loadable/component": "^5.5.0",
+    "@loadable/component": "^5.16.7",
     "@reality.eth/contracts": "3.0.0",
     "@reality.eth/reality-eth-lib": "3.4.6",
     "@sentry/react": "^7.37.2",
