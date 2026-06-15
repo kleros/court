@@ -137,6 +137,67 @@
         return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       }
 
+      // Round a PNK amount to 2 decimal places.
+      function round2(n) {
+        return Math.round(n * 100) / 100;
+      }
+
+      // Sort month labels newest-first, keeping the combined "2021-01 & 02" bucket last.
+      function compareMonths(a, b) {
+        if (a === "2021-01 & 02") return 1;
+        if (b === "2021-01 & 02") return -1;
+        return b.localeCompare(a);
+      }
+
+      // Build a { Month, Mainnet PNK, Gnosis PNK, Total PNK } row summing all wallets for a month.
+      function monthTotalRow(label, bucket) {
+        let m = 0,
+          g = 0;
+        for (const v of Object.values(bucket.mainnet)) m += v;
+        for (const v of Object.values(bucket.gnosis)) g += v;
+        return {
+          Month: label,
+          "Mainnet PNK": round2(m),
+          "Gnosis PNK": round2(g),
+          "Total PNK": round2(m + g),
+        };
+      }
+
+      // Build sorted per-wallet { Address, Mainnet PNK, Gnosis PNK, Total PNK } rows for one month.
+      function monthWalletRows(bucket) {
+        const addrs = new Set([...Object.keys(bucket.mainnet), ...Object.keys(bucket.gnosis)]);
+        return [...addrs]
+          .map((addr) => {
+            const m = bucket.mainnet[addr] || 0;
+            const g = bucket.gnosis[addr] || 0;
+            return {
+              Address: addr,
+              "Mainnet PNK": round2(m),
+              "Gnosis PNK": round2(g),
+              "Total PNK": round2(m + g),
+            };
+          })
+          .sort((a, b) => b["Total PNK"] - a["Total PNK"]);
+      }
+
+      // Build the 4-column spec shared by every tab: a left-aligned first column,
+      // the two right-aligned PNK columns, and a right-aligned final total column.
+      function pnkColumns(firstKey, lastKey) {
+        return [
+          { key: firstKey, label: firstKey, align: "left" },
+          { key: "Mainnet PNK", label: "Mainnet PNK", align: "right" },
+          { key: "Gnosis PNK", label: "Gnosis PNK", align: "right" },
+          { key: lastKey, label: lastKey, align: "right" },
+        ];
+      }
+
+      // Append a worksheet built from row objects, with the given column widths.
+      function addSheet(wb, name, rows, widths) {
+        const ws = XLSX.utils.json_to_sheet(rows);
+        ws["!cols"] = widths.map((wch) => ({ wch }));
+        XLSX.utils.book_append_sheet(wb, ws, name);
+      }
+
       // Spreadsheet-like table component
       const PAGE_SIZE = 100;
 
@@ -471,11 +532,7 @@
             setProgress((p) => ({ ...p, done: Math.min(i + CONCURRENCY, total) }));
           }
 
-          const sorted = Object.keys(md).sort((a, b) => {
-            if (a === "2021-01 & 02") return 1;
-            if (b === "2021-01 & 02") return -1;
-            return b.localeCompare(a);
-          });
+          const sorted = Object.keys(md).sort(compareMonths);
 
           setMonthData(md);
           setGrandTotals(gt);
@@ -488,11 +545,7 @@
         // Months sorted newest-first (matches the tab order)
         const sortedMonths = useMemo(() => {
           if (!monthData) return [];
-          return Object.keys(monthData).sort((a, b) => {
-            if (a === "2021-01 & 02") return 1;
-            if (b === "2021-01 & 02") return -1;
-            return b.localeCompare(a);
-          });
+          return Object.keys(monthData).sort(compareMonths);
         }, [monthData]);
 
         // Build rows for current tab
@@ -502,64 +555,22 @@
             return Object.entries(grandTotals)
               .map(([addr, t]) => ({
                 Address: addr,
-                "Mainnet PNK": Math.round(t.mainnet * 100) / 100,
-                "Gnosis PNK": Math.round(t.gnosis * 100) / 100,
-                "Grand Total": Math.round((t.mainnet + t.gnosis) * 100) / 100,
+                "Mainnet PNK": round2(t.mainnet),
+                "Gnosis PNK": round2(t.gnosis),
+                "Grand Total": round2(t.mainnet + t.gnosis),
               }))
               .sort((a, b) => b["Grand Total"] - a["Grand Total"]);
           }
           if (activeTab === "Monthly Totals") {
-            return sortedMonths.map((label) => {
-              const { mainnet, gnosis } = monthData[label];
-              let m = 0,
-                g = 0;
-              for (const v of Object.values(mainnet)) m += v;
-              for (const v of Object.values(gnosis)) g += v;
-              return {
-                Month: label,
-                "Mainnet PNK": Math.round(m * 100) / 100,
-                "Gnosis PNK": Math.round(g * 100) / 100,
-                "Total PNK": Math.round((m + g) * 100) / 100,
-              };
-            });
+            return sortedMonths.map((label) => monthTotalRow(label, monthData[label]));
           }
-          const { mainnet, gnosis } = monthData[activeTab] || { mainnet: {}, gnosis: {} };
-          const allAddrs = new Set([...Object.keys(mainnet), ...Object.keys(gnosis)]);
-          return [...allAddrs]
-            .map((addr) => {
-              const m = mainnet[addr] || 0;
-              const g = gnosis[addr] || 0;
-              return {
-                Address: addr,
-                "Mainnet PNK": Math.round(m * 100) / 100,
-                "Gnosis PNK": Math.round(g * 100) / 100,
-                "Total PNK": Math.round((m + g) * 100) / 100,
-              };
-            })
-            .sort((a, b) => (b["Total PNK"] || 0) - (a["Total PNK"] || 0));
+          return monthWalletRows(monthData[activeTab] || { mainnet: {}, gnosis: {} });
         }, [activeTab, grandTotals, monthData, sortedMonths]);
 
         const currentColumns = useMemo(() => {
-          if (activeTab === "Summary")
-            return [
-              { key: "Address", label: "Address", align: "left" },
-              { key: "Mainnet PNK", label: "Mainnet PNK", align: "right" },
-              { key: "Gnosis PNK", label: "Gnosis PNK", align: "right" },
-              { key: "Grand Total", label: "Grand Total", align: "right" },
-            ];
-          if (activeTab === "Monthly Totals")
-            return [
-              { key: "Month", label: "Month", align: "left" },
-              { key: "Mainnet PNK", label: "Mainnet PNK", align: "right" },
-              { key: "Gnosis PNK", label: "Gnosis PNK", align: "right" },
-              { key: "Total PNK", label: "Total PNK", align: "right" },
-            ];
-          return [
-            { key: "Address", label: "Address", align: "left" },
-            { key: "Mainnet PNK", label: "Mainnet PNK", align: "right" },
-            { key: "Gnosis PNK", label: "Gnosis PNK", align: "right" },
-            { key: "Total PNK", label: "Total PNK", align: "right" },
-          ];
+          if (activeTab === "Summary") return pnkColumns("Address", "Grand Total");
+          if (activeTab === "Monthly Totals") return pnkColumns("Month", "Total PNK");
+          return pnkColumns("Address", "Total PNK");
         }, [activeTab]);
 
         function downloadXLSX() {
@@ -569,51 +580,20 @@
           const summaryRows = Object.entries(grandTotals)
             .map(([addr, t]) => ({
               Address: addr,
-              "Total Mainnet PNK": Math.round(t.mainnet * 100) / 100,
-              "Total Gnosis PNK": Math.round(t.gnosis * 100) / 100,
-              "Grand Total PNK": Math.round((t.mainnet + t.gnosis) * 100) / 100,
+              "Total Mainnet PNK": round2(t.mainnet),
+              "Total Gnosis PNK": round2(t.gnosis),
+              "Grand Total PNK": round2(t.mainnet + t.gnosis),
             }))
             .sort((a, b) => b["Grand Total PNK"] - a["Grand Total PNK"]);
-          const sws = XLSX.utils.json_to_sheet(summaryRows);
-          sws["!cols"] = [{ wch: 44 }, { wch: 20 }, { wch: 20 }, { wch: 20 }];
-          XLSX.utils.book_append_sheet(wb, sws, "Summary");
+          addSheet(wb, "Summary", summaryRows, [44, 20, 20, 20]);
 
-          const monthlyTotalRows = sortedMonths.map((label) => {
-            const { mainnet, gnosis } = monthData[label];
-            let m = 0,
-              g = 0;
-            for (const v of Object.values(mainnet)) m += v;
-            for (const v of Object.values(gnosis)) g += v;
-            return {
-              Month: label,
-              "Mainnet PNK": Math.round(m * 100) / 100,
-              "Gnosis PNK": Math.round(g * 100) / 100,
-              "Total PNK": Math.round((m + g) * 100) / 100,
-            };
-          });
-          const mts = XLSX.utils.json_to_sheet(monthlyTotalRows);
-          mts["!cols"] = [{ wch: 14 }, { wch: 18 }, { wch: 18 }, { wch: 18 }];
-          XLSX.utils.book_append_sheet(wb, mts, "Monthly Totals");
+          const monthlyTotalRows = sortedMonths.map((label) => monthTotalRow(label, monthData[label]));
+          addSheet(wb, "Monthly Totals", monthlyTotalRows, [14, 18, 18, 18]);
 
           for (const label of sortedMonths) {
-            const { mainnet, gnosis } = monthData[label];
-            const allAddrs = new Set([...Object.keys(mainnet), ...Object.keys(gnosis)]);
-            if (allAddrs.size === 0) continue;
-            const rows = [...allAddrs]
-              .map((addr) => {
-                const m = mainnet[addr] || 0;
-                const g = gnosis[addr] || 0;
-                return {
-                  Address: addr,
-                  "Mainnet PNK": Math.round(m * 100) / 100,
-                  "Gnosis PNK": Math.round(g * 100) / 100,
-                  "Total PNK": Math.round((m + g) * 100) / 100,
-                };
-              })
-              .sort((a, b) => b["Total PNK"] - a["Total PNK"]);
-            const ws = XLSX.utils.json_to_sheet(rows);
-            ws["!cols"] = [{ wch: 44 }, { wch: 18 }, { wch: 18 }, { wch: 18 }];
-            XLSX.utils.book_append_sheet(wb, ws, label.slice(0, 31));
+            const rows = monthWalletRows(monthData[label]);
+            if (rows.length === 0) continue;
+            addSheet(wb, label.slice(0, 31), rows, [44, 18, 18, 18]);
           }
 
           const buf = XLSX.write(wb, { bookType: "xlsx", type: "array" });
