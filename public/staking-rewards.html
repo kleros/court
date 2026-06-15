@@ -140,17 +140,22 @@
       // Spreadsheet-like table component
       const PAGE_SIZE = 100;
 
-      function SpreadsheetTable({ rows, columns }) {
+      function SpreadsheetTable({ rows, columns, noun = "address", nounPlural = "addresses" }) {
         const [sortCol, setSortCol] = useState(null);
         const [sortAsc, setSortAsc] = useState(false);
         const [search, setSearch] = useState("");
         const [page, setPage] = useState(0);
 
+        const filterKey = columns[0].key;
         const filtered = useMemo(() => {
           if (!search) return rows;
           const q = search.toLowerCase();
-          return rows.filter((r) => r.Address.toLowerCase().includes(q));
-        }, [rows, search]);
+          return rows.filter((r) =>
+            String(r[filterKey] ?? "")
+              .toLowerCase()
+              .includes(q)
+          );
+        }, [rows, search, filterKey]);
 
         const sorted = useMemo(() => {
           if (sortCol === null) return filtered;
@@ -185,7 +190,7 @@
               <input
                 className="search-input"
                 type="text"
-                placeholder="Search address..."
+                placeholder={"Search " + noun + "..."}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 style={{
@@ -201,7 +206,7 @@
                 }}
               />
               <span style={{ fontSize: 11, color: "#6c6c8a", whiteSpace: "nowrap" }}>
-                {filtered.length.toLocaleString()} address{filtered.length !== 1 ? "es" : ""}
+                {filtered.length.toLocaleString()} {filtered.length !== 1 ? nounPlural : noun}
               </span>
             </div>
             <div style={{ overflowX: "auto", borderRadius: 8, border: "1px solid rgba(108,92,231,0.15)" }}>
@@ -474,11 +479,21 @@
 
           setMonthData(md);
           setGrandTotals(gt);
-          setTabList(["Summary", ...sorted]);
+          setTabList(["Summary", "Monthly Totals", ...sorted]);
           setActiveTab("Summary");
           setErrors(errs);
           setPhase("done");
         }
+
+        // Months sorted newest-first (matches the tab order)
+        const sortedMonths = useMemo(() => {
+          if (!monthData) return [];
+          return Object.keys(monthData).sort((a, b) => {
+            if (a === "2021-01 & 02") return 1;
+            if (b === "2021-01 & 02") return -1;
+            return b.localeCompare(a);
+          });
+        }, [monthData]);
 
         // Build rows for current tab
         const currentRows = useMemo(() => {
@@ -492,6 +507,21 @@
                 "Grand Total": Math.round((t.mainnet + t.gnosis) * 100) / 100,
               }))
               .sort((a, b) => b["Grand Total"] - a["Grand Total"]);
+          }
+          if (activeTab === "Monthly Totals") {
+            return sortedMonths.map((label) => {
+              const { mainnet, gnosis } = monthData[label];
+              let m = 0,
+                g = 0;
+              for (const v of Object.values(mainnet)) m += v;
+              for (const v of Object.values(gnosis)) g += v;
+              return {
+                Month: label,
+                "Mainnet PNK": Math.round(m * 100) / 100,
+                "Gnosis PNK": Math.round(g * 100) / 100,
+                "Total PNK": Math.round((m + g) * 100) / 100,
+              };
+            });
           }
           const { mainnet, gnosis } = monthData[activeTab] || { mainnet: {}, gnosis: {} };
           const allAddrs = new Set([...Object.keys(mainnet), ...Object.keys(gnosis)]);
@@ -507,7 +537,7 @@
               };
             })
             .sort((a, b) => (b["Total PNK"] || 0) - (a["Total PNK"] || 0));
-        }, [activeTab, grandTotals, monthData]);
+        }, [activeTab, grandTotals, monthData, sortedMonths]);
 
         const currentColumns = useMemo(() => {
           if (activeTab === "Summary")
@@ -516,6 +546,13 @@
               { key: "Mainnet PNK", label: "Mainnet PNK", align: "right" },
               { key: "Gnosis PNK", label: "Gnosis PNK", align: "right" },
               { key: "Grand Total", label: "Grand Total", align: "right" },
+            ];
+          if (activeTab === "Monthly Totals")
+            return [
+              { key: "Month", label: "Month", align: "left" },
+              { key: "Mainnet PNK", label: "Mainnet PNK", align: "right" },
+              { key: "Gnosis PNK", label: "Gnosis PNK", align: "right" },
+              { key: "Total PNK", label: "Total PNK", align: "right" },
             ];
           return [
             { key: "Address", label: "Address", align: "left" },
@@ -541,7 +578,24 @@
           sws["!cols"] = [{ wch: 44 }, { wch: 20 }, { wch: 20 }, { wch: 20 }];
           XLSX.utils.book_append_sheet(wb, sws, "Summary");
 
-          for (const label of tabList.slice(1)) {
+          const monthlyTotalRows = sortedMonths.map((label) => {
+            const { mainnet, gnosis } = monthData[label];
+            let m = 0,
+              g = 0;
+            for (const v of Object.values(mainnet)) m += v;
+            for (const v of Object.values(gnosis)) g += v;
+            return {
+              Month: label,
+              "Mainnet PNK": Math.round(m * 100) / 100,
+              "Gnosis PNK": Math.round(g * 100) / 100,
+              "Total PNK": Math.round((m + g) * 100) / 100,
+            };
+          });
+          const mts = XLSX.utils.json_to_sheet(monthlyTotalRows);
+          mts["!cols"] = [{ wch: 14 }, { wch: 18 }, { wch: 18 }, { wch: 18 }];
+          XLSX.utils.book_append_sheet(wb, mts, "Monthly Totals");
+
+          for (const label of sortedMonths) {
             const { mainnet, gnosis } = monthData[label];
             const allAddrs = new Set([...Object.keys(mainnet), ...Object.keys(gnosis)]);
             if (allAddrs.size === 0) continue;
@@ -634,7 +688,7 @@
                 )}
                 {phase === "done" && (
                   <span style={{ fontSize: 10, color: "#6c6c8a" }}>
-                    {Object.keys(grandTotals).length.toLocaleString()} addresses &middot; {tabList.length - 1} months
+                    {Object.keys(grandTotals).length.toLocaleString()} addresses &middot; {sortedMonths.length} months
                   </span>
                 )}
               </div>
@@ -776,7 +830,12 @@
 
                 {/* Table */}
                 <div className="table-wrap" style={{ flex: 1, overflow: "auto", padding: "16px 20px" }}>
-                  <SpreadsheetTable rows={currentRows} columns={currentColumns} />
+                  <SpreadsheetTable
+                    rows={currentRows}
+                    columns={currentColumns}
+                    noun={activeTab === "Monthly Totals" ? "month" : "address"}
+                    nounPlural={activeTab === "Monthly Totals" ? "months" : "addresses"}
+                  />
                 </div>
 
                 {/* Fetch errors */}
