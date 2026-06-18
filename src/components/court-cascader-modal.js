@@ -1,4 +1,4 @@
-import { Button, Cascader, Col, Modal, Row, Skeleton, Tooltip, Typography } from "antd";
+import { Button, Cascader, Col, Icon, Modal, Row, Skeleton, Tooltip, Typography } from "antd";
 import React, { useCallback, useState } from "react";
 import PropTypes from "prop-types";
 import ReactMarkdown from "react-markdown";
@@ -151,6 +151,23 @@ const CourtCascaderModal = ({ onClick }) => {
                         tokenSymbol="PNK"
                       />
                       .
+                      {_court !== null && (
+                        <>
+                          {" | "}
+                          <Tooltip
+                            title={
+                              _court.hiddenVotes
+                                ? "Jurors in this court must commit their vote first and reveal it later."
+                                : "Jurors in this court cast their vote in a single step, visible to others."
+                            }
+                          >
+                            <StyledVoteTypeDisplay>
+                              <span>{_court.hiddenVotes ? "Hidden votes" : "Public votes"}</span>
+                              <StyledInfoIcon type="info-circle" theme="filled" />
+                            </StyledVoteTypeDisplay>
+                          </Tooltip>
+                        </>
+                      )}
                     </StyledMinStakeDisplay>
                   </Typography.Title>
                   <ReactMarkdown source={option.description} />
@@ -424,4 +441,17 @@ const StyledMinStakeDisplay = styled.div`
   font-weight: 400;
   font-size: 12px;
   margin: 3px 0 20px 0;
+`;
+
+const StyledVoteTypeDisplay = styled.span`
+  cursor: help;
+
+  span {
+    border-bottom: 1px dotted currentColor;
+  }
+`;
+
+const StyledInfoIcon = styled(Icon)`
+  margin-left: 4px;
+  vertical-align: middle;
 `;
