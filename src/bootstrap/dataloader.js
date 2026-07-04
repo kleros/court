@@ -27,7 +27,7 @@ const getHttpUri = (uri) => {
       if (uri.substr(0, 5) === "/ipfs" || uri.substr(0, 5) === "ipfs/") {
         if (uri.substr(0, 1) === "/") uri = uri.substr(1, uri.length - 1);
         uri = `https://cdn.kleros.link/${uri}`;
-      } else if (uri.substr(0, 6) === "ipfs:/") uri = `https://cdn.kleros.link/${uri.split(":/").pop()}`;
+      } else if (uri.substr(0, 6) === "ipfs:/") uri = `https://cdn.kleros.link/ipfs/${uri.split(":/").pop()}`;
       else throw new Error(`Unrecognized protocol ${protocol}`);
       break;
     default:
