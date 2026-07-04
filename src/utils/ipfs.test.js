@@ -1,4 +1,5 @@
 import { normalizeIpfsUri } from "./ipfs-normalizer";
+import { isSafeNavigationUrl } from "./urlValidation";
 
 describe("normalizeIpfsUri", () => {
   it.each([
@@ -29,5 +30,19 @@ describe("normalizeIpfsUri", () => {
     expect(normalizeIpfsUri("data.json")).toBe("data.json");
     expect(normalizeIpfsUri(null)).toBe(null);
     expect(normalizeIpfsUri(undefined)).toBe(undefined);
+  });
+
+  it("does not preserve executable schemes when normalizing IPFS URIs", () => {
+    const normalizedUri = normalizeIpfsUri("ipfs://javascript:alert(1)");
+
+    expect(normalizedUri).toBe("https://cdn.kleros.link/ipfs/javascript:alert(1)");
+    expect(new URL(normalizedUri).protocol).toBe("https:");
+  });
+
+  it("keeps non-IPFS executable schemes unsafe", () => {
+    const normalizedUri = normalizeIpfsUri("javascript:alert(1)");
+
+    expect(normalizedUri).toBe("javascript:alert(1)");
+    expect(isSafeNavigationUrl(normalizedUri)).toBe(false);
   });
 });

@@ -39,6 +39,12 @@ const DisabledAttachment = styled.span`
 
 const isPDF = (extension) => extension.toLowerCase() === ".pdf";
 
+const getSafeNavigationUrl = (uri) => {
+  const normalizedUri = normalizeIpfsUri(uri);
+
+  return isSafeNavigationUrl(normalizedUri) ? normalizedUri : null;
+};
+
 const Attachment = ({ URI, description, extension: _extension, previewURI, title }) => {
   let extension;
   if (!_extension && URI) extension = `.${URI.split(".").pop()}`;
@@ -52,16 +58,18 @@ const Attachment = ({ URI, description, extension: _extension, previewURI, title
   else Component = Link;
   Component = <Component className="primary-purple-fill theme-fill" />;
 
-  const href = normalizeIpfsUri(URI);
-  const previewHref = normalizeIpfsUri(previewURI);
+  const navigationUrls = {
+    attachment: getSafeNavigationUrl(URI),
+    preview: getSafeNavigationUrl(previewURI),
+  };
 
   // Unsafe attachment URL still indicate that a file was attached,
   // but render it as a disabled, non-clickable icon with an explanation.
-  if (!isSafeNavigationUrl(href)) {
+  if (!navigationUrls.attachment) {
     return (
       <Tooltip
         overlayStyle={{ wordBreak: "break-all" }}
-        title={`This attachment link was flagged as unsafe and has been disabled: "${href}"`}
+        title={`This attachment link was flagged as unsafe and has been disabled: "${normalizeIpfsUri(URI)}"`}
       >
         <DisabledAttachment>{Component}</DisabledAttachment>
       </Tooltip>
@@ -69,7 +77,7 @@ const Attachment = ({ URI, description, extension: _extension, previewURI, title
   }
 
   const LinkedComponent = (
-    <a href={href} rel="noopener noreferrer" target="_blank">
+    <a href={navigationUrls.attachment} rel="noopener noreferrer" target="_blank">
       {Component}
     </a>
   );
@@ -84,11 +92,11 @@ const Attachment = ({ URI, description, extension: _extension, previewURI, title
       arrowPointAtCenter
       className=""
       content={
-        previewURI ? (
+        navigationUrls.preview ? (
           <>
             {description}
             <Divider dashed />
-            <StyledIFrame sandbox="" frameBorder="0" src={previewHref} title="Attachment Preview" />
+            <StyledIFrame sandbox="" frameBorder="0" src={navigationUrls.preview} title="Attachment Preview" />
           </>
         ) : (
           description
