@@ -29,6 +29,7 @@ import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 import useGetDraws from "../hooks/use-get-draws";
 import arbitrableWhitelist from "../temp/arbitrable-whitelist";
 import { getAnswerString, RTA_LABEL } from "../temp/answer-string";
+import { normalizeIpfsUri } from "../utils/ipfs-normalizer";
 import { isSafeNavigationUrl } from "../utils/urlValidation";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
@@ -494,7 +495,6 @@ export default function CaseDetailsCard({ ID }) {
   }, [dispute?.arbitrated, arbitrableChainID, metaEvidence]);
 
   const evidenceDisplayInterfaceURL = useMemo(() => {
-    const normalizeIPFSUri = (uri) => uri.replace(/^\/ipfs\//, "https://cdn.kleros.link/ipfs/");
     if (metaEvidence?.evidenceDisplayInterfaceURI) {
       // hack to allow displaying old t2cr disputes, since old endpoint was lost
       const evidenceDisplayInterfaceURI =
@@ -504,7 +504,7 @@ export default function CaseDetailsCard({ ID }) {
 
       const { _v = "0" } = metaEvidence;
 
-      let url = normalizeIPFSUri(evidenceDisplayInterfaceURI);
+      let url = normalizeIpfsUri(evidenceDisplayInterfaceURI);
       if (!isSafeNavigationUrl(url)) return null;
 
       const injectedParams = {
@@ -528,6 +528,9 @@ export default function CaseDetailsCard({ ID }) {
       return url;
     }
   }, [metaEvidence, ID, dispute, chainId, KlerosLiquid.address, arbitratorChainID, arbitrableChainID]);
+  const arbitrableInterfaceURL = useMemo(() => normalizeIpfsUri(metaEvidence?.arbitrableInterfaceURI), [
+    metaEvidence?.arbitrableInterfaceURI,
+  ]);
 
   return (
     <>
@@ -705,9 +708,9 @@ export default function CaseDetailsCard({ ID }) {
                       />
                     </StyledIframeContainer>
                   )}
-                  {metaEvidence.arbitrableInterfaceURI && isSafeNavigationUrl(metaEvidence.arbitrableInterfaceURI) && (
+                  {arbitrableInterfaceURL && isSafeNavigationUrl(arbitrableInterfaceURL) && (
                     <ArbitrableInterfaceDiv>
-                      <a href={metaEvidence.arbitrableInterfaceURI} target="_blank" rel="noopener noreferrer">
+                      <a href={arbitrableInterfaceURL} target="_blank" rel="noopener noreferrer">
                         <Icon type="double-right" style={{ marginRight: "5px" }} />
                         Go to the Arbitrable Application
                       </a>

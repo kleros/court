@@ -16,6 +16,7 @@
   "scripts": {
     "prestart": "run-s build:theme",
     "start": "cross-env BROWSER=none react-app-rewired start",
+    "test": "react-app-rewired test --watchAll=false",
     "prebuild": "run-s build:theme",
     "build": "react-app-rewired build",
     "build:analyze": "source-map-explorer build/static/js/main.*",

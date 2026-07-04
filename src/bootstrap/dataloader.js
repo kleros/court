@@ -5,6 +5,7 @@ import axios from "axios";
 import useSWR from "swr";
 import arbitrableWhitelist from "../temp/arbitrable-whitelist";
 import { displaySubgraph } from "./subgraph";
+import { normalizeIpfsUri } from "../utils/ipfs-normalizer";
 
 const getURIProtocol = (uri) => {
   const uriParts = uri.replace(":", "").split("/");
@@ -23,12 +24,8 @@ const getHttpUri = (uri) => {
       else throw new Error(`Unrecognized protocol ${protocol}`);
       break;
     case "ipfs":
-      uri = uri.replace("://", ":/");
-      if (uri.substr(0, 5) === "/ipfs" || uri.substr(0, 5) === "ipfs/") {
-        if (uri.substr(0, 1) === "/") uri = uri.substr(1, uri.length - 1);
-        uri = `https://cdn.kleros.link/${uri}`;
-      } else if (uri.substr(0, 6) === "ipfs:/") uri = `https://cdn.kleros.link/ipfs/${uri.split(":/").pop()}`;
-      else throw new Error(`Unrecognized protocol ${protocol}`);
+      uri = normalizeIpfsUri(uri);
+      if (!uri.startsWith("https://")) throw new Error(`Unrecognized protocol ${protocol}`);
       break;
     default:
       throw new Error(`Unrecognized protocol ${protocol}`);

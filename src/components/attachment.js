@@ -10,6 +10,7 @@ import { ReactComponent as Image } from "../assets/images/image.svg";
 import { ReactComponent as Link } from "../assets/images/link.svg";
 import { ReactComponent as PDF } from "../assets/images/pdf.svg";
 import { ReactComponent as Video } from "../assets/images/video.svg";
+import { normalizeIpfsUri } from "../utils/ipfs-normalizer";
 import { isSafeNavigationUrl } from "../utils/urlValidation";
 
 const StyledPopover = styled(({ className, ...rest }) => (
@@ -51,7 +52,8 @@ const Attachment = ({ URI, description, extension: _extension, previewURI, title
   else Component = Link;
   Component = <Component className="primary-purple-fill theme-fill" />;
 
-  const href = URI.replace(/^\/ipfs\//, "https://cdn.kleros.link/ipfs/");
+  const href = normalizeIpfsUri(URI);
+  const previewHref = normalizeIpfsUri(previewURI);
 
   // Unsafe attachment URL still indicate that a file was attached,
   // but render it as a disabled, non-clickable icon with an explanation.
@@ -86,7 +88,7 @@ const Attachment = ({ URI, description, extension: _extension, previewURI, title
           <>
             {description}
             <Divider dashed />
-            <StyledIFrame sandbox="" frameBorder="0" src={previewURI} title="Attachment Preview" />
+            <StyledIFrame sandbox="" frameBorder="0" src={previewHref} title="Attachment Preview" />
           </>
         ) : (
           description
