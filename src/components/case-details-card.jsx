@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components/macro";
-import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, Row, Spin, Radio } from "antd";
+import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, Radio, Row, Spin } from "antd";
 import InputNumber from "rc-input-number";
 import BigNumber from "bignumber.js";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
@@ -16,7 +16,7 @@ import { ReactComponent as Scales } from "../assets/images/scales.svg";
 import { postJustification } from "../bootstrap/api";
 import { useDataloader, useEvidence, VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import web3Salt from "../temp/web3-salt";
-import { range, binaryPermutations } from "../helpers/array";
+import { binaryPermutations, range } from "../helpers/array";
 import useChainId from "../hooks/use-chain-id";
 import Attachment from "./attachment";
 import DisputeTimeline from "./dispute-timeline";
@@ -646,21 +646,23 @@ export default function CaseDetailsCard({ ID }) {
                     ) : null}
                   </div>
 
-                  {Object.entries(metaEvidence.rulingOptions?.reserved ?? {}).map(([ruling, title]) => (
-                    <div key={ruling} style={{ marginTop: "32px" }}>
-                      {Number(dispute.period) < "3" && !votesData.voted ? (
-                        <Button
-                          disabled={!votesData.canVote}
-                          ghost={votesData.canVote}
-                          id={ruling}
-                          onClick={onVoteClick}
-                          size="large"
-                        >
-                          {title}
-                        </Button>
-                      ) : null}
-                    </div>
-                  ))}
+                  {Object.entries(metaEvidence.rulingOptions?.reserved ?? {})
+                    .filter(([ruling]) => ruling !== "0")
+                    .map(([ruling, title]) => (
+                      <div key={ruling} style={{ marginTop: "32px" }}>
+                        {Number(dispute.period) < "3" && !votesData.voted ? (
+                          <Button
+                            disabled={!votesData.canVote}
+                            ghost={votesData.canVote}
+                            id={ruling}
+                            onClick={onVoteClick}
+                            size="large"
+                          >
+                            {title}
+                          </Button>
+                        ) : null}
+                      </div>
+                    ))}
                 </StyledDiv>
               </>
             ) : (

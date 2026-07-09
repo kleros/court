@@ -106,13 +106,15 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
                         </Col>
                       ))}
                     {metaEvidence.rulingOptions?.reserved &&
-                      Object.keys(metaEvidence.rulingOptions.reserved).map((key) => (
-                        <Col lg={24} key={key}>
-                          <Radio.Button size="large" value={key}>
-                            {metaEvidence.rulingOptions.reserved[key]}
-                          </Radio.Button>
-                        </Col>
-                      ))}
+                      Object.keys(metaEvidence.rulingOptions.reserved)
+                        .filter((key) => key !== "0")
+                        .map((key) => (
+                          <Col lg={24} key={key}>
+                            <Radio.Button size="large" value={key}>
+                              {metaEvidence.rulingOptions.reserved[key]}
+                            </Radio.Button>
+                          </Col>
+                        ))}
                   </Row>
                 </StyledRadioGroup>
               </RulingOptionsBox>
