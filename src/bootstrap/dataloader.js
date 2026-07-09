@@ -13,24 +13,17 @@ const getURIProtocol = (uri) => {
 };
 
 const getHttpUri = (uri) => {
+  if (isContentAddressed(uri)) return toHttpUrl(uri);
+
   const protocol = getURIProtocol(uri);
   switch (protocol) {
     case "http":
     case "https":
     case "ipns":
-      break;
-    case "fs":
-      if (uri.includes("/ipfs/")) uri = toHttpUrl(uri);
-      else throw new Error(`Unrecognized protocol ${protocol}`);
-      break;
-    case "ipfs":
-      uri = toHttpUrl(uri);
-      break;
+      return uri;
     default:
       throw new Error(`Unrecognized protocol ${protocol}`);
   }
-
-  return uri;
 };
 
 const fetchDataFromScript = async (scriptString, scriptParameters) => {
