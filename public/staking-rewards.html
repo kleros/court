@@ -70,27 +70,19 @@
       const { useState, useEffect, useMemo } = React;
 
       const IPFS = "https://cdn.kleros.link/ipfs/";
-      const CLAIM_MODAL_URL = "https://raw.githubusercontent.com/kleros/court/master/src/components/claim-modal.js";
+      // Generated at build time from src/assets/snapshots.json by scripts/emit-snapshots.js.
+      const SNAPSHOTS_URL = "./snapshots.json";
 
-      function parseSnapshotsFromSource(source) {
-        const mainnetMatch = source.match(/\b1:\s*\{[^}]*?snapshots:\s*\[([\s\S]*?)\]/);
-        const gnosisMatch = source.match(/\b100:\s*\{[^}]*?snapshots:\s*\[([\s\S]*?)\]/);
-        function extractPaths(block) {
-          if (!block) return [];
-          const paths = [];
-          const re = /"([^"]+\.json)"/g;
-          let m;
-          while ((m = re.exec(block)) !== null) paths.push(m[1]);
-          return paths;
-        }
-        function toSnapshot(path) {
-          const filename = path.split("/").pop();
-          const dateMatch = filename.match(/(\d{4}-\d{2})/);
-          return { path, label: dateMatch ? dateMatch[1] : "2021-01 & 02" };
-        }
+      function toSnapshot(path) {
+        const filename = path.split("/").pop();
+        const dateMatch = filename.match(/(\d{4}-\d{2})/);
+        return { path, label: dateMatch ? dateMatch[1] : "2021-01 & 02" };
+      }
+
+      function parseSnapshots(byChainId) {
         return {
-          mainnet: extractPaths(mainnetMatch?.[1]).map(toSnapshot),
-          gnosis: extractPaths(gnosisMatch?.[1]).map(toSnapshot),
+          mainnet: (byChainId?.["1"] ?? []).map(toSnapshot),
+          gnosis: (byChainId?.["100"] ?? []).map(toSnapshot),
         };
       }
 
@@ -469,15 +461,14 @@
           setPhase("loading");
           setErrors([]);
 
-          // Step 1: fetch snapshot list from GitHub
+          // Step 1: load the snapshot list
           let snapshots;
           try {
-            const r = await fetch(CLAIM_MODAL_URL);
+            const r = await fetch(SNAPSHOTS_URL);
             if (!r.ok) throw new Error("HTTP " + r.status);
-            const source = await r.text();
-            snapshots = parseSnapshotsFromSource(source);
+            snapshots = parseSnapshots(await r.json());
             if (snapshots.mainnet.length === 0 && snapshots.gnosis.length === 0) {
-              throw new Error("Could not parse any snapshots from claim-modal.js");
+              throw new Error("snapshots.json contained no snapshots");
             }
           } catch (e) {
             setSourceError(e.message);
@@ -694,7 +685,7 @@
                     fontWeight: 600,
                   }}
                 >
-                  {phase === "loading" ? "Fetching snapshot list from GitHub..." : "Fetching snapshots from IPFS..."}
+                  {phase === "loading" ? "Loading snapshot list..." : "Fetching snapshots from IPFS..."}
                 </div>
                 {phase === "fetching" && (
                   <div style={{ width: 400, maxWidth: "90%" }}>
@@ -847,7 +838,7 @@
                     gap: 8,
                   }}
                 >
-                  <span>Snapshot hashes fetched live from kleros/court master branch</span>
+                  <span>Reward data fetched from IPFS snapshots published by Kleros Court</span>
                   <span>Tip: Use "Download XLSX" to import into Google Sheets or Excel</span>
                 </div>
               </div>
