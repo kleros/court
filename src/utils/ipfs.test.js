@@ -35,9 +35,15 @@ describe("toHttpUrl", () => {
 
   it("returns undefined for empty or non-string input", () => {
     expect(toHttpUrl("")).toBeUndefined();
+    expect(toHttpUrl("   ")).toBeUndefined();
     expect(toHttpUrl(null)).toBeUndefined();
     expect(toHttpUrl(undefined)).toBeUndefined();
     expect(toHttpUrl(42)).toBeUndefined();
+  });
+
+  it("ignores surrounding whitespace", () => {
+    expect(toHttpUrl(` /ipfs/${CID_V0} `)).toBe(GATEWAY_URL);
+    expect(toHttpUrl(" https://curate.kleros.io ")).toBe("https://curate.kleros.io");
   });
 });
 
@@ -68,6 +74,13 @@ describe("isContentAddressed", () => {
     expect(isContentAddressed(`${CID_V0}X`)).toBe(false);
     expect(isContentAddressed("whatever")).toBe(false);
     expect(isContentAddressed("some random text")).toBe(false);
+  });
+
+  it("rejects accepted prefixes that are not followed by a CID", () => {
+    expect(isContentAddressed("/ipfs/whatever")).toBe(false);
+    expect(isContentAddressed("ipfs:whatever")).toBe(false);
+    expect(isContentAddressed("ipfs::whatever")).toBe(false);
+    expect(isContentAddressed("fs:/ipfs/whatever")).toBe(false);
   });
 
   it("rejects empty or non-string input", () => {
