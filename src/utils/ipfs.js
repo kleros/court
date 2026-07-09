@@ -5,7 +5,7 @@ export const IPFS_GATEWAY = "https://cdn.kleros.link";
 export const toHttpUrl = (uri) => {
   if (typeof uri !== "string" || uri === "") return uri;
   if (/^https?:\/\//.test(uri)) return uri;
-  const path = uri.replace(/^ipfs:\/*/, "").replace(/^\/?(?:ipfs\/)?/, "");
+  const path = uri.replace(/^(?:ipfs:|fs:)\/*/, "").replace(/^\/?(?:ipfs\/)?/, "");
   return `${IPFS_GATEWAY}/ipfs/${path}`;
 };
 
