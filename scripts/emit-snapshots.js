@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 /**
- * Copies src/assets/snapshots.json — the single source of truth for the monthly reward
- * snapshot CIDs — to public/snapshots.json, so that:
+ * 1. Verifies src/assets/snapshots.json still matches the `snapshots` arrays in
+ *    src/components/claim-modal.js, and fails the build if they have drifted.
+ * 2. Copies the manifest to public/snapshots.json so the standalone
+ *    staking-rewards.html page can read it same-origin (files under public/ are
+ *    copied verbatim by the build and cannot import from src/).
  *
- * 1. the standalone staking-rewards.html page can read it same-origin (files under
- *    public/ are copied verbatim by the build and cannot import from src/), and
- * 2. klerosboard and proof-of-humanity-v2-web can fetch it cross-origin from
- *    https://court.kleros.io/snapshots.json (see the CORS header in netlify.toml).
- *
- * src/components/claim-modal.js and src/helpers/rewards.js import the manifest directly.
+ * The arrays in claim-modal.js are duplicated here on purpose, and only
+ * temporarily: raw.githubusercontent.com/kleros/court/master/src/components/claim-modal.js
+ * is scraped by klerosboard and proof-of-humanity-v2-web to locate the monthly
+ * reward snapshots. Once those repos point at snapshots.json instead, delete the
+ * arrays from claim-modal.js, have it import this manifest, and drop assertParity().
  *
  * The array index of each snapshot is the on-chain `week` argument to
  * MerkleRedeem.claimWeek, so order and length must never change.
@@ -18,15 +20,77 @@ const path = require("path");
 
 const root = path.join(__dirname, "..");
 const source = path.join(root, "src", "assets", "snapshots.json");
+const claimModal = path.join(root, "src", "components", "claim-modal.js");
 const destination = path.join(root, "public", "snapshots.json");
 
 const CHAIN_IDS = ["1", "100"];
+const FILENAME_PREFIX = { 1: "snapshot-", 100: "xdai-snapshot-" };
+const ENTRY = /^[A-Za-z0-9]+\/[A-Za-z0-9._-]+\.json$/;
+
+// rewards.js derives the IPFS url, the month and the chain from these strings alone, so a
+// malformed entry there is a wrong reward figure at runtime rather than an error.
+function assertEntriesAreWellFormed(entries, chainId) {
+  for (const entry of entries) {
+    if (!ENTRY.test(entry)) {
+      throw new Error(`snapshots.json: chain ${chainId} entry "${entry}" is not of the form "<cid>/<filename>.json"`);
+    }
+    const filename = entry.split("/")[1];
+    if (!filename.startsWith(FILENAME_PREFIX[chainId])) {
+      throw new Error(
+        `snapshots.json: chain ${chainId} entry "${entry}" must start with "${FILENAME_PREFIX[chainId]}" ` +
+          `— rewards.js tells the chains apart by that prefix.`
+      );
+    }
+  }
+}
+
+// A month published for one chain but not the other would make getSnapshotRewardAndSupply()
+// sum an incomplete reward set. Snapshots are appended, so only the newest month can be partial.
+function assertNewestMonthIsOnEveryChain(snapshots) {
+  const newestMonth = (chainId) => {
+    const entries = snapshots[chainId];
+    return (entries[entries.length - 1].match(/(\d{4}-\d{2})/) || [])[1];
+  };
+  const [mainnet, gnosis] = CHAIN_IDS.map(newestMonth);
+  if (mainnet !== gnosis) {
+    throw new Error(
+      `snapshots.json: newest month differs per chain (mainnet ${mainnet}, gnosis ${gnosis}). Add both, or the ` +
+        `monthly reward total will be missing a chain.`
+    );
+  }
+}
+
+// Read the `snapshots: [...]` array literal for a chain out of claim-modal.js. This is coupled to
+// that file's current indentation; reformatting it will throw here rather than pass silently.
+function readClaimModalSnapshots(code, chainId) {
+  const block = code.match(new RegExp(`\\n  ${chainId}: \\{[\\s\\S]*?snapshots: \\[([\\s\\S]*?)\\n    \\]`));
+  if (!block) throw new Error(`claim-modal.js: could not find the snapshots array for chain ${chainId}`);
+  return Array.from(block[1].matchAll(/"([^"]+)"/g), (match) => match[1]);
+}
+
+function assertParity(snapshots) {
+  const code = fs.readFileSync(claimModal, "utf8");
+  for (const chainId of CHAIN_IDS) {
+    const expected = readClaimModalSnapshots(code, chainId);
+    const actual = snapshots[chainId];
+    const drifted = expected.length !== actual.length || expected.some((entry, i) => entry !== actual[i]);
+    if (drifted) {
+      throw new Error(
+        `snapshots.json and claim-modal.js disagree for chain ${chainId} ` +
+          `(${actual.length} vs ${expected.length} entries). Update both, keeping the order identical.`
+      );
+    }
+  }
+}
 
 const snapshots = JSON.parse(fs.readFileSync(source, "utf8"));
 for (const chainId of CHAIN_IDS) {
   if (!Array.isArray(snapshots[chainId]) || snapshots[chainId].length === 0) {
     throw new Error(`snapshots.json is missing snapshots for chain ${chainId}`);
   }
+  assertEntriesAreWellFormed(snapshots[chainId], chainId);
 }
+assertNewestMonthIsOnEveryChain(snapshots);
+assertParity(snapshots);
 
 fs.writeFileSync(destination, JSON.stringify(snapshots) + "\n");
