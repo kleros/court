@@ -3,6 +3,7 @@ import PNKAbi from "../assets/contracts/pinakion.json";
 import Web3 from "web3";
 import { klerosboardSubgraph } from "../bootstrap/subgraph";
 import { getReadOnlyRpcUrl } from "../bootstrap/web3";
+import { IPFS_GATEWAY } from "../utils/ipfs";
 
 const CLAIM_MODAL_URL = "https://raw.githubusercontent.com/kleros/court/master/src/components/claim-modal.js";
 
@@ -52,7 +53,7 @@ async function getLatestSnapshotUrls() {
   );
   let matches = Array.from(claimModalCode.matchAll(reg));
   let urls = matches.map((r) => ({
-    url: `https://cdn.kleros.link/ipfs/${r.groups.cid}/${r.groups.filename}.json`,
+    url: `${IPFS_GATEWAY}/ipfs/${r.groups.cid}/${r.groups.filename}.json`,
     isGnosis: r.groups.filename.startsWith("xdai-"),
   }));
   if (urls.length === 0) {
@@ -64,7 +65,7 @@ async function getLatestSnapshotUrls() {
     );
     matches = Array.from(claimModalCode.matchAll(reg));
     urls = matches.map((r) => ({
-      url: `https://cdn.kleros.link/ipfs/${r.groups.cid}/${r.groups.filename}.json`,
+      url: `${IPFS_GATEWAY}/ipfs/${r.groups.cid}/${r.groups.filename}.json`,
       isGnosis: r.groups.filename.startsWith("xdai-"),
     }));
   }

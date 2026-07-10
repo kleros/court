@@ -11,6 +11,7 @@ import { ReactComponent as Link } from "../assets/images/link.svg";
 import { ReactComponent as PDF } from "../assets/images/pdf.svg";
 import { ReactComponent as Video } from "../assets/images/video.svg";
 import { isSafeNavigationUrl } from "../utils/urlValidation";
+import { isContentAddressed, toHttpUrl } from "../utils/ipfs";
 
 const StyledPopover = styled(({ className, ...rest }) => (
   <Popover className={className} overlayClassName={className} {...rest} />
@@ -51,11 +52,11 @@ const Attachment = ({ URI, description, extension: _extension, previewURI, title
   else Component = Link;
   Component = <Component className="primary-purple-fill theme-fill" />;
 
-  const href = URI.replace(/^\/ipfs\//, "https://cdn.kleros.link/ipfs/");
+  const href = toHttpUrl(URI);
 
-  // Unsafe attachment URL still indicate that a file was attached,
-  // but render it as a disabled, non-clickable icon with an explanation.
-  if (!isSafeNavigationUrl(href)) {
+  //A rejected attachment still indicates that a file was attached,
+  //but renders as a disabled, non-clickable icon with an explanation.
+  if (!isContentAddressed(URI) || !isSafeNavigationUrl(href)) {
     return (
       <Tooltip
         overlayStyle={{ wordBreak: "break-all" }}
