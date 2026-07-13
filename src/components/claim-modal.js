@@ -10,6 +10,7 @@ import { ReactComponent as RightArrow } from "../assets/images/right-arrow.svg";
 import useChainId from "../hooks/use-chain-id";
 import ETHAmount from "./eth-amount";
 import { klerosboardSubgraph } from "../bootstrap/subgraph";
+import { IPFS_GATEWAY } from "../utils/ipfs";
 
 const StyledModal = styled(Modal)`
   max-width: calc(100vw - 32px);
@@ -82,8 +83,6 @@ const StyledHr = styled.hr`
   border: 1px solid ${({ theme }) => theme.dividerColor};
   margin-bottom: 32px;
 `;
-
-const ipfsEndpoint = "https://cdn.kleros.link";
 
 const chainIdToParams = {
   1: {
@@ -267,7 +266,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
     const snapshots = airdropParams?.snapshots ?? [];
 
     for (var month = 0; month < snapshots.length; month++) {
-      responses[month] = fetch(`${ipfsEndpoint}/ipfs/${snapshots[month]}`);
+      responses[month] = fetch(`${IPFS_GATEWAY}/ipfs/${snapshots[month]}`);
     }
 
     const results = Promise.all(

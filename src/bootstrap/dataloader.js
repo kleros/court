@@ -5,6 +5,7 @@ import axios from "axios";
 import useSWR from "swr";
 import arbitrableWhitelist from "../temp/arbitrable-whitelist";
 import { displaySubgraph } from "./subgraph";
+import { isContentAddressed, toHttpUrl } from "../utils/ipfs";
 
 const getURIProtocol = (uri) => {
   const uriParts = uri.replace(":", "").split("/");
@@ -12,29 +13,17 @@ const getURIProtocol = (uri) => {
 };
 
 const getHttpUri = (uri) => {
+  if (isContentAddressed(uri)) return toHttpUrl(uri);
+
   const protocol = getURIProtocol(uri);
   switch (protocol) {
     case "http":
     case "https":
     case "ipns":
-      break;
-    case "fs":
-      if (uri.includes("/ipfs/")) uri = uri.split(":/").pop();
-      else throw new Error(`Unrecognized protocol ${protocol}`);
-      break;
-    case "ipfs":
-      uri = uri.replace("://", ":/");
-      if (uri.substr(0, 5) === "/ipfs" || uri.substr(0, 5) === "ipfs/") {
-        if (uri.substr(0, 1) === "/") uri = uri.substr(1, uri.length - 1);
-        uri = `https://cdn.kleros.link/${uri}`;
-      } else if (uri.substr(0, 6) === "ipfs:/") uri = `https://cdn.kleros.link/${uri.split(":/").pop()}`;
-      else throw new Error(`Unrecognized protocol ${protocol}`);
-      break;
+      return uri;
     default:
       throw new Error(`Unrecognized protocol ${protocol}`);
   }
-
-  return uri;
 };
 
 const fetchDataFromScript = async (scriptString, scriptParameters) => {
@@ -129,6 +118,7 @@ const funcs = {
 
         const uri = metaEvidenceUriData.data?.metaEvidenceUri;
         if (!uri) throw new Error(`No MetaEvidence log for disputeId ${disputeId} on chainID ${chainID}`);
+        if (!isContentAddressed(uri)) break;
 
         let metaEvidenceJSON = (await axios.get(getHttpUri(uri))).data;
 
@@ -149,6 +139,8 @@ const funcs = {
           metaEvidenceJSON.rulingOptions.type = "single-select";
 
         if (metaEvidenceJSON.dynamicScriptURI) {
+          if (!isContentAddressed(metaEvidenceJSON.dynamicScriptURI)) break;
+
           const scriptURI =
             chainID === 1 && disputeId === "1621"
               ? getHttpUri("/ipfs/Qmf1k727vP7qZv21MDB8vwL6tfVEKPCUQAiw8CTfHStkjf")
@@ -209,6 +201,7 @@ const funcs = {
       description:
         "In case you have an AdBlock enabled, please disable it and refresh the page. It may be preventing the correct working of the page. If that's not the case, the data for this case is not formatted correctly or has been tampered since the time of its submission. Please refresh the page and refuse to arbitrate if the problem persists.",
       title: "Invalid or tampered case data, refuse to arbitrate.",
+      rulingOptions: { type: "single-select", titles: [] },
     };
   },
   async loadPolicy(URI) {
@@ -216,10 +209,11 @@ const funcs = {
       console.error("No URI provided");
       return;
     }
-    const prefix = URI.startsWith("/ipfs/") ? "" : "/ipfs/";
-    const policyURL = `https://cdn.kleros.link${prefix}${URI}`;
+    const policyURL = toHttpUrl(URI);
 
     try {
+      if (!isContentAddressed(URI)) throw new Error(`Policy URI is not content-addressed: ${URI}`);
+
       const res = await axios.get(policyURL);
 
       if (res.status !== 200)
@@ -311,6 +305,9 @@ const evidenceFetcher = async ([subgraph, disputeId]) => {
     await Promise.all(
       evidence.map(async (evidenceItem) => {
         try {
+          if (!isContentAddressed(evidenceItem.URI))
+            throw new Error(`Evidence URI is not content-addressed: ${evidenceItem.URI}`);
+
           const uri = getHttpUri(evidenceItem.URI);
           try {
             const fileRes = await axios.get(uri);
