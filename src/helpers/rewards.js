@@ -3,9 +3,9 @@ import PNKAbi from "../assets/contracts/pinakion.json";
 import Web3 from "web3";
 import { klerosboardSubgraph } from "../bootstrap/subgraph";
 import { getReadOnlyRpcUrl } from "../bootstrap/web3";
+import { IPFS_GATEWAY } from "../utils/ipfs";
 import snapshotsByChainId from "../assets/snapshots.json";
 
-const ipfsEndpoint = "https://cdn.kleros.link";
 const allSnapshotPaths = [...snapshotsByChainId["1"], ...snapshotsByChainId["100"]];
 
 function getTarget() {
@@ -47,7 +47,7 @@ function snapshotUrlsForMonth(year, month) {
   return allSnapshotPaths
     .filter((path) => filenames.some((filename) => path.endsWith(`/${filename}`)))
     .map((path) => ({
-      url: `${ipfsEndpoint}/ipfs/${path}`,
+      url: `${IPFS_GATEWAY}/ipfs/${path}`,
       isGnosis: path.includes("/xdai-snapshot-"),
     }));
 }

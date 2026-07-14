@@ -79,10 +79,10 @@
         return { path, label: dateMatch ? dateMatch[1] : "2021-01 & 02" };
       }
 
-      function parseSnapshots(byChainId) {
+      function parseSnapshots(snapshotsByChainId) {
         return {
-          mainnet: (byChainId?.["1"] ?? []).map(toSnapshot),
-          gnosis: (byChainId?.["100"] ?? []).map(toSnapshot),
+          mainnet: (snapshotsByChainId?.["1"] ?? []).map(toSnapshot),
+          gnosis: (snapshotsByChainId?.["100"] ?? []).map(toSnapshot),
         };
       }
 
@@ -448,8 +448,8 @@
         const [errors, setErrors] = useState([]);
         const [monthData, setMonthData] = useState(null);
         const [grandTotals, setGrandTotals] = useState(null);
-        const [activeTab, setActiveTab] = useState("Summary");
-        const [tabList, setTabList] = useState(["Summary"]);
+        const [activeTab, setActiveTab] = useState("Monthly Totals");
+        const [tabList, setTabList] = useState(["Monthly Totals"]);
         const [sourceError, setSourceError] = useState(null);
 
         // Auto-start everything on mount
@@ -527,8 +527,8 @@
 
           setMonthData(md);
           setGrandTotals(gt);
-          setTabList(["Summary", "Monthly Totals", ...sorted]);
-          setActiveTab("Summary");
+          setTabList(["Monthly Totals", "Summary", ...sorted]);
+          setActiveTab("Monthly Totals");
           setErrors(errs);
           setPhase("done");
         }
@@ -568,6 +568,9 @@
           if (!grandTotals || !monthData) return;
           const wb = XLSX.utils.book_new();
 
+          const monthlyTotalRows = sortedMonths.map((label) => monthTotalRow(label, monthData[label]));
+          addSheet(wb, "Monthly Totals", monthlyTotalRows, [14, 18, 18, 18]);
+
           const summaryRows = Object.entries(grandTotals)
             .map(([addr, t]) => ({
               Address: addr,
@@ -577,9 +580,6 @@
             }))
             .sort((a, b) => b["Grand Total PNK"] - a["Grand Total PNK"]);
           addSheet(wb, "Summary", summaryRows, [44, 20, 20, 20]);
-
-          const monthlyTotalRows = sortedMonths.map((label) => monthTotalRow(label, monthData[label]));
-          addSheet(wb, "Monthly Totals", monthlyTotalRows, [14, 18, 18, 18]);
 
           for (const label of sortedMonths) {
             const rows = monthWalletRows(monthData[label]);
