@@ -4,8 +4,9 @@ import Web3 from "web3";
 import { klerosboardSubgraph } from "../bootstrap/subgraph";
 import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 import { IPFS_GATEWAY } from "../utils/ipfs";
+import snapshotsByChainId from "../assets/snapshots.json";
 
-const CLAIM_MODAL_URL = "https://raw.githubusercontent.com/kleros/court/master/src/components/claim-modal.js";
+const allSnapshotPaths = [...snapshotsByChainId["1"], ...snapshotsByChainId["100"]];
 
 function getTarget() {
   let months;
@@ -41,35 +42,23 @@ function getPreviousMonthAndYear(date = new Date()) {
   };
 }
 
-async function getLatestSnapshotUrls() {
-  let { month, year } = getPreviousMonthAndYear();
-  // fetch the script where the court get the rewads. There is a list of IPFS files with the rewards there.
-  const res = await fetch(CLAIM_MODAL_URL);
-  const claimModalCode = await res.text();
-  // extract the ipfs files from the court code of the last month (for gnosis and mainnet)
-  let reg = new RegExp(
-    `"(?<cid>[a-zA-Z0-9]*)/(?<filename>snapshot-${year}-${month}|xdai-snapshot-${year}-${month}).json"`,
-    "g"
-  );
-  let matches = Array.from(claimModalCode.matchAll(reg));
-  let urls = matches.map((r) => ({
-    url: `${IPFS_GATEWAY}/ipfs/${r.groups.cid}/${r.groups.filename}.json`,
-    isGnosis: r.groups.filename.startsWith("xdai-"),
-  }));
-  if (urls.length === 0) {
-    // try with previous month if no urls where found.
-    let { month: prevMonth, year: prevYear } = getPreviousMonthAndYear(new Date(Number(year), Number(month) - 1, 1));
-    reg = new RegExp(
-      `"(?<cid>[a-zA-Z0-9]*)/(?<filename>snapshot-${prevYear}-${prevMonth}|xdai-snapshot-${prevYear}-${prevMonth}).json"`,
-      "g"
-    );
-    matches = Array.from(claimModalCode.matchAll(reg));
-    urls = matches.map((r) => ({
-      url: `${IPFS_GATEWAY}/ipfs/${r.groups.cid}/${r.groups.filename}.json`,
-      isGnosis: r.groups.filename.startsWith("xdai-"),
+function snapshotUrlsForMonth(year, month) {
+  const filenames = [`snapshot-${year}-${month}.json`, `xdai-snapshot-${year}-${month}.json`];
+  return allSnapshotPaths
+    .filter((path) => filenames.some((filename) => path.endsWith(`/${filename}`)))
+    .map((path) => ({
+      url: `${IPFS_GATEWAY}/ipfs/${path}`,
+      isGnosis: path.includes("/xdai-snapshot-"),
     }));
-  }
-  return urls;
+}
+
+function getLatestSnapshotUrls() {
+  const { month, year } = getPreviousMonthAndYear();
+  const urls = snapshotUrlsForMonth(year, month);
+  if (urls.length > 0) return urls;
+  // Last month's snapshot may not be published yet, so fall back to the month before.
+  const { month: prevMonth, year: prevYear } = getPreviousMonthAndYear(new Date(Number(year), Number(month) - 1, 1));
+  return snapshotUrlsForMonth(prevYear, prevMonth);
 }
 
 async function fetchSubgraphStaked(subgraphUrl) {
@@ -113,7 +102,7 @@ async function getTotalStakedAllChains() {
     mainnetStaked = await fetchSubgraphStaked(klerosboardSubgraph[1]);
   } catch (mainnetError) {
     try {
-      const snapshotUrls = await getLatestSnapshotUrls();
+      const snapshotUrls = getLatestSnapshotUrls();
       const mainnetSnapshotUrl = snapshotUrls.find((s) => !s.isGnosis)?.url;
       if (mainnetSnapshotUrl) {
         mainnetStaked = await fetchSnapshotStaked(mainnetSnapshotUrl);
@@ -129,7 +118,7 @@ async function getTotalStakedAllChains() {
     gnosisStaked = await fetchSubgraphStaked(klerosboardSubgraph[100]);
   } catch (gnosisError) {
     try {
-      const snapshotUrls = await getLatestSnapshotUrls();
+      const snapshotUrls = getLatestSnapshotUrls();
       const gnosisSnapshotUrl = snapshotUrls.find((s) => s.isGnosis)?.url;
       if (gnosisSnapshotUrl) {
         gnosisStaked = await fetchSnapshotStaked(gnosisSnapshotUrl);
@@ -148,7 +137,7 @@ async function getTotalStakedAllChains() {
  * and the KIP-86 adjusted supply (if available) in a single pass.
  */
 async function getSnapshotRewardAndSupply() {
-  const urls = await getLatestSnapshotUrls();
+  const urls = getLatestSnapshotUrls();
   let lastMonthReward = BigNumber.from(0);
   let adjustedSupplyInEther = null;
 

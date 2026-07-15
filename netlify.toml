@@ -2,6 +2,13 @@
   YARN_FLAGS='--pure-lockfile'
   NODE_VERSION='16.20.2'
 
+# snapshots.json is the published list of monthly reward snapshot CIDs.
+# It is read by various consumers, so it needs CORS.
+[[headers]]
+  for = "/snapshots.json"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
