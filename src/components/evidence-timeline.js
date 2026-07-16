@@ -3,6 +3,7 @@ import React from "react";
 // eslint-disable-next-line no-restricted-imports
 import styled from "styled-components";
 import EvidenceCard from "./evidence-card";
+import { getAnswerString, RTA_LABEL } from "../temp/answer-string";
 
 const StyledHeaderCol = styled(Col)`
   color: ${({ theme }) => theme.textPrimary};
@@ -24,7 +25,7 @@ const EventDiv = styled.div`
   line-height: 14px;
   margin-left: auto;
   margin-right: auto;
-  padding: 10px 0;
+  padding: 10px 5px;
   text-align: center;
   width: 135px;
 `;
@@ -45,11 +46,15 @@ const StyledEvidenceTimelineArea = styled.div`
 `;
 
 const getRulingText = (ruling, metaEvidence) => {
-  if (!ruling) {
-    return "Jurors refused to make a ruling";
+  if (ruling === "0") {
+    return `Jurors ruled: ${RTA_LABEL}`;
   }
-  const rulingIndex = Number(ruling) - 1;
-  const rulingTitle = metaEvidence.rulingOptions?.titles?.[rulingIndex];
+  let rulingTitle;
+  try {
+    rulingTitle = metaEvidence.rulingOptions && getAnswerString(metaEvidence.rulingOptions, ruling);
+  } catch {
+    rulingTitle = undefined;
+  }
   return `Jurors ruled: ${rulingTitle || ruling}`;
 };
 
