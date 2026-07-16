@@ -18,7 +18,7 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
   const { drizzle, useCacheCall } = useDrizzle();
   const getMetaEvidence = useDataloader.getMetaEvidence();
   const [round, setRound] = useState(dispute.votesLengths.length - 1);
-  const [rulingOption, setRulingOption] = useState(ruling || "1");
+  const [rulingOption, setRulingOption] = useState(ruling == null ? "1" : toBN(ruling).toString());
   const [justificationIndex, setJustificationIndex] = useState(0);
   const chainId = useChainId();
 
