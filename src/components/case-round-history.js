@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
 import { Col, Radio, Row, Skeleton } from "antd";
@@ -14,13 +14,27 @@ import { RTA_LABEL } from "../temp/answer-string";
 const { useDrizzle } = drizzleReactHooks;
 const { toBN } = Web3.utils;
 
+const normalizeRulingValue = (value) => {
+  try {
+    return toBN(value).toString();
+  } catch {
+    return String(value);
+  }
+};
+
 export default function CaseRoundHistory({ ID, dispute, ruling }) {
   const { drizzle, useCacheCall } = useDrizzle();
   const getMetaEvidence = useDataloader.getMetaEvidence();
   const [round, setRound] = useState(dispute.votesLengths.length - 1);
-  const [rulingOption, setRulingOption] = useState(ruling == null ? "1" : toBN(ruling).toString());
+  const [rulingOption, setRulingOption] = useState(ruling == null ? "1" : normalizeRulingValue(ruling));
   const [justificationIndex, setJustificationIndex] = useState(0);
   const chainId = useChainId();
+
+  useEffect(() => {
+    if (ruling != null) {
+      setRulingOption(normalizeRulingValue(ruling));
+    }
+  }, [ruling]);
 
   const metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
 
@@ -110,7 +124,7 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
                     {metaEvidence.rulingOptions?.reserved &&
                       Object.keys(metaEvidence.rulingOptions.reserved).map((key) => (
                         <Col lg={24} key={key}>
-                          <Radio.Button size="large" value={toBN(key).toString()}>
+                          <Radio.Button size="large" value={normalizeRulingValue(key)}>
                             {metaEvidence.rulingOptions.reserved[key]}
                           </Radio.Button>
                         </Col>
