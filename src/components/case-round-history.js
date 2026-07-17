@@ -22,18 +22,19 @@ const normalizeRulingValue = (value) => {
   }
 };
 
+const resolveRulingOption = (ruling) => (ruling == null ? null : normalizeRulingValue(ruling));
+
 export default function CaseRoundHistory({ ID, dispute, ruling }) {
   const { drizzle, useCacheCall } = useDrizzle();
   const getMetaEvidence = useDataloader.getMetaEvidence();
   const [round, setRound] = useState(dispute.votesLengths.length - 1);
-  const [rulingOption, setRulingOption] = useState(ruling == null ? "1" : normalizeRulingValue(ruling));
+  const [rulingOption, setRulingOption] = useState(resolveRulingOption(ruling));
   const [justificationIndex, setJustificationIndex] = useState(0);
   const chainId = useChainId();
 
   useEffect(() => {
-    if (ruling != null) {
-      setRulingOption(normalizeRulingValue(ruling));
-    }
+    setRulingOption(resolveRulingOption(ruling));
+    setJustificationIndex(0);
   }, [ruling]);
 
   const metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
