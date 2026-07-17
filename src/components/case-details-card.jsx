@@ -194,15 +194,21 @@ const RevealVoteButton = ({ onRevealClick, votesData, dispute }) => {
   );
 };
 
-const AnswerDisplay = ({ msg, vote, rulingOptions, uintDisplayMode }) => (
-  <>
-    {msg}
-    {vote === "0"
-      ? RTA_LABEL
-      : (rulingOptions && getAnswerString(rulingOptions, vote, uintDisplayMode)) || "Unknown Choice"}
-    &rdquo;.
-  </>
-);
+const AnswerDisplay = ({ msg, vote, rulingOptions, uintDisplayMode }) => {
+  let answerString;
+  try {
+    answerString = rulingOptions && getAnswerString(rulingOptions, vote, uintDisplayMode);
+  } catch {
+    answerString = undefined;
+  }
+  return (
+    <>
+      {msg}
+      {vote === "0" ? RTA_LABEL : answerString || "Unknown Choice"}
+      &rdquo;.
+    </>
+  );
+};
 
 export default function CaseDetailsCard({ ID }) {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle();
