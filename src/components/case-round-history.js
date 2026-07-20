@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
 import { Col, Radio, Row, Skeleton } from "antd";
@@ -8,17 +8,34 @@ import useChainId from "../hooks/use-chain-id";
 import ScrollBar from "./scroll-bar";
 import axios from "axios";
 import useSWR from "swr";
+import Web3 from "web3";
 import { RTA_LABEL } from "../temp/answer-string";
 
 const { useDrizzle } = drizzleReactHooks;
+const { toBN } = Web3.utils;
+
+const normalizeRulingValue = (value) => {
+  try {
+    return toBN(value).toString();
+  } catch {
+    return String(value);
+  }
+};
+
+const resolveRulingOption = (ruling) => (ruling == null ? null : normalizeRulingValue(ruling));
 
 export default function CaseRoundHistory({ ID, dispute, ruling }) {
   const { drizzle, useCacheCall } = useDrizzle();
   const getMetaEvidence = useDataloader.getMetaEvidence();
   const [round, setRound] = useState(dispute.votesLengths.length - 1);
-  const [rulingOption, setRulingOption] = useState(ruling || 1);
+  const [rulingOption, setRulingOption] = useState(resolveRulingOption(ruling));
   const [justificationIndex, setJustificationIndex] = useState(0);
   const chainId = useChainId();
+
+  useEffect(() => {
+    setRulingOption(resolveRulingOption(ruling));
+    setJustificationIndex(0);
+  }, [ruling]);
 
   const metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
 
@@ -108,7 +125,7 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
                     {metaEvidence.rulingOptions?.reserved &&
                       Object.keys(metaEvidence.rulingOptions.reserved).map((key) => (
                         <Col lg={24} key={key}>
-                          <Radio.Button size="large" value={key}>
+                          <Radio.Button size="large" value={normalizeRulingValue(key)}>
                             {metaEvidence.rulingOptions.reserved[key]}
                           </Radio.Button>
                         </Col>
