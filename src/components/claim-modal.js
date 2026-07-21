@@ -345,7 +345,7 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
             target="_blank"
             rel="noopener noreferrer"
           >
-            View Transaction on Etherscan <RightArrow style={{ marginLeft: "4px", verticalAlign: "middle" }} />
+            View Transaction <RightArrow style={{ marginLeft: "4px", verticalAlign: "middle" }} />
           </a>
         )}
 
