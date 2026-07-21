@@ -98,7 +98,7 @@ const chainIdToParams = {
   100: {
     contractAddress: "0xf1A9589880DbF393F32A5b2d5a0054Fa10385074",
     snapshots: snapshotsByChainId["100"],
-    blockExplorerBaseUrl: "https://gnosisscan.io",
+    blockExplorerBaseUrl: "https://gnosis.blockscout.com",
     klerosboard: klerosboardSubgraph[100],
   },
 };

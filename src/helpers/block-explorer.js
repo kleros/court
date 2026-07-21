@@ -1,6 +1,6 @@
 const chainIdToBaseUrl = {
   1: "https://etherscan.io",
-  100: "https://gnosisscan.io",
+  100: "https://gnosis.blockscout.com",
   10200: "https://blockscout.chiadochain.net",
   11155111: "https://sepolia.etherscan.io",
 };
