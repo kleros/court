@@ -1,0 +1,36 @@
+name: Verify Snapshot Roots
+
+# Every entry in src/assets/snapshots.json must carry the merkle root seeded on-chain in
+# MerkleRedeem for its week (= its array index). This job verifies the entries a PR adds or
+# changes against the contracts on mainnet and gnosis, so a wrong or tampered CID fails the PR
+# instead of surfacing when a juror's claim breaks.
+#
+# A month that has not been seeded on-chain yet is reported as "pending" and does not fail:
+# the monthly rewards runbook opens this PR before the owner runs seedAllocations.
+
+on:
+  pull_request:
+    paths:
+      - "src/assets/snapshots.json"
+
+permissions: # added using https://github.com/step-security/secure-workflows
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Verify added or changed snapshot roots against MerkleRedeem
+        run: |
+          git show "origin/${GITHUB_BASE_REF}:src/assets/snapshots.json" > /tmp/base-snapshots.json \
+            || echo '{}' > /tmp/base-snapshots.json
+          node scripts/verify-snapshot-roots.js --base /tmp/base-snapshots.json
