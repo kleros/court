@@ -61,6 +61,24 @@ describe("Dataloader", () => {
     expect(axios.get).toHaveBeenCalledTimes(2);
   });
 
+  it("discards a cached entry with an invalid shape, refetches and overwrites it", async () => {
+    const cacheKey = `@@kleros/court/metaevidence/v1/${CHAIN_ID}/${ARBITRATOR}/${DISPUTE_ID}`;
+    window.localStorage.setItem(cacheKey, JSON.stringify({ foo: "bar" }));
+
+    const result = await loadMetaEvidence(true);
+    expect(result).toMatchObject(META_EVIDENCE_JSON);
+    expect(axios.get).toHaveBeenCalledTimes(2);
+    expect(JSON.parse(window.localStorage.getItem(cacheKey))).toMatchObject(META_EVIDENCE_JSON);
+  });
+
+  it("removes an invalid cached entry even when the dispute is not ruled", async () => {
+    const cacheKey = `@@kleros/court/metaevidence/v1/${CHAIN_ID}/${ARBITRATOR}/${DISPUTE_ID}`;
+    window.localStorage.setItem(cacheKey, JSON.stringify({ foo: "bar" }));
+
+    await loadMetaEvidence(false);
+    expect(window.localStorage.getItem(cacheKey)).toBeNull();
+  });
+
   it("does not cache a malformed gateway response served with status 200", async () => {
     axios.get.mockImplementation((url) =>
       url.startsWith(process.env.REACT_APP_METAEVIDENCE_URL)

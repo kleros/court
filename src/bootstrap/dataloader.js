@@ -31,23 +31,36 @@ const META_EVIDENCE_CACHE_PREFIX = "@@kleros/court/metaevidence/v1";
 const metaEvidenceCacheKey = (chainID, arbitrator, disputeId) =>
   `${META_EVIDENCE_CACHE_PREFIX}/${chainID}/${arbitrator}/${disputeId}`;
 
+//MetaEvidence must be an object with at least a title or rulingOptions.
+const isValidMetaEvidence = (metaEvidenceJSON) =>
+  Boolean(metaEvidenceJSON) &&
+  typeof metaEvidenceJSON === "object" &&
+  Boolean(metaEvidenceJSON.title || metaEvidenceJSON.rulingOptions);
+
 const readCachedMetaEvidence = (chainID, arbitrator, disputeId) => {
+  const cacheKey = metaEvidenceCacheKey(chainID, arbitrator, disputeId);
+
   try {
-    const cached = window.localStorage.getItem(metaEvidenceCacheKey(chainID, arbitrator, disputeId));
-    return cached ? JSON.parse(cached) : undefined;
+    const cached = window.localStorage.getItem(cacheKey);
+    if (!cached) return undefined;
+
+    const parsed = JSON.parse(cached);
+    if (isValidMetaEvidence(parsed)) return parsed;
   } catch {
-    return undefined;
+    //Unparsable entry, clean up will happen next.
   }
+
+  try {
+    window.localStorage.removeItem(cacheKey);
+  } catch {
+    //Storage unavailable, so nothing to clean up.
+  }
+  return undefined;
 };
 
 const writeCachedMetaEvidence = (chainID, arbitrator, disputeId, metaEvidenceJSON) => {
   //A malformed response, even with status 200 must not be cached
-  if (
-    !metaEvidenceJSON ||
-    typeof metaEvidenceJSON !== "object" ||
-    (!metaEvidenceJSON.title && !metaEvidenceJSON.rulingOptions)
-  )
-    return;
+  if (!isValidMetaEvidence(metaEvidenceJSON)) return;
 
   try {
     window.localStorage.setItem(metaEvidenceCacheKey(chainID, arbitrator, disputeId), JSON.stringify(metaEvidenceJSON));
@@ -61,24 +74,42 @@ const writeCachedMetaEvidence = (chainID, arbitrator, disputeId, metaEvidenceJSO
 //and it would leave earlier cases, for which the fetch had finished, hanging, possibly forever if one of the other requests failed.
 let dynamicScriptTargetCounter = 0;
 
+//A script that errors inside its iframe never posts a result, which would leave the promise, the
+//listener and the iframe allocated forever. The timeout must exceed getMetaEvidence's retry window
+//so a timed-out scan falls out of the retry loop instead of being re-run from scratch.
+const DYNAMIC_SCRIPT_TIMEOUT_MS = 180000;
+
 const fetchDataFromScript = async (scriptString, scriptParameters) => {
   const { default: iframe } = await import("iframe");
 
   const messageTarget = `script-${dynamicScriptTargetCounter++}`;
 
   let resolver;
-  const returnPromise = new Promise((resolve) => {
+  let rejecter;
+  const returnPromise = new Promise((resolve, reject) => {
     resolver = resolve;
+    rejecter = reject;
   });
 
+  const cleanup = () => {
+    clearTimeout(timeoutId);
+    window.removeEventListener("message", handleScriptMessage);
+    _.iframe.remove();
+  };
+
   const handleScriptMessage = (message) => {
-    if (message.data?.target === messageTarget) {
-      window.removeEventListener("message", handleScriptMessage);
-      _.iframe.remove();
+    //Only accept results posted by this request's own iframe.
+    if (message.source === _.iframe.contentWindow && message.data?.target === messageTarget) {
+      cleanup();
       resolver(message.data.result);
     }
   };
   window.addEventListener("message", handleScriptMessage);
+
+  const timeoutId = setTimeout(() => {
+    cleanup();
+    rejecter(new Error(`The dynamic script for dispute ${scriptParameters.disputeID} timed out.`));
+  }, DYNAMIC_SCRIPT_TIMEOUT_MS);
   const frameBody = `<script type='text/javascript'>
   (function rpcRedirectPatch() {
     const OLD_RPC = "https://mainnet.infura.io/v3/668b3268d5b241b5bab5c6cb886e4c61";
