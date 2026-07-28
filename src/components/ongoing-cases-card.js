@@ -91,7 +91,8 @@ const OngoingCasesCard = () => {
                     chainId,
                     dispute.arbitrated,
                     drizzle.contracts.KlerosLiquid.address,
-                    d.disputeID
+                    d.disputeID,
+                    dispute.ruled
                   );
 
                   if (Number(d.appeal) === dispute2.votesLengths.length - 1) {
@@ -123,7 +124,8 @@ const OngoingCasesCard = () => {
                   chainId,
                   dispute.arbitrated,
                   drizzle.contracts.KlerosLiquid.address,
-                  d.disputeID
+                  d.disputeID,
+                  dispute.ruled
                 );
 
                 if (dispute.period === "4")

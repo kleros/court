@@ -21,6 +21,10 @@ const StyledCard = styled(Card).attrs({ className: "purple-header-card" })`
   margin: 20px 0 0;
   text-align: center;
 
+  &.ant-card-loading .ant-card-body {
+    min-height: 225px;
+  }
+
   .ant-card-actions {
     border: none;
     padding: 12px 24px;
@@ -209,7 +213,7 @@ const CaseCard = ({ ID, draws, isVoteCommitted }) => {
   });
 
   const metaEvidence =
-    dispute && getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
+    dispute && getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID, dispute.ruled);
 
   return (
     <StyledCard

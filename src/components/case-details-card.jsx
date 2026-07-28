@@ -301,7 +301,7 @@ export default function CaseDetailsCard({ ID }) {
     }
   });
 
-  const metaEvidence = dispute && getMetaEvidence(chainId, dispute.arbitrated, KlerosLiquid.address, ID);
+  const metaEvidence = dispute && getMetaEvidence(chainId, dispute.arbitrated, KlerosLiquid.address, ID, dispute.ruled);
   const evidence = useEvidence(chainId, ID);
 
   const [showRefuse, setShowRefuse] = useState(false);

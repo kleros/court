@@ -37,7 +37,13 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
     setJustificationIndex(0);
   }, [ruling]);
 
-  const metaEvidence = getMetaEvidence(chainId, dispute.arbitrated, drizzle.contracts.KlerosLiquid.address, ID);
+  const metaEvidence = getMetaEvidence(
+    chainId,
+    dispute.arbitrated,
+    drizzle.contracts.KlerosLiquid.address,
+    ID,
+    dispute.ruled
+  );
 
   const { data: justificationsByRound, isLoading } = useSWR(
     metaEvidence && dispute && ID && chainId && ["justifications", chainId, ID, dispute.votesLengths],
