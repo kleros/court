@@ -3,8 +3,8 @@
  * Validates src/assets/snapshots.json — the source of truth for the monthly reward snapshot CIDs —
  * and copies it to public/snapshots.json, which the build publishes at court.kleros.io/snapshots.json.
  *
- * That published manifest is read same-origin by the standalone staking-rewards.html page and, cross-
- * origin, by klerosboard and proof-of-humanity-v2-web. src/components/claim-modal.js and
+ * That published manifest is read cross-origin by rewards.kleros.io, klerosboard and
+ * proof-of-humanity-v2-web. src/components/claim-modal.js and
  * src/helpers/rewards.js import snapshots.json directly.
  *
  * The array index of each snapshot is the on-chain `week` argument to MerkleRedeem.claimWeek,
