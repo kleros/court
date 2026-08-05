@@ -186,7 +186,9 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
 
     setClaims(0);
 
-    if (account === VIEW_ONLY_ADDRESS) return;
+    //The view-only placeholder has no claims to resolve.
+    //An empty snapshot list must leave `claims` at its initial 0
+    if (account === VIEW_ONLY_ADDRESS || snapshots.length === 0) return;
 
     loadClaims({
       account,
@@ -324,8 +326,8 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
           </StyledInfoBox>
           {hasUnverifiedWeeks(claims) && (
             <StyledIncompleteNotice>
-              Some monthly rewards could not be checked right now, so the amounts above may be incomplete. They will be
-              rechecked automatically on your next visit.
+              Some monthly rewards could not be checked, so the amounts above may be incomplete. They will be rechecked
+              on reload or next visit.
             </StyledIncompleteNotice>
           )}
         </>

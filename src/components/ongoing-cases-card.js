@@ -110,7 +110,7 @@ const OngoingCasesCard = () => {
                       ID: d.disputeID,
                     });
                 } else acc.loading = true;
-                //Executed disputes (period 4) are skipped entirely.
+                //Executed disputes are skipped entirely.
                 //This card never renders them and resolving their metaEvidence caused dashboard freezes to some jurors.
               } else if (dispute.period !== "4") {
                 const metaEvidence = getMetaEvidence(

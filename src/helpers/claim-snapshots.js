@@ -6,9 +6,8 @@ const CACHE_PREFIX = "@@kleros/court/claim-snapshots/v1";
 
 export const SNAPSHOT_FETCH_TIMEOUT_MS = 30000;
 
-//A gateway request that hangs forever would stall its worker and keep the Claim button pending for
-//the whole session. A timed-out week resolves to 0 like any other failed fetch: excluded from this
-//session's totals, never cached, retried on the next load.
+//A request that hangs forever would stall and keep the Claim button pending for the whole session.
+//A timeout resolves to 0 and is excluded from this session's totals, never cached, and retried on the next load.
 const fetchTreeWithTimeout = async (fetchFn, url, timeoutMs) => {
   const controller = typeof AbortController !== "undefined" ? new AbortController() : undefined;
   let timer;

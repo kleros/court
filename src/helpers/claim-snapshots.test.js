@@ -125,6 +125,16 @@ describe("loadClaims", () => {
     expect(retried).toEqual([CLAIM_A, undefined, CLAIM_C]);
   });
 
+  it("returns an empty array for an empty snapshot list without fetching or caching", async () => {
+    const storage = makeStorage();
+    const fetchFn = jest.fn();
+
+    const claims = await load({ storage, fetchFn, snapshots: [] });
+    expect(claims).toEqual([]);
+    expect(fetchFn).not.toHaveBeenCalled();
+    expect(storage.map.size).toBe(0);
+  });
+
   it("never runs more than `concurrency` fetches at once", async () => {
     const snapshots = Array.from({ length: 20 }, (_, i) => `cid${i}`);
     let active = 0;
