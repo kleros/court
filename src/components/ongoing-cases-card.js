@@ -35,15 +35,6 @@ const StyledVoting = styled.div`
     }
   }
 `;
-const StyledExecuted = styled.div`
-  color: ${({ theme }) => theme.dangerColor};
-  svg {
-    height: 12px;
-    path {
-      fill: ${({ theme }) => theme.dangerColor};
-    }
-  }
-`;
 const StyledAppealed = styled.div`
   color: ${({ theme }) => theme.dangerColor};
   svg {
@@ -83,7 +74,7 @@ const OngoingCasesCard = () => {
         ).reduce(
           (acc, d) => {
             const dispute = call("KlerosLiquid", "disputes", d.disputeID);
-            if (dispute)
+            if (dispute) {
               if (dispute.period === "1" || dispute.period === "2") {
                 const dispute2 = call("KlerosLiquid", "getDispute", d.disputeID);
                 if (dispute2) {
@@ -119,7 +110,9 @@ const OngoingCasesCard = () => {
                       ID: d.disputeID,
                     });
                 } else acc.loading = true;
-              } else {
+                //Executed disputes are skipped entirely.
+                //This card never renders them and resolving their metaEvidence caused dashboard freezes to some jurors.
+              } else if (dispute.period !== "4") {
                 const metaEvidence = getMetaEvidence(
                   chainId,
                   dispute.arbitrated,
@@ -128,33 +121,22 @@ const OngoingCasesCard = () => {
                   dispute.ruled
                 );
 
-                if (dispute.period === "4")
-                  acc.executed.push({
-                    metaEvidence,
-                    statusDiv: (
-                      <StyledExecuted>
-                        Executed <HourGlass />
-                      </StyledExecuted>
-                    ),
-                    ID: d.disputeID,
-                  });
-                else
-                  acc.active.push({
-                    metaEvidence,
-                    statusDiv: (
-                      <StyledPending>
-                        Pending <HourGlass />
-                      </StyledPending>
-                    ),
-                    ID: d.disputeID,
-                  });
+                acc.active.push({
+                  metaEvidence,
+                  statusDiv: (
+                    <StyledPending>
+                      Pending <HourGlass />
+                    </StyledPending>
+                  ),
+                  ID: d.disputeID,
+                });
               }
-            else acc.loading = true;
+            } else acc.loading = true;
             return acc;
           },
-          { active: [], executed: [], loading: false, votePending: [] }
+          { active: [], loading: false, votePending: [] }
         )
-      : { active: [], executed: [], loading: true, votePending: [] }
+      : { active: [], loading: true, votePending: [] }
   );
 
   const _allActive = disputes.votePending.reverse().concat(disputes.active.reverse());

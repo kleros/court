@@ -11,6 +11,7 @@ import useChainId from "../hooks/use-chain-id";
 import ETHAmount from "./eth-amount";
 import { klerosboardSubgraph } from "../bootstrap/subgraph";
 import { IPFS_GATEWAY } from "../utils/ipfs";
+import { loadClaims, hasUnverifiedWeeks } from "../helpers/claim-snapshots";
 import snapshotsByChainId from "../assets/snapshots.json";
 
 const StyledModal = styled(Modal)`
@@ -74,6 +75,13 @@ const StyledUnclaimedAmount = styled.div`
   text-align: right;
 `;
 
+const StyledIncompleteNotice = styled.div`
+  font-size: 14px;
+  color: ${({ theme }) => theme.disabledColor};
+  text-align: center;
+  margin-bottom: 16px;
+`;
+
 const StyledReadMoreLink = styled.div`
   font-size: 18px;
   color: ${({ theme }) => theme.primaryColor};
@@ -120,20 +128,22 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
 
   const claimObjects = (claims) => {
     if (claims.length > 0)
-      return claims
-        .map(
-          (claim, index) =>
-            claim && {
-              week: index,
-              balance: claim.value.hex,
-              merkleProof: claim.proof,
-            }
-        )
-        .filter((claimObject) => typeof claimObject !== "undefined");
+      return (
+        claims
+          .map(
+            (claim, index) =>
+              claim && {
+                week: index,
+                balance: claim.value.hex,
+                merkleProof: claim.proof,
+              }
+          )
+          //Weeks whose snapshot failed to load are 0 in `claims` and they must be excluded
+          .filter(Boolean)
+      );
   };
 
   useEffect(() => {
-    var responses = [];
     const airdropParams = chainIdToParams[chainId];
 
     if (!airdropParams) {
@@ -141,14 +151,6 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
     }
 
     const snapshots = airdropParams?.snapshots ?? [];
-
-    for (var month = 0; month < snapshots.length; month++) {
-      responses[month] = fetch(`${IPFS_GATEWAY}/ipfs/${snapshots[month]}`);
-    }
-
-    const results = Promise.all(
-      responses.map((promise) => promise.then((r) => r.json()).catch((e) => console.error(e)))
-    );
 
     fetch(airdropParams.klerosboard, {
       headers: {
@@ -171,36 +173,36 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
       .then((r) => apyCallback(drizzle.web3.utils.fromWei(r.data.klerosCounters[0].tokenStaked)))
       .catch(() => {
         console.warn("Falling back to last merkle tree for calculating APY");
-        results.then((trees) => {
-          if (trees.length === 0) {
-            console.warn("No snapshot found! Cannot calculate the APY");
-            return;
-          }
+        if (snapshots.length === 0) {
+          console.warn("No snapshot found! Cannot calculate the APY");
+          return;
+        }
 
-          return apyCallback(drizzle.web3.utils.fromWei(trees.slice(-1)[0].averageTotalStaked.hex));
-        });
+        fetch(`${IPFS_GATEWAY}/ipfs/${snapshots[snapshots.length - 1]}`)
+          .then((r) => r.json())
+          .then((tree) => apyCallback(drizzle.web3.utils.fromWei(tree.averageTotalStaked.hex)))
+          .catch((e) => console.error(e));
       });
 
     setClaims(0);
-    results.then((r) =>
-      r.forEach(function (item) {
-        if (item) {
-          apyCallback(item.apy);
-          if (item.merkleTree.claims[account]) displayButton();
-          setClaims((prevState) => {
-            if (prevState) return [...prevState, item.merkleTree.claims[account]];
-            else return [item.merkleTree.claims[account]];
-          });
-        } else
-          setClaims((prevState) => {
-            if (prevState) return [...prevState, 0];
-            else return [0];
-          });
-      })
-    );
+
+    //The view-only placeholder has no claims to resolve.
+    //An empty snapshot list must leave `claims` at its initial 0
+    if (account === VIEW_ONLY_ADDRESS || snapshots.length === 0) return;
+
+    loadClaims({
+      account,
+      chainId,
+      snapshots,
+      gateway: IPFS_GATEWAY,
+      storage: window.localStorage,
+    }).then((claimsByWeek) => {
+      if (claimsByWeek.some(Boolean)) displayButton();
+      setClaims(claimsByWeek);
+    });
 
     const contract = new drizzle.web3.eth.Contract(MerkleRedeem.abi, airdropParams.contractAddress);
-    const claimStatus = contract.methods.claimStatus(account, 0, chainIdToParams[chainId].snapshots.length).call();
+    const claimStatus = contract.methods.claimStatus(account, 0, snapshots.length).call();
 
     claimStatus.then((r) => setClaimStatus(r));
   }, [account, chainId, drizzle.web3.utils, drizzle.web3.eth.Contract, modalState, apyCallback, displayButton]);
@@ -322,6 +324,12 @@ const ClaimModal = ({ visible, onOk, onCancel, displayButton, apyCallback }) => 
               </StyledUnclaimedAmount>
             </div>
           </StyledInfoBox>
+          {hasUnverifiedWeeks(claims) && (
+            <StyledIncompleteNotice>
+              Some monthly rewards could not be checked, so the amounts above may be incomplete. They will be rechecked
+              on reload or next visit.
+            </StyledIncompleteNotice>
+          )}
         </>
       )}
       {modalState >= 1 && <StyledHr />}
