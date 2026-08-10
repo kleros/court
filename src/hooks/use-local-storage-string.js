@@ -1,11 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
 
+const readValue = (key) => {
+  try {
+    return localStorage.getItem(key) ?? "";
+  } catch (err) {
+    console.warn("Failed to read the stored value:", err);
+    return "";
+  }
+};
+
 //Alternative to `use-persisted-state` due to no key removal functionality.
 export default function useLocalStorageString(key) {
-  const [value, setValue] = useState(() => localStorage.getItem(key) ?? "");
+  const [value, setValue] = useState(() => readValue(key));
 
   useEffect(() => {
-    setValue(localStorage.getItem(key) ?? "");
+    setValue(readValue(key));
   }, [key]);
 
   const setAndStore = useCallback(
