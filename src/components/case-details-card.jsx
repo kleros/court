@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components/macro";
-import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, Row, Spin, Radio } from "antd";
+import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, Row, Spin, Radio, notification } from "antd";
 import InputNumber from "rc-input-number";
 import BigNumber from "bignumber.js";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
@@ -222,7 +222,6 @@ export default function CaseDetailsCard({ ID }) {
   const loadPolicy = useDataloader.loadPolicy();
   const getMetaEvidence = useDataloader.getMetaEvidence();
   const [activeSubcourtID, setActiveSubcourtID] = useState();
-  const [justification, setJustification] = useState();
   const [complexRuling, setComplexRuling] = useState();
   const [uintDisplayMode, setUintDisplayMode] = useState("dec");
   const dispute = useCacheCall("KlerosLiquid", "disputes", ID);
@@ -314,7 +313,26 @@ export default function CaseDetailsCard({ ID }) {
 
   const { send: sendCommit, status: sendCommitStatus } = useCacheSend("KlerosLiquid", "castCommit");
   const { send: sendVote, status: sendVoteStatus } = useCacheSend("KlerosLiquid", "castVote");
-  const onJustificationChange = useCallback(({ currentTarget: { value } }) => setJustification(value), []);
+
+  //The justification draft is stored locally per dispute. There's no cross-device support.
+  const justificationDraftKey = `@kleros/court/${chainId}/${account}/${ID}/justification-draft`;
+  const useStoredJustificationDraft = useMemo(() => createPersistedState(justificationDraftKey), [
+    justificationDraftKey,
+  ]);
+  const [justification, setJustification] = useStoredJustificationDraft();
+
+  //Delete the justification draft once the current round's vote is confirmed.
+  useEffect(() => {
+    if (votesData.voted && justification) {
+      setJustification("");
+      localStorage.removeItem(justificationDraftKey);
+    }
+  }, [votesData.voted, justification, setJustification, justificationDraftKey]);
+
+  const onJustificationChange = useCallback(({ currentTarget: { value } }) => setJustification(value), [
+    setJustification,
+  ]);
+
   const disabledDate = useCallback(
     (date) =>
       realitioLibQuestionFormatter
@@ -366,16 +384,26 @@ export default function CaseDetailsCard({ ID }) {
   const sendOrRevealVote = useCallback(
     async (choice) => {
       if (justification && justification.trim().length > 0)
-        await postJustification({
-          account,
-          web3,
-          justification: {
-            appeal: disputeExtraInfo.votesLengths.length - 1,
-            disputeID: ID,
-            justification,
-            voteIDs: votesData.voteIDs,
-          },
-        });
+        try {
+          await postJustification({
+            account,
+            web3,
+            justification: {
+              appeal: disputeExtraInfo.votesLengths.length - 1,
+              disputeID: ID,
+              justification,
+              voteIDs: votesData.voteIDs,
+            },
+          });
+        } catch (err) {
+          //The justification is best effort. It must never block the vote transaction,
+          //as a juror who fails to cast/reveal their vote gets penalized.
+          console.error("Failed to submit the justification:", err);
+          notification.warning({
+            message: "Your justification could not be submitted",
+            description: "Your vote will still be cast, just without the justification text.",
+          });
+        }
 
       sendVote(
         ID,
@@ -621,6 +649,16 @@ export default function CaseDetailsCard({ ID }) {
                   {votesData.canVote && dispute.period === "2" && (
                     <JustificationBox onChange={onJustificationChange} justification={justification} />
                   )}
+                  {votesData.drawnInCurrentRound &&
+                    dispute.period === "1" &&
+                    subcourts[subcourts.length - 1].hiddenVotes && (
+                      <>
+                        <JustificationBox onChange={onJustificationChange} justification={justification} />
+                        <StyledJustificationCaption>
+                          Saved on this device only. You will be able to review and submit it when you reveal your vote.
+                        </StyledJustificationCaption>
+                      </>
+                    )}
                   {Number(dispute.period) < 3 && !votesData.voted && metaEvidence.rulingOptions ? (
                     votesData.committed && committedVote !== undefined ? (
                       <RevealVoteButton onRevealClick={onRevealClick} votesData={votesData} dispute={dispute} />
@@ -1027,6 +1065,13 @@ const StyledRadioGroup = styled(Radio.Group)`
 
 const SecondaryActionText = styled.div`
   margin-top: 30px;
+`;
+
+const StyledJustificationCaption = styled.div`
+  font-size: 12px;
+  margin: -12px auto 12px;
+  opacity: 0.8;
+  width: 70%;
 `;
 
 const StyledInputTextArea = styled(Input.TextArea)`
