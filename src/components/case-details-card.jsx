@@ -27,6 +27,7 @@ import CourtDrawer from "./court-drawer";
 import EvidenceTimeline from "./evidence-timeline";
 import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 import useGetDraws from "../hooks/use-get-draws";
+import useLocalStorageString from "../hooks/use-local-storage-string";
 import arbitrableWhitelist from "../temp/arbitrable-whitelist";
 import { getAnswerString, RTA_LABEL } from "../temp/answer-string";
 import { isSafeNavigationUrl } from "../utils/urlValidation";
@@ -315,19 +316,13 @@ export default function CaseDetailsCard({ ID }) {
   const { send: sendVote, status: sendVoteStatus } = useCacheSend("KlerosLiquid", "castVote");
 
   //The justification draft is stored locally per dispute. There's no cross-device support.
-  const justificationDraftKey = `@kleros/court/${chainId}/${account}/${ID}/justification-draft`;
-  const useStoredJustificationDraft = useMemo(() => createPersistedState(justificationDraftKey), [
-    justificationDraftKey,
-  ]);
-  const [justification, setJustification] = useStoredJustificationDraft();
+  const [justification, setJustification] = useLocalStorageString(
+    `@kleros/court/${chainId}/${account}/${ID}/justification-draft`
+  );
 
-  //Delete the justification draft once the current round's vote is confirmed.
   useEffect(() => {
-    if (votesData.voted && justification) {
-      setJustification("");
-      localStorage.removeItem(justificationDraftKey);
-    }
-  }, [votesData.voted, justification, setJustification, justificationDraftKey]);
+    if (votesData.voted && justification) setJustification("");
+  }, [votesData.voted, justification, setJustification]);
 
   const onJustificationChange = useCallback(({ currentTarget: { value } }) => setJustification(value), [
     setJustification,
