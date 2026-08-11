@@ -649,9 +649,9 @@ export default function CaseDetailsCard({ ID }) {
                     subcourts[subcourts.length - 1].hiddenVotes && (
                       <>
                         <JustificationBox onChange={onJustificationChange} justification={justification} />
-                        <StyledJustificationCaption>
+                        <StyledJustificationNote>
                           Saved on this device only. You will be able to review and submit it when you reveal your vote.
-                        </StyledJustificationCaption>
+                        </StyledJustificationNote>
                       </>
                     )}
                   {Number(dispute.period) < 3 && !votesData.voted && metaEvidence.rulingOptions ? (
@@ -1062,7 +1062,7 @@ const SecondaryActionText = styled.div`
   margin-top: 30px;
 `;
 
-const StyledJustificationCaption = styled.div`
+const StyledJustificationNote = styled.div`
   font-size: 12px;
   margin: -12px auto 12px;
   opacity: 0.8;

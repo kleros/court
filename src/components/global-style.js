@@ -567,6 +567,7 @@ const GlobalStyle = createGlobalStyle`
   .ant-collapse-header,
   .ant-alert-message,
   .ant-notification-notice-message,
+  .ant-notification-notice-description,
   .ant-notification-notice-close,
   .ant-notification-close-icon,
   .ant-message-notice-content,
