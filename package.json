@@ -107,7 +107,8 @@
   },
   "resolutions": {
     "html-to-text": "^7.0.0",
-    "graceful-fs": "^4.2.11"
+    "graceful-fs": "^4.2.11",
+    "cipher-base": "1.0.5"
   },
   "volta": {
     "node": "16.20.2",
