@@ -6,12 +6,15 @@ name: Verify Snapshot Roots
 # instead of surfacing when a juror's claim breaks.
 #
 # A month that has not been seeded on-chain yet is reported as "pending" and does not fail:
-# the monthly rewards runbook opens this PR before the owner runs seedAllocations.
+# the monthly rewards runbook opens this PR before the owner runs seedAllocations. To confirm
+# such a week after seeding, run this workflow manually — the dispatch run audits every entry
+# and fails on anything still unseeded.
 
 on:
   pull_request:
     paths:
       - "src/assets/snapshots.json"
+  workflow_dispatch:
 
 permissions: # added using https://github.com/step-security/secure-workflows
   contents: read
@@ -23,14 +26,22 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
+      # snapshots.json exists on every base branch, so a failing `git show` is an infrastructure
+      # problem and must fail the job loudly — a silently empty base manifest would disable the
+      # removal and reorder checks.
       - name: Verify added or changed snapshot roots against MerkleRedeem
+        if: github.event_name == 'pull_request'
         run: |
-          git show "origin/${GITHUB_BASE_REF}:src/assets/snapshots.json" > /tmp/base-snapshots.json \
-            || echo '{}' > /tmp/base-snapshots.json
+          git show "origin/${GITHUB_BASE_REF}:src/assets/snapshots.json" > /tmp/base-snapshots.json
           node scripts/verify-snapshot-roots.js --base /tmp/base-snapshots.json
+
+      - name: Verify every snapshot root against MerkleRedeem
+        if: github.event_name == 'workflow_dispatch'
+        run: node scripts/verify-snapshot-roots.js --strict

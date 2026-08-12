@@ -24,14 +24,14 @@
  */
 // CLI script; the console output is its interface.
 /* eslint-disable no-console */
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 
 const root = path.join(__dirname, "..");
 
-// The RPC endpoints come from the committed .env, through the same variables the app itself uses
-// (see chainIdToRpcEndpoint in src/bootstrap/web3.js). Real environment variables take precedence,
-// so CI or a caller can point elsewhere without touching the file.
+// An RPC endpoint set through the environment or a local .env wins, through the same variables the
+// app itself uses (see chainIdToRpcEndpoint in src/bootstrap/web3.js). Without one — CI and fork
+// PRs, where .env is untracked and secrets are unavailable — the public endpoints in CHAINS serve.
 function readDotEnv() {
   const values = {};
   const dotEnvPath = path.join(root, ".env");
@@ -45,10 +45,9 @@ function readDotEnv() {
 const dotEnv = readDotEnv();
 const env = (name) => process.env[name] || dotEnv[name];
 
-function rpcUrl(rpcEnvVar) {
-  const url = env(rpcEnvVar);
-  if (!url) throw new Error(`no RPC url: set ${rpcEnvVar} (in the environment or .env)`);
-  return url;
+function rpcUrls(chain) {
+  const override = env(chain.rpcEnvVar);
+  return override ? [override] : chain.publicRpcUrls;
 }
 
 // The MerkleRedeem deployments. The addresses are immutable deployed contracts, kept in sync with
@@ -59,11 +58,13 @@ const CHAINS = {
     label: "mainnet",
     merkleRedeem: "0xdbc3088Dfebc3cc6A84B0271DaDe2696DB00Af38",
     rpcEnvVar: "REACT_APP_WEB3_FALLBACK_HTTPS_URL",
+    publicRpcUrls: ["https://ethereum-rpc.publicnode.com", "https://eth.drpc.org"],
   },
   100: {
     label: "gnosis",
     merkleRedeem: "0xf1A9589880DbF393F32A5b2d5a0054Fa10385074",
     rpcEnvVar: "REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL",
+    publicRpcUrls: ["https://rpc.gnosischain.com", "https://gnosis-rpc.publicnode.com"],
   },
 };
 // Mirrors IPFS_GATEWAY in src/utils/ipfs.js (an ES module a node script cannot require).
@@ -101,11 +102,11 @@ async function fetchOnChainRoot(chainId, week) {
     method: "eth_call",
     params: [{ to: CHAINS[chainId].merkleRedeem, data }, "latest"],
   });
-  const rpcResponse = await fetchWithFallback(
-    [rpcUrl(CHAINS[chainId].rpcEnvVar)],
-    `weekMerkleRoots(${week}) on ${chainId}`,
-    { method: "POST", headers: { "content-type": "application/json" }, body }
-  );
+  const rpcResponse = await fetchWithFallback(rpcUrls(CHAINS[chainId]), `weekMerkleRoots(${week}) on ${chainId}`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body,
+  });
   if (rpcResponse.error || !ROOT_SHAPE.test(rpcResponse.result || "")) {
     throw new Error(
       `bad RPC response for week ${week} on chain ${chainId}: ${JSON.stringify(rpcResponse).slice(0, 200)}`
@@ -142,6 +143,26 @@ function entriesToVerify(current, base) {
   return work;
 }
 
+// Verifies one entry against its on-chain root and reports the outcome: "ok", "pending" or "failed".
+async function verifyEntry({ chainId, week, entry, changed }) {
+  const where = `${CHAINS[chainId].label} week ${week} (${entry})${changed ? " [existing entry CHANGED]" : ""}`;
+  try {
+    const [fileRoot, onChainRoot] = await Promise.all([fetchSnapshotRoot(entry), fetchOnChainRoot(chainId, week)]);
+    if (onChainRoot === ZERO_ROOT) {
+      console.log(`PENDING  ${where}\n         not seeded on-chain yet; re-run after seedAllocations to confirm.`);
+      return "pending";
+    }
+    if (onChainRoot === fileRoot) {
+      console.log(`OK       ${where}`);
+      return "ok";
+    }
+    console.error(`MISMATCH ${where}\n         file:     ${fileRoot}\n         on-chain: ${onChainRoot}`);
+  } catch (error) {
+    console.error(`ERROR    ${where}\n         ${error.message}`);
+  }
+  return "failed";
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const strict = args.includes("--strict");
@@ -159,24 +180,10 @@ async function main() {
 
   let failed = 0;
   let pending = 0;
-  for (const { chainId, week, entry, changed } of work) {
-    const where = `${CHAINS[chainId].label} week ${week} (${entry})${changed ? " [existing entry CHANGED]" : ""}`;
-    try {
-      const [fileRoot, onChainRoot] = await Promise.all([fetchSnapshotRoot(entry), fetchOnChainRoot(chainId, week)]);
-      if (onChainRoot === ZERO_ROOT) {
-        pending += 1;
-        console.log(`PENDING  ${where}\n         not seeded on-chain yet; re-run after seedAllocations to confirm.`);
-        if (strict) failed += 1;
-      } else if (onChainRoot === fileRoot) {
-        console.log(`OK       ${where}`);
-      } else {
-        failed += 1;
-        console.error(`MISMATCH ${where}\n         file:     ${fileRoot}\n         on-chain: ${onChainRoot}`);
-      }
-    } catch (error) {
-      failed += 1;
-      console.error(`ERROR    ${where}\n         ${error.message}`);
-    }
+  for (const item of work) {
+    const outcome = await verifyEntry(item);
+    if (outcome === "pending") pending += 1;
+    if (outcome === "failed" || (outcome === "pending" && strict)) failed += 1;
   }
 
   console.log(
