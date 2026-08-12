@@ -26,19 +26,90 @@ const getHttpUri = (uri) => {
   }
 };
 
+const META_EVIDENCE_CACHE_PREFIX = "@@kleros/court/metaevidence/v1";
+
+const metaEvidenceCacheKey = (chainID, arbitrator, disputeId) =>
+  `${META_EVIDENCE_CACHE_PREFIX}/${chainID}/${arbitrator}/${disputeId}`;
+
+//MetaEvidence must be an object with at least a title or rulingOptions.
+const isValidMetaEvidence = (metaEvidenceJSON) =>
+  Boolean(metaEvidenceJSON) &&
+  typeof metaEvidenceJSON === "object" &&
+  Boolean(metaEvidenceJSON.title || metaEvidenceJSON.rulingOptions);
+
+const readCachedMetaEvidence = (chainID, arbitrator, disputeId) => {
+  const cacheKey = metaEvidenceCacheKey(chainID, arbitrator, disputeId);
+
+  try {
+    const cached = window.localStorage.getItem(cacheKey);
+    if (!cached) return undefined;
+
+    const parsed = JSON.parse(cached);
+    if (isValidMetaEvidence(parsed)) return parsed;
+  } catch {
+    //Unparsable entry, clean up will happen next.
+  }
+
+  try {
+    window.localStorage.removeItem(cacheKey);
+  } catch {
+    //Storage unavailable, so nothing to clean up.
+  }
+  return undefined;
+};
+
+const writeCachedMetaEvidence = (chainID, arbitrator, disputeId, metaEvidenceJSON) => {
+  //A malformed response, even with status 200 must not be cached
+  if (!isValidMetaEvidence(metaEvidenceJSON)) return;
+
+  try {
+    window.localStorage.setItem(metaEvidenceCacheKey(chainID, arbitrator, disputeId), JSON.stringify(metaEvidenceJSON));
+  } catch {
+    //Caching is best-effort
+  }
+};
+
+//Each concurrent fetch spawns its own iframe, so responses are tagged with a target counter.
+//Previously, the single shared `window.onmessage` handler would get flooded by calls,
+//and it would leave earlier cases, for which the fetch had finished, hanging, possibly forever if one of the other requests failed.
+let dynamicScriptTargetCounter = 0;
+
+//A script that errors inside its iframe never posts a result, which would leave the promise, the
+//listener and the iframe allocated forever. The timeout must exceed getMetaEvidence's retry window
+//so a timed-out scan falls out of the retry loop instead of being re-run from scratch.
+const DYNAMIC_SCRIPT_TIMEOUT_MS = 180000;
+
 const fetchDataFromScript = async (scriptString, scriptParameters) => {
   const { default: iframe } = await import("iframe");
 
+  const messageTarget = `script-${dynamicScriptTargetCounter++}`;
+
   let resolver;
-  const returnPromise = new Promise((resolve) => {
+  let rejecter;
+  const returnPromise = new Promise((resolve, reject) => {
     resolver = resolve;
+    rejecter = reject;
   });
 
-  window.onmessage = (message) => {
-    if (message.data.target === "script") {
+  const cleanup = () => {
+    clearTimeout(timeoutId);
+    window.removeEventListener("message", handleScriptMessage);
+    _.iframe.remove();
+  };
+
+  const handleScriptMessage = (message) => {
+    //Only accept results posted by this request's own iframe.
+    if (message.source === _.iframe.contentWindow && message.data?.target === messageTarget) {
+      cleanup();
       resolver(message.data.result);
     }
   };
+  window.addEventListener("message", handleScriptMessage);
+
+  const timeoutId = setTimeout(() => {
+    cleanup();
+    rejecter(new Error(`The dynamic script for dispute ${scriptParameters.disputeID} timed out.`));
+  }, DYNAMIC_SCRIPT_TIMEOUT_MS);
   const frameBody = `<script type='text/javascript'>
   (function rpcRedirectPatch() {
     const OLD_RPC = "https://mainnet.infura.io/v3/668b3268d5b241b5bab5c6cb886e4c61";
@@ -80,7 +151,7 @@ const fetchDataFromScript = async (scriptString, scriptParameters) => {
 
     returnPromise.then(result => {window.parent.postMessage(
       {
-        target: 'script',
+        target: ${JSON.stringify(messageTarget)},
         result
       },
       '*'
@@ -106,7 +177,10 @@ const fetchDataFromScript = async (scriptString, scriptParameters) => {
 };
 
 const funcs = {
-  async getMetaEvidence(chainID, arbitrated, arbitrator, disputeId) {
+  async getMetaEvidence(chainID, arbitrated, arbitrator, disputeId, ruled) {
+    const cached = readCachedMetaEvidence(chainID, arbitrator, disputeId);
+    if (cached) return cached;
+
     const startTime = Date.now();
     const maxTime = 120000;
     const waitTime = 5000;
@@ -191,6 +265,9 @@ const funcs = {
           };
         }
 
+        //Ruled disputes are final, their metaEvidence can never change and is safe to cache.
+        if (ruled) writeCachedMetaEvidence(chainID, arbitrator, disputeId, metaEvidenceJSON);
+
         return metaEvidenceJSON;
       } catch (err) {
         await new Promise((r) => setTimeout(() => r(), waitTime));
@@ -232,7 +309,10 @@ const funcs = {
 };
 
 export const dataloaders = Object.keys(funcs).reduce((acc, f) => {
+  //Batching is disabled because the loaders gain nothing from it (each key is fetched independently)
+  //A single hanging dynamic script would keep all the other cards of a cases list stuck on their skeletons.
   acc[f] = new Dataloader((argsArr) => Promise.all(argsArr.map((args) => funcs[f](...args))), {
+    batch: false,
     cacheKeyFn: JSON.stringify,
   });
   return acc;

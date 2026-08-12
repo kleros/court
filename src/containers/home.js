@@ -101,7 +101,7 @@ export default function Home() {
                 Buy PNK
               </StyledButton>
             </Link>
-            <a href="/staking-rewards.html" target="_blank" rel="noopener noreferrer">
+            <a href="https://rewards.kleros.io/staking-rewards" target="_blank" rel="noopener noreferrer">
               <StyledButton size="large" type="secondary">
                 Staking Rewards
               </StyledButton>
