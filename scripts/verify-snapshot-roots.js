@@ -183,13 +183,14 @@ async function main() {
   for (const item of work) {
     const outcome = await verifyEntry(item);
     if (outcome === "pending") pending += 1;
-    if (outcome === "failed" || (outcome === "pending" && strict)) failed += 1;
+    if (outcome === "failed") failed += 1;
   }
 
   console.log(
     `\nverified ${work.length} entr${work.length === 1 ? "y" : "ies"}: ${failed} failed, ${pending} pending.`
   );
-  if (failed > 0) process.exit(1);
+  if (strict && pending > 0) console.error(`--strict: pending entries are treated as failures.`);
+  if (failed > 0 || (strict && pending > 0)) process.exit(1);
 }
 
 main().catch((error) => {
