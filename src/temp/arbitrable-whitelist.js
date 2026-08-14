@@ -37,6 +37,7 @@ const arbitrableWhitelist = {
     "0xf339047c85d0dd2645f2bd802a1e8a5e7af61053",
     "0xf65c7560d6ce320cc3a16a07f1f65aab66396b9e",
     "0xbE9834097A4E97689d9B667441acafb456D0480A", // PoH V2
+    "0x327a29fcE0a6490E4236240Be176dAA282EcCfdF", // PoH Governor
     ...MAINNET_REALITY_ADDRESSES,
   ].map((address) => address.toLowerCase()),
   100: [
