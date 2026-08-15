@@ -83,7 +83,7 @@ function WalletWarningPerAccount({ account }) {
         <StyledP>
           You are using a smart contract wallet. This is not recommended.{" "}
           <a
-            href="https://docs.kleros.io/kleros-faq#can-i-use-a-smart-contract-account-to-stake-in-the-court"
+            href="https://docs.kleros.io/welcome/faq#can-i-use-a-smart-contract-account-to-stake-in-the-court"
             target="_blank"
             rel="noopener noreferrer"
           >
