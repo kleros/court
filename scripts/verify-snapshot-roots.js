@@ -13,19 +13,34 @@
  *
  * Usage:
  *   node scripts/verify-snapshot-roots.js --base <path>   verify entries added or changed vs the
- *                                                         base manifest (what CI does on PRs)
+ *                                                         base manifest (CI adds --strict on PRs)
  *   node scripts/verify-snapshot-roots.js                 verify every entry (manual audit)
  *   --strict                                              fail on not-yet-seeded weeks too
  *
- * A week that is not seeded yet reads as the zero root on-chain. The monthly rewards runbook
- * opens the court PR before the owner runs seedAllocations, so that state is reported as
- * "pending" and does not fail the check unless --strict is passed. A non-zero root that differs
+ * Needs node >= 18 for global fetch, but package.json pins 16 through volta, so locally run it as
+ *   volta run --node 22 node scripts/verify-snapshot-roots.js
+ *
+ * A week that is not seeded yet reads as the zero root on-chain, and is reported as "pending"
+ * rather than failing unless --strict is passed. The rewards runbook seeds both chains before
+ * opening the court PR, so a pending week means the PR was opened too early — often in the gap
+ * where mainnet is seeded but gnosis is not. Seed it, then re-run. A non-zero root that differs
  * from the file always fails.
  */
 // CLI script; the console output is its interface.
 /* eslint-disable no-console */
 const fs = require("node:fs");
 const path = require("node:path");
+
+// package.json pins node 16 through volta, which predates global fetch (node 18). Without this
+// guard every entry fails with "fetch is not defined", which reads as a manifest full of bad
+// snapshots rather than as the wrong node version.
+if (typeof fetch !== "function") {
+  console.error(
+    `This script needs node >= 18; running ${process.version}.\n` +
+      `Run it as: volta run --node 22 node scripts/verify-snapshot-roots.js`
+  );
+  process.exit(1);
+}
 
 const root = path.join(__dirname, "..");
 
@@ -47,7 +62,10 @@ const env = (name) => process.env[name] || dotEnv[name];
 
 function rpcUrls(chain) {
   const override = env(chain.rpcEnvVar);
-  return override ? [override] : chain.publicRpcUrls;
+  // The override is tried first but never replaces the public endpoints: it is the app's browser
+  // key, which can be origin-restricted and then rejects a node script, failing the run outright
+  // for anyone who has a .env.
+  return override ? [override, ...chain.publicRpcUrls] : chain.publicRpcUrls;
 }
 
 // The MerkleRedeem deployments. The addresses are immutable deployed contracts, kept in sync with
@@ -73,13 +91,19 @@ const WEEK_MERKLE_ROOTS_SELECTOR = "0xdd8c9c9d"; // keccak256("weekMerkleRoots(u
 const ZERO_ROOT = `0x${"0".repeat(64)}`;
 const ROOT_SHAPE = /^0x[0-9a-fA-F]{64}$/;
 
-async function fetchWithFallback(urls, describe, init) {
+// `validate` rejects a payload by throwing, which retires that endpoint exactly like a transport
+// error does. An RPC key that is origin-restricted may answer 200 with a JSON-RPC error rather
+// than a 4xx, and without this that answer would fail the run instead of falling through to the
+// public endpoints.
+async function fetchWithFallback(urls, describe, init, validate) {
   const failures = [];
   for (const url of urls) {
     try {
       const response = await fetch(url, { signal: AbortSignal.timeout(30000), ...init });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return await response.json();
+      const payload = await response.json();
+      if (validate) validate(payload);
+      return payload;
     } catch (error) {
       failures.push(`${url}: ${error.message}`);
     }
@@ -94,7 +118,9 @@ async function fetchSnapshotRoot(entry) {
   return root.toLowerCase();
 }
 
-async function fetchOnChainRoot(chainId, week) {
+// One weekMerkleRoots(week) call, tried against `urls` in order. `acceptRoot`, when given, also
+// treats a root it rejects as a reason to move on to the next endpoint.
+async function callWeekRoot(chainId, week, urls, acceptRoot) {
   const data = WEEK_MERKLE_ROOTS_SELECTOR + week.toString(16).padStart(64, "0");
   const body = JSON.stringify({
     jsonrpc: "2.0",
@@ -102,17 +128,29 @@ async function fetchOnChainRoot(chainId, week) {
     method: "eth_call",
     params: [{ to: CHAINS[chainId].merkleRedeem, data }, "latest"],
   });
-  const rpcResponse = await fetchWithFallback(rpcUrls(CHAINS[chainId]), `weekMerkleRoots(${week}) on ${chainId}`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body,
-  });
-  if (rpcResponse.error || !ROOT_SHAPE.test(rpcResponse.result || "")) {
-    throw new Error(
-      `bad RPC response for week ${week} on chain ${chainId}: ${JSON.stringify(rpcResponse).slice(0, 200)}`
-    );
-  }
+  const rpcResponse = await fetchWithFallback(
+    urls,
+    `weekMerkleRoots(${week}) on ${chainId}`,
+    { method: "POST", headers: { "content-type": "application/json" }, body },
+    (payload) => {
+      if (payload.error || !ROOT_SHAPE.test(payload.result || "")) {
+        throw new Error(`bad RPC response: ${JSON.stringify(payload).slice(0, 200)}`);
+      }
+      if (acceptRoot && !acceptRoot(payload.result.toLowerCase())) throw new Error(`root ${payload.result}`);
+    }
+  );
   return rpcResponse.result.toLowerCase();
+}
+
+async function fetchOnChainRoot(chainId, week) {
+  const urls = rpcUrls(CHAINS[chainId]);
+  const root = await callWeekRoot(chainId, week, urls);
+  if (root !== ZERO_ROOT || urls.length === 1) return root;
+  // A zero root means the week is not seeded — or that whichever endpoint answered is behind the
+  // seeding transaction. Since a pending week fails the check under --strict, ask the rest of the
+  // endpoints before reporting one: a non-zero root from any of them wins. If they all read zero,
+  // or none can be reached, the zero stands and the week is genuinely pending.
+  return callWeekRoot(chainId, week, urls, (candidate) => candidate !== ZERO_ROOT).catch(() => ZERO_ROOT);
 }
 
 // Entries whose index is new or whose content changed relative to the base manifest. Existing
@@ -149,7 +187,9 @@ async function verifyEntry({ chainId, week, entry, changed }) {
   try {
     const [fileRoot, onChainRoot] = await Promise.all([fetchSnapshotRoot(entry), fetchOnChainRoot(chainId, week)]);
     if (onChainRoot === ZERO_ROOT) {
-      console.log(`PENDING  ${where}\n         not seeded on-chain yet; re-run after seedAllocations to confirm.`);
+      console.log(
+        `PENDING  ${where}\n         not seeded on-chain yet — seed it, then re-run this check before merging.`
+      );
       return "pending";
     }
     if (onChainRoot === fileRoot) {
