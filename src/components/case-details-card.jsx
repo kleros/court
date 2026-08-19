@@ -647,12 +647,7 @@ export default function CaseDetailsCard({ ID }) {
                   {votesData.drawnInCurrentRound &&
                     dispute.period === "1" &&
                     subcourts[subcourts.length - 1].hiddenVotes && (
-                      <>
-                        <JustificationBox onChange={onJustificationChange} justification={justification} />
-                        <StyledJustificationNote>
-                          Saved on this device only. You will be able to review and submit it when you reveal your vote.
-                        </StyledJustificationNote>
-                      </>
+                      <JustificationBox onChange={onJustificationChange} justification={justification} />
                     )}
                   {Number(dispute.period) < 3 && !votesData.voted && metaEvidence.rulingOptions ? (
                     votesData.committed && committedVote !== undefined ? (
@@ -1060,13 +1055,6 @@ const StyledRadioGroup = styled(Radio.Group)`
 
 const SecondaryActionText = styled.div`
   margin-top: 30px;
-`;
-
-const StyledJustificationNote = styled.div`
-  font-size: 12px;
-  margin: -12px auto 12px;
-  opacity: 0.8;
-  width: 70%;
 `;
 
 const StyledInputTextArea = styled(Input.TextArea)`
