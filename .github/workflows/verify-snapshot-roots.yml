@@ -1,0 +1,56 @@
+name: Verify Snapshot Roots
+
+# Every entry in src/assets/snapshots.json must carry the merkle root seeded on-chain in
+# MerkleRedeem for its week (= its array index). This job verifies the entries a PR adds or
+# changes against the contracts on mainnet and gnosis, so a wrong or tampered CID fails the PR
+# instead of surfacing when a juror's claim breaks.
+#
+# The rewards runbook calls seedAllocations on both chains first and opens this PR afterwards, so
+# the roots are already on-chain when CI runs and every new entry verifies for real. Gnosis has
+# trailed mainnet by 16 to 88 minutes on recent months, so "after seeding" means after the last
+# chain — a PR opened in between verifies mainnet and reports gnosis as pending. That order
+# matters twice over. Merging ahead of the seeding breaks claiming for every juror in the new
+# snapshot: claim-modal batches all of their unclaimed weeks into a single claimWeeks call, and
+# the unseeded week's zero root reverts the whole transaction, so they cannot claim the earlier
+# months either. And a check verdict is frozen when it runs — a PR opened first reports the week
+# as "pending" and goes green, and nothing re-runs it when the root later lands, so it would be
+# merged on a check that verified nothing.
+#
+# A "pending" week therefore fails the job (--strict): it means this PR was opened too early, so
+# seed the week and re-run. The manual dispatch run stays available as a full audit of every entry.
+
+on:
+  pull_request:
+    paths:
+      - "src/assets/snapshots.json"
+  workflow_dispatch:
+
+permissions: # added using https://github.com/step-security/secure-workflows
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # snapshots.json exists on every base branch, so a failing `git show` is an infrastructure
+      # problem and must fail the job loudly — a silently empty base manifest would disable the
+      # removal and reorder checks.
+      - name: Verify added or changed snapshot roots against MerkleRedeem
+        if: github.event_name == 'pull_request'
+        run: |
+          git show "origin/${GITHUB_BASE_REF}:src/assets/snapshots.json" > /tmp/base-snapshots.json
+          node scripts/verify-snapshot-roots.js --base /tmp/base-snapshots.json --strict
+
+      - name: Verify every snapshot root against MerkleRedeem
+        if: github.event_name == 'workflow_dispatch'
+        run: node scripts/verify-snapshot-roots.js --strict
