@@ -24,6 +24,49 @@ const normalizeRulingValue = (value) => {
 
 const resolveRulingOption = (ruling) => (ruling == null ? null : normalizeRulingValue(ruling));
 
+//Only show a round's vote counts once its voting is over and no more votes can enter it
+const PERIOD_APPEAL = 3;
+const isRoundTallyFinal = (roundIndex, currentRoundIndex, period) =>
+  roundIndex < currentRoundIndex || period >= PERIOD_APPEAL;
+
+//The getVoteCounter function in the contract uses numberOfChoices + 1 as the length of the array.
+//Additionally, numberOfChoices is NOT a count of choices, but an upper bound for acceptable choice values.
+//This is problematic for reality disputes, for instance, as those have a reserved answer with value 2^256 - 1.
+//This means the call to getVoteCounter will revert, as the array is impossible to allocate, so we skip it instead of having drizzle keep retrying it.
+//Note that 512 was chosen as a "reasonable" value. In practice, most disputes have a handful of choices at most.
+const MAX_TALLYABLE_CHOICES = 512;
+const isTallyableDispute = (numberOfChoices) => Number(numberOfChoices) <= MAX_TALLYABLE_CHOICES;
+
+//Returns the number of votes for a given choice in a given round, or undefined if we can't tell
+const getChoiceVoteCount = (roundVoteCounter, choiceKey) => {
+  const counts = roundVoteCounter?.counts;
+  if (!counts || choiceKey == null) return undefined;
+
+  //The key is also the index in the array for the tally (e.g.: 0 = RtA)
+  const index = Number(choiceKey);
+  return index >= 0 && index < counts.length ? Number(counts[index]) : undefined;
+};
+
+//Drawn votes that were never cast land in no choice's total.
+//This is just a QoL helper, so jurors can easily understand why individual choice tallies might not add up to the round's total votes.
+const getVoteTurnoutSummary = (votesCast, votesDrawn) => {
+  const cast = Number(votesCast);
+  const drawn = Number(votesDrawn);
+  return Number.isFinite(cast) && drawn > 0 ? `${cast} of ${drawn} votes cast` : null;
+};
+
+const VoteOptionLabel = ({ title, voteCount }) => (
+  <VoteOption>
+    <VoteOptionTitle>{title}</VoteOptionTitle>
+    {voteCount !== undefined && <VoteOptionCount>({voteCount})</VoteOptionCount>}
+  </VoteOption>
+);
+
+VoteOptionLabel.propTypes = {
+  title: t.string,
+  voteCount: t.number,
+};
+
 export default function CaseRoundHistory({ ID, dispute, ruling }) {
   const { drizzle, useCacheCall } = useDrizzle();
   const getMetaEvidence = useDataloader.getMetaEvidence();
@@ -76,6 +119,27 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
     })
   );
 
+  const currentRound = dispute.votesLengths.length - 1;
+  const period = Number(dispute.period);
+  const isTallyable = isTallyableDispute(dispute.numberOfChoices);
+
+  //Get the vote tally for each round that can no longer receive votes.
+  //A slow or failing call does not block the UI, it just doesn't show vote counts for that round.
+  const voteCountersByRound = useCacheCall(["KlerosLiquid"], (call) =>
+    dispute.votesLengths.map((_, i) =>
+      isTallyable && isRoundTallyFinal(i, currentRound, period)
+        ? call("KlerosLiquid", "getVoteCounter", ID, i)
+        : undefined
+    )
+  );
+
+  const selectedRoundVoteCounter = voteCountersByRound[round];
+
+  //Note that this can be gated only on the round being finalized because we don't need to worry about calling getVoteCounter.
+  const voteTurnoutSummary = isRoundTallyFinal(round, currentRound, period)
+    ? getVoteTurnoutSummary(dispute.votesInEachRound[round], dispute.votesLengths[round])
+    : null;
+
   const handleChangeRound = useCallback((e) => {
     setRound(e.target.value);
     setJustificationIndex(0);
@@ -96,9 +160,9 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
                 <h3>Round</h3>
                 <StyledRadioGroup buttonStyle="solid" name="round" onChange={handleChangeRound} value={round}>
                   <Row>
-                    {justificationsByRound.map((justs, i) => (
+                    {dispute.votesLengths.map((_, i) => (
                       <Col lg={12} md={24} key={i}>
-                        <Radio.Button disabled={!justs.length} key={i} value={i}>
+                        <Radio.Button key={i} value={i}>
                           Round {i + 1}
                         </Radio.Button>
                       </Col>
@@ -108,6 +172,7 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
               </RoundSelectBox>
               <RulingOptionsBox>
                 <h3>Votes</h3>
+                {voteTurnoutSummary && <VoteTurnoutSummary>{voteTurnoutSummary}</VoteTurnoutSummary>}
                 <StyledRadioGroup
                   buttonStyle="solid"
                   name="votes"
@@ -117,25 +182,40 @@ export default function CaseRoundHistory({ ID, dispute, ruling }) {
                   <Row>
                     <Col lg={24}>
                       <Radio.Button size="large" value={"0"}>
-                        {RTA_LABEL}
+                        <VoteOptionLabel
+                          title={RTA_LABEL}
+                          voteCount={getChoiceVoteCount(selectedRoundVoteCounter, "0")}
+                        />
                       </Radio.Button>
                     </Col>
                     {metaEvidence &&
-                      metaEvidence.rulingOptions?.titles?.map((option, i) => (
-                        <Col lg={24} key={i}>
-                          <Radio.Button size="large" value={(i + 1).toString()}>
-                            {option}
-                          </Radio.Button>
-                        </Col>
-                      ))}
+                      metaEvidence.rulingOptions?.titles?.map((option, i) => {
+                        const choiceKey = (i + 1).toString();
+                        return (
+                          <Col lg={24} key={i}>
+                            <Radio.Button size="large" value={choiceKey}>
+                              <VoteOptionLabel
+                                title={option}
+                                voteCount={getChoiceVoteCount(selectedRoundVoteCounter, choiceKey)}
+                              />
+                            </Radio.Button>
+                          </Col>
+                        );
+                      })}
                     {metaEvidence.rulingOptions?.reserved &&
-                      Object.keys(metaEvidence.rulingOptions.reserved).map((key) => (
-                        <Col lg={24} key={key}>
-                          <Radio.Button size="large" value={normalizeRulingValue(key)}>
-                            {metaEvidence.rulingOptions.reserved[key]}
-                          </Radio.Button>
-                        </Col>
-                      ))}
+                      Object.keys(metaEvidence.rulingOptions.reserved).map((key) => {
+                        const choiceKey = normalizeRulingValue(key);
+                        return (
+                          <Col lg={24} key={key}>
+                            <Radio.Button size="large" value={choiceKey}>
+                              <VoteOptionLabel
+                                title={metaEvidence.rulingOptions.reserved[key]}
+                                voteCount={getChoiceVoteCount(selectedRoundVoteCounter, choiceKey)}
+                              />
+                            </Radio.Button>
+                          </Col>
+                        );
+                      })}
                   </Row>
                 </StyledRadioGroup>
               </RulingOptionsBox>
@@ -176,10 +256,6 @@ CaseRoundHistory.propTypes = {
   ruling: t.oneOfType([t.number, t.string]),
 };
 
-CaseRoundHistory.defaultProps = {
-  disabled: false,
-};
-
 const StyledCaseRoundHistory = styled.div`
   height: 550px;
 
@@ -203,10 +279,31 @@ const StyledRadioGroup = styled(Radio.Group)`
     overflow: hidden;
     text-overflow: ellipsis;
   }
+`;
 
-  .ant-radio-button-wrapper-disabled.ant-radio-button-wrapper-checked {
-    background: ${({ theme }) => theme.disabledColor} !important;
-  }
+const VoteOption = styled.span`
+  align-items: baseline;
+  display: inline-flex;
+  max-width: 100%;
+`;
+
+const VoteOptionTitle = styled.span`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const VoteOptionCount = styled.span`
+  flex: 0 0 auto;
+  padding-left: 6px;
+`;
+
+const VoteTurnoutSummary = styled.div`
+  color: ${({ theme }) => theme.textSecondary};
+  font-size: 12px;
+  line-height: 14px;
+  margin-bottom: 14px;
+  text-align: center;
 `;
 
 const Box = styled.div`
