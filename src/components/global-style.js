@@ -244,7 +244,10 @@ const GlobalStyle = createGlobalStyle`
     filter: none;
   }
 
-  .ant-btn-link[disabled] {
+  .ant-btn-link[disabled],
+  .ant-btn-link[disabled]:hover,
+  .ant-btn-link[disabled]:focus,
+  .ant-btn-link[disabled]:active {
     background: transparent;
     border-color: transparent;
   }
