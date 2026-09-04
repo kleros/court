@@ -234,6 +234,21 @@ const GlobalStyle = createGlobalStyle`
     }
   }
 
+  .ant-btn[disabled],
+  .ant-btn[disabled]:hover,
+  .ant-btn[disabled]:focus,
+  .ant-btn[disabled]:active {
+    background: ${({ theme }) => theme.disabledButtonBackground};
+    border-color: ${({ theme }) => theme.disabledButtonBorder};
+    color: ${({ theme }) => theme.disabledButtonText};
+    filter: none;
+  }
+
+  .ant-btn-link[disabled] {
+    background: transparent;
+    border-color: transparent;
+  }
+
   /* Ant Design Table Overrides */
   .ant-table {
     background: ${({ theme }) => theme.componentBackground};

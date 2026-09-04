@@ -77,12 +77,6 @@ const StyledButton = styled(Button)`
     background: ${({ theme }) => theme.secondaryPurple};
     border-color: ${({ theme }) => theme.secondaryPurple};
   }
-
-  &[disabled] {
-    background: ${({ theme }) => theme.elevatedBackground};
-    border-color: ${({ theme }) => theme.borderColor};
-    color: ${({ theme }) => theme.disabledColor};
-  }
 `;
 
 const StyledExplainerText = styled.p`
