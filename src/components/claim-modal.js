@@ -55,10 +55,12 @@ const StyledClaimButton = styled(Button)`
     }
   }
 
-  &.ant-btn-primary[disabled] {
-    background-color: ${({ theme }) => theme.elevatedBackground};
-    color: ${({ theme }) => theme.disabledColor};
-    border: none;
+  &.ant-btn-primary[disabled],
+  &.ant-btn-primary[disabled]:hover,
+  &.ant-btn-primary[disabled]:focus {
+    background-color: ${({ theme }) => theme.disabledButtonBackground};
+    border: 1px solid ${({ theme }) => theme.disabledButtonBorder};
+    color: ${({ theme }) => theme.disabledButtonText};
   }
 `;
 

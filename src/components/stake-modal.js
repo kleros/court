@@ -311,10 +311,6 @@ const StyledModal = styled(Modal)`
 
       .ant-btn {
         border-radius: 3px;
-
-        &-primary:disabled {
-          background: grey;
-        }
       }
     }
   }

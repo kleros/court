@@ -62,6 +62,9 @@ export const lightTheme = {
   mutedText: lightBase.grayMuted,
   textMutedLight: "rgba(60, 66, 66, 0.6)",
   disabledColor: "rgba(0, 0, 0, 0.25)",
+  disabledButtonBackground: "rgba(0, 0, 0, 0.12)",
+  disabledButtonBorder: "rgba(0, 0, 0, 0.2)",
+  disabledButtonText: "#8c8c8c",
   // Links & status
   successColor: lightBase.green,
   errorColor: lightBase.red,
@@ -167,6 +170,9 @@ export const darkTheme = {
   mutedText: darkBase.grayMuted,
   textMutedLight: darkBase.textLightAlpha,
   disabledColor: "rgba(255, 255, 255, 0.25)",
+  disabledButtonBackground: "rgba(255, 255, 255, 0.12)",
+  disabledButtonBorder: "rgba(255, 255, 255, 0.2)",
+  disabledButtonText: "rgba(255, 255, 255, 0.4)",
   // Links & status
   successColor: darkBase.green,
   errorColor: darkBase.red,
