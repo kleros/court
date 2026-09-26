@@ -212,6 +212,7 @@ export default function Case() {
 
   return (
     <RequiredChainIdGateway
+      keepChainIdInUrl
       renderOnMismatch={({ requiredChainId }) => <RequiredChainIdModal requiredChainId={requiredChainId} />}
     >
       {renderContent()}
