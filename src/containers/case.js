@@ -111,9 +111,6 @@ export default function Case() {
     if (isDisputeTooOld && chainId !== 1) setIsModalOpen(true);
   }, [isDisputeTooOld, chainId]);
 
-  //Fallback to the 404 like the loadable() in app.js used to do
-  if (error) return <C404 />;
-
   async function handleChainSwitchToMainnet() {
     setIsModalOpen(false);
     if (drizzleState.account === VIEW_ONLY_ADDRESS) {
@@ -129,6 +126,9 @@ export default function Case() {
   }
 
   const renderContent = () => {
+    //Fallback to the 404 like the loadable() in app.js used to do.
+    if (error) return <C404 />;
+
     if (isDisputeTooOld && chainId !== 1) {
       return (
         <Modal
@@ -212,6 +212,7 @@ export default function Case() {
 
   return (
     <RequiredChainIdGateway
+      keepChainIdInUrl
       renderOnMismatch={({ requiredChainId }) => <RequiredChainIdModal requiredChainId={requiredChainId} />}
     >
       {renderContent()}

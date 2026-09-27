@@ -2,29 +2,49 @@ import React from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
 import { useHistory, useLocation } from "react-router-dom";
-import { Card } from "antd";
+import { Card, Spin } from "antd";
 import useQueryParams from "../hooks/use-query-params";
 import useChainId from "../hooks/use-chain-id";
 import SwitchNetworkMessage from "./switch-network-message";
 
-export default function RequiredChainIdGateway({ children, render, renderOnMismatch }) {
+export default function RequiredChainIdGateway({ children, render, renderOnMismatch, keepChainIdInUrl }) {
   const queryParams = useQueryParams();
   const parsedValue = Number.parseInt(queryParams.requiredChainId, 10);
   const requiredChainId = Number.isNaN(parsedValue) ? undefined : parsedValue;
   const chainId = useChainId();
+  const isReloadPending = useIsReloadPending(chainId);
 
   useClearWhenInvalid();
-  useClearWhenMatching({ chainId, requiredChainId });
+  useSyncRequiredChainId({ chainId, requiredChainId, keepChainIdInUrl });
+
+  if (isReloadPending) {
+    return (
+      <Spin spinning tip="Switching network…">
+        <div></div>
+      </Spin>
+    );
+  }
 
   const content = children ?? render?.({ requiredChainId }) ?? null;
 
   return requiredChainId === undefined || requiredChainId === chainId ? content : renderOnMismatch({ requiredChainId });
 }
 
+//A wallet chain change always reloads the page.
+//If the URL still has the old chain, the "switch back" prompt and wrong-chain modals could flash. Show a spinner instead.
+function useIsReloadPending(chainId) {
+  const initialChainId = React.useRef();
+  if (initialChainId.current === undefined && chainId !== undefined) {
+    initialChainId.current = chainId;
+  }
+  return initialChainId.current !== undefined && chainId !== initialChainId.current;
+}
+
 RequiredChainIdGateway.propTypes = {
   children: t.node,
   render: t.func,
   renderOnMismatch: t.func,
+  keepChainIdInUrl: t.bool,
 };
 
 RequiredChainIdGateway.defaultProps = {
@@ -32,6 +52,7 @@ RequiredChainIdGateway.defaultProps = {
   renderOnMismatch(props) {
     return <DefaultRenderOnMismatch {...props} />;
   },
+  keepChainIdInUrl: false,
 };
 
 function DefaultRenderOnMismatch({ requiredChainId }) {
@@ -93,14 +114,27 @@ export function useClearRequiredChainId() {
   }, [history, location, queryParams]);
 }
 
-function useClearWhenMatching({ chainId, requiredChainId }) {
+function useSyncRequiredChainId({ chainId, requiredChainId, keepChainIdInUrl }) {
   const clear = useClearRequiredChainId();
+  const setRequiredChainId = useSetRequiredChainId();
 
   React.useEffect(() => {
-    if (chainId && requiredChainId && requiredChainId === chainId) {
+    //Without a `chainID`, there's nothing to sync. Without this guard, undefined would get compared to undefined, and we'd get an infinite loop.
+    if (!chainId) {
+      return;
+    }
+
+    //Keep the chain in the URL, so a copied link opens the case on the correct chain. Only used in the case page, currently.
+    if (keepChainIdInUrl) {
+      //Only add the param when it is missing. Overwriting would silently open the wrong case instead of asking to switch.
+      if (requiredChainId === undefined) {
+        setRequiredChainId(chainId);
+      }
+    } else if (requiredChainId === chainId) {
+      //The param is not needed in this scenario.
       clear();
     }
-  }, [requiredChainId, chainId, clear]);
+  }, [keepChainIdInUrl, chainId, requiredChainId, clear, setRequiredChainId]);
 }
 
 function useClearWhenInvalid() {
