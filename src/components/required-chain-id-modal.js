@@ -34,12 +34,12 @@ export default function RequiredChainIdModal({ requiredChainId }) {
         <>
           {isSupportedSideChain(requiredChainId) ? (
             <StyledExplainer>
-              To go to the Kleros Side-Chain Court, please click the button below or switch to {networkName} on
-              MetaMask.
+              To go to the Kleros Side-Chain Court, please click the button below or switch to {networkName} in your
+              wallet.
             </StyledExplainer>
           ) : (
             <StyledExplainer>
-              To go back to the main Kleros Court, please switch to {networkName} on MetaMask.
+              To go back to the main Kleros Court, please switch to {networkName} in your wallet.
             </StyledExplainer>
           )}
         </>
