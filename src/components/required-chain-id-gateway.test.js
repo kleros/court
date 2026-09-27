@@ -114,6 +114,20 @@ describe("RequiredChainIdGateway", () => {
     expect(rewrites).toBe(0);
   });
 
+  it("does not treat discovering the chain after mount as a pending reload", () => {
+    const page = mount({ url: "/cases/1", chainId: undefined, keepChainIdInUrl: true });
+
+    page.switchWalletTo(1);
+
+    expect(container.querySelector(".ant-spin")).toBeNull();
+    expect(shows("content")).toBe(true);
+    expect(currentUrl()).toBe("/cases/1?requiredChainId=1");
+
+    page.switchWalletTo(100);
+
+    expect(container.querySelector(".ant-spin")).not.toBeNull();
+  });
+
   it("shows a spinner while the wallet switches chain, instead of flashing the switch prompt or stale content", () => {
     const page = mount({ url: "/cases/1?requiredChainId=1", chainId: 1, keepChainIdInUrl: true });
     expect(shows("content")).toBe(true);

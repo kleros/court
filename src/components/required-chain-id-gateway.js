@@ -31,11 +31,13 @@ export default function RequiredChainIdGateway({ children, render, renderOnMisma
 }
 
 //A wallet chain change always reloads the page.
-//If the URL still has the old chain, the "switch back" prompt and wrong-chain modals could flash for a moment.
-//Show a spinner instead.
+//If the URL still has the old chain, the "switch back" prompt and wrong-chain modals could flash. Show a spinner instead.
 function useIsReloadPending(chainId) {
-  const initialChainId = React.useRef(chainId).current;
-  return chainId !== initialChainId;
+  const initialChainId = React.useRef();
+  if (initialChainId.current === undefined && chainId !== undefined) {
+    initialChainId.current = chainId;
+  }
+  return initialChainId.current !== undefined && chainId !== initialChainId.current;
 }
 
 RequiredChainIdGateway.propTypes = {
