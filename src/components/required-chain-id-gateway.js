@@ -2,7 +2,7 @@ import React from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
 import { useHistory, useLocation } from "react-router-dom";
-import { Card } from "antd";
+import { Card, Spin } from "antd";
 import useQueryParams from "../hooks/use-query-params";
 import useChainId from "../hooks/use-chain-id";
 import SwitchNetworkMessage from "./switch-network-message";
@@ -12,13 +12,30 @@ export default function RequiredChainIdGateway({ children, render, renderOnMisma
   const parsedValue = Number.parseInt(queryParams.requiredChainId, 10);
   const requiredChainId = Number.isNaN(parsedValue) ? undefined : parsedValue;
   const chainId = useChainId();
+  const isReloadPending = useIsReloadPending(chainId);
 
   useClearWhenInvalid();
   useSyncRequiredChainId({ chainId, requiredChainId, keepChainIdInUrl });
 
+  if (isReloadPending) {
+    return (
+      <Spin spinning tip="Switching network…">
+        <div></div>
+      </Spin>
+    );
+  }
+
   const content = children ?? render?.({ requiredChainId }) ?? null;
 
   return requiredChainId === undefined || requiredChainId === chainId ? content : renderOnMismatch({ requiredChainId });
+}
+
+//A wallet chain change always reloads the page.
+//If the URL still has the old chain, the "switch back" prompt and wrong-chain modals could flash for a moment.
+//Show a spinner instead.
+function useIsReloadPending(chainId) {
+  const initialChainId = React.useRef(chainId).current;
+  return chainId !== initialChainId;
 }
 
 RequiredChainIdGateway.propTypes = {
