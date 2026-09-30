@@ -1,9 +1,14 @@
 import axios from "axios";
 import { dataloaders } from "./dataloader";
+import { fetchRealityQuestion } from "../temp/reality-question";
 
 jest.mock("axios", () => ({ get: jest.fn(), post: jest.fn() }));
 jest.mock("./web3", () => ({
   getReadOnlyRpcUrl: () => "http://localhost:8545",
+}));
+jest.mock("../temp/reality-question", () => ({
+  ...jest.requireActual("../temp/reality-question"),
+  fetchRealityQuestion: jest.fn(),
 }));
 
 //Test values - change if needed
@@ -62,7 +67,7 @@ describe("Dataloader", () => {
   });
 
   it("discards a cached entry with an invalid shape, refetches and overwrites it", async () => {
-    const cacheKey = `@@kleros/court/metaevidence/v1/${CHAIN_ID}/${ARBITRATOR}/${DISPUTE_ID}`;
+    const cacheKey = `@@kleros/court/metaevidence/v2/${CHAIN_ID}/${ARBITRATOR}/${DISPUTE_ID}`;
     window.localStorage.setItem(cacheKey, JSON.stringify({ foo: "bar" }));
 
     const result = await loadMetaEvidence(true);
@@ -72,7 +77,7 @@ describe("Dataloader", () => {
   });
 
   it("removes an invalid cached entry even when the dispute is not ruled", async () => {
-    const cacheKey = `@@kleros/court/metaevidence/v1/${CHAIN_ID}/${ARBITRATOR}/${DISPUTE_ID}`;
+    const cacheKey = `@@kleros/court/metaevidence/v2/${CHAIN_ID}/${ARBITRATOR}/${DISPUTE_ID}`;
     window.localStorage.setItem(cacheKey, JSON.stringify({ foo: "bar" }));
 
     await loadMetaEvidence(false);
@@ -106,5 +111,59 @@ describe("Dataloader", () => {
     axios.get.mockClear();
     await loadMetaEvidence(true);
     expect(axios.get).toHaveBeenCalled();
+  });
+
+  describe("Reality.eth arbitrables", () => {
+    //Kleros dispute 1680 on Ethereum (Realitio_v2_1_ArbitratorWithAppeals, Reality.eth v3.0 question
+    //0x7eea8e9e34d09c2964393878714198552f7b41381407e8bfee7312199e748844). The template is a bool question, but its first
+    //parameter overrides the type with a single-select ["Yes","No"] when populated by reality-eth-lib.
+    const REALITY_ARBITRATED = "0xf72CfD1B34a91A64f9A98537fe63FBaB7530AdcA";
+    const TEMPLATE = '{"lang":"en","type":"bool","category":"DAO proposal","title":"Did the proposal %s pass? 0x%s"}';
+    const QUESTION = '0x1275956c","type":"single-select","outcomes":["Yes","No"],"has_invalid":false,"z":"\u241fe423';
+
+    const loadRealityMetaEvidence = () =>
+      dataloaders.getMetaEvidence.load([CHAIN_ID, REALITY_ARBITRATED, ARBITRATOR, "1680", false]);
+
+    beforeEach(() => {
+      fetchRealityQuestion.mockReset();
+      fetchRealityQuestion.mockResolvedValue({ templateText: TEMPLATE, questionText: QUESTION, templateId: "20" });
+    });
+
+    it("derives the ruling options from the on-chain question instead of trusting the MetaEvidence", async () => {
+      const result = await loadRealityMetaEvidence();
+      expect(fetchRealityQuestion).toHaveBeenCalledWith({
+        arbitratorChainId: CHAIN_ID,
+        arbitrable: REALITY_ARBITRATED,
+        disputeId: "1680",
+      });
+      expect(result.rulingOptions).toEqual({
+        type: "single-select",
+        titles: ["No", "Yes"],
+        reserved: { "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF": "Answered Too Soon" },
+      });
+      expect(result.realityQuestion).toMatchObject({ status: "verified", divergent: true });
+    });
+
+    it("does not run the dynamic script of a known Reality.eth arbitrable", async () => {
+      axios.get.mockImplementation((url) =>
+        url.startsWith(process.env.REACT_APP_METAEVIDENCE_URL)
+          ? Promise.resolve({ status: 200, data: { metaEvidenceUri: META_EVIDENCE_URI } })
+          : Promise.resolve({
+              status: 200,
+              data: {
+                ...META_EVIDENCE_JSON,
+                dynamicScriptURI: "/ipfs/QmWWsDmvjhR9UVRgkcG75vAKzfK3vB85EkZzudnaxwfAWr/bundle.js",
+              },
+            })
+      );
+      const result = await loadRealityMetaEvidence();
+      expect(axios.get).toHaveBeenCalledTimes(2);
+      expect(result.rulingOptions.titles).toEqual(["No", "Yes"]);
+    });
+
+    it("does not look up questions for other arbitrables", async () => {
+      await loadMetaEvidence(false);
+      expect(fetchRealityQuestion).not.toHaveBeenCalled();
+    });
   });
 });
