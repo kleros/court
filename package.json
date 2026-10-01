@@ -22,6 +22,8 @@
     "build:analyze": "source-map-explorer build/static/js/main.*",
     "build:theme": "lessc --js ./src/components/theme.less ./src/components/theme.css",
     "build:snapshots": "node scripts/emit-snapshots.js",
+    "reality:known-questions": "node scripts/generate-reality-known-questions.js",
+    "reality:known-questions:check": "node scripts/generate-reality-known-questions.js --check",
     "fix": "run-p -c fix:*",
     "fix:js": "eslint --fix '**/*.{js,jsx}'",
     "fix:css": "stylelint --fix '**/*.{less,css}'",
