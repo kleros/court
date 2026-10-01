@@ -43,7 +43,7 @@ export default function RealityQuestionNotice({ realityQuestion }) {
   if (!key) return null;
   const { type, message, description } = NOTICES[key];
   return (
-    <Alert
+    <StyledAlert
       showIcon
       type={type}
       message={message}
@@ -58,10 +58,6 @@ export default function RealityQuestionNotice({ realityQuestion }) {
           )}
         </>
       }
-      css={`
-        text-align: left;
-        margin-bottom: 1rem;
-      `}
     />
   );
 }
@@ -77,6 +73,15 @@ RealityQuestionNotice.propTypes = {
 RealityQuestionNotice.defaultProps = {
   realityQuestion: undefined,
 };
+
+const StyledAlert = styled(Alert)`
+  text-align: left;
+  margin-bottom: 1rem;
+
+  .ant-alert-message {
+    color: ${({ theme }) => theme.textPrimary};
+  }
+`;
 
 const StyledQuestion = styled.p`
   white-space: pre-wrap;
