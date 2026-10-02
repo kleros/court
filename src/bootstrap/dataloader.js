@@ -6,6 +6,9 @@ import useSWR from "swr";
 import arbitrableWhitelist from "../temp/arbitrable-whitelist";
 import { displaySubgraph } from "./subgraph";
 import { isContentAddressed, toHttpUrl } from "../utils/ipfs";
+import { fetchRealityQuestion, getRealityProxy } from "../temp/reality-question";
+import { deriveRealityRulingOptions, sanitizeRulingOptions } from "../temp/reality-ruling-options";
+import { JSON_DUPLICATE_KEY_GUARD } from "../temp/json-duplicate-key-guard";
 
 const getURIProtocol = (uri) => {
   const uriParts = uri.replace(":", "").split("/");
@@ -26,7 +29,17 @@ const getHttpUri = (uri) => {
   }
 };
 
-const META_EVIDENCE_CACHE_PREFIX = "@@kleros/court/metaevidence/v1";
+//v2: entries cached by v1 may hold ruling options computed by vulnerable Reality.eth dynamic scripts.
+const META_EVIDENCE_CACHE_PREFIX = "@@kleros/court/metaevidence/v2";
+
+//Drop the entries of the previous cache versions.
+try {
+  Object.keys(window.localStorage)
+    .filter((key) => key.startsWith("@@kleros/court/metaevidence/v1/"))
+    .forEach((key) => window.localStorage.removeItem(key));
+} catch {
+  //Storage unavailable, so nothing to clean up.
+}
 
 const metaEvidenceCacheKey = (chainID, arbitrator, disputeId) =>
   `${META_EVIDENCE_CACHE_PREFIX}/${chainID}/${arbitrator}/${disputeId}`;
@@ -79,6 +92,12 @@ let dynamicScriptTargetCounter = 0;
 //so a timed-out scan falls out of the retry loop instead of being re-run from scratch.
 const DYNAMIC_SCRIPT_TIMEOUT_MS = 180000;
 
+//Dynamic scripts of Reality.eth arbitrables render the question with reality-eth-lib, which substitutes the question
+//parameters into the template without escaping them and then parses the result with JSON.parse: crafted parameters
+//can then override keys of the template (e.g. the question type or outcomes) through duplicate keys.
+const isRealityScript = (scriptString) =>
+  typeof scriptString === "string" && scriptString.includes("populatedJSONForTemplate");
+
 const fetchDataFromScript = async (scriptString, scriptParameters) => {
   const { default: iframe } = await import("iframe");
 
@@ -101,7 +120,7 @@ const fetchDataFromScript = async (scriptString, scriptParameters) => {
     //Only accept results posted by this request's own iframe.
     if (message.source === _.iframe.contentWindow && message.data?.target === messageTarget) {
       cleanup();
-      resolver(message.data.result);
+      resolver({ result: message.data.result, jsonDuplicateKeys: message.data.jsonDuplicateKeys === true });
     }
   };
   window.addEventListener("message", handleScriptMessage);
@@ -111,6 +130,7 @@ const fetchDataFromScript = async (scriptString, scriptParameters) => {
     rejecter(new Error(`The dynamic script for dispute ${scriptParameters.disputeID} timed out.`));
   }, DYNAMIC_SCRIPT_TIMEOUT_MS);
   const frameBody = `<script type='text/javascript'>
+  ${isRealityScript(scriptString) ? JSON_DUPLICATE_KEY_GUARD : ""}
   (function rpcRedirectPatch() {
     const OLD_RPC = "https://mainnet.infura.io/v3/668b3268d5b241b5bab5c6cb886e4c61";
     const NEW_RPC = ${JSON.stringify(getReadOnlyRpcUrl(scriptParameters.arbitrableChainID))};
@@ -152,7 +172,8 @@ const fetchDataFromScript = async (scriptString, scriptParameters) => {
     returnPromise.then(result => {window.parent.postMessage(
       {
         target: ${JSON.stringify(messageTarget)},
-        result
+        result,
+        jsonDuplicateKeys: window.__klerosJsonDuplicateKeys === true
       },
       '*'
     )})
@@ -212,58 +233,92 @@ const funcs = {
         if (metaEvidenceJSON.rulingOptions && !metaEvidenceJSON.rulingOptions.type)
           metaEvidenceJSON.rulingOptions.type = "single-select";
 
+        const realityProxy = getRealityProxy(chainID, arbitrated);
         if (metaEvidenceJSON.dynamicScriptURI) {
           if (!isContentAddressed(metaEvidenceJSON.dynamicScriptURI)) break;
 
-          const scriptURI =
-            chainID === 1 && disputeId === "1621"
-              ? getHttpUri("/ipfs/Qmf1k727vP7qZv21MDB8vwL6tfVEKPCUQAiw8CTfHStkjf")
-              : getHttpUri(metaEvidenceJSON.dynamicScriptURI);
+          //The dynamic scripts of known Reality.eth arbitrables are not run: the court derives their output itself
+          //below, because they render the question with reality-eth-lib (see ../temp/reality-question.js).
+          if (!realityProxy) {
+            const scriptURI =
+              chainID === 1 && disputeId === "1621"
+                ? getHttpUri("/ipfs/Qmf1k727vP7qZv21MDB8vwL6tfVEKPCUQAiw8CTfHStkjf")
+                : getHttpUri(metaEvidenceJSON.dynamicScriptURI);
 
-          console.info("Fetching dynamic script file at", scriptURI);
+            console.info("Fetching dynamic script file at", scriptURI);
 
-          const fileResponse = await axios.get(scriptURI);
+            const fileResponse = await axios.get(scriptURI);
 
-          if (fileResponse.status !== 200) throw new Error(`Unable to fetch dynamic script file at ${scriptURI}.`);
+            if (fileResponse.status !== 200) throw new Error(`Unable to fetch dynamic script file at ${scriptURI}.`);
 
-          const injectedParameters = {
-            arbitratorChainID: metaEvidenceJSON.arbitratorChainID || chainID,
-            arbitrableChainID: metaEvidenceJSON.arbitrableChainID || chainID,
-            disputeID: disputeId,
-          };
+            const injectedParameters = {
+              arbitratorChainID: metaEvidenceJSON.arbitratorChainID || chainID,
+              arbitrableChainID: metaEvidenceJSON.arbitrableChainID || chainID,
+              disputeID: disputeId,
+            };
 
-          injectedParameters.arbitrableContractAddress = injectedParameters.arbitrableContractAddress || arbitrated;
-          injectedParameters.arbitratorJsonRpcUrl =
-            injectedParameters.arbitratorJsonRpcUrl || getReadOnlyRpcUrl(injectedParameters.arbitratorChainID);
-          injectedParameters.arbitrableChainID = injectedParameters.arbitrableChainID || arbitrator;
-          injectedParameters.arbitrableJsonRpcUrl =
-            injectedParameters.arbitrableJsonRpcUrl || getReadOnlyRpcUrl(injectedParameters.arbitrableChainID);
+            injectedParameters.arbitrableContractAddress = injectedParameters.arbitrableContractAddress || arbitrated;
+            injectedParameters.arbitratorJsonRpcUrl =
+              injectedParameters.arbitratorJsonRpcUrl || getReadOnlyRpcUrl(injectedParameters.arbitratorChainID);
+            injectedParameters.arbitrableChainID = injectedParameters.arbitrableChainID || arbitrator;
+            injectedParameters.arbitrableJsonRpcUrl =
+              injectedParameters.arbitrableJsonRpcUrl || getReadOnlyRpcUrl(injectedParameters.arbitrableChainID);
 
-          if (
-            injectedParameters.arbitratorChainID !== undefined &&
-            injectedParameters.arbitratorJsonRpcUrl === undefined
-          ) {
-            console.warn(
-              `Could not obtain a valid 'arbitratorJsonRpcUrl' for chain ID ${injectedParameters.arbitratorChainID} on the Arbitrator side.`
+            if (
+              injectedParameters.arbitratorChainID !== undefined &&
+              injectedParameters.arbitratorJsonRpcUrl === undefined
+            ) {
+              console.warn(
+                `Could not obtain a valid 'arbitratorJsonRpcUrl' for chain ID ${injectedParameters.arbitratorChainID} on the Arbitrator side.`
+              );
+            }
+
+            if (
+              injectedParameters.arbitrableChainID !== undefined &&
+              injectedParameters.arbitrableJsonRpcUrl === undefined
+            ) {
+              console.warn(
+                `Could not obtain a valid 'arbitrableJsonRpcUrl' for chain ID ${injectedParameters.arbitrableChainID} on the Arbitrable side.`
+              );
+            }
+
+            const { result: metaEvidenceEdits, jsonDuplicateKeys } = await fetchDataFromScript(
+              fileResponse.data,
+              injectedParameters
             );
+
+            metaEvidenceJSON = {
+              ...metaEvidenceJSON,
+              ...metaEvidenceEdits,
+            };
+
+            //Unknown Reality.eth arbitrable: its ruling options cannot be verified, and must be refused when the
+            //question JSON had duplicate keys.
+            if (isRealityScript(fileResponse.data)) {
+              metaEvidenceJSON.realityQuestion = { status: jsonDuplicateKeys ? "unresolvable" : "unverified" };
+              if (jsonDuplicateKeys) metaEvidenceJSON.rulingOptions = { type: "single-select", titles: [] };
+            }
           }
-
-          if (
-            injectedParameters.arbitrableChainID !== undefined &&
-            injectedParameters.arbitrableJsonRpcUrl === undefined
-          ) {
-            console.warn(
-              `Could not obtain a valid 'arbitrableJsonRpcUrl' for chain ID ${injectedParameters.arbitrableChainID} on the Arbitrable side.`
-            );
-          }
-
-          const metaEvidenceEdits = await fetchDataFromScript(fileResponse.data, injectedParameters);
-
-          metaEvidenceJSON = {
-            ...metaEvidenceJSON,
-            ...metaEvidenceEdits,
-          };
         }
+
+        if (realityProxy && isValidMetaEvidence(metaEvidenceJSON)) {
+          const realityQuestionData = await fetchRealityQuestion({
+            arbitratorChainId: chainID,
+            arbitrable: arbitrated,
+            disputeId,
+          });
+          const { rulingOptions, realityQuestion, question } = deriveRealityRulingOptions(
+            realityQuestionData,
+            realityProxy
+          );
+          metaEvidenceJSON.rulingOptions = rulingOptions;
+          metaEvidenceJSON.realityQuestion = realityQuestion;
+          if (question) metaEvidenceJSON.question = question;
+        }
+
+        //Only coerce the ruling options of otherwise valid MetaEvidence: invalid data must stay invalid (and uncached).
+        if (isValidMetaEvidence(metaEvidenceJSON))
+          metaEvidenceJSON.rulingOptions = sanitizeRulingOptions(metaEvidenceJSON.rulingOptions);
 
         //Ruled disputes are final, their metaEvidence can never change and is safe to cache.
         if (ruled) writeCachedMetaEvidence(chainID, arbitrator, disputeId, metaEvidenceJSON);

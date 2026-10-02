@@ -30,6 +30,7 @@ import useGetDraws from "../hooks/use-get-draws";
 import useLocalStorageString from "../hooks/use-local-storage-string";
 import arbitrableWhitelist from "../temp/arbitrable-whitelist";
 import { getAnswerString, RTA_LABEL } from "../temp/answer-string";
+import RealityQuestionNotice from "./reality-question-notice";
 import { isSafeNavigationUrl } from "../utils/urlValidation";
 import { toHttpUrl } from "../utils/ipfs";
 
@@ -730,6 +731,7 @@ export default function CaseDetailsCard({ ID }) {
                 <StyledInnerCard actions={metaEvidenceActions}>
                   {/* ReactMarkdown 4 escapes HTML by default. Changing this or bumping the major
                       version without sanitizing the output could expose us to XSS attacks. */}
+                  <RealityQuestionNotice realityQuestion={metaEvidence.realityQuestion} />
                   <ReactMarkdown source={metaEvidence.description} />
                   {evidenceDisplayInterfaceURL && (
                     <StyledIframeContainer>
