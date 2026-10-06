@@ -66,7 +66,15 @@ const SEPOLIA = [
   "QmVmXuzGMapNGkpS2zyT8PCKd1qMFCSGUoEUQgfzpxJhZc",
 ];
 
-const dynamicScriptWhitelist = { 1: MAINNET, 100: GNOSIS, 11155111: SEPOLIA };
+//The meta-evidence endpoint used above does not serve Chiado, so this list was built differently: on 2026-10-06 the
+//MetaEvidence events emitted on Chiado by the four arbitrables that have ever had a dispute there (13 disputes) were read
+//from the chain, and the scripts their MetaEvidence names were collected.
+const CHIADO = [
+  "QmZZHwVaXWtvChdFPG4UeXStKaC9aHamwQkNTEAfRmT2Fj", // Dispute Resolver default
+  "QmQGMR6MyC851poYVyBfGthzmCdvTuRFKp1UDB19p89Gcn/bundle.js", // Reality.eth
+];
+
+const dynamicScriptWhitelist = { 1: MAINNET, 100: GNOSIS, 11155111: SEPOLIA, 10200: CHIADO };
 
 //A script is only accepted for disputes of the chain it is listed under.
 export const isDynamicScriptWhitelisted = (uri, chainId) =>
