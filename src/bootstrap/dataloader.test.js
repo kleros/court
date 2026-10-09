@@ -1,4 +1,5 @@
 import axios from "axios";
+import iframe from "iframe";
 import { dataloaders } from "./dataloader";
 import { fetchRealityQuestion } from "../temp/reality-question";
 
@@ -6,6 +7,20 @@ jest.mock("axios", () => ({ get: jest.fn(), post: jest.fn() }));
 jest.mock("./web3", () => ({
   getReadOnlyRpcUrl: () => "http://localhost:8545",
 }));
+jest.mock("iframe", () =>
+  jest.fn(({ body }) => {
+    const target = body.match(/target: "(script-\d+)"/)[1];
+    setTimeout(() =>
+      global.window.dispatchEvent(
+        new global.MessageEvent("message", {
+          source: global.window,
+          data: { target, result: { rulingOptions: { type: "single-select", titles: ["Ran"] } } },
+        })
+      )
+    );
+    return { iframe: { contentWindow: global.window, style: {}, remove: () => {} } };
+  })
+);
 jest.mock("../temp/reality-question", () => ({
   ...jest.requireActual("../temp/reality-question"),
   fetchRealityQuestion: jest.fn(),
@@ -31,6 +46,7 @@ describe("Dataloader", () => {
     window.localStorage.clear();
     dataloaders.getMetaEvidence.clearAll();
     axios.get.mockReset();
+    iframe.mockClear();
     axios.get.mockImplementation((url) =>
       url.startsWith(process.env.REACT_APP_METAEVIDENCE_URL)
         ? Promise.resolve({ status: 200, data: { metaEvidenceUri: META_EVIDENCE_URI } })
@@ -111,6 +127,53 @@ describe("Dataloader", () => {
     axios.get.mockClear();
     await loadMetaEvidence(true);
     expect(axios.get).toHaveBeenCalled();
+  });
+
+  it("does not run a dynamic script that is not whitelisted and returns the tamper fallback", async () => {
+    const dynamicScriptURI = "/ipfs/QmVkffjdrtLVsRxybdB2xSidamnUrvck3FVxmKxJz6eD7f";
+    axios.get.mockImplementation((url) =>
+      url.startsWith(process.env.REACT_APP_METAEVIDENCE_URL)
+        ? Promise.resolve({ status: 200, data: { metaEvidenceUri: META_EVIDENCE_URI } })
+        : Promise.resolve({ status: 200, data: { ...META_EVIDENCE_JSON, dynamicScriptURI } })
+    );
+
+    const result = await loadMetaEvidence(false);
+    expect(result.title).toBe("Invalid or tampered case data, refuse to arbitrate.");
+    expect(axios.get.mock.calls.some(([url]) => url.includes(dynamicScriptURI.slice("/ipfs/".length)))).toBe(false);
+  });
+
+  it("runs a whitelisted dynamic script and merges its result", async () => {
+    const dynamicScriptURI = "/ipfs/QmZZHwVaXWtvChdFPG4UeXStKaC9aHamwQkNTEAfRmT2Fj";
+    axios.get.mockImplementation((url) =>
+      url.startsWith(process.env.REACT_APP_METAEVIDENCE_URL)
+        ? Promise.resolve({ status: 200, data: { metaEvidenceUri: META_EVIDENCE_URI } })
+        : url.includes("QmZZHwVaXWtvChdFPG4UeXStKaC9aHamwQkNTEAfRmT2Fj")
+        ? Promise.resolve({ status: 200, data: "/* the script */" })
+        : Promise.resolve({ status: 200, data: { ...META_EVIDENCE_JSON, dynamicScriptURI } })
+    );
+
+    const result = await loadMetaEvidence(false);
+    expect(iframe).toHaveBeenCalledTimes(1);
+    expect(iframe.mock.calls[0][0].body).toContain("/* the script */");
+    expect(result.rulingOptions.titles).toEqual(["Ran"]);
+  });
+
+  it("fetches the override script for dispute 1621 instead of the one in its MetaEvidence", async () => {
+    const dynamicScriptURI = "/ipfs/QmdpXXmNxmdmLqZCabRUC9bZ65c2BN54EuUTRi5SdtiHQ4";
+    axios.get.mockImplementation((url) =>
+      url.startsWith(process.env.REACT_APP_METAEVIDENCE_URL)
+        ? Promise.resolve({ status: 200, data: { metaEvidenceUri: META_EVIDENCE_URI } })
+        : url.includes("Qmf1k727vP7qZv21MDB8vwL6tfVEKPCUQAiw8CTfHStkjf")
+        ? Promise.resolve({ status: 200, data: "/* override */" })
+        : url.includes("QmdpXXmNxmdmLqZCabRUC9bZ65c2BN54EuUTRi5SdtiHQ4")
+        ? Promise.resolve({ status: 200, data: "/* original */" })
+        : Promise.resolve({ status: 200, data: { ...META_EVIDENCE_JSON, dynamicScriptURI } })
+    );
+
+    await dataloaders.getMetaEvidence.load([CHAIN_ID, ARBITRATED, ARBITRATOR, "1621", false]);
+    expect(iframe).toHaveBeenCalledTimes(1);
+    expect(iframe.mock.calls[0][0].body).toContain("/* override */");
+    expect(iframe.mock.calls[0][0].body).not.toContain("/* original */");
   });
 
   describe("Reality.eth arbitrables", () => {

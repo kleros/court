@@ -4,7 +4,7 @@ export const IPFS_GATEWAY = "https://cdn.kleros.link";
 const CID_REGEX = /^(Qm[1-9A-HJ-NP-Za-km-z]{44}|b[a-z2-7]{50,})([/?#]|$)/;
 
 //Strips the common IPFS URI prefixes, leaving only the CID or CID/path.
-const toIpfsPath = (uri) =>
+export const toIpfsPath = (uri) =>
   uri
     .trim()
     .replace(/^(?:ipfs:|fs:)\/*/, "")

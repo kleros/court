@@ -9,6 +9,7 @@ import { isContentAddressed, toHttpUrl } from "../utils/ipfs";
 import { fetchRealityQuestion, getRealityProxy } from "../temp/reality-question";
 import { deriveRealityRulingOptions, sanitizeRulingOptions } from "../temp/reality-ruling-options";
 import { JSON_DUPLICATE_KEY_GUARD } from "../temp/json-duplicate-key-guard";
+import { isDynamicScriptWhitelisted } from "../temp/dynamic-script-whitelist";
 
 const getURIProtocol = (uri) => {
   const uriParts = uri.replace(":", "").split("/");
@@ -240,6 +241,14 @@ const funcs = {
           //The dynamic scripts of known Reality.eth arbitrables are not run: the court derives their output itself
           //below, because they render the question with reality-eth-lib (see ../temp/reality-question.js).
           if (!realityProxy) {
+            //Only run dynamic scripts that are whitelisted.
+            if (!isDynamicScriptWhitelisted(metaEvidenceJSON.dynamicScriptURI, chainID)) {
+              console.warn(
+                `The dynamic script ${metaEvidenceJSON.dynamicScriptURI} is not whitelisted and was not run.`
+              );
+              break;
+            }
+
             const scriptURI =
               chainID === 1 && disputeId === "1621"
                 ? getHttpUri("/ipfs/Qmf1k727vP7qZv21MDB8vwL6tfVEKPCUQAiw8CTfHStkjf")
