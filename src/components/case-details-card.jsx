@@ -5,7 +5,7 @@ import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, Row, Spin,
 import InputNumber from "rc-input-number";
 import BigNumber from "bignumber.js";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
-import * as realitioLibQuestionFormatter from "@reality.eth/reality-eth-lib/formatters/question";
+import { answerToBytes32, maxNumber, minNumber, padToBytes32 } from "../helpers/reality-answer-format";
 import ReactMarkdown from "react-markdown";
 import createPersistedState from "use-persisted-state";
 import Web3 from "web3";
@@ -64,6 +64,7 @@ const VoteOptions = ({ metaEvidence, votesData, complexRuling, setComplexRuling,
   const isMultipleSelect = metaEvidence.rulingOptions.type === "multiple-select";
   const isDateTime = metaEvidence.rulingOptions.type === "datetime";
   const isHash = metaEvidence.rulingOptions.type === "hash";
+  const isUint = metaEvidence.rulingOptions.type === "uint";
 
   let inputComponent;
 
@@ -125,7 +126,7 @@ const VoteOptions = ({ metaEvidence, votesData, complexRuling, setComplexRuling,
         {title}
       </StyledButton>
     ));
-  } else {
+  } else if (isUint) {
     inputComponent = (
       <StyledInputNumber
         prefixCls="ant-input-number"
@@ -143,15 +144,13 @@ const VoteOptions = ({ metaEvidence, votesData, complexRuling, setComplexRuling,
           });
           const bigValue = new BigNumber(value);
           const max = new BigNumber(
-            realitioLibQuestionFormatter
-              .maxNumber({
-                decimals,
-                type: metaEvidence.rulingOptions.type,
-              })
-              .minus(1)
+            maxNumber({
+              decimals,
+              type: metaEvidence.rulingOptions.type,
+            }).minus(1)
           );
           const min = new BigNumber(
-            realitioLibQuestionFormatter.minNumber({
+            minNumber({
               decimals,
               type: metaEvidence.rulingOptions.type,
             })
@@ -172,11 +171,11 @@ const VoteOptions = ({ metaEvidence, votesData, complexRuling, setComplexRuling,
   return (
     <StyledButtonsDiv>
       {inputComponent}
-      {isSingleSelect ? null : (
+      {inputComponent && !isSingleSelect ? (
         <StyledButton disabled={!votesData.canVote || !complexRuling} onClick={onVoteClick} size="large" type="primary">
           Submit
         </StyledButton>
-      )}
+      ) : null}
     </StyledButtonsDiv>
   );
 };
@@ -331,12 +330,10 @@ export default function CaseDetailsCard({ ID }) {
 
   const disabledDate = useCallback(
     (date) =>
-      realitioLibQuestionFormatter
-        .maxNumber({
-          decimals: metaEvidence.rulingOptions.precision,
-          type: metaEvidence.rulingOptions.type,
-        })
-        .lte(date.unix() + 1),
+      maxNumber({
+        decimals: metaEvidence.rulingOptions.precision,
+        type: metaEvidence.rulingOptions.type,
+      }).lte(date.unix() + 1),
     [metaEvidence]
   );
 
@@ -449,11 +446,11 @@ export default function CaseDetailsCard({ ID }) {
         case "datetime":
         case "uint":
         case "hash":
-          choice = realitioLibQuestionFormatter.answerToBytes32(choice, {
+          choice = answerToBytes32(choice, {
             decimals: metaEvidence.rulingOptions.precision,
             type: metaEvidence.rulingOptions.type,
           });
-          choice = realitioLibQuestionFormatter.padToBytes32(toBN(choice).add(toBN("1")).toString(16));
+          choice = padToBytes32(toBN(choice).add(toBN("1")).toString(16));
           break;
         default:
           break;
@@ -908,14 +905,6 @@ AnswerDisplay.propTypes = {
   uintDisplayMode: PropTypes.string,
 };
 
-realitioLibQuestionFormatter.minNumber = realitioLibQuestionFormatter.minNumber.bind({
-  maxNumber: (...args) => {
-    const result = realitioLibQuestionFormatter.maxNumber(...args);
-    result.neg = result.negated;
-    return result;
-  },
-});
-
 /**
  * This function will try to derive the original vote made by a juror by generating every
  * possible vote and combining them with the salt to compare against the on-chain commit.
@@ -946,11 +935,11 @@ const deriveVoteFromCommitThroughBruteForce = async ({ commit, salt, rulingOptio
     let encodedCommittedVote;
 
     permutations.find((choice) => {
-      let encodedAnswer = realitioLibQuestionFormatter.answerToBytes32(choice, {
+      let encodedAnswer = answerToBytes32(choice, {
         decimals: rulingOptions.precision,
         type: rulingOptions.type,
       });
-      encodedAnswer = realitioLibQuestionFormatter.padToBytes32(toBN(encodedAnswer).add(toBN("1")).toString(16));
+      encodedAnswer = padToBytes32(toBN(encodedAnswer).add(toBN("1")).toString(16));
 
       if (soliditySha3(encodedAnswer, salt) !== commit) {
         return false;
