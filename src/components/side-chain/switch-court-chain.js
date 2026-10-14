@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
 import { Button, Icon, Modal, Typography } from "antd";
-import { Link } from "react-router-dom";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import Web3 from "web3";
 import { ButtonLink } from "../../adapters/antd";
@@ -21,7 +20,7 @@ import usePromise from "../../hooks/use-promise";
 import useInterval from "../../hooks/use-interval";
 import useForceUpdate from "../../hooks/use-force-update";
 import { chainIdToNetworkName } from "../../helpers/networks";
-import { useSetRequiredChainId } from "../required-chain-id-gateway";
+import { ChainLink, useChainPath, useReplaceChainInUrl } from "../chain-navigation";
 import AnnouncementBanner from "./announcement-banner";
 import MultiBalance from "../multi-balance";
 import { getTokenSymbol } from "../../helpers/get-token-symbol";
@@ -242,7 +241,7 @@ CustomButton.defaultProps = {
 
 function useSwitchChain(destinationChainId) {
   const { drizzle } = useDrizzle();
-  const setRequiredChainId = useSetRequiredChainId();
+  const replaceChainInUrl = useReplaceChainInUrl();
 
   return React.useCallback(async () => {
     try {
@@ -251,13 +250,13 @@ function useSwitchChain(destinationChainId) {
       // 4001 is the MetaMask error code when users deny permission.
       if (err.code !== 4001) {
         /**
-         * If the call fails with any other reason, then set the global required chain ID.
+         * If the call fails with any other reason, point the URL at the destination chain, so the page asks the user to switch.
          */
         console.warn("Failed to request the switch to the side-chain:", err);
-        setRequiredChainId(destinationChainId);
+        replaceChainInUrl(destinationChainId);
       }
     }
-  }, [destinationChainId, setRequiredChainId, drizzle.web3.currentProvider]);
+  }, [destinationChainId, replaceChainInUrl, drizzle.web3.currentProvider]);
 }
 
 const StyledButtonWrapper = styled.div`
@@ -312,6 +311,7 @@ function SideChainCourtModal({ balance, rawBalance, errors, trigger }) {
   const xPnkDestinationTokenSymbol = useMemo(() => getTokenSymbol(destinationChainId, "xPNK"), [destinationChainId]);
 
   const switchChain = useSwitchChain(destinationChainId);
+  const toChain = useChainPath();
 
   const triggerElement = React.cloneElement(trigger, {
     onClick: (e) => {
@@ -324,9 +324,9 @@ function SideChainCourtModal({ balance, rawBalance, errors, trigger }) {
   });
 
   const handleGetPnk = React.useCallback(() => {
-    window.history.pushState({}, "", "/tokens");
+    window.history.pushState({}, "", toChain("/tokens"));
     switchChain();
-  }, [switchChain]);
+  }, [switchChain, toChain]);
 
   return (
     <>
@@ -485,7 +485,7 @@ const StyledResponsiveBannerButton = styled(Button).attrs((props) => ({
   }
 `;
 
-const StyledLink = styled(Link)`
+const StyledLink = styled(ChainLink)`
   display: flex;
   text-decoration: none;
   align-items: center;

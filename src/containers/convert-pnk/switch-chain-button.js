@@ -4,7 +4,7 @@ import styled from "styled-components/macro";
 import { Button } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { requestSwitchChain } from "../../api/side-chain";
-import { useSetRequiredChainId } from "../../components/required-chain-id-gateway";
+import { useReplaceChainInUrl } from "../../components/chain-navigation";
 import { chainIdToNetworkShortName } from "../../helpers/networks";
 
 const { useDrizzle } = drizzleReactHooks;
@@ -27,7 +27,7 @@ SwitchChainButton.propTypes = {
 
 function useSwitchChain(destinationChainId) {
   const { drizzle } = useDrizzle();
-  const setRequiredChainId = useSetRequiredChainId();
+  const replaceChainInUrl = useReplaceChainInUrl();
 
   return React.useCallback(async () => {
     try {
@@ -36,13 +36,13 @@ function useSwitchChain(destinationChainId) {
       // 4001 is the MetaMask error code when users deny permission.
       if (err.code !== 4001) {
         /**
-         * If the call fails with any other reason, then set the global required chain ID.
+         * If the call fails with any other reason, point the URL at the destination chain, so the page asks the user to switch.
          */
         console.warn("Failed to request the switch to the side-chain:", err);
-        setRequiredChainId(destinationChainId);
+        replaceChainInUrl(destinationChainId);
       }
     }
-  }, [destinationChainId, setRequiredChainId, drizzle.web3.currentProvider]);
+  }, [destinationChainId, replaceChainInUrl, drizzle.web3.currentProvider]);
 }
 
 const StyledWrapper = styled.div`

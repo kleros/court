@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Col, Row } from "antd";
 import styled from "styled-components/macro";
-import { Link } from "react-router-dom";
+import { ChainLink } from "../components/chain-navigation";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
 import SwitchCourtChain from "../components/side-chain/switch-court-chain";
@@ -91,7 +91,7 @@ export default function Home() {
               <Present style={{ marginRight: "8px", verticalAlign: "text-top" }} />
               <span>Claim PNK</span>
             </StyledClaimButton>
-            <Link
+            <ChainLink
               to="/tokens"
               style={{
                 display: isBuyPnkButtonVisible ? "inline-block" : "none",
@@ -100,17 +100,17 @@ export default function Home() {
               <StyledButton size="large" type="secondary">
                 Buy PNK
               </StyledButton>
-            </Link>
+            </ChainLink>
             <a href="https://rewards.kleros.io/staking-rewards" target="_blank" rel="noopener noreferrer">
               <StyledButton size="large" type="secondary">
                 Staking Rewards
               </StyledButton>
             </a>
-            <Link to="/courts">
+            <ChainLink to="/courts">
               <StyledButton size="large" type="primary">
                 See Courts
               </StyledButton>
-            </Link>
+            </ChainLink>
           </StyledButtonBar>
         }
       />

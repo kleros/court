@@ -1,21 +1,16 @@
 import React from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
-import { useHistory, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Card, Spin } from "antd";
-import useQueryParams from "../hooks/use-query-params";
 import useChainId from "../hooks/use-chain-id";
 import SwitchNetworkMessage from "./switch-network-message";
 
-export default function RequiredChainIdGateway({ children, render, renderOnMismatch, keepChainIdInUrl }) {
-  const queryParams = useQueryParams();
-  const parsedValue = Number.parseInt(queryParams.requiredChainId, 10);
-  const requiredChainId = Number.isNaN(parsedValue) ? undefined : parsedValue;
+export default function RequiredChainIdGateway({ children, render, renderOnMismatch }) {
+  //Pages render only under a chain route (chainRoutePath in helpers/chain-url), so the param is always one of the supported ids.
+  const requiredChainId = Number(useParams().chainId);
   const chainId = useChainId();
   const isReloadPending = useIsReloadPending(chainId);
-
-  useClearWhenInvalid();
-  useSyncRequiredChainId({ chainId, requiredChainId, keepChainIdInUrl });
 
   if (isReloadPending) {
     return (
@@ -27,7 +22,7 @@ export default function RequiredChainIdGateway({ children, render, renderOnMisma
 
   const content = children ?? render?.({ requiredChainId }) ?? null;
 
-  return requiredChainId === undefined || requiredChainId === chainId ? content : renderOnMismatch({ requiredChainId });
+  return requiredChainId === chainId ? content : renderOnMismatch({ requiredChainId });
 }
 
 //A wallet chain change always reloads the page.
@@ -44,7 +39,6 @@ RequiredChainIdGateway.propTypes = {
   children: t.node,
   render: t.func,
   renderOnMismatch: t.func,
-  keepChainIdInUrl: t.bool,
 };
 
 RequiredChainIdGateway.defaultProps = {
@@ -52,7 +46,6 @@ RequiredChainIdGateway.defaultProps = {
   renderOnMismatch(props) {
     return <DefaultRenderOnMismatch {...props} />;
   },
-  keepChainIdInUrl: false,
 };
 
 function DefaultRenderOnMismatch({ requiredChainId }) {
@@ -66,87 +59,6 @@ function DefaultRenderOnMismatch({ requiredChainId }) {
 DefaultRenderOnMismatch.propTypes = {
   requiredChainId: t.number,
 };
-
-export function useSetRequiredChainId() {
-  const history = useHistory();
-  const location = useLocation();
-  const queryParams = useQueryParams();
-
-  return React.useCallback(
-    (requiredChainId, { location: newLocation } = {}) => {
-      if (Number.isNaN(Number.parseInt(requiredChainId, 10))) {
-        return;
-      }
-
-      const newLocationMixin = typeof newLocation === "string" ? { pathname: newLocation } : newLocation;
-
-      const newQueryParams = Object.fromEntries(
-        Object.entries({
-          ...queryParams,
-          requiredChainId,
-        })
-      );
-      history.replace({
-        ...location,
-        ...newLocationMixin,
-        search: new URLSearchParams(newQueryParams).toString(),
-      });
-    },
-    [history, location, queryParams]
-  );
-}
-
-export function useClearRequiredChainId() {
-  const history = useHistory();
-  const location = useLocation();
-  const queryParams = useQueryParams();
-
-  return React.useCallback(() => {
-    const newQueryParams = Object.fromEntries(
-      Object.entries({
-        ...queryParams,
-      }).filter(([key, _]) => key !== "requiredChainId")
-    );
-    history.replace({
-      ...location,
-      search: new URLSearchParams(newQueryParams).toString(),
-    });
-  }, [history, location, queryParams]);
-}
-
-function useSyncRequiredChainId({ chainId, requiredChainId, keepChainIdInUrl }) {
-  const clear = useClearRequiredChainId();
-  const setRequiredChainId = useSetRequiredChainId();
-
-  React.useEffect(() => {
-    //Without a `chainID`, there's nothing to sync. Without this guard, undefined would get compared to undefined, and we'd get an infinite loop.
-    if (!chainId) {
-      return;
-    }
-
-    //Keep the chain in the URL, so a copied link opens the case on the correct chain. Only used in the case page, currently.
-    if (keepChainIdInUrl) {
-      //Only add the param when it is missing. Overwriting would silently open the wrong case instead of asking to switch.
-      if (requiredChainId === undefined) {
-        setRequiredChainId(chainId);
-      }
-    } else if (requiredChainId === chainId) {
-      //The param is not needed in this scenario.
-      clear();
-    }
-  }, [keepChainIdInUrl, chainId, requiredChainId, clear, setRequiredChainId]);
-}
-
-function useClearWhenInvalid() {
-  const clear = useClearRequiredChainId();
-  const { requiredChainId } = useQueryParams();
-
-  React.useEffect(() => {
-    if (requiredChainId !== undefined && Number.isNaN(Number.parseInt(requiredChainId, 10))) {
-      clear();
-    }
-  }, [requiredChainId, clear]);
-}
 
 const StyledCard = styled(Card)`
   margin: 20px auto 0;

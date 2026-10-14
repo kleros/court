@@ -1,0 +1,84 @@
+import React from "react";
+import ReactDOM from "react-dom";
+import { act } from "react-dom/test-utils";
+import WalletConnector from "./wallet-connector";
+import { connectWallet, detectWallets } from "../bootstrap/wallet-connector";
+import { toPath } from "../helpers/chain-url";
+
+jest.mock("../bootstrap/wallet-connector", () => ({ connectWallet: jest.fn(), detectWallets: jest.fn() }));
+jest.mock("../bootstrap/dataloader", () => ({ VIEW_ONLY_ADDRESS: "0x0000000000000000000000000000000000000000" }));
+//No wallet account yet: the Connect Wallet button is shown.
+jest.mock("@drizzle/react-plugin", () => ({
+  drizzleReactHooks: { useDrizzleState: (select) => select({ accounts: [] }) },
+}));
+
+let container;
+let reloadedAt;
+
+beforeEach(() => {
+  //antd's modal closes with an animation on timers; fake timers let it finish before unmounting.
+  jest.useFakeTimers();
+  reloadedAt = [];
+  //Records the address bar at reload time: the new document boots on whatever chain it names.
+  jest.spyOn(window.location, "reload").mockImplementation(() => reloadedAt.push(toPath(window.location)));
+  detectWallets.mockReturnValue([{ id: "mock", name: "Mock Wallet", icon: "" }]);
+  container = document.createElement("div");
+  document.body.appendChild(container);
+});
+
+afterEach(() => {
+  //The close animation chains timers, so run them all, not only those pending now.
+  act(() => {
+    jest.runAllTimers();
+  });
+  ReactDOM.unmountComponentAtNode(container);
+  jest.useRealTimers();
+  document.body.innerHTML = "";
+  jest.restoreAllMocks();
+  connectWallet.mockReset();
+  window.history.replaceState(null, "", "/");
+});
+
+//Connects from `url` with a wallet that ends up on `walletChain` (what eth_chainId returns), or whose chain cannot be read (an Error).
+async function connectFrom(url, walletChain) {
+  window.history.replaceState(null, "", url);
+  const request = jest.fn(() =>
+    walletChain instanceof Error ? Promise.reject(walletChain) : Promise.resolve(walletChain)
+  );
+  connectWallet.mockResolvedValue({ request });
+  act(() => {
+    ReactDOM.render(<WalletConnector />, container);
+  });
+  act(() => {
+    container.querySelector("button").click();
+  });
+  await act(async () => {
+    [...document.querySelectorAll("strong")].find((el) => el.textContent === "Mock Wallet").parentElement.click();
+  });
+  return request;
+}
+
+describe("WalletConnector", () => {
+  it("follows the wallet's chain on courts when the switch on connect was declined", async () => {
+    const historyLength = window.history.length;
+    const request = await connectFrom("/100/courts?x=1#h", "0x1");
+    expect(request).toHaveBeenCalledWith({ method: "eth_chainId" });
+    expect(reloadedAt).toEqual(["/1/courts?x=1#h"]);
+    expect(window.history.length).toBe(historyLength);
+  });
+
+  it("also reads a wallet that reports its chain as a number", async () => {
+    await connectFrom("/1/courts", 100);
+    expect(reloadedAt).toEqual(["/100/courts"]);
+  });
+
+  it("keeps the case page's chain, so the mismatch modal asks to switch", async () => {
+    await connectFrom("/100/cases/5", "0x1");
+    expect(reloadedAt).toEqual(["/100/cases/5"]);
+  });
+
+  it("reloads in place when the wallet's chain cannot be read", async () => {
+    await connectFrom("/100/courts", new Error("eth_chainId failed"));
+    expect(reloadedAt).toEqual(["/100/courts"]);
+  });
+});

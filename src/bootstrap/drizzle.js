@@ -7,6 +7,7 @@ import Pinakion from "../assets/contracts/pinakion.json";
 import PolicyRegistry from "../assets/contracts/policy-registry.json";
 import UniswapV2Factory from "../assets/contracts/uniswap-v2-factory.json";
 import UniswapV2Router02 from "../assets/contracts/uniswap-v2-router-02.json";
+import { resolveFallbackChainId } from "../helpers/chain-url";
 
 const defaultOptions = {
   networkWhitelist: [
@@ -114,7 +115,7 @@ function createDrizzle({ fallbackChainId, customProvider } = {}) {
 
 /**
  * Workaround to allow non-web3 browsers to connect to the right chain
- * when `requiredChainId` query string param is set.
+ * when the URL names a chain (path prefix, or the legacy `requiredChainId` param).
  *
  * Multi-chain support requires e-mail include to notifications include
  * such param in links to make sure the user will be redirected to the
@@ -131,33 +132,14 @@ function createDrizzle({ fallbackChainId, customProvider } = {}) {
  * Users with web3 support will not be affected.
  */
 export const FALLBACK_CHAIN_ID_STORAGE_KEY = "@@kleros/court/fallback-chain-id";
-const DEFAULT_FALLBACK_CHAIN_ID = 1;
-
-const extractFromQueryString = (param, search) => {
-  if (typeof URLSearchParams !== "function") {
-    const regex = new RegExp(`(\\?:\\\\?|&)?${param}=([^&]*)`);
-    const matches = regex.exec(search);
-    return matches ? matches[1] : undefined;
-  }
-
-  const params = new URLSearchParams(search);
-  return params.get(param);
-};
 
 const detectRequiredChainId = () => {
-  const fromStorage = Number.parseInt(window?.localStorage?.getItem(FALLBACK_CHAIN_ID_STORAGE_KEY), 10);
-  const fromQueryString = Number.parseInt(
-    extractFromQueryString("requiredChainId", window?.location?.search ?? ""),
-    10
+  const { chainId, shouldStore } = resolveFallbackChainId(
+    window.location,
+    window?.localStorage?.getItem(FALLBACK_CHAIN_ID_STORAGE_KEY)
   );
 
-  const chainId = !Number.isNaN(fromQueryString)
-    ? fromQueryString
-    : !Number.isNaN(fromStorage)
-    ? fromStorage
-    : DEFAULT_FALLBACK_CHAIN_ID;
-
-  if (Number.isNaN(fromStorage) || fromStorage !== fromQueryString) {
+  if (shouldStore) {
     window.localStorage.setItem(FALLBACK_CHAIN_ID_STORAGE_KEY, chainId);
   }
 

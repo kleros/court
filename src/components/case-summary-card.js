@@ -1,6 +1,7 @@
 import { Col, Row } from "antd";
 import React from "react";
-import { Link, withRouter } from "react-router-dom";
+import { withRouter } from "react-router-dom";
+import { ChainLink } from "./chain-navigation";
 import styled from "styled-components/macro";
 import t from "prop-types";
 
@@ -38,7 +39,7 @@ const CaseSummaryText = styled.div`
 `;
 
 const CaseSummaryCard = ({ dispute }) => (
-  <Link to={`/cases/${dispute.ID}`}>
+  <ChainLink to={`/cases/${dispute.ID}`}>
     <StyledCaseSummary>
       <CaseSummaryBody>
         <Row>
@@ -52,7 +53,7 @@ const CaseSummaryCard = ({ dispute }) => (
         <CaseSummaryText>{dispute.metaEvidence ? dispute.metaEvidence.title : ""}</CaseSummaryText>
       </CaseSummaryBody>
     </StyledCaseSummary>
-  </Link>
+  </ChainLink>
 );
 
 export default withRouter(CaseSummaryCard);

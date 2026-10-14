@@ -4,6 +4,7 @@ import styled from "styled-components/macro";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { detectWallets, connectWallet } from "../bootstrap/wallet-connector";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import { chainAfterConnect, reloadOnChain } from "../helpers/chain-url";
 
 const { useDrizzleState } = drizzleReactHooks;
 
@@ -74,10 +75,15 @@ export default function WalletConnector() {
     message.loading({ content: "Connecting wallet…", key: msgKey, duration: 0 });
 
     try {
-      await connectWallet(walletId);
+      const provider = await connectWallet(walletId);
       message.success({ content: "Wallet connected successfully!", key: msgKey });
       setModalVisible(false);
-      window.location.reload();
+      const chainId = chainAfterConnect(window.location, await getWalletChainId(provider));
+      if (chainId) {
+        reloadOnChain(chainId);
+      } else {
+        window.location.reload();
+      }
     } catch (err) {
       setError(err.message);
       message.error({ content: err.message, key: msgKey });
@@ -122,6 +128,17 @@ export default function WalletConnector() {
       </StyledModal>
     </>
   );
+}
+
+//The wallet's chain after connecting. Number() reads the standard hex string ("0x64") and the plain numbers some wallets return.
+//A failed request must not block the reload: the wallet is already connected. Anything that is not a supported chain id
+//makes the caller reload in place, as before.
+async function getWalletChainId(provider) {
+  try {
+    return Number(await provider.request({ method: "eth_chainId" }));
+  } catch {
+    return undefined;
+  }
 }
 
 const StyledEmptyText = styled(Text)`

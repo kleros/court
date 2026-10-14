@@ -6,7 +6,7 @@ import CaseDetailsCard from "../components/case-details-card.jsx";
 import ETHAmount from "../components/eth-amount";
 import TimeAgo from "../components/time-ago";
 import TopBanner from "../components/top-banner";
-import RequiredChainIdGateway, { useSetRequiredChainId } from "../components/required-chain-id-gateway";
+import RequiredChainIdGateway from "../components/required-chain-id-gateway";
 import RequiredChainIdModal from "../components/required-chain-id-modal";
 import styled from "styled-components/macro";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
@@ -14,6 +14,7 @@ import { requestSwitchChain } from "../api/side-chain";
 import useChainId from "../hooks/use-chain-id";
 import useGetDraws from "../hooks/use-get-draws";
 import { chainIdToNetworkName } from "../helpers/networks";
+import { reloadOnChain } from "../helpers/chain-url";
 import C404 from "./404";
 
 const { useDrizzle, useDrizzleState } = drizzleReactHooks;
@@ -58,7 +59,6 @@ export default function Case() {
   const dispute = useCacheCall("KlerosLiquid", "disputes", ID);
   const dispute2 = useCacheCall("KlerosLiquid", "getDispute", ID);
   const chainId = useChainId();
-  const setRequiredChainId = useSetRequiredChainId();
   const draws = useGetDraws(chainId, `address: "${drizzleState.account}", disputeID: ${ID}`);
 
   const disputeData = useCacheCall(["KlerosLiquid"], (call) => {
@@ -114,8 +114,7 @@ export default function Case() {
   async function handleChainSwitchToMainnet() {
     setIsModalOpen(false);
     if (drizzleState.account === VIEW_ONLY_ADDRESS) {
-      setRequiredChainId(1);
-      window.location.reload();
+      reloadOnChain(1);
     } else {
       try {
         await requestSwitchChain(drizzle.web3.currentProvider, 1);
@@ -212,7 +211,6 @@ export default function Case() {
 
   return (
     <RequiredChainIdGateway
-      keepChainIdInUrl
       renderOnMismatch={({ requiredChainId }) => <RequiredChainIdModal requiredChainId={requiredChainId} />}
     >
       {renderContent()}

@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import styled from "styled-components/macro";
-import { Link } from "react-router-dom";
+import { ChainLink } from "../components/chain-navigation";
 import { Button, Col, Row, Spin } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
@@ -39,7 +39,7 @@ export default function Courts() {
         description={<>Select courts and stake PNK</>}
         extra={
           <StyledButtonBar>
-            <Link
+            <ChainLink
               to="/tokens"
               style={{
                 display: isBuyPnkButtonVisible ? "inline-block" : "none",
@@ -48,7 +48,7 @@ export default function Courts() {
               <StyledButton size="large" type="secondary">
                 Buy PNK
               </StyledButton>
-            </Link>
+            </ChainLink>
             <StyledButton
               onClick={useCallback(() => setStakingID(null), [])}
               size="large"
