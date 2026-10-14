@@ -129,21 +129,26 @@ export default function Case() {
     if (error) return <C404 />;
 
     if (isDisputeTooOld && chainId !== 1) {
+      //The dispute does not exist on this chain, so the page behind the modal is the 404.
+      //Closing the modal, or declining the switch, then leaves the 404 instead of a blank page.
       return (
-        <Modal
-          title="Dispute Not Found"
-          visible={isModalOpen}
-          onCancel={() => setIsModalOpen(false)}
-          footer={[
-            <Button key="switch" type="primary" onClick={handleChainSwitchToMainnet}>
-              Switch to Mainnet
-            </Button>,
-          ]}
-        >
-          <p>
-            The dispute with ID {ID} does not exist on {chainIdToNetworkName[chainId]}. Please switch to Mainnet.
-          </p>
-        </Modal>
+        <>
+          <C404 />
+          <Modal
+            title="Dispute Not Found"
+            visible={isModalOpen}
+            onCancel={() => setIsModalOpen(false)}
+            footer={[
+              <Button key="switch" type="primary" onClick={handleChainSwitchToMainnet}>
+                Switch to Mainnet
+              </Button>,
+            ]}
+          >
+            <p>
+              The dispute with ID {ID} does not exist on {chainIdToNetworkName[chainId]}. Please switch to Mainnet.
+            </p>
+          </Modal>
+        </>
       );
     }
 
