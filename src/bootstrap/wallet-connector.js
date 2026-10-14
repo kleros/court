@@ -1,4 +1,5 @@
 import { FALLBACK_CHAIN_ID_STORAGE_KEY } from "./drizzle";
+import { urlChainId } from "../helpers/chain-url";
 
 let hasRequestedEip6963Announcements = false;
 const discoveredWalletIDs = new Set();
@@ -126,13 +127,15 @@ export async function connectWallet(walletId) {
       window.localStorage.setItem(STORAGE_KEY_LAST_WALLET_ID, wallet.id);
     }
 
-    //If the user was browsing a specific chain in view mode, try to switch to it, so user remains in the chain he was.
-    const fallbackChainId = window.localStorage?.getItem(FALLBACK_CHAIN_ID_STORAGE_KEY);
-    if (fallbackChainId) {
+    //Try to switch to the chain the user was browsing in view mode, so they stay on it. The URL names that chain.
+    //The stored chain is only the fallback for a page whose URL names none, such as a 404: another tab may have stored a
+    //different chain since this page loaded.
+    const browsedChainId = urlChainId(window.location) ?? window.localStorage?.getItem(FALLBACK_CHAIN_ID_STORAGE_KEY);
+    if (browsedChainId) {
       try {
         await wallet.provider.request({
           method: "wallet_switchEthereumChain",
-          params: [{ chainId: `0x${Number(fallbackChainId).toString(16)}` }],
+          params: [{ chainId: `0x${Number(browsedChainId).toString(16)}` }],
         });
       } catch (_) {
         //Ignore. The wallet may not support this chain or the user may have rejected it.
