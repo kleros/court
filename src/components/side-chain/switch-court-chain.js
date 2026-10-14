@@ -1,8 +1,9 @@
 import React, { useMemo } from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
-import { Button, Icon, Modal, Typography } from "antd";
+import { Button, Icon, message, Modal, Typography } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
+import { useHistory } from "react-router-dom";
 import Web3 from "web3";
 import { ButtonLink } from "../../adapters/antd";
 import {
@@ -239,6 +240,32 @@ CustomButton.defaultProps = {
   as: ButtonLink,
 };
 
+//"Get xPNK": open the tokens page through the router, so the address bar and the page always agree, then ask the wallet
+//to switch. If it accepts, the reload after chainChanged lands on the tokens page of the new chain.
+//If it declines or fails, the user stays on the tokens page they asked for. A failure is reported, so the user can switch
+//in the wallet instead, which lands on the same page.
+export function useGetPnk(destinationChainId) {
+  const { drizzle } = useDrizzle();
+  const history = useHistory();
+  const toChain = useChainPath();
+
+  return React.useCallback(async () => {
+    history.push(toChain("/tokens"));
+    try {
+      await requestSwitchChain(drizzle.web3.currentProvider, destinationChainId);
+    } catch (err) {
+      // 4001 is the MetaMask error code when users deny permission.
+      if (err.code !== 4001) {
+        console.warn("Failed to request the switch to the side-chain:", err);
+        message.error({
+          content: `Failed to switch network. Please switch to ${chainIdToNetworkName[destinationChainId]} in your wallet.`,
+          key: "switch-chain",
+        });
+      }
+    }
+  }, [history, toChain, drizzle.web3.currentProvider, destinationChainId]);
+}
+
 function useSwitchChain(destinationChainId) {
   const { drizzle } = useDrizzle();
   const replaceChainInUrl = useReplaceChainInUrl();
@@ -311,7 +338,7 @@ function SideChainCourtModal({ balance, rawBalance, errors, trigger }) {
   const xPnkDestinationTokenSymbol = useMemo(() => getTokenSymbol(destinationChainId, "xPNK"), [destinationChainId]);
 
   const switchChain = useSwitchChain(destinationChainId);
-  const toChain = useChainPath();
+  const handleGetPnk = useGetPnk(destinationChainId);
 
   const triggerElement = React.cloneElement(trigger, {
     onClick: (e) => {
@@ -322,11 +349,6 @@ function SideChainCourtModal({ balance, rawBalance, errors, trigger }) {
       setVisible(true);
     },
   });
-
-  const handleGetPnk = React.useCallback(() => {
-    window.history.pushState({}, "", toChain("/tokens"));
-    switchChain();
-  }, [switchChain, toChain]);
 
   return (
     <>
