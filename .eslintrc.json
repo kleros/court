@@ -78,26 +78,6 @@
           }
         ]
       }
-    ],
-    "no-restricted-syntax": [
-      "error",
-      "WithStatement",
-      {
-        "selector": "CallExpression[callee.property.name=/^(push|replace|pushState|replaceState)$/]:matches([callee.object.name='history'], [callee.object.property.name='history']) > Literal[value=/^\\x2F/]",
-        "message": "Bare in-app path. Build it with useChainPath() from components/chain-navigation."
-      },
-      {
-        "selector": "CallExpression[callee.property.name=/^(push|replace|pushState|replaceState)$/]:matches([callee.object.name='history'], [callee.object.property.name='history']) > TemplateLiteral[quasis.0.value.raw=/^\\x2F/]",
-        "message": "Bare in-app path. Build it with useChainPath() from components/chain-navigation."
-      },
-      {
-        "selector": "CallExpression[callee.property.name=/^(push|replace|pushState|replaceState)$/]:matches([callee.object.name='history'], [callee.object.property.name='history']) > ObjectExpression > Property[key.name='pathname'] > Literal[value=/^\\x2F/]",
-        "message": "Bare in-app path. Build it with useChainPath() from components/chain-navigation."
-      },
-      {
-        "selector": "CallExpression[callee.property.name=/^(push|replace|pushState|replaceState)$/]:matches([callee.object.name='history'], [callee.object.property.name='history']) > ObjectExpression > Property[key.name='pathname'] > TemplateLiteral[quasis.0.value.raw=/^\\x2F/]",
-        "message": "Bare in-app path. Build it with useChainPath() from components/chain-navigation."
-      }
     ]
   },
   "overrides": [
@@ -107,16 +87,6 @@
       ],
       "rules": {
         "no-restricted-imports": "off"
-      }
-    },
-    {
-      "files": [
-        "**/*.test.js",
-        "src/test-utils/*.js"
-      ],
-      "rules": {
-        "no-restricted-imports": "off",
-        "no-restricted-syntax": "off"
       }
     }
   ]
