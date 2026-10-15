@@ -3,12 +3,14 @@ import BigNumberBase from "bignumber.js";
 // Encoding and display of Reality.eth-style answers, for the metaEvidence ruling types the court supports
 // (`uint`, `int`, `datetime`, `hash`, `bool`, `single-select`, `multiple-select`).
 //
-// These are the five functions the court used from `@reality.eth/reality-eth-lib/formatters/question` (3.4.6), plus
-// `bytes32ToString` which `getAnswerString` needs, copied here so that the dependency could be removed. The output must
-// stay byte-identical to the library's: `answerToBytes32` and `padToBytes32` produce the choice that jurors commit to
-// and cast, and `getAnswerString` renders the votes already on-chain. Quirks of the library are therefore kept on
-// purpose (see `reality-answer-format.test.js`, whose expected values were recorded from the library). The only intended
-// difference is `minNumber` for `int`, which crashed in the library because of a bignumber.js API mismatch.
+// These are the functions the court used from `@reality.eth/reality-eth-lib/formatters/question` (3.4.6), plus
+// `bytes32ToString` which `getAnswerString` needs, copied here so that the dependency could be removed. For every input
+// the court passes, the output must stay identical to the library's: `answerToBytes32` and `padToBytes32` produce the
+// choice that jurors commit to and cast, and `getAnswerString` renders the votes already on-chain. Quirks of the
+// library are therefore kept on purpose (see `reality-answer-format.test.js`, whose expected values were recorded from
+// the library). Malformed inputs the court never passes, such as numbers or whitespace where a hex string is expected,
+// throw here where the library coerced them. `int` answers are only decoded, for display: the vote form has no input
+// for them, so encoding them is not supported.
 //
 // The court changes BigNumber's global formatting configuration (`EXPONENTIAL_AT`) while rendering numeric votes. The
 // library used its own copy of bignumber.js with the default configuration, so this module uses a private clone with
@@ -39,22 +41,19 @@ const hexToBigNumber = (hex) => {
   return new BigNumber(hex.toLowerCase(), 16);
 };
 
-export const padToBytes32 = (n, raw) => {
+export const padToBytes32 = (n) => {
   let padded = n;
   while (padded.length < 64) padded = "0" + padded;
-  return raw ? padded : "0x" + padded;
+  return "0x" + padded;
 };
 
-// Upper bound of the answers of the question type in the question's unit: 2^256 - 1 divided by 10^decimals, and
-// halved for `int`, as the library computed it.
+// Upper bound of the answers of the question type in the question's unit: 2^256 - 1 divided by 10^decimals, as the
+// library computed it.
 export const maxNumber = (qjson) => {
   let divby = new BigNumber(1);
   if (qjson.decimals) divby = tenPow(qjson.decimals);
-  if (qjson.type === "int") divby = divby.times(2);
   return UINT256_MAX.dividedBy(divby);
 };
-
-export const minNumber = (qjson) => (qjson.type === "int" ? maxNumber(qjson).negated() : new BigNumber(0));
 
 // `selections[i]` is bit i of the bitmask.
 const arrayToBitmask = (selections) => {
@@ -66,18 +65,13 @@ const arrayToBitmask = (selections) => {
 // Encodes an answer as the bytes32 hex string that Reality.eth stores on-chain.
 // `answer` is an array of booleans for `multiple-select`, a unix timestamp for `datetime`, a hex string for `hash` and
 // a decimal string otherwise. Like the library, a `uint` answer is multiplied by 10^decimals (giving a hex string) and
-// then read as hex, so with 0 decimals the raw decimal input itself is read as hex ("10" encodes 0x10); an `int`
-// answer is never scaled, is always read as hex and is encoded in two's complement.
+// then read as hex, so with 0 decimals the raw decimal input itself is read as hex ("10" encodes 0x10).
 export const answerToBytes32 = (answer, qjson) => {
   const qtype = qjson.type;
   let value = answer;
   if (qtype === "multiple-select") value = arrayToBitmask(answer);
   const decimals = qtype === "uint" ? parseDecimals(qjson.decimals) : 0;
   if (decimals > 0) value = new BigNumber(value).times(tenPow(decimals)).toString(16);
-  if (qtype === "int") {
-    const n = hexToBigNumber(value);
-    return padToBytes32((n.lt(0) ? TWO_POW_256.plus(n) : n).toString(16));
-  }
   if (qtype === "uint") return padToBytes32(hexToBigNumber(value).toString(16));
   return padToBytes32(new BigNumber(value).toString(16));
 };

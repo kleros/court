@@ -5,7 +5,7 @@ import { Alert, Button, Card, Checkbox, Col, DatePicker, Icon, Input, Row, Spin,
 import InputNumber from "rc-input-number";
 import BigNumber from "bignumber.js";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
-import { answerToBytes32, maxNumber, minNumber, padToBytes32 } from "../helpers/reality-answer-format";
+import { answerToBytes32, maxNumber, padToBytes32 } from "../helpers/reality-answer-format";
 import ReactMarkdown from "react-markdown";
 import createPersistedState from "use-persisted-state";
 import Web3 from "web3";
@@ -149,12 +149,7 @@ const VoteOptions = ({ metaEvidence, votesData, complexRuling, setComplexRuling,
               type: metaEvidence.rulingOptions.type,
             }).minus(1)
           );
-          const min = new BigNumber(
-            minNumber({
-              decimals,
-              type: metaEvidence.rulingOptions.type,
-            })
-          );
+          const min = new BigNumber(0);
           const stringTest = BigNumber.min(BigNumber.max(bigValue, min), max).toFixed(decimalsFormat);
           setComplexRuling(stringTest);
         }}
@@ -171,6 +166,13 @@ const VoteOptions = ({ metaEvidence, votesData, complexRuling, setComplexRuling,
   return (
     <StyledButtonsDiv>
       {inputComponent}
+      {!inputComponent && !isSingleSelect ? (
+        <Alert
+          message="The court interface does not support this ruling type. Jurors can only refuse to arbitrate."
+          showIcon
+          type="warning"
+        />
+      ) : null}
       {inputComponent && !isSingleSelect ? (
         <StyledButton disabled={!votesData.canVote || !complexRuling} onClick={onVoteClick} size="large" type="primary">
           Submit

@@ -108,7 +108,6 @@
     "web3": "1.5.2"
   },
   "resolutions": {
-    "html-to-text": "^7.0.0",
     "graceful-fs": "^4.2.11",
     "cipher-base": "^1.0.5",
     "sha.js": "^2.4.12"

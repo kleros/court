@@ -1,18 +1,11 @@
 import BigNumber from "bignumber.js";
 import Web3 from "web3";
-import {
-  answerToBytes32,
-  bytes32ToString,
-  getAnswerString,
-  maxNumber,
-  minNumber,
-  padToBytes32,
-} from "./reality-answer-format";
+import { answerToBytes32, bytes32ToString, getAnswerString, maxNumber, padToBytes32 } from "./reality-answer-format";
 
 // Every expected value below was produced by @reality.eth/reality-eth-lib 3.4.6 (formatters/question), the library these
 // functions replace, called with the same arguments; the replacement must match it byte for byte. answerToBytes32 and
 // padToBytes32 produce the choice a juror commits to and casts, and getAnswerString renders the votes already on-chain.
-// The one exception is minNumber for int rulings, which crashed in the library (see its test).
+// int answers are only decoded (for display): the vote form has no int input, so they are never encoded.
 
 const { toBN } = Web3.utils;
 // How answer-string.js turns an on-chain vote into the answer passed to getAnswerString (vote 0 gives a junk string).
@@ -25,16 +18,15 @@ const MAX_UINT256 = toBN(2).pow(toBN(256)).sub(toBN(1)).toString();
 const HASH = "0x9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08";
 
 describe("padToBytes32", () => {
-  it("left-pads to 32 bytes and prefixes 0x unless raw", () => {
+  it("left-pads to 32 bytes and prefixes 0x", () => {
     expect(padToBytes32("1")).toBe("0x0000000000000000000000000000000000000000000000000000000000000001");
-    expect(padToBytes32("ff", true)).toBe("00000000000000000000000000000000000000000000000000000000000000ff");
     expect(padToBytes32(HASH.slice(2))).toBe("0x9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08");
     expect(padToBytes32("-1")).toBe("0x00000000000000000000000000000000000000000000000000000000000000-1");
   });
 });
 
-describe("maxNumber and minNumber (the bounds of the numeric vote input)", () => {
-  it("divide the uint256 maximum by 10^decimals, halved for int", () => {
+describe("maxNumber (the upper bound of the uint vote input and the datetime picker)", () => {
+  it("divides the uint256 maximum by 10^decimals", () => {
     expect(maxNumber({ decimals: 18, type: "uint" }).toFixed()).toBe(
       "115792089237316195423570985008687907853269984665640564039457.584007913129639935"
     );
@@ -44,17 +36,8 @@ describe("maxNumber and minNumber (the bounds of the numeric vote input)", () =>
     expect(maxNumber({ type: "uint" }).toFixed()).toBe(
       "115792089237316195423570985008687907853269984665640564039457584007913129639935"
     );
-    expect(maxNumber({ decimals: 2, type: "int" }).toFixed()).toBe(
-      "578960446186580977117854925043439539266349923328202820197287920039565648199.675"
-    );
     expect(maxNumber({ type: "datetime" }).toFixed()).toBe(
       "115792089237316195423570985008687907853269984665640564039457584007913129639935"
-    );
-    expect(minNumber({ decimals: 18, type: "uint" }).toFixed()).toBe("0");
-  });
-  it("minNumber for int is minus maxNumber (the library threw '.neg is not a function' here)", () => {
-    expect(minNumber({ decimals: 2, type: "int" }).toFixed()).toBe(
-      "-578960446186580977117854925043439539266349923328202820197287920039565648199.675"
     );
   });
 });
@@ -125,6 +108,37 @@ describe("answerToBytes32 (encoding the juror's input before it is committed or 
     );
     expect(answerToBytes32([true, false, false, false, true], { decimals: undefined, type: "multiple-select" })).toBe(
       "0x0000000000000000000000000000000000000000000000000000000000000011"
+    );
+  });
+  it("encodes a multiple-select given as 0/1 numbers, the shape the brute-force reveal passes, like booleans", () => {
+    const ms = { decimals: undefined, type: "multiple-select" };
+    expect(answerToBytes32([0, 0, 0], ms)).toBe("0x0000000000000000000000000000000000000000000000000000000000000000");
+    expect(answerToBytes32([1, 0, 0], ms)).toBe("0x0000000000000000000000000000000000000000000000000000000000000001");
+    expect(answerToBytes32([0, 1, 0], ms)).toBe("0x0000000000000000000000000000000000000000000000000000000000000002");
+    expect(answerToBytes32([1, 1, 0], ms)).toBe("0x0000000000000000000000000000000000000000000000000000000000000003");
+    expect(answerToBytes32([0, 0, 1], ms)).toBe("0x0000000000000000000000000000000000000000000000000000000000000004");
+    expect(answerToBytes32([1, 0, 1], ms)).toBe("0x0000000000000000000000000000000000000000000000000000000000000005");
+    expect(answerToBytes32([0, 1, 1], ms)).toBe("0x0000000000000000000000000000000000000000000000000000000000000006");
+    expect(answerToBytes32([1, 1, 1], ms)).toBe("0x0000000000000000000000000000000000000000000000000000000000000007");
+    expect(answerToBytes32([1, 0, 0, 0, 1], ms)).toBe(
+      "0x0000000000000000000000000000000000000000000000000000000000000011"
+    );
+  });
+  it("ignores the precision for every type but uint", () => {
+    expect(answerToBytes32(1704067200, { decimals: 2, type: "datetime" })).toBe(
+      "0x0000000000000000000000000000000000000000000000000000000065920080"
+    );
+    expect(answerToBytes32(1704067200, { decimals: 18, type: "datetime" })).toBe(
+      "0x0000000000000000000000000000000000000000000000000000000065920080"
+    );
+    expect(answerToBytes32("0x1", { decimals: 2, type: "hash" })).toBe(
+      "0x0000000000000000000000000000000000000000000000000000000000000001"
+    );
+    expect(answerToBytes32([true, false, true], { decimals: 2, type: "multiple-select" })).toBe(
+      "0x0000000000000000000000000000000000000000000000000000000000000005"
+    );
+    expect(answerToBytes32([1, 0, 1], { decimals: 2, type: "multiple-select" })).toBe(
+      "0x0000000000000000000000000000000000000000000000000000000000000005"
     );
   });
   it("gives the same on-chain choice as before once the court adds 1", () => {
