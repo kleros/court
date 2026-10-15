@@ -292,10 +292,14 @@ describe("resolveFallbackChainId", () => {
     });
   });
 
-  it("reads the raw pathname, so percent-encoded prefix digits are not a prefix at boot", () => {
+  it("reads a percent-encoded prefix the way the router does", () => {
     const raw = "/%31%30%30/courts";
-    expect(resolveFallbackChainId({ pathname: raw, search: "" }, "1").chainId).toBe(1);
+    expect(resolveFallbackChainId({ pathname: raw, search: "" }, "1").chainId).toBe(100);
     expect(splitChainPrefix(decodeURI(raw)).chainId).toBe(100);
+  });
+
+  it("falls back to storage on a path the router cannot decode, without throwing", () => {
+    expect(resolveFallbackChainId({ pathname: "/100%/courts", search: "" }, "1").chainId).toBe(1);
   });
 });
 

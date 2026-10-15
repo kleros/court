@@ -93,11 +93,22 @@ export function canonicalLocation(location, connectedChainId) {
   return toPath(target) === toPath(location) ? null : target; //Write only when the URL changes.
 }
 
+//decodeURI, as the router applies it. A malformed path stays as it is: the router then fails on it inside the error boundary.
+function decodePathname(pathname) {
+  try {
+    return decodeURI(pathname);
+  } catch {
+    return pathname;
+  }
+}
+
 //Boot-time chain for view-only mode: the URL (prefix, then legacy param), then storage, then mainnet.
 //`shouldStore` keeps the previous write rule: store unless storage already holds the URL's chain.
+//`location` is the raw window.location. The router decodes the path before matching routes, so boot decodes it too:
+//otherwise "/%31%30%30/courts" would boot on the stored chain while the router shows chain 100.
 export function resolveFallbackChainId(location, storedValue) {
   const fromStorage = Number.parseInt(storedValue, 10);
-  const fromUrl = urlChainId(location);
+  const fromUrl = urlChainId({ ...location, pathname: decodePathname(location.pathname) });
   const chainId = fromUrl ?? (Number.isNaN(fromStorage) ? DEFAULT_CHAIN_ID : fromStorage);
   return { chainId, shouldStore: Number.isNaN(fromStorage) || fromStorage !== fromUrl };
 }
