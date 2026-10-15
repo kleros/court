@@ -75,10 +75,12 @@ export default function WalletConnector() {
     message.loading({ content: "Connecting wallet…", key: msgKey, duration: 0 });
 
     try {
-      const provider = await connectWallet(walletId);
+      const { provider, switched } = await connectWallet(walletId);
       message.success({ content: "Wallet connected successfully!", key: msgKey });
       setModalVisible(false);
-      const chainId = chainAfterConnect(window.location, await getWalletChainId(provider));
+      //An accepted switch put the wallet on the chain the page shows, so reload in place. Asking the wallet for its chain
+      //right away could still return the old one. Otherwise the wallet stayed put and the page may follow it.
+      const chainId = switched ? undefined : chainAfterConnect(window.location, await getWalletChainId(provider));
       if (chainId) {
         reloadOnChain(chainId);
       } else {

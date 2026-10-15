@@ -40,12 +40,13 @@ afterEach(() => {
 });
 
 //Connects from `url` with a wallet that ends up on `walletChain` (what eth_chainId returns), or whose chain cannot be read (an Error).
-async function connectFrom(url, walletChain) {
+//`switched` is whether the wallet accepted the switch to the page's chain; these tests decline it unless they say otherwise.
+async function connectFrom(url, walletChain, { switched = false } = {}) {
   window.history.replaceState(null, "", url);
   const request = jest.fn(() =>
     walletChain instanceof Error ? Promise.reject(walletChain) : Promise.resolve(walletChain)
   );
-  connectWallet.mockResolvedValue({ request });
+  connectWallet.mockResolvedValue({ provider: { request }, switched });
   act(() => {
     ReactDOM.render(<WalletConnector />, container);
   });
@@ -65,6 +66,13 @@ describe("WalletConnector", () => {
     expect(request).toHaveBeenCalledWith({ method: "eth_chainId" });
     expect(reloadedAt).toEqual(["/1/courts?x=1#h"]);
     expect(window.history.length).toBe(historyLength);
+  });
+
+  it("reloads in place after an accepted switch, without asking the wallet for its chain", async () => {
+    //The wallet still reports the old chain, as one that answers before it finishes switching would.
+    const request = await connectFrom("/100/courts", "0x1", { switched: true });
+    expect(request).not.toHaveBeenCalled();
+    expect(reloadedAt).toEqual(["/100/courts"]);
   });
 
   it("also reads a wallet that reports its chain as a number", async () => {

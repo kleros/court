@@ -104,7 +104,7 @@ export function disconnectWallet(chainId) {
   window.location.reload();
 }
 
-//Connect to a specific wallet
+//Connect to a specific wallet. Returns its provider and whether it accepted the switch to the chain the user was browsing.
 export async function connectWallet(walletId) {
   const wallets = detectWallets();
   const wallet = wallets.find((w) => w.id === walletId);
@@ -131,18 +131,20 @@ export async function connectWallet(walletId) {
     //The stored chain is only the fallback for a page whose URL names none, such as a 404: another tab may have stored a
     //different chain since this page loaded.
     const browsedChainId = urlChainId(window.location) ?? window.localStorage?.getItem(FALLBACK_CHAIN_ID_STORAGE_KEY);
+    let switched = false;
     if (browsedChainId) {
       try {
         await wallet.provider.request({
           method: "wallet_switchEthereumChain",
           params: [{ chainId: `0x${Number(browsedChainId).toString(16)}` }],
         });
+        switched = true;
       } catch (_) {
         //Ignore. The wallet may not support this chain or the user may have rejected it.
       }
     }
 
-    return wallet.provider;
+    return { provider: wallet.provider, switched };
   } catch (error) {
     const message = error && typeof error === "object" && "message" in error ? error.message : String(error);
     throw new Error(`Failed to connect to ${wallet.name}: ${message}`);

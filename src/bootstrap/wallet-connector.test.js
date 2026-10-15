@@ -3,9 +3,13 @@ import { FALLBACK_CHAIN_ID_STORAGE_KEY } from "./drizzle";
 
 const WALLET_ID = "io.test.wallet";
 let calls;
+let declinesSwitch;
 const provider = {
   request: jest.fn(({ method, params }) => {
     calls.push([method, params]);
+    if (method === "wallet_switchEthereumChain" && declinesSwitch) {
+      return Promise.reject({ code: 4001 });
+    }
     return Promise.resolve(method === "eth_requestAccounts" ? ["0xabc"] : null);
   }),
 };
@@ -22,6 +26,7 @@ beforeAll(() => {
 
 beforeEach(() => {
   calls = [];
+  declinesSwitch = false;
 });
 
 afterEach(() => {
@@ -36,20 +41,32 @@ describe("connectWallet", () => {
   it("asks the wallet for the URL's chain, even when another tab stored a different one", async () => {
     window.history.replaceState(null, "", "/100/courts");
     window.localStorage.setItem(FALLBACK_CHAIN_ID_STORAGE_KEY, "1");
-    await connectWallet(WALLET_ID);
+    const { switched } = await connectWallet(WALLET_ID);
     expect(switchRequests()).toEqual(["0x64"]);
+    expect(switched).toBe(true);
   });
 
   it("falls back to the stored chain on a page whose URL names none", async () => {
     window.history.replaceState(null, "", "/foo");
     window.localStorage.setItem(FALLBACK_CHAIN_ID_STORAGE_KEY, "100");
-    await connectWallet(WALLET_ID);
+    const { switched } = await connectWallet(WALLET_ID);
     expect(switchRequests()).toEqual(["0x64"]);
+    expect(switched).toBe(true);
   });
 
   it("asks for no switch when neither the URL nor storage names a chain", async () => {
     window.history.replaceState(null, "", "/foo");
-    await connectWallet(WALLET_ID);
+    const { provider: connected, switched } = await connectWallet(WALLET_ID);
     expect(switchRequests()).toEqual([]);
+    expect(switched).toBe(false);
+    expect(connected).toBe(provider);
+  });
+
+  it("reports a declined switch, so the page can follow the wallet's chain", async () => {
+    window.history.replaceState(null, "", "/100/courts");
+    declinesSwitch = true;
+    const { switched } = await connectWallet(WALLET_ID);
+    expect(switchRequests()).toEqual(["0x64"]);
+    expect(switched).toBe(false);
   });
 });
