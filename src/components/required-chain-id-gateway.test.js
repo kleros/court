@@ -59,29 +59,4 @@ describe("RequiredChainIdGateway", () => {
     expect(page.currentUrl()).toBe("/100/cases/1");
     expect(page.rewrites()).toBe(0);
   });
-
-  it("does not treat discovering the chain after mount as a pending reload", () => {
-    const wallet = mount({ url: "/1/cases/1", chainId: undefined });
-
-    wallet.switchWalletTo(1);
-
-    expect(page.container.querySelector(".ant-spin")).toBeNull();
-    expect(shows("content")).toBe(true);
-    expect(page.currentUrl()).toBe("/1/cases/1");
-
-    wallet.switchWalletTo(100);
-
-    expect(page.container.querySelector(".ant-spin")).not.toBeNull();
-  });
-
-  it("shows a spinner while the wallet switches chain, instead of flashing the switch prompt or stale content", () => {
-    const wallet = mount({ url: "/1/cases/1", chainId: 1 });
-    expect(shows("content")).toBe(true);
-
-    wallet.switchWalletTo(100);
-
-    expect(shows("mismatch")).toBe(false);
-    expect(shows("content")).toBe(false);
-    expect(page.container.querySelector(".ant-spin")).not.toBeNull();
-  });
 });

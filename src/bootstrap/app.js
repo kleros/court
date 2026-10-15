@@ -26,6 +26,7 @@ import DefaultFallback from "../components/error-fallback";
 import SmartContractWalletWarning from "../components/smart-contract-wallet-warning";
 import { DesktopMenu, MobileMenu } from "../components/menu";
 import { CanonicalChainUrl, ChainNavLink } from "../components/chain-navigation";
+import SwitchingNetwork from "../components/switching-network";
 import { chainRoutePath, pagePaths } from "../helpers/chain-url";
 
 export default function App() {
@@ -139,43 +140,45 @@ export default function App() {
                       </StyledHeaderRow>
                     </StyledLayoutHeader>
                     <StyledLayoutContent>
-                      <CanonicalChainUrl>
-                        <Switch>
-                          {/* Handle hash-based email confirmation links (e.g., /1/#/settings/email-confirmation) */}
-                          <Route
-                            exact
-                            path={chainRoutePath(pagePaths.home)}
-                            render={() => {
-                              //Check if hash contains email confirmation path
-                              if (
-                                typeof window !== "undefined" &&
-                                window.location.hash?.includes("/settings/email-confirmation")
-                              ) {
-                                return <EmailConfirmation />;
-                              }
-                              return <Home />;
-                            }}
-                          />
-                          <Route exact path={chainRoutePath(pagePaths.courts)}>
-                            <Courts />
-                          </Route>
-                          <Route exact path={chainRoutePath(pagePaths.cases)}>
-                            <Cases />
-                          </Route>
-                          <Route exact path={chainRoutePath(pagePaths.case)}>
-                            <Case />
-                          </Route>
-                          <Route exact path={chainRoutePath(pagePaths.tokens)}>
-                            <Tokens />
-                          </Route>
-                          <Route exact path={chainRoutePath(pagePaths.convertPnk)}>
-                            <ConvertPnk />
-                          </Route>
-                          <Route path="*">
-                            <C404 />
-                          </Route>
-                        </Switch>
-                      </CanonicalChainUrl>
+                      <SwitchingNetwork>
+                        <CanonicalChainUrl>
+                          <Switch>
+                            {/* Handle hash-based email confirmation links (e.g., /1/#/settings/email-confirmation) */}
+                            <Route
+                              exact
+                              path={chainRoutePath(pagePaths.home)}
+                              render={() => {
+                                //Check if hash contains email confirmation path
+                                if (
+                                  typeof window !== "undefined" &&
+                                  window.location.hash?.includes("/settings/email-confirmation")
+                                ) {
+                                  return <EmailConfirmation />;
+                                }
+                                return <Home />;
+                              }}
+                            />
+                            <Route exact path={chainRoutePath(pagePaths.courts)}>
+                              <Courts />
+                            </Route>
+                            <Route exact path={chainRoutePath(pagePaths.cases)}>
+                              <Cases />
+                            </Route>
+                            <Route exact path={chainRoutePath(pagePaths.case)}>
+                              <Case />
+                            </Route>
+                            <Route exact path={chainRoutePath(pagePaths.tokens)}>
+                              <Tokens />
+                            </Route>
+                            <Route exact path={chainRoutePath(pagePaths.convertPnk)}>
+                              <ConvertPnk />
+                            </Route>
+                            <Route path="*">
+                              <C404 />
+                            </Route>
+                          </Switch>
+                        </CanonicalChainUrl>
+                      </SwitchingNetwork>
                     </StyledLayoutContent>
                     <Footer />
                   </Layout>
