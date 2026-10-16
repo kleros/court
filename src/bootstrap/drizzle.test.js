@@ -1,4 +1,5 @@
 import { detectRequiredChainId, FALLBACK_CHAIN_ID_STORAGE_KEY } from "./drizzle";
+import { normalizeEncodedChainPrefix } from "../helpers/chain-url";
 
 //Boots at `url` with `stored` in localStorage (undefined: empty) and reports the chain plus every storage write.
 function boot(url, stored) {
@@ -26,6 +27,13 @@ afterEach(() => {
 describe("detectRequiredChainId", () => {
   it("boots on the path prefix over the legacy param and storage, and stores it", () => {
     expect(boot("/100/cases/1?requiredChainId=1", "1")).toEqual({ chainId: 100, writes: wrote(100), stored: "100" });
+  });
+
+  it("boots on a percent-encoded prefix after the load-time normalization, with a plain address bar", () => {
+    window.history.replaceState(null, "", "/%31%30%30/cases/1");
+    normalizeEncodedChainPrefix();
+    expect(window.location.pathname).toBe("/100/cases/1");
+    expect(boot(window.location.pathname, "1").chainId).toBe(100);
   });
 
   it("boots on a percent-encoded prefix, like the router reads it", () => {

@@ -4,6 +4,7 @@ import {
   canonicalLocation,
   chainAfterConnect,
   chainPath,
+  normalizeEncodedChainPrefix,
   pagePaths,
   reloadOnChain,
   resolveFallbackChainId,
@@ -328,6 +329,52 @@ describe("browserLocation", () => {
   it("keeps a path that cannot be decoded, without throwing", () => {
     window.history.replaceState(null, "", "/100%/courts");
     expect(browserLocation().pathname).toBe("/100%/courts");
+  });
+});
+
+describe("normalizeEncodedChainPrefix", () => {
+  let replaceStateSpy;
+
+  beforeEach(() => {
+    replaceStateSpy = jest.spyOn(window.history, "replaceState");
+  });
+
+  afterEach(() => {
+    replaceStateSpy.mockRestore();
+    window.history.replaceState(null, "", "/");
+  });
+
+  const normalize = (url) => {
+    window.history.replaceState(null, "", url);
+    replaceStateSpy.mockClear();
+    const historyLength = window.history.length;
+    normalizeEncodedChainPrefix();
+    expect(window.history.length).toBe(historyLength);
+    return toPath(window.location);
+  };
+
+  it.each([
+    ["/%31%30%30/cases/1004?x=%20#h", "/100/cases/1004?x=%20#h"],
+    ["/%31%30%30", "/100"],
+    ["/1%30%30/courts", "/100/courts"],
+    ["/%31/", "/1/"],
+    //Only the prefix is decoded: the rest stays as it was, so nothing is decoded twice.
+    ["/%31%30%30/cases/a%2520b", "/100/cases/a%2520b"],
+  ])("rewrites %p to %p", (url, expected) => {
+    expect(normalize(url)).toBe(expected);
+    expect(replaceStateSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    "/100/courts",
+    "/cases/1000",
+    "/%2531%30%30/courts",
+    "/%39%39%39/cases/1",
+    "/%E0%A4%A/courts",
+    "/cases/%31%30%30",
+  ])("leaves %p alone", (url) => {
+    expect(normalize(url)).toBe(url);
+    expect(replaceStateSpy).not.toHaveBeenCalled();
   });
 });
 

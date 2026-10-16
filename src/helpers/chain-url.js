@@ -107,6 +107,29 @@ export function browserLocation() {
   return { pathname: decoded, search, hash };
 }
 
+//A hand-written link can percent-encode the chain prefix ("/%31%30%30/courts"). The router decodes it, but the prefix
+//rewriter (reloadOnChain) reads the raw address bar, so a later switch would land on a 404.
+//Called once at load, before the router starts: rewrites such a prefix to its plain form, the rest of the URL byte for
+//byte. decodeURI, as the router decodes, so a segment counts as a prefix exactly when the router would read one.
+export function normalizeEncodedChainPrefix() {
+  const { pathname, search, hash } = window.location;
+  const segment = pathname.split("/")[1] ?? "";
+  if (!segment.includes("%")) {
+    return;
+  }
+  let decoded;
+  try {
+    decoded = decodeURI(segment);
+  } catch {
+    return; //Malformed: the router fails on it inside the error boundary, as before.
+  }
+  if (!supportedChainIds.map(String).includes(decoded)) {
+    return;
+  }
+  const rest = pathname.slice(segment.length + 1);
+  window.history.replaceState(window.history.state, "", `/${decoded}${rest}${search}${hash}`);
+}
+
 //Boot-time chain for view-only mode: the URL (prefix, then legacy param), then storage, then mainnet.
 //`shouldStore` keeps the previous write rule: store unless storage already holds the URL's chain.
 //Pass browserLocation(), so boot reads the chain the router will show.
