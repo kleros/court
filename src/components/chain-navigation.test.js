@@ -2,7 +2,13 @@ import React from "react";
 import { act } from "react-dom/test-utils";
 import { Route, Switch, useParams } from "react-router-dom";
 import { CanonicalChainUrl, ChainLink, ChainNavLink, useReplaceChainInUrl } from "./chain-navigation";
-import { chainRoutePath, detectBackForwardLoad, pagePaths } from "../helpers/chain-url";
+import {
+  chainRoutePath,
+  detectBackForwardLoad,
+  pagePaths,
+  showChainOnBackForwardLoad,
+  showWalletChainOnBackForwardLoad,
+} from "../helpers/chain-url";
 import { createBrowserHistory, createMemoryHistory } from "history";
 import { mountInRouter } from "../test-utils/memory-router";
 import useChainId from "../hooks/use-chain-id";
@@ -278,6 +284,86 @@ describe("CanonicalChainUrl on Back and Forward", () => {
       mount("/100/cases/5", 1);
       expect(page.currentUrl()).toBe("/100/cases/5");
       expect(page.rewrites()).toBe(0);
+    });
+
+    //The app writes the router's own target as soon as it knows the chain (showChainOnBackForwardLoad). Over every page,
+    //prefix, query and chain, the router then ends on the same URL as without that early write, with nothing left to do.
+    describe("ends where the router alone ends after the early write", () => {
+      const urls = [
+        ...["/", "/courts", "/cases", "/cases/5", "/tokens", "/convert-pnk", "/foo"].flatMap((path) =>
+          [1, 100].flatMap((chainId) => [
+            `/${chainId}${path}`,
+            `/${chainId}${path}?x=1#h`,
+            `/${chainId}${path}?requiredChainId=100`,
+          ])
+        ),
+        "/courts",
+        "/cases/5?requiredChainId=100",
+        "/100/%63ourts",
+        "/999/courts",
+        //Crafted case URLs from the red team: the router decodes their ID twice more than a single decodeURI.
+        "/100/cases/%2535?requiredChainId=1",
+        "/100/cases/%252535?requiredChainId=1",
+      ];
+      const openWith = (url, chainId, early) => {
+        window.history.replaceState(null, "", url);
+        if (early) {
+          showChainOnBackForwardLoad(chainId);
+        }
+        const wroteEarly = `${window.location.pathname}${window.location.search}${window.location.hash}` !== url;
+        mount(undefined, chainId, undefined, createBrowserHistory());
+        const result = { url: page.currentUrl(), rewrites: page.rewrites(), wroteEarly };
+        page.unmount();
+        page = undefined;
+        return result;
+      };
+
+      it.each(urls)("%p", (url) => {
+        [1, 100, 10200].forEach((chainId) => {
+          const routerAlone = openWith(url, chainId, false);
+          const withEarlyWrite = openWith(url, chainId, true);
+          expect([chainId, withEarlyWrite.url]).toEqual([chainId, routerAlone.url]);
+          //Whenever the early write changed the URL, it was the router's whole job. It writes only on prefixed pages
+          //that follow the chain; the case page, bare and legacy URLs stay the router's.
+          expect([chainId, withEarlyWrite.wroteEarly ? withEarlyWrite.rewrites : 0]).toEqual([chainId, 0]);
+          const isFollowingPage = /^\/(1|100|10200|11155111)(\/|\/courts|\/cases|\/tokens|\/convert-pnk)?([?#]|$)/.test(
+            decodeURI(url)
+          );
+          expect([chainId, withEarlyWrite.wroteEarly]).toEqual([chainId, isFollowingPage && routerAlone.rewrites > 0]);
+        });
+      });
+    });
+
+    //Codex's sequence: the router corrects the URL, the switch-court fallback replaces it back to the loaded URL, and only
+    //then does a slow wallet answer. The answer must not touch the address bar behind the router's back.
+    it("ignores a wallet answer that comes after the router changed the entry, even back to the same URL", async () => {
+      window.history.replaceState(null, "", "/100/courts");
+      let answer;
+      const pending = showWalletChainOnBackForwardLoad({ request: () => new Promise((resolve) => (answer = resolve)) });
+      mount(undefined, 1, undefined, createBrowserHistory());
+      expect(page.currentUrl()).toBe("/1/courts");
+      navigate((history) => history.replace("/100/courts"));
+      await act(async () => {
+        answer("0x1");
+        await pending;
+      });
+      expect(window.location.pathname).toBe("/100/courts");
+      expect(page.currentUrl()).toBe("/100/courts");
+    });
+
+    //Red team: the router rendered without changing the URL, then a wallet answer comes late with another chain.
+    it("ignores a wallet answer that comes after the pages were shown, even if the URL never changed", async () => {
+      window.history.replaceState(null, "", "/1/courts");
+      let answer;
+      const pending = showWalletChainOnBackForwardLoad({ request: () => new Promise((resolve) => (answer = resolve)) });
+      mount(undefined, 1, undefined, createBrowserHistory());
+      expect(page.rewrites()).toBe(0);
+      await act(async () => {
+        answer("0x64");
+        await pending;
+      });
+      expect(window.location.pathname).toBe("/1/courts");
+      expect(page.currentUrl()).toBe("/1/courts");
     });
 
     it("keeps later paths it has shown, as on any page", () => {

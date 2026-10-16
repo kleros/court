@@ -27,7 +27,12 @@ import SmartContractWalletWarning from "../components/smart-contract-wallet-warn
 import { DesktopMenu, MobileMenu } from "../components/menu";
 import { CanonicalChainUrl, ChainNavLink } from "../components/chain-navigation";
 import SwitchingNetwork from "../components/switching-network";
-import { chainRoutePath, pagePaths } from "../helpers/chain-url";
+import {
+  chainRoutePath,
+  pagePaths,
+  showChainOnBackForwardLoad,
+  showWalletChainOnBackForwardLoad,
+} from "../helpers/chain-url";
 
 export default function App() {
   const [customDrizzle, setCustomDrizzle] = useState(null);
@@ -35,6 +40,12 @@ export default function App() {
 
   //Check if wallet is already connected
   useEffect(() => {
+    const startViewOnly = () => {
+      const fallbackChainId = detectRequiredChainId();
+      showChainOnBackForwardLoad(fallbackChainId);
+      setCustomDrizzle(createDrizzle({ fallbackChainId }));
+    };
+
     (async () => {
       try {
         //Trigger wallet search and await results
@@ -42,7 +53,7 @@ export default function App() {
 
         //No wallets found, enter view mode
         if (wallets.length === 0) {
-          setCustomDrizzle(createDrizzle({ fallbackChainId: detectRequiredChainId() }));
+          startViewOnly();
           return;
         }
 
@@ -61,16 +72,18 @@ export default function App() {
           }
 
           if (accounts && accounts.length > 0) {
+            //Not awaited: a slow wallet must not hold up loading.
+            showWalletChainOnBackForwardLoad(provider);
             handleWalletConnected(provider);
             return;
           }
         }
 
         //Wallets available but not connected — enter view mode
-        setCustomDrizzle(createDrizzle({ fallbackChainId: detectRequiredChainId() }));
+        startViewOnly();
       } catch (err) {
         console.warn("Auto-detect provider failed", err);
-        setCustomDrizzle(createDrizzle({ fallbackChainId: detectRequiredChainId() }));
+        startViewOnly();
       } finally {
         setCheckingProvider(false);
       }

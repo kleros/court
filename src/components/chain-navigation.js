@@ -1,8 +1,15 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import t from "prop-types";
 import { Link, NavLink, Redirect, useHistory, useLocation } from "react-router-dom";
 import useChainId from "../hooks/use-chain-id";
-import { canonicalLocation, chainPath, isBackForwardLoad, toPath, withChainPrefix } from "../helpers/chain-url";
+import {
+  canonicalLocation,
+  chainPath,
+  isBackForwardLoad,
+  markPagesShown,
+  toPath,
+  withChainPrefix,
+} from "../helpers/chain-url";
 
 //Internal links follow the CONNECTED chain, not the URL's: from /100/courts with a mainnet wallet, Home is /1/.
 export function useChainPath() {
@@ -59,6 +66,12 @@ export function CanonicalChainUrl({ children }) {
     (shownPaths.current.size === 0 ? isBackForwardLoad() : !shownPaths.current.has(location.pathname));
   const canonical = canonicalLocation(location, chainId, isHistoryMove);
   const isCanonical = canonical === null;
+
+  //In the same commit as the router's first render, so no late wallet answer can land in between (see
+  //showWalletChainOnBackForwardLoad).
+  useLayoutEffect(() => {
+    markPagesShown();
+  }, []);
 
   useEffect(() => {
     if (isCanonical) {

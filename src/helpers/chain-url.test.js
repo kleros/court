@@ -6,11 +6,14 @@ import {
   chainPath,
   detectBackForwardLoad,
   isBackForwardLoad,
+  markPagesShown,
   normalizeEncodedChainPrefix,
   pagePaths,
   reloadOnChain,
   reloadWhenRestoredFromCache,
   resolveFallbackChainId,
+  showChainOnBackForwardLoad,
+  showWalletChainOnBackForwardLoad,
   splitChainPrefix,
   toPath,
   urlChainId,
@@ -461,6 +464,137 @@ describe("detectBackForwardLoad", () => {
       reloadWhenRestoredFromCache({ persisted: false });
       expect(reloadSpy).not.toHaveBeenCalled();
       expect(window.sessionStorage.getItem(RESTORED_KEY)).toBeNull();
+    });
+  });
+});
+
+describe("showing the starting chain on a page loaded by Back or Forward", () => {
+  let replaceStateSpy;
+
+  //Opens `url` on a load of `type`, as the page the browser shows before the app has started.
+  function loadAs(url, type = "back_forward") {
+    window.history.replaceState({ key: "k" }, "", url);
+    window.performance.getEntriesByType = () => [{ type }];
+    detectBackForwardLoad();
+    replaceStateSpy = jest.spyOn(window.history, "replaceState");
+  }
+  const shown = () => toPath(window.location);
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    delete window.performance.getEntriesByType;
+    detectBackForwardLoad();
+    window.history.replaceState(null, "", "/");
+  });
+
+  describe("showChainOnBackForwardLoad", () => {
+    it.each([
+      ["/100/cases?x=1#h", 1, "/1/cases?x=1#h"],
+      ["/100/", 1, "/1/"],
+      ["/1/courts", 100, "/100/courts"],
+      ["/100/tokens", 1, "/1/tokens"],
+      ["/100/courts?requiredChainId=100&x=1", 1, "/1/courts?x=1"],
+      //Router-decoded, as CanonicalChainUrl's Redirect writes it.
+      ["/100/%63ourts", 1, "/1/courts"],
+    ])("points %p at chain %p: %p, keeping the history state", (url, chainId, expected) => {
+      loadAs(url);
+      showChainOnBackForwardLoad(chainId);
+      expect(shown()).toBe(expected);
+      expect(window.history.state).toEqual({ key: "k" });
+    });
+
+    it.each([
+      ["the case page", "/100/cases/5", 1],
+      ["a 404", "/100/foo", 1],
+      ["a path the router cannot decode", "/100/%E0%A4%A", 1],
+      ["a page path with a bad escape", "/100/courts%E0", 1],
+      ["a URL without a chain prefix", "/courts", 1],
+      ["a legacy URL without a chain prefix", "/cases/5?requiredChainId=100", 1],
+      ["a case page with a legacy param", "/100/cases/5?requiredChainId=1", 1],
+      ["a crafted case URL with a legacy param", "/100/cases/%252535?requiredChainId=1", 1],
+      ["a double-encoded legacy case URL", "/cases/%2535?requiredChainId=100", 1],
+      ["a case page with a bad escape", "/100/cases/%E0", 1],
+      ["the chain it already names", "/1/courts", 1],
+      ["an unsupported chain", "/100/courts", 56],
+      ["an unknown chain", "/100/courts", undefined],
+      ["a chain id that is no number", "/100/courts", NaN],
+    ])("writes nothing for %s", (_, url, chainId) => {
+      loadAs(url);
+      showChainOnBackForwardLoad(chainId);
+      expect(shown()).toBe(url);
+      expect(replaceStateSpy).not.toHaveBeenCalled();
+    });
+
+    it.each(["navigate", "reload"])("writes nothing on a %p load", (type) => {
+      loadAs("/100/courts", type);
+      showChainOnBackForwardLoad(1);
+      expect(shown()).toBe("/100/courts");
+    });
+  });
+
+  describe("showWalletChainOnBackForwardLoad", () => {
+    const walletOn = (answer) => ({
+      request: jest.fn(() => (answer instanceof Error ? Promise.reject(answer) : Promise.resolve(answer))),
+    });
+
+    it.each([
+      ["a hex string", "0x1"],
+      ["a number", 1],
+    ])("points the URL at the wallet's chain, read as %s", async (_, answer) => {
+      loadAs("/100/cases");
+      const wallet = walletOn(answer);
+      await showWalletChainOnBackForwardLoad(wallet);
+      expect(wallet.request).toHaveBeenCalledWith({ method: "eth_chainId" });
+      expect(shown()).toBe("/1/cases");
+    });
+
+    it("writes nothing when the wallet cannot answer", async () => {
+      loadAs("/100/cases");
+      await showWalletChainOnBackForwardLoad(walletOn(new Error("eth_chainId failed")));
+      expect(shown()).toBe("/100/cases");
+    });
+
+    it("writes nothing when the URL changed while the wallet answered", async () => {
+      loadAs("/100/cases");
+      let answer;
+      const wallet = { request: () => new Promise((resolve) => (answer = resolve)) };
+      const pending = showWalletChainOnBackForwardLoad(wallet);
+      window.history.replaceState(null, "", "/100/courts");
+      answer("0x1");
+      await pending;
+      expect(shown()).toBe("/100/courts");
+    });
+
+    //A typed URL's entry has no router key, so only the URL shows that the user moved on (here, editing the hash).
+    it("writes nothing when a keyless entry's URL changed while the wallet answered", async () => {
+      loadAs("/100/cases");
+      window.history.replaceState(null, "", "/100/cases");
+      let answer;
+      const wallet = { request: () => new Promise((resolve) => (answer = resolve)) };
+      const pending = showWalletChainOnBackForwardLoad(wallet);
+      window.history.pushState(null, "", "/100/cases#x");
+      answer("0x1");
+      await pending;
+      expect(shown()).toBe("/100/cases#x");
+    });
+
+    it("writes nothing once the pages are shown, until the next page load", async () => {
+      loadAs("/100/cases");
+      markPagesShown();
+      await showWalletChainOnBackForwardLoad(walletOn("0x1"));
+      expect(shown()).toBe("/100/cases");
+
+      loadAs("/100/cases");
+      await showWalletChainOnBackForwardLoad(walletOn("0x1"));
+      expect(shown()).toBe("/1/cases");
+    });
+
+    it("asks nothing of the wallet on any other load", async () => {
+      loadAs("/100/cases", "navigate");
+      const wallet = walletOn("0x1");
+      await showWalletChainOnBackForwardLoad(wallet);
+      expect(wallet.request).not.toHaveBeenCalled();
+      expect(shown()).toBe("/100/cases");
     });
   });
 });

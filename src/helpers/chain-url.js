@@ -157,10 +157,13 @@ export function resolveFallbackChainId(location, storedValue, isBackForward = fa
 const RESTORED_FROM_CACHE_KEY = "@@kleros/court/restored-from-back-forward-cache";
 
 let loadedByBackForward = false;
+//Whether CanonicalChainUrl has rendered on this page load: from then on the router keeps the URL right.
+let pagesShown = false;
 
 //Called once at load, before anything reads isBackForwardLoad(). Back or Forward to a page from another document (one
 //opened by a typed URL or a link) loads it again instead of a Back inside the app.
 export function detectBackForwardLoad() {
+  pagesShown = false;
   const navigationType = window.performance?.getEntriesByType?.("navigation")?.[0]?.type;
   let wasRestored = false;
   try {
@@ -173,6 +176,50 @@ export function detectBackForwardLoad() {
 }
 
 export const isBackForwardLoad = () => loadedByBackForward;
+
+//Called by CanonicalChainUrl when it first renders.
+export function markPagesShown() {
+  pagesShown = true;
+}
+
+//On a page loaded by Back or Forward, writes the URL CanonicalChainUrl would write once the app has loaded, as soon as the
+//chain the app starts on is known: the old URL shows for less time. The same rule (canonicalLocation for a history move)
+//on the same router-decoded location, so it can only write that final URL. Only on a page that follows the chain, with
+//its chain prefix: the case page, bare and legacy URLs stay the router's, as before. Nothing for an unsupported chain,
+//which renders no router. A path the router cannot decode is never such a page, so it writes nothing either.
+export function showChainOnBackForwardLoad(chainId) {
+  if (!isBackForwardLoad() || !supportedChainIds.includes(chainId)) {
+    return;
+  }
+  const location = browserLocation();
+  if (!isPage(location.pathname, chainFollowingPagePaths)) {
+    return;
+  }
+  const target = canonicalLocation(location, chainId, true);
+  if (target) {
+    window.history.replaceState(window.history.state, "", toPath(target));
+  }
+}
+
+//The same, for a wallet that reconnected at load: its chain is the one the app starts on. The answer is used only if it
+//comes before the pages are shown, as from then on the router keeps the URL right, and only if the URL has not changed
+//meanwhile (a hash edited in the address bar, say). A failed request writes nothing either: the router corrects the
+//URL after loading, as before.
+export async function showWalletChainOnBackForwardLoad(provider) {
+  if (!isBackForwardLoad()) {
+    return;
+  }
+  const loadedUrl = toPath(window.location);
+  let chainId;
+  try {
+    chainId = Number(await provider.request({ method: "eth_chainId" }));
+  } catch {
+    return;
+  }
+  if (!pagesShown && toPath(window.location) === loadedUrl) {
+    showChainOnBackForwardLoad(chainId);
+  }
+}
 
 //A page the browser restores from its back/forward cache resumes with the chain it had then, which the wallet may have
 //left since. Reload it instead, so it boots like any page loaded by Back. A `pageshow` listener.
