@@ -52,6 +52,7 @@ describe("detectRequiredChainId", () => {
   it.each([
     ["empty", undefined],
     ["junk", "abc"],
+    ["an unsupported chain", "999"],
   ])("defaults to mainnet and stores it when storage is %s", (_, stored) => {
     expect(boot("/cases/1", stored)).toEqual({ chainId: 1, writes: wrote(1), stored: "1" });
   });

@@ -241,22 +241,39 @@ describe("resolveFallbackChainId", () => {
   const searchFor = (param) => (param === undefined ? "" : `?requiredChainId=${param}`);
 
   describe("matches master on bare paths", () => {
-    storageValues.forEach((stored) => {
-      paramValues
-        .filter((param) => param !== "999")
-        .forEach((param) => {
-          it(`storage ${JSON.stringify(stored)}, param ${JSON.stringify(param)}`, () => {
-            const search = searchFor(param);
-            expect(resolveFallbackChainId({ pathname: "/cases/1", search }, stored)).toEqual(
-              masterResolve(search, stored)
-            );
+    storageValues
+      .filter((stored) => stored !== "999")
+      .forEach((stored) => {
+        paramValues
+          .filter((param) => param !== "999")
+          .forEach((param) => {
+            it(`storage ${JSON.stringify(stored)}, param ${JSON.stringify(param)}`, () => {
+              const search = searchFor(param);
+              expect(resolveFallbackChainId({ pathname: "/cases/1", search }, stored)).toEqual(
+                masterResolve(search, stored)
+              );
+            });
           });
-        });
+      });
+  });
+
+  describe("ignores an unsupported stored chain, as if storage were empty, where master booted on it", () => {
+    it("master booted on it", () => {
+      expect(masterResolve("", "999").chainId).toBe(999);
+    });
+
+    it.each(paramValues)("param %p", (param) => {
+      const search = searchFor(param);
+      //The 999 param is ignored as well, so master's reference reading has no param in that row.
+      const masterSearch = param === "999" ? "" : search;
+      expect(resolveFallbackChainId({ pathname: "/cases/1", search }, "999")).toEqual(
+        masterResolve(masterSearch, null)
+      );
     });
   });
 
   describe("ignores an unsupported numeric param, where master booted on it", () => {
-    it.each(storageValues)("storage %p", (stored) => {
+    it.each(storageValues.filter((stored) => stored !== "999"))("storage %p", (stored) => {
       const search = "?requiredChainId=999";
       expect(masterResolve(search, stored).chainId).toBe(999);
       expect(resolveFallbackChainId({ pathname: "/cases/1", search }, stored)).toEqual(masterResolve("", stored));
@@ -281,11 +298,9 @@ describe("resolveFallbackChainId", () => {
       ...prefixes.flatMap((c) => gatedPages.map((p) => `/${c}${p}`)),
       "/1/cases/1000?requiredChainId=100",
     ];
-    //An unsupported stored id ("999") is left out: it boots no web3 at all, so the router never renders.
-    const bootableStorageValues = storageValues.filter((stored) => stored !== "999");
     //Both sides receive the same pathname string, so this covers every URL whose first segment decodeURI leaves unchanged.
     urls.forEach((url) => {
-      bootableStorageValues.forEach((stored) => {
+      storageValues.forEach((stored) => {
         const boot = resolveFallbackChainId(loc(url), stored).chainId;
         const shown = canonicalLocation(loc(url), boot) ?? loc(url);
         expect(splitChainPrefix(shown.pathname).chainId).toBe(boot);

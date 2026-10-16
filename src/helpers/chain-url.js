@@ -111,10 +111,13 @@ export function browserLocation() {
 //`shouldStore` keeps the previous write rule: store unless storage already holds the URL's chain.
 //Pass browserLocation(), so boot reads the chain the router will show.
 export function resolveFallbackChainId(location, storedValue) {
-  const fromStorage = Number.parseInt(storedValue, 10);
+  const parsed = Number.parseInt(storedValue, 10);
+  //Only a supported stored chain counts. Junk, or an id like 999 left by an older version, is ignored and overwritten:
+  //booting on it finds no RPC, so drizzle falls back to the browser's wallet and asks it to connect.
+  const fromStorage = supportedChainIds.includes(parsed) ? parsed : undefined;
   const fromUrl = urlChainId(location);
-  const chainId = fromUrl ?? (Number.isNaN(fromStorage) ? DEFAULT_CHAIN_ID : fromStorage);
-  return { chainId, shouldStore: Number.isNaN(fromStorage) || fromStorage !== fromUrl };
+  const chainId = fromUrl ?? fromStorage ?? DEFAULT_CHAIN_ID;
+  return { chainId, shouldStore: fromStorage === undefined || fromStorage !== fromUrl };
 }
 
 //The chain to reload onto after a wallet connects, or undefined to reload in place.
