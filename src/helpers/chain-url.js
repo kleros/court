@@ -137,14 +137,55 @@ export function normalizeEncodedChainPrefix() {
 //Boot-time chain for view-only mode: the URL (prefix, then legacy param), then storage, then mainnet.
 //`shouldStore` keeps the previous write rule: store unless storage already holds the URL's chain.
 //Pass browserLocation(), so boot reads the chain the router will show.
-export function resolveFallbackChainId(location, storedValue) {
+//`isBackForward`: Back or Forward loaded the page. On every page but the case page the stored chain then wins, as Back
+//shows the previous page on the chain the user was on. Storage holds the chain this browser last booted on, so another
+//tab can have changed it: then the page shows that tab's chain, never another chain's data under this URL.
+export function resolveFallbackChainId(location, storedValue, isBackForward = false) {
   const parsed = Number.parseInt(storedValue, 10);
   //Only a supported stored chain counts. Junk, or an id like 999 left by an older version, is ignored and overwritten:
   //booting on it finds no RPC, so drizzle falls back to the browser's wallet and asks it to connect.
   const fromStorage = supportedChainIds.includes(parsed) ? parsed : undefined;
+  if (isBackForward && fromStorage !== undefined && isPage(location.pathname, chainFollowingPagePaths)) {
+    return { chainId: fromStorage, shouldStore: false };
+  }
   const fromUrl = urlChainId(location);
   const chainId = fromUrl ?? fromStorage ?? DEFAULT_CHAIN_ID;
   return { chainId, shouldStore: fromStorage === undefined || fromStorage !== fromUrl };
+}
+
+//Set when the browser restored a page from its back/forward cache, so the reload that follows counts as a Back.
+const RESTORED_FROM_CACHE_KEY = "@@kleros/court/restored-from-back-forward-cache";
+
+let loadedByBackForward = false;
+
+//Called once at load, before anything reads isBackForwardLoad(). Back or Forward to a page from another document (one
+//opened by a typed URL or a link) loads it again instead of a Back inside the app.
+export function detectBackForwardLoad() {
+  const navigationType = window.performance?.getEntriesByType?.("navigation")?.[0]?.type;
+  let wasRestored = false;
+  try {
+    wasRestored = window.sessionStorage.getItem(RESTORED_FROM_CACHE_KEY) !== null;
+    window.sessionStorage.removeItem(RESTORED_FROM_CACHE_KEY);
+  } catch {
+    //Without session storage only the navigation type counts.
+  }
+  loadedByBackForward = navigationType === "back_forward" || wasRestored;
+}
+
+export const isBackForwardLoad = () => loadedByBackForward;
+
+//A page the browser restores from its back/forward cache resumes with the chain it had then, which the wallet may have
+//left since. Reload it instead, so it boots like any page loaded by Back. A `pageshow` listener.
+export function reloadWhenRestoredFromCache(event) {
+  if (!event.persisted) {
+    return;
+  }
+  try {
+    window.sessionStorage.setItem(RESTORED_FROM_CACHE_KEY, "1");
+  } catch {
+    //The reload still boots on the wallet's chain; without the marker it keeps the URL's chain, as a link does.
+  }
+  window.location.reload();
 }
 
 //The chain to reload onto after a wallet connects, or undefined to reload in place.

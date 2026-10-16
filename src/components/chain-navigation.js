@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef } from "react";
 import t from "prop-types";
 import { Link, NavLink, Redirect, useHistory, useLocation } from "react-router-dom";
 import useChainId from "../hooks/use-chain-id";
-import { canonicalLocation, chainPath, toPath, withChainPrefix } from "../helpers/chain-url";
+import { canonicalLocation, chainPath, isBackForwardLoad, toPath, withChainPrefix } from "../helpers/chain-url";
 
 //Internal links follow the CONNECTED chain, not the URL's: from /100/courts with a mainnet wallet, Home is /1/.
 export function useChainPath() {
@@ -46,16 +46,17 @@ export function useReplaceChainInUrl() {
 //an entry was visited before a chain switch, which reloads. Every path the page did show keeps its chain: the link it
 //opened on, a URL the app pointed at another chain to ask for a switch, and those paths with only the hash edited.
 //Paths are compared, not history entries, because entries the browser makes (a typed URL, a hash edited in the address
-//bar) have no router key.
+//bar) have no router key. When Back or Forward loaded the page itself, its first path is a history move too.
 export function CanonicalChainUrl({ children }) {
   const history = useHistory();
   const location = useLocation();
   const chainId = useChainId();
-  //Every path a page was shown under, after any redirect. Before the first one (Back pressed while the app was still
-  //loading), nothing counts as a history move, so the page keeps today's prompt.
+  //Every path a page was shown under, after any redirect. Before the first one, only a page loaded by Back or Forward
+  //counts as a history move (Back pressed while the app was still loading keeps today's prompt).
   const shownPaths = useRef(new Set());
   const isHistoryMove =
-    history.action === "POP" && shownPaths.current.size > 0 && !shownPaths.current.has(location.pathname);
+    history.action === "POP" &&
+    (shownPaths.current.size === 0 ? isBackForwardLoad() : !shownPaths.current.has(location.pathname));
   const canonical = canonicalLocation(location, chainId, isHistoryMove);
   const isCanonical = canonical === null;
 

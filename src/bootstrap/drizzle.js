@@ -7,7 +7,7 @@ import Pinakion from "../assets/contracts/pinakion.json";
 import PolicyRegistry from "../assets/contracts/policy-registry.json";
 import UniswapV2Factory from "../assets/contracts/uniswap-v2-factory.json";
 import UniswapV2Router02 from "../assets/contracts/uniswap-v2-router-02.json";
-import { browserLocation, resolveFallbackChainId } from "../helpers/chain-url";
+import { browserLocation, isBackForwardLoad, resolveFallbackChainId } from "../helpers/chain-url";
 
 const defaultOptions = {
   networkWhitelist: [
@@ -136,7 +136,8 @@ export const FALLBACK_CHAIN_ID_STORAGE_KEY = "@@kleros/court/fallback-chain-id";
 const detectRequiredChainId = () => {
   const { chainId, shouldStore } = resolveFallbackChainId(
     browserLocation(),
-    window?.localStorage?.getItem(FALLBACK_CHAIN_ID_STORAGE_KEY)
+    window?.localStorage?.getItem(FALLBACK_CHAIN_ID_STORAGE_KEY),
+    isBackForwardLoad()
   );
 
   if (shouldStore) {

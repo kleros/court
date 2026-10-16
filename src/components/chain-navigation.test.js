@@ -2,7 +2,7 @@ import React from "react";
 import { act } from "react-dom/test-utils";
 import { Route, Switch, useParams } from "react-router-dom";
 import { CanonicalChainUrl, ChainLink, ChainNavLink, useReplaceChainInUrl } from "./chain-navigation";
-import { chainRoutePath, pagePaths } from "../helpers/chain-url";
+import { chainRoutePath, detectBackForwardLoad, pagePaths } from "../helpers/chain-url";
 import { createBrowserHistory, createMemoryHistory } from "history";
 import { mountInRouter } from "../test-utils/memory-router";
 import useChainId from "../hooks/use-chain-id";
@@ -254,6 +254,39 @@ describe("CanonicalChainUrl on Back and Forward", () => {
     navigate((history) => history.replace("/100/courts"));
     expect(page.currentUrl()).toBe("/100/courts");
     expect(page.rewrites()).toBe(1);
+  });
+
+  describe("on a page loaded by Back or Forward", () => {
+    beforeEach(() => {
+      window.performance.getEntriesByType = () => [{ type: "back_forward" }];
+      detectBackForwardLoad();
+    });
+
+    afterEach(() => {
+      delete window.performance.getEntriesByType;
+      detectBackForwardLoad();
+    });
+
+    it("moves the first page to the connected chain: Back from a page opened by a typed URL", () => {
+      mount("/100/cases?x=1#h", 1);
+      expect(shows("cases")).toBe(true);
+      expect(page.currentUrl()).toBe("/1/cases?x=1#h");
+      expect(page.rewrites()).toBe(1);
+    });
+
+    it("keeps the case page's chain", () => {
+      mount("/100/cases/5", 1);
+      expect(page.currentUrl()).toBe("/100/cases/5");
+      expect(page.rewrites()).toBe(0);
+    });
+
+    it("keeps later paths it has shown, as on any page", () => {
+      mount("/100/cases", 1);
+      navigate((history) => history.push("/1/courts"));
+      navigate((history) => history.goBack());
+      expect(page.currentUrl()).toBe("/1/cases");
+      expect(page.rewrites()).toBe(1);
+    });
   });
 
   it("leaves pages alone on Back while the chain is unknown", () => {

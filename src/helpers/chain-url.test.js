@@ -4,9 +4,12 @@ import {
   canonicalLocation,
   chainAfterConnect,
   chainPath,
+  detectBackForwardLoad,
+  isBackForwardLoad,
   normalizeEncodedChainPrefix,
   pagePaths,
   reloadOnChain,
+  reloadWhenRestoredFromCache,
   resolveFallbackChainId,
   splitChainPrefix,
   toPath,
@@ -372,6 +375,93 @@ describe("browserLocation", () => {
   it("keeps a path that cannot be decoded, without throwing", () => {
     window.history.replaceState(null, "", "/100%/courts");
     expect(browserLocation().pathname).toBe("/100%/courts");
+  });
+});
+
+describe("resolveFallbackChainId on a page loaded by Back or Forward", () => {
+  it.each(["/100/", "/100/courts", "/100/cases", "/100/tokens", "/100/convert-pnk?x=1"])(
+    "boots %p on the stored chain, the one the user was on, and writes nothing",
+    (url) => {
+      expect(resolveFallbackChainId(loc(url), "1", true)).toEqual({ chainId: 1, shouldStore: false });
+    }
+  );
+
+  it("keeps the case page on its URL's chain: the same ID is another dispute elsewhere", () => {
+    expect(resolveFallbackChainId(loc("/100/cases/5"), "1", true)).toEqual(
+      resolveFallbackChainId(loc("/100/cases/5"), "1")
+    );
+  });
+
+  it.each([
+    ["no stored chain", null],
+    ["junk", "abc"],
+    ["an unsupported chain", "999"],
+  ])("follows the URL as usual with %s", (_, stored) => {
+    expect(resolveFallbackChainId(loc("/100/courts"), stored, true)).toEqual(
+      resolveFallbackChainId(loc("/100/courts"), stored)
+    );
+  });
+
+  it("changes nothing on any other load", () => {
+    expect(resolveFallbackChainId(loc("/100/courts"), "1")).toEqual({ chainId: 100, shouldStore: true });
+  });
+});
+
+describe("detectBackForwardLoad", () => {
+  const RESTORED_KEY = "@@kleros/court/restored-from-back-forward-cache";
+  const loadedAs = (type) => {
+    window.performance.getEntriesByType = () => (type === undefined ? [] : [{ type }]);
+    detectBackForwardLoad();
+    return isBackForwardLoad();
+  };
+
+  afterEach(() => {
+    delete window.performance.getEntriesByType;
+    window.sessionStorage.clear();
+    detectBackForwardLoad();
+  });
+
+  it.each([
+    ["back_forward", true],
+    ["navigate", false],
+    ["reload", false],
+    [undefined, false],
+  ])("reads a %p navigation as %p", (type, expected) => {
+    expect(loadedAs(type)).toBe(expected);
+  });
+
+  it("is false where the browser has no navigation timing", () => {
+    detectBackForwardLoad();
+    expect(isBackForwardLoad()).toBe(false);
+  });
+
+  it("counts the reload after a restore from the back/forward cache, once", () => {
+    window.sessionStorage.setItem(RESTORED_KEY, "1");
+    expect(loadedAs("reload")).toBe(true);
+    expect(window.sessionStorage.getItem(RESTORED_KEY)).toBeNull();
+    expect(loadedAs("reload")).toBe(false);
+  });
+
+  describe("reloadWhenRestoredFromCache", () => {
+    let reloadSpy;
+    beforeEach(() => {
+      reloadSpy = jest.spyOn(window.location, "reload").mockImplementation(() => {});
+    });
+    afterEach(() => {
+      reloadSpy.mockRestore();
+    });
+
+    it("reloads a restored page and marks the reload as a Back", () => {
+      reloadWhenRestoredFromCache({ persisted: true });
+      expect(reloadSpy).toHaveBeenCalledTimes(1);
+      expect(window.sessionStorage.getItem(RESTORED_KEY)).toBe("1");
+    });
+
+    it("leaves a page that was loaded normally alone", () => {
+      reloadWhenRestoredFromCache({ persisted: false });
+      expect(reloadSpy).not.toHaveBeenCalled();
+      expect(window.sessionStorage.getItem(RESTORED_KEY)).toBeNull();
+    });
   });
 });
 

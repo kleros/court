@@ -1,5 +1,5 @@
 import { detectRequiredChainId, FALLBACK_CHAIN_ID_STORAGE_KEY } from "./drizzle";
-import { normalizeEncodedChainPrefix } from "../helpers/chain-url";
+import { detectBackForwardLoad, normalizeEncodedChainPrefix } from "../helpers/chain-url";
 
 //Boots at `url` with `stored` in localStorage (undefined: empty) and reports the chain plus every storage write.
 function boot(url, stored) {
@@ -34,6 +34,26 @@ describe("detectRequiredChainId", () => {
     normalizeEncodedChainPrefix();
     expect(window.location.pathname).toBe("/100/cases/1");
     expect(boot(window.location.pathname, "1").chainId).toBe(100);
+  });
+
+  describe("on a page loaded by Back or Forward", () => {
+    beforeEach(() => {
+      window.performance.getEntriesByType = () => [{ type: "back_forward" }];
+      detectBackForwardLoad();
+    });
+
+    afterEach(() => {
+      delete window.performance.getEntriesByType;
+      detectBackForwardLoad();
+    });
+
+    it("boots on the stored chain, the one the user was on, and writes nothing", () => {
+      expect(boot("/100/cases", "1")).toEqual({ chainId: 1, writes: [], stored: "1" });
+    });
+
+    it("boots the case page on its URL's chain", () => {
+      expect(boot("/100/cases/5", "1")).toEqual({ chainId: 100, writes: wrote(100), stored: "100" });
+    });
   });
 
   it("boots on a percent-encoded prefix, like the router reads it", () => {
