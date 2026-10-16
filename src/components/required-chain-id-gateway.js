@@ -34,8 +34,9 @@ RequiredChainIdGateway.defaultProps = {
 //The URL a view-only reload was already tried for.
 const VIEW_ONLY_RELOAD_KEY = "@@kleros/court/view-only-reload";
 
-//Without a wallet the app boots on the URL's chain, so a mismatch only appears after an in-page navigation, such as Back
-//after a header switch. The switch prompt needs a wallet, so reload instead: boot then follows the URL.
+//Without a wallet the app boots on the URL's chain, so a mismatch only appears after Back or Forward to the case page
+//from before a header switch (other pages follow the chain then, see CanonicalChainUrl). The switch prompt needs a
+//wallet, so reload instead: boot then follows the URL.
 //Tried once per URL. If boot still lands elsewhere (an RPC configured for the wrong chain, say), the page keeps today's
 //mismatch rendering instead of reloading forever. "reloads at most once for the same URL" fails without this guard.
 //No reload when the marker cannot be saved either: the next load could not tell it already tried.

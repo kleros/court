@@ -23,8 +23,9 @@ export const pagePaths = {
 //Pages that mount no RequiredChainIdGateway. There the connected chain wins over the URL's.
 const ungatedPagePaths = [pagePaths.tokens, pagePaths.convertPnk];
 
-//Pages that follow the wallet's chain after it connects. Not the case page: there the same ID is another dispute elsewhere.
-const walletFollowingPagePaths = Object.values(pagePaths).filter((path) => path !== pagePaths.case);
+//Pages that follow the connected chain after a wallet connects, and on Back or Forward inside the app.
+//Not the case page: there the same ID is another dispute elsewhere.
+const chainFollowingPagePaths = Object.values(pagePaths).filter((path) => path !== pagePaths.case);
 
 //"/cases/:ID" -> "/:chainId(1|100|10200|11155111)/cases/:ID"
 export const chainRoutePath = (pagePath) => `${CHAIN_ID_ROUTE}${pagePath}`;
@@ -76,7 +77,9 @@ export function withChainPrefix({ pathname, search = "", hash = "" }, chainId) {
 const isPage = (pathname, paths) => paths.some((p) => matchPath(pathname, { path: chainRoutePath(p), exact: true }));
 
 //The location a page must be shown under, or null when the URL is already canonical or is not a page.
-export function canonicalLocation(location, connectedChainId) {
+//`isHistoryMove`: the URL comes from Back or Forward inside the app, not from opening a link. Every page but the case
+//page then follows the connected chain, as tokens and convert-pnk always do.
+export function canonicalLocation(location, connectedChainId, isHistoryMove = false) {
   //ChainIdProvider renders the router only once the chain is known, so this is never undefined in the app.
   //Without the check, "/100/tokens" with an unknown chain would be replaced by "/undefined/tokens" (a 404),
   //through the ungated-page branch.
@@ -89,7 +92,8 @@ export function canonicalLocation(location, connectedChainId) {
   if (!isPage(prefixed.pathname, Object.values(pagePaths))) {
     return null; //Not a page once prefixed, so the 404 renders in place and the URL stays.
   }
-  const target = isPage(prefixed.pathname, ungatedPagePaths) ? withChainPrefix(location, connectedChainId) : prefixed;
+  const followingPaths = isHistoryMove ? chainFollowingPagePaths : ungatedPagePaths;
+  const target = isPage(prefixed.pathname, followingPaths) ? withChainPrefix(location, connectedChainId) : prefixed;
   return toPath(target) === toPath(location) ? null : target; //Write only when the URL changes.
 }
 
@@ -148,8 +152,7 @@ export function resolveFallbackChainId(location, storedValue) {
 //follows the wallet, as a URL without a chain always did. The case page keeps its chain and asks to switch instead,
 //because the same ID is a different dispute on another chain.
 export function chainAfterConnect(location, walletChainId) {
-  const followsWallet =
-    supportedChainIds.includes(walletChainId) && isPage(location.pathname, walletFollowingPagePaths);
+  const followsWallet = supportedChainIds.includes(walletChainId) && isPage(location.pathname, chainFollowingPagePaths);
   return followsWallet ? walletChainId : undefined;
 }
 

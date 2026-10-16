@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import t from "prop-types";
 import { Link, NavLink, Redirect, useHistory, useLocation } from "react-router-dom";
 import useChainId from "../hooks/use-chain-id";
@@ -42,10 +42,29 @@ export function useReplaceChainInUrl() {
 //Pages only ever render under their canonical URL. Bare and legacy URLs are replaced (no history entry) before any
 //page mounts; tokens and convert-pnk move to the connected chain. Redirect runs in the layout phase, so no frame paints
 //under the old URL, and it unmounts after one replace because canonicalLocation is idempotent.
+//Back or Forward to a path this page has not shown yet moves every page but the case page to the connected chain: such
+//an entry was visited before a chain switch, which reloads. Every path the page did show keeps its chain: the link it
+//opened on, a URL the app pointed at another chain to ask for a switch, and those paths with only the hash edited.
+//Paths are compared, not history entries, because entries the browser makes (a typed URL, a hash edited in the address
+//bar) have no router key.
 export function CanonicalChainUrl({ children }) {
+  const history = useHistory();
   const location = useLocation();
   const chainId = useChainId();
-  const canonical = canonicalLocation(location, chainId);
+  //Every path a page was shown under, after any redirect. Before the first one (Back pressed while the app was still
+  //loading), nothing counts as a history move, so the page keeps today's prompt.
+  const shownPaths = useRef(new Set());
+  const isHistoryMove =
+    history.action === "POP" && shownPaths.current.size > 0 && !shownPaths.current.has(location.pathname);
+  const canonical = canonicalLocation(location, chainId, isHistoryMove);
+  const isCanonical = canonical === null;
+
+  useEffect(() => {
+    if (isCanonical) {
+      shownPaths.current.add(location.pathname);
+    }
+  }, [isCanonical, location.pathname]);
+
   return canonical ? <Redirect to={canonical} /> : children;
 }
 CanonicalChainUrl.propTypes = { children: t.node };

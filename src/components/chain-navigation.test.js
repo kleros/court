@@ -3,6 +3,7 @@ import { act } from "react-dom/test-utils";
 import { Route, Switch, useParams } from "react-router-dom";
 import { CanonicalChainUrl, ChainLink, ChainNavLink, useReplaceChainInUrl } from "./chain-navigation";
 import { chainRoutePath, pagePaths } from "../helpers/chain-url";
+import { createBrowserHistory, createMemoryHistory } from "history";
 import { mountInRouter } from "../test-utils/memory-router";
 import useChainId from "../hooks/use-chain-id";
 
@@ -33,11 +34,29 @@ function Pages() {
 let page;
 let allowConsoleError;
 
-function mount(url, chainId, renderTree = () => <Pages />) {
+function mount(url, chainId, renderTree = () => <Pages />, history = undefined) {
   useChainId.mockReturnValue(chainId);
-  page = mountInRouter(renderTree, { url });
+  page = mountInRouter(renderTree, { url, history });
   return page;
 }
+
+//Opens the app on `entries[index]` with the other entries already in the session history, as after a chain switch,
+//which reloads the page and keeps the entries visited before it.
+const openOn = (entries, index, chainId) =>
+  mount(undefined, chainId, undefined, createMemoryHistory({ initialEntries: entries, initialIndex: index }));
+
+const navigate = (fn) =>
+  act(() => {
+    fn(page.history);
+  });
+
+//The browser fires popstate after history.back() or forward() returns.
+const traverse = (move) =>
+  act(async () => {
+    const popped = new Promise((resolve) => window.addEventListener("popstate", resolve, { once: true }));
+    move();
+    await popped;
+  });
 
 const shows = (id) => page.container.querySelector(`#${id}`) !== null;
 
@@ -172,6 +191,144 @@ describe("CanonicalChainUrl", () => {
     mount("/cases/%252541", 1);
     expect(page.currentUrl()).toBe("/1/cases/A");
     expect(JSON.parse(page.container.querySelector("#case").textContent).ID).toBe("A");
+  });
+});
+
+describe("CanonicalChainUrl on Back and Forward", () => {
+  afterEach(() => {
+    window.history.replaceState(null, "", "/");
+  });
+
+  it("moves a page visited before a chain switch to the connected chain", () => {
+    openOn(["/100/courts?x=1#h", "/1/tokens"], 1, 1);
+    navigate((history) => history.goBack());
+    expect(shows("courts")).toBe(true);
+    expect(page.currentUrl()).toBe("/1/courts?x=1#h");
+    expect(page.rewrites()).toBe(1);
+  });
+
+  it("moves every entry from before the switch, also two for the same page", () => {
+    openOn(["/100/courts", "/100/cases", "/100/courts", "/1/tokens"], 3, 1);
+    navigate((history) => history.goBack());
+    navigate((history) => history.goBack());
+    navigate((history) => history.goBack());
+    expect(page.currentUrl()).toBe("/1/courts");
+    expect(page.rewrites()).toBe(3);
+  });
+
+  it("does the same on Forward", () => {
+    openOn(["/1/tokens", "/100/cases"], 0, 1);
+    navigate((history) => history.goForward());
+    expect(shows("cases")).toBe(true);
+    expect(page.currentUrl()).toBe("/1/cases");
+  });
+
+  it("keeps the case page's chain, so the switch prompt asks for it", () => {
+    openOn(["/100/cases/5", "/1/tokens"], 1, 1);
+    navigate((history) => history.goBack());
+    expect(page.container.querySelector("#case").textContent).toBe(JSON.stringify({ chainId: "100", ID: "5" }));
+    expect(page.currentUrl()).toBe("/100/cases/5");
+    expect(page.rewrites()).toBe(0);
+  });
+
+  it("keeps a link's chain when Back returns to the entry the page opened on", () => {
+    mount("/100/courts", 1);
+    navigate((history) => history.push("/1/cases"));
+    navigate((history) => history.goBack());
+    expect(page.currentUrl()).toBe("/100/courts");
+    expect(page.rewrites()).toBe(0);
+  });
+
+  it("counts the entry a legacy link was redirected to as the one the page opened on", () => {
+    mount("/courts?requiredChainId=100", 1);
+    expect(page.currentUrl()).toBe("/100/courts");
+    navigate((history) => history.push("/1/cases"));
+    navigate((history) => history.goBack());
+    expect(page.currentUrl()).toBe("/100/courts");
+    expect(page.rewrites()).toBe(1);
+  });
+
+  //The switch-court fallback points the URL at the chain the user asked for, so the page asks to switch.
+  it("keeps a replace to another chain, which is no history move", () => {
+    mount("/1/courts", 1);
+    navigate((history) => history.replace("/100/courts"));
+    expect(page.currentUrl()).toBe("/100/courts");
+    expect(page.rewrites()).toBe(1);
+  });
+
+  it("leaves pages alone on Back while the chain is unknown", () => {
+    openOn(["/100/courts", "/1/tokens"], 1, undefined);
+    navigate((history) => history.goBack());
+    expect(page.currentUrl()).toBe("/100/courts");
+    expect(page.rewrites()).toBe(0);
+  });
+
+  //In the browser a typed URL or a hash edited in the address bar makes an entry with no state, so no router key.
+  describe("with the browser's history", () => {
+    it("moves an entry with no key from before the switch, when the page also opened on one", async () => {
+      //Typed /1/courts, edited the hash (a new keyless entry), then a switch to 100 rewrote it and reloaded.
+      window.history.replaceState(null, "", "/1/courts");
+      window.history.pushState(null, "", "/100/courts#top");
+      mount(undefined, 100, undefined, createBrowserHistory());
+      await traverse(() => page.history.goBack());
+      expect(page.currentUrl()).toBe("/100/courts");
+    });
+
+    it("keeps a URL the app pointed at another chain, on a hash edit and on Back", async () => {
+      window.history.replaceState(null, "", "/1/courts");
+      mount(undefined, 1, undefined, createBrowserHistory());
+      //The switch-court fallback asks for the switch through the URL.
+      navigate((history) => history.replace("/100/courts"));
+      await traverse(() => {
+        window.history.pushState(null, "", "/100/courts#x");
+        window.dispatchEvent(new PopStateEvent("popstate", { state: null }));
+      });
+      expect(page.currentUrl()).toBe("/100/courts#x");
+      navigate((history) => history.push("/1/cases"));
+      await traverse(() => page.history.goBack());
+      expect(page.currentUrl()).toBe("/100/courts#x");
+      expect(page.rewrites()).toBe(1);
+    });
+
+    it("keeps a link's chain when only the hash is edited in the address bar", async () => {
+      window.history.replaceState(null, "", "/courts?requiredChainId=100");
+      mount(undefined, 1, undefined, createBrowserHistory());
+      expect(page.currentUrl()).toBe("/100/courts");
+      //A same-document fragment navigation: a new entry with no state, announced by popstate.
+      await traverse(() => {
+        window.history.pushState(null, "", "/100/courts#x");
+        window.dispatchEvent(new PopStateEvent("popstate", { state: null }));
+      });
+      expect(page.currentUrl()).toBe("/100/courts#x");
+      expect(page.rewrites()).toBe(1);
+    });
+
+    it("moves a page whose entry has no key, from before the switch", async () => {
+      window.history.replaceState(null, "", "/100/courts");
+      window.history.pushState({ key: "tokens" }, "", "/1/tokens");
+      mount(undefined, 1, undefined, createBrowserHistory());
+      await traverse(() => page.history.goBack());
+      expect(page.currentUrl()).toBe("/1/courts");
+      expect(window.location.pathname).toBe("/1/courts");
+    });
+
+    it("moves a page on Forward when the page opened on an entry with no key", async () => {
+      window.history.replaceState(null, "", "/1/courts");
+      window.history.pushState({ key: "cases" }, "", "/100/cases");
+      await traverse(() => window.history.back());
+      mount(undefined, 1, undefined, createBrowserHistory());
+      await traverse(() => page.history.goForward());
+      expect(page.currentUrl()).toBe("/1/cases");
+    });
+
+    it("keeps the chain of a typed link when Back returns to it", async () => {
+      window.history.replaceState(null, "", "/100/courts");
+      mount(undefined, 1, undefined, createBrowserHistory());
+      navigate((history) => history.push("/1/cases"));
+      await traverse(() => page.history.goBack());
+      expect(page.currentUrl()).toBe("/100/courts");
+      expect(page.rewrites()).toBe(0);
+    });
   });
 });
 

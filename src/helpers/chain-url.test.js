@@ -175,6 +175,33 @@ describe("canonicalLocation", () => {
     expect(canonicalUrl("/100/tokens", undefined)).toBeNull();
   });
 
+  describe("on Back or Forward inside the app", () => {
+    const movedUrl = (url, chainId) => {
+      const out = canonicalLocation(loc(url), chainId, true);
+      return out === null ? null : toPath(out);
+    };
+
+    it.each(["/", "/courts", "/cases", "/tokens", "/convert-pnk"])(
+      "moves %p to the connected chain, keeping the rest of the URL",
+      (pagePath) => {
+        expect(movedUrl(`/100${pagePath}?x=1#h`, 1)).toBe(`/1${pagePath}?x=1#h`);
+        expect(movedUrl(`/1${pagePath}`, 100)).toBe(`/100${pagePath}`);
+      }
+    );
+
+    it("keeps the case page's chain: the same ID is another dispute there", () => {
+      expect(movedUrl("/100/cases/5", 1)).toBeNull();
+      expect(movedUrl("/1/cases/5?x=1", 100)).toBeNull();
+    });
+
+    it("leaves the connected chain's pages, a 404 and an unknown chain alone", () => {
+      expect(movedUrl("/1/courts", 1)).toBeNull();
+      expect(movedUrl("/100/foo", 1)).toBeNull();
+      expect(movedUrl("/999/courts", 1)).toBeNull();
+      expect(movedUrl("/100/courts", undefined)).toBeNull();
+    });
+  });
+
   it("canonicalizes the bare email confirmation link with its hash intact", () => {
     expect(canonicalUrl("/#/settings/email-confirmation?address=0xA&token=a%2Bb", 1)).toBe(
       "/1/#/settings/email-confirmation?address=0xA&token=a%2Bb"
@@ -204,6 +231,22 @@ describe("canonicalLocation", () => {
         const out = canonicalLocation(loc(url), connected);
         expect(canonicalLocation(out ?? loc(url), connected)).toBeNull();
         expect(out === null || isPage(out.pathname)).toBe(true);
+      });
+    });
+
+    //The redirect's own replace is not a history move, so its result must already be canonical either way.
+    it.each(rows)("%p: a history move is idempotent too, and differs only where the page follows the chain", (url) => {
+      [1, 100, 10200, 11155111].forEach((connected) => {
+        const moved = canonicalLocation(loc(url), connected, true);
+        const shown = moved ?? loc(url);
+        expect(canonicalLocation(shown, connected, true)).toBeNull();
+        expect(canonicalLocation(shown, connected)).toBeNull();
+        expect(moved === null || isPage(moved.pathname)).toBe(true);
+        const opened = canonicalLocation(loc(url), connected);
+        if (toPath(moved ?? loc(url)) !== toPath(opened ?? loc(url))) {
+          expect(splitChainPrefix(moved.pathname).chainId).toBe(connected);
+          expect(matchPath(moved.pathname, { path: `${CHAIN_ID_ROUTE}${pagePaths.case}`, exact: true })).toBeNull();
+        }
       });
     });
   });

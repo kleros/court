@@ -7,8 +7,11 @@ import { toPath } from "../helpers/chain-url";
 
 //Renders `renderTree()` inside a memory router at `url` and counts URL replaces.
 //A runaway writer replaces the same URL forever, so fail fast past `maxRewrites` instead of hanging the test.
-export function mountInRouter(renderTree, { url, maxRewrites = 20 }) {
-  const history = createMemoryHistory({ initialEntries: [url] });
+//Pass `history` to start from other entries, or from the browser's history.
+export function mountInRouter(
+  renderTree,
+  { url, history = createMemoryHistory({ initialEntries: [url] }), maxRewrites = 20 }
+) {
   let rewrites = 0;
   history.listen((_, action) => {
     if (action !== "REPLACE") return;
