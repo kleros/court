@@ -85,6 +85,32 @@ describe("WalletConnector", () => {
     expect(reloadedAt).toEqual(["/100/cases/5"]);
   });
 
+  //The router decodes the path, so these are courts and a case page. Only the prefix is rewritten; the rest stays as typed.
+  it("reads the page as the router does on a hand-encoded path", async () => {
+    await connectFrom("/100/%63ourts", "0x1");
+    expect(reloadedAt).toEqual(["/1/%63ourts"]);
+  });
+
+  it("keeps the case page's chain on a hand-encoded path", async () => {
+    await connectFrom("/100/%63ases/5", "0x1");
+    expect(reloadedAt).toEqual(["/100/%63ases/5"]);
+  });
+
+  it("reads the page after the wallet answers, so a navigation meanwhile keeps the case page's chain", async () => {
+    let answer;
+    await connectFrom(
+      "/100/courts",
+      new Promise((resolve) => {
+        answer = resolve;
+      })
+    );
+    window.history.replaceState(null, "", "/100/cases/5");
+    await act(async () => {
+      answer("0x1");
+    });
+    expect(reloadedAt).toEqual(["/100/cases/5"]);
+  });
+
   it("reloads in place when the wallet's chain cannot be read", async () => {
     await connectFrom("/100/courts", new Error("eth_chainId failed"));
     expect(reloadedAt).toEqual(["/100/courts"]);

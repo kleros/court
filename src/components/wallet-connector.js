@@ -4,7 +4,7 @@ import styled from "styled-components/macro";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { detectWallets, connectWallet } from "../bootstrap/wallet-connector";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
-import { chainAfterConnect, reloadOnChain } from "../helpers/chain-url";
+import { browserLocation, chainAfterConnect, reloadOnChain } from "../helpers/chain-url";
 
 const { useDrizzleState } = drizzleReactHooks;
 
@@ -80,7 +80,9 @@ export default function WalletConnector() {
       setModalVisible(false);
       //An accepted switch put the wallet on the chain the page shows, so reload in place. Asking the wallet for its chain
       //right away could still return the old one. Otherwise the wallet stayed put and the page may follow it.
-      const chainId = switched ? undefined : chainAfterConnect(window.location, await getWalletChainId(provider));
+      const walletChainId = switched ? undefined : await getWalletChainId(provider);
+      //Read the page only now: the user may have navigated while the wallet answered.
+      const chainId = chainAfterConnect(browserLocation(), walletChainId);
       if (chainId) {
         reloadOnChain(chainId);
       } else {
