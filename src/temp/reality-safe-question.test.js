@@ -9,7 +9,7 @@ const D = "\u241f";
 // Same algorithm as reality-eth-lib's populatedJSONForTemplate (vsprintf of the raw parameters into the template, then
 // JSON.parse), minus its post-processing. reality-eth-lib itself is not imported here because it does not load in the
 // react-scripts Jest environment (jsdom/marked). Its outputs quoted in the tests below were checked against
-// reality-eth-lib 3.4.6 (the version used by the court) and 3.4.30.
+// reality-eth-lib 3.4.6 (the version the court used until it removed the library) and 3.4.30.
 const naivePopulate = (template, question) => {
   const parts = question.split(D);
   let i = 0;

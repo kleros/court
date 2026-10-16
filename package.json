@@ -69,16 +69,16 @@
     "@drizzle/store": "^1.5.3",
     "@kleros/pnk-merkle-drop-contracts": "^0.1.0",
     "@loadable/component": "^5.5.0",
-    "@reality.eth/contracts": "3.0.0",
-    "@reality.eth/reality-eth-lib": "3.4.6",
     "@sentry/react": "^7.37.2",
     "@sentry/tracing": "^7.37.2",
     "antd": "^3.10.8",
     "axios": "^1.4.0",
+    "bignumber.js": "9.0.1",
     "bootstrap": "^5.2.3",
     "clsx": "^1.1.1",
     "dataloader": "^1.4.0",
     "debounce": "^1.2.0",
+    "ethers": "5.7.2",
     "iframe": "^1.0.0",
     "iframe-resizer-react": "^1.1.0",
     "is-image": "^2.0.0",
@@ -108,7 +108,6 @@
     "web3": "1.5.2"
   },
   "resolutions": {
-    "html-to-text": "^7.0.0",
     "graceful-fs": "^4.2.11",
     "cipher-base": "^1.0.5",
     "sha.js": "^2.4.12"
