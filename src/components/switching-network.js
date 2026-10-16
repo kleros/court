@@ -9,7 +9,11 @@ import useChainId from "../hooks/use-chain-id";
 //a spinner instead.
 export default function SwitchingNetwork({ children }) {
   const isReloadPending = useIsReloadPending(useChainId());
-  return isReloadPending ? <StyledSpin tip="Switching network…" /> : children;
+  return isReloadPending ? <SwitchingNetworkSpinner /> : children;
+}
+
+export function SwitchingNetworkSpinner() {
+  return <StyledSpin tip="Switching network…" />;
 }
 
 SwitchingNetwork.propTypes = {

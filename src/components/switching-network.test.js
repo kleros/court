@@ -8,6 +8,8 @@ import { CHAIN_ID_ROUTE } from "../helpers/chain-url";
 import { mountInRouter } from "../test-utils/memory-router";
 
 jest.mock("../hooks/use-chain-id", () => ({ __esModule: true, default: jest.fn() }));
+//A connected wallet: these tests are about the reload after a wallet chain change.
+jest.mock("../hooks/use-account", () => ({ __esModule: true, default: () => "0xabc" }));
 
 let page;
 
