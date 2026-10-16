@@ -1,5 +1,6 @@
 import {
   CHAIN_ID_ROUTE,
+  browserLocation,
   canonicalLocation,
   chainAfterConnect,
   chainPath,
@@ -292,14 +293,26 @@ describe("resolveFallbackChainId", () => {
     });
   });
 
-  it("reads a percent-encoded prefix the way the router does", () => {
-    const raw = "/%31%30%30/courts";
-    expect(resolveFallbackChainId({ pathname: raw, search: "" }, "1").chainId).toBe(100);
-    expect(splitChainPrefix(decodeURI(raw)).chainId).toBe(100);
+  it("boots on a percent-encoded prefix read through browserLocation, like the router", () => {
+    window.history.replaceState(null, "", "/%31%30%30/courts");
+    expect(resolveFallbackChainId(browserLocation(), "1").chainId).toBe(100);
+    window.history.replaceState(null, "", "/");
+  });
+});
+
+describe("browserLocation", () => {
+  afterEach(() => {
+    window.history.replaceState(null, "", "/");
   });
 
-  it("falls back to storage on a path the router cannot decode, without throwing", () => {
-    expect(resolveFallbackChainId({ pathname: "/100%/courts", search: "" }, "1").chainId).toBe(1);
+  it("decodes the path like the router, keeping the query and hash", () => {
+    window.history.replaceState(null, "", "/%31%30%30/cases/a%20b?x=%20#h");
+    expect(browserLocation()).toEqual({ pathname: "/100/cases/a b", search: "?x=%20", hash: "#h" });
+  });
+
+  it("keeps a path that cannot be decoded, without throwing", () => {
+    window.history.replaceState(null, "", "/100%/courts");
+    expect(browserLocation().pathname).toBe("/100%/courts");
   });
 });
 

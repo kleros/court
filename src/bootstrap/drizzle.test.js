@@ -28,6 +28,10 @@ describe("detectRequiredChainId", () => {
     expect(boot("/100/cases/1?requiredChainId=1", "1")).toEqual({ chainId: 100, writes: wrote(100), stored: "100" });
   });
 
+  it("boots on a percent-encoded prefix, like the router reads it", () => {
+    expect(boot("/%31%30%30/cases/1", "1")).toEqual({ chainId: 100, writes: wrote(100), stored: "100" });
+  });
+
   it("writes nothing when storage already holds the prefix's chain", () => {
     expect(boot("/100/cases/1", "100")).toEqual({ chainId: 100, writes: [], stored: "100" });
   });

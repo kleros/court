@@ -46,6 +46,13 @@ describe("connectWallet", () => {
     expect(switched).toBe(true);
   });
 
+  it("reads a percent-encoded prefix like the router", async () => {
+    window.history.replaceState(null, "", "/%31%30%30/courts");
+    window.localStorage.setItem(FALLBACK_CHAIN_ID_STORAGE_KEY, "1");
+    await connectWallet(WALLET_ID);
+    expect(switchRequests()).toEqual(["0x64"]);
+  });
+
   it("falls back to the stored chain on a page whose URL names none", async () => {
     window.history.replaceState(null, "", "/foo");
     window.localStorage.setItem(FALLBACK_CHAIN_ID_STORAGE_KEY, "100");

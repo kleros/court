@@ -1,5 +1,5 @@
 import { FALLBACK_CHAIN_ID_STORAGE_KEY } from "./drizzle";
-import { urlChainId } from "../helpers/chain-url";
+import { browserLocation, urlChainId } from "../helpers/chain-url";
 
 let hasRequestedEip6963Announcements = false;
 const discoveredWalletIDs = new Set();
@@ -130,7 +130,7 @@ export async function connectWallet(walletId) {
     //Try to switch to the chain the user was browsing in view mode, so they stay on it. The URL names that chain.
     //The stored chain is only the fallback for a page whose URL names none, such as a 404: another tab may have stored a
     //different chain since this page loaded.
-    const browsedChainId = urlChainId(window.location) ?? window.localStorage?.getItem(FALLBACK_CHAIN_ID_STORAGE_KEY);
+    const browsedChainId = urlChainId(browserLocation()) ?? window.localStorage?.getItem(FALLBACK_CHAIN_ID_STORAGE_KEY);
     let switched = false;
     if (browsedChainId) {
       try {
