@@ -4,6 +4,7 @@ import styled from "styled-components/macro";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { detectWallets, connectWallet } from "../bootstrap/wallet-connector";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
+import { browserLocation, chainAfterConnect, reloadOnChain } from "../helpers/chain-url";
 
 const { useDrizzleState } = drizzleReactHooks;
 
@@ -74,10 +75,19 @@ export default function WalletConnector() {
     message.loading({ content: "Connecting wallet…", key: msgKey, duration: 0 });
 
     try {
-      await connectWallet(walletId);
+      const { provider, switched } = await connectWallet(walletId);
       message.success({ content: "Wallet connected successfully!", key: msgKey });
       setModalVisible(false);
-      window.location.reload();
+      //An accepted switch put the wallet on the chain the page shows, so reload in place. Asking the wallet for its chain
+      //right away could still return the old one. Otherwise the wallet stayed put and the page may follow it.
+      const walletChainId = switched ? undefined : await getWalletChainId(provider);
+      //Read the page only now: the user may have navigated while the wallet answered.
+      const chainId = chainAfterConnect(browserLocation(), walletChainId);
+      if (chainId) {
+        reloadOnChain(chainId);
+      } else {
+        window.location.reload();
+      }
     } catch (err) {
       setError(err.message);
       message.error({ content: err.message, key: msgKey });
@@ -122,6 +132,17 @@ export default function WalletConnector() {
       </StyledModal>
     </>
   );
+}
+
+//The wallet's chain after connecting. Number() reads the standard hex string ("0x64") and the plain numbers some wallets return.
+//A failed request must not block the reload: the wallet is already connected. Anything that is not a supported chain id
+//makes the caller reload in place, as before.
+async function getWalletChainId(provider) {
+  try {
+    return Number(await provider.request({ method: "eth_chainId" }));
+  } catch {
+    return undefined;
+  }
 }
 
 const StyledEmptyText = styled(Text)`

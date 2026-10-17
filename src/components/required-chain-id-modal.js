@@ -5,8 +5,9 @@ import { drizzleReactHooks } from "@drizzle/react-plugin";
 import { Button, Icon, Modal, Typography } from "antd";
 import { chainIdToNetworkName } from "../helpers/networks";
 import { isSupportedSideChain, requestSwitchChain } from "../api/side-chain";
-import { useClearRequiredChainId, useSetRequiredChainId } from "./required-chain-id-gateway";
+import { useReplaceChainInUrl } from "./chain-navigation";
 import useAccount from "../hooks/use-account";
+import useChainId from "../hooks/use-chain-id";
 
 const { useDrizzle } = drizzleReactHooks;
 
@@ -15,7 +16,8 @@ export default function RequiredChainIdModal({ requiredChainId }) {
   const hasAccount = !!account;
 
   const networkName = chainIdToNetworkName[requiredChainId];
-  const cleanRequiredChainId = useClearRequiredChainId();
+  const chainId = useChainId();
+  const replaceChainInUrl = useReplaceChainInUrl();
 
   return (
     <StyledModal
@@ -28,7 +30,7 @@ export default function RequiredChainIdModal({ requiredChainId }) {
         ) : null
       }
       title={`Switch to ${networkName}`}
-      onCancel={() => cleanRequiredChainId()}
+      onCancel={() => replaceChainInUrl(chainId)}
     >
       {hasAccount && (
         <>
@@ -55,7 +57,7 @@ RequiredChainIdModal.propTypes = {
 function SwitchNetworkButton({ requiredChainId }) {
   const { drizzle } = useDrizzle();
 
-  const setRequiredChainId = useSetRequiredChainId();
+  const replaceChainInUrl = useReplaceChainInUrl();
 
   const switchChain = async () => {
     if (isSupportedSideChain(requiredChainId)) {
@@ -69,10 +71,10 @@ function SwitchNetworkButton({ requiredChainId }) {
          * such as Ropsten and Kovan. Apparently this is due to security reasons.
          * @see { @link https://docs.metamask.io/guide/rpc-api.html#wallet-addethereumchain }
          */
-        setRequiredChainId(requiredChainId);
+        replaceChainInUrl(requiredChainId);
       }
     } else if (requiredChainId) {
-      setRequiredChainId(requiredChainId);
+      replaceChainInUrl(requiredChainId);
     }
   };
 

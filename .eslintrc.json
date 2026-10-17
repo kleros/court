@@ -55,6 +55,39 @@
           "debug"
         ]
       }
+    ],
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "react-router-dom",
+            "importNames": [
+              "Link",
+              "NavLink",
+              "Redirect"
+            ],
+            "message": "Use ChainLink / ChainNavLink / CanonicalChainUrl from components/chain-navigation: internal paths carry the chain prefix."
+          },
+          {
+            "name": "react-router",
+            "importNames": [
+              "Redirect"
+            ],
+            "message": "Use CanonicalChainUrl / useReplaceChainInUrl from components/chain-navigation."
+          }
+        ]
+      }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/components/chain-navigation.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ]
 }

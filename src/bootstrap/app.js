@@ -7,7 +7,7 @@ import styled from "styled-components/macro";
 import { Dropdown, Layout, Spin } from "antd";
 import { MenuOutlined } from "@ant-design/icons";
 import { Helmet } from "react-helmet";
-import { BrowserRouter, NavLink, Route, Switch, useParams } from "react-router-dom";
+import { BrowserRouter, Route, Switch, useParams } from "react-router-dom";
 import { ReactComponent as Logo } from "../assets/images/kleros-logo-flat-light.svg";
 import NetworkStatus from "../components/network-status";
 import AccountStatus from "../components/account-status";
@@ -25,6 +25,14 @@ import ErrorBoundary from "../components/error-boundary";
 import DefaultFallback from "../components/error-fallback";
 import SmartContractWalletWarning from "../components/smart-contract-wallet-warning";
 import { DesktopMenu, MobileMenu } from "../components/menu";
+import { CanonicalChainUrl, ChainNavLink } from "../components/chain-navigation";
+import SwitchingNetwork from "../components/switching-network";
+import {
+  chainRoutePath,
+  pagePaths,
+  showChainOnBackForwardLoad,
+  showWalletChainOnBackForwardLoad,
+} from "../helpers/chain-url";
 
 export default function App() {
   const [customDrizzle, setCustomDrizzle] = useState(null);
@@ -32,6 +40,12 @@ export default function App() {
 
   //Check if wallet is already connected
   useEffect(() => {
+    const startViewOnly = () => {
+      const fallbackChainId = detectRequiredChainId();
+      showChainOnBackForwardLoad(fallbackChainId);
+      setCustomDrizzle(createDrizzle({ fallbackChainId }));
+    };
+
     (async () => {
       try {
         //Trigger wallet search and await results
@@ -39,7 +53,7 @@ export default function App() {
 
         //No wallets found, enter view mode
         if (wallets.length === 0) {
-          setCustomDrizzle(createDrizzle({ fallbackChainId: detectRequiredChainId() }));
+          startViewOnly();
           return;
         }
 
@@ -58,16 +72,18 @@ export default function App() {
           }
 
           if (accounts && accounts.length > 0) {
+            //Not awaited: a slow wallet must not hold up loading. It never rejects.
+            void showWalletChainOnBackForwardLoad(provider);
             handleWalletConnected(provider);
             return;
           }
         }
 
         //Wallets available but not connected — enter view mode
-        setCustomDrizzle(createDrizzle({ fallbackChainId: detectRequiredChainId() }));
+        startViewOnly();
       } catch (err) {
         console.warn("Auto-detect provider failed", err);
-        setCustomDrizzle(createDrizzle({ fallbackChainId: detectRequiredChainId() }));
+        startViewOnly();
       } finally {
         setCheckingProvider(false);
       }
@@ -137,41 +153,45 @@ export default function App() {
                       </StyledHeaderRow>
                     </StyledLayoutHeader>
                     <StyledLayoutContent>
-                      <Switch>
-                        {/* Handle hash-based email confirmation links (e.g., /#/settings/email-confirmation) */}
-                        <Route
-                          exact
-                          path="/"
-                          render={() => {
-                            //Check if hash contains email confirmation path
-                            if (
-                              typeof window !== "undefined" &&
-                              window.location.hash?.includes("/settings/email-confirmation")
-                            ) {
-                              return <EmailConfirmation />;
-                            }
-                            return <Home />;
-                          }}
-                        />
-                        <Route exact path="/courts">
-                          <Courts />
-                        </Route>
-                        <Route exact path="/cases">
-                          <Cases />
-                        </Route>
-                        <Route exact path="/cases/:ID">
-                          <Case />
-                        </Route>
-                        <Route exact path="/tokens">
-                          <Tokens />
-                        </Route>
-                        <Route exact path="/convert-pnk">
-                          <ConvertPnk />
-                        </Route>
-                        <Route path="*">
-                          <C404 />
-                        </Route>
-                      </Switch>
+                      <SwitchingNetwork>
+                        <CanonicalChainUrl>
+                          <Switch>
+                            {/* Handle hash-based email confirmation links (e.g., /1/#/settings/email-confirmation) */}
+                            <Route
+                              exact
+                              path={chainRoutePath(pagePaths.home)}
+                              render={() => {
+                                //Check if hash contains email confirmation path
+                                if (
+                                  typeof window !== "undefined" &&
+                                  window.location.hash?.includes("/settings/email-confirmation")
+                                ) {
+                                  return <EmailConfirmation />;
+                                }
+                                return <Home />;
+                              }}
+                            />
+                            <Route exact path={chainRoutePath(pagePaths.courts)}>
+                              <Courts />
+                            </Route>
+                            <Route exact path={chainRoutePath(pagePaths.cases)}>
+                              <Cases />
+                            </Route>
+                            <Route exact path={chainRoutePath(pagePaths.case)}>
+                              <Case />
+                            </Route>
+                            <Route exact path={chainRoutePath(pagePaths.tokens)}>
+                              <Tokens />
+                            </Route>
+                            <Route exact path={chainRoutePath(pagePaths.convertPnk)}>
+                              <ConvertPnk />
+                            </Route>
+                            <Route path="*">
+                              <C404 />
+                            </Route>
+                          </Switch>
+                        </CanonicalChainUrl>
+                      </SwitchingNetwork>
                     </StyledLayoutContent>
                     <Footer />
                   </Layout>
@@ -332,7 +352,7 @@ const StyledTray = styled.div`
   }
 `;
 
-const LogoNavLink = styled(NavLink)`
+const LogoNavLink = styled(ChainNavLink)`
   display: inline-block;
   max-width: 120px;
   transition: opacity 0.2s ease;

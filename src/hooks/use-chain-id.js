@@ -58,6 +58,13 @@ export function ChainIdProvider({ web3, children, renderOnError, renderOnLoading
       // chainChanged payload is the chain ID in hex format.
       const normalizedChainId = hexStringToNumber(chainIdFromEvent);
 
+      //Ignore a payload that is no chain id ("0x", "", "0x0"). Setting it would unmount everything below the provider,
+      //and the next real change would then mount the app fresh, without the reload a chain change needs.
+      //Unsupported chains still pass: ChainChangeWatcher shows its fallback for them.
+      if (!Number.isInteger(normalizedChainId) || normalizedChainId <= 0) {
+        return;
+      }
+
       if (isMounted) {
         setChainId(normalizedChainId);
       }
