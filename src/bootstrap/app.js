@@ -72,8 +72,8 @@ export default function App() {
           }
 
           if (accounts && accounts.length > 0) {
-            //Not awaited: a slow wallet must not hold up loading.
-            showWalletChainOnBackForwardLoad(provider);
+            //Not awaited: a slow wallet must not hold up loading. It never rejects.
+            void showWalletChainOnBackForwardLoad(provider);
             handleWalletConnected(provider);
             return;
           }
