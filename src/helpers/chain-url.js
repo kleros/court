@@ -172,7 +172,9 @@ export function detectBackForwardLoad() {
   } catch {
     //Without session storage only the navigation type counts.
   }
-  loadedByBackForward = navigationType === "back_forward" || wasRestored;
+  //The marker counts only on the reload it was set for. One left by a reload that never happened (Back pressed again
+  //first) must not make the next page opened by a link a Back.
+  loadedByBackForward = navigationType === "back_forward" || (wasRestored && navigationType === "reload");
 }
 
 export const isBackForwardLoad = () => loadedByBackForward;

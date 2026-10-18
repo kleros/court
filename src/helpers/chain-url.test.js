@@ -445,6 +445,12 @@ describe("detectBackForwardLoad", () => {
     expect(loadedAs("reload")).toBe(false);
   });
 
+  it.each(["navigate", undefined])("ignores a marker left by a reload that never happened, on a %p load", (type) => {
+    window.sessionStorage.setItem(RESTORED_KEY, "1");
+    expect(loadedAs(type)).toBe(false);
+    expect(window.sessionStorage.getItem(RESTORED_KEY)).toBeNull();
+  });
+
   describe("reloadWhenRestoredFromCache", () => {
     let reloadSpy;
     beforeEach(() => {
