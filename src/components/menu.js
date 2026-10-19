@@ -1,17 +1,19 @@
 import React from "react";
 import styled from "styled-components/macro";
 import { Menu } from "antd";
-import { useLocation, NavLink } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { ChainNavLink } from "./chain-navigation";
+import { splitChainPrefix } from "../helpers/chain-url";
 
 const MenuItems = [
   <Menu.Item key="home">
-    <NavLink to="/">Home</NavLink>
+    <ChainNavLink to="/">Home</ChainNavLink>
   </Menu.Item>,
   <Menu.Item key="courts">
-    <NavLink to="/courts">Courts</NavLink>
+    <ChainNavLink to="/courts">Courts</ChainNavLink>
   </Menu.Item>,
   <Menu.Item key="cases">
-    <NavLink to="/cases">My Cases</NavLink>
+    <ChainNavLink to="/cases">My Cases</ChainNavLink>
   </Menu.Item>,
   <Menu.Item key="guide">
     <a
@@ -24,12 +26,17 @@ const MenuItems = [
   </Menu.Item>,
 ];
 
-function useMenuSelectKey() {
-  const { pathname } = useLocation();
-  if (pathname === "/") return "home";
-  if (pathname === "/courts" || pathname.startsWith("/courts/")) return "courts";
-  if (pathname === "/cases" || pathname.startsWith("/cases/")) return "cases";
+//The selected item ignores the chain prefix: "/100/courts" selects Courts. "/100" has an empty rest, which is home.
+export function menuKeyForPath(pathname) {
+  const path = splitChainPrefix(pathname).rest || "/";
+  if (path === "/") return "home";
+  if (path === "/courts" || path.startsWith("/courts/")) return "courts";
+  if (path === "/cases" || path.startsWith("/cases/")) return "cases";
   return null;
+}
+
+function useMenuSelectKey() {
+  return menuKeyForPath(useLocation().pathname);
 }
 
 export function MobileMenu() {

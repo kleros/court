@@ -1,4 +1,5 @@
 import { FALLBACK_CHAIN_ID_STORAGE_KEY } from "./drizzle";
+import { browserLocation, urlChainId } from "../helpers/chain-url";
 
 let hasRequestedEip6963Announcements = false;
 const discoveredWalletIDs = new Set();
@@ -103,7 +104,7 @@ export function disconnectWallet(chainId) {
   window.location.reload();
 }
 
-//Connect to a specific wallet
+//Connect to a specific wallet. Returns its provider and whether it accepted the switch to the chain the user was browsing.
 export async function connectWallet(walletId) {
   const wallets = detectWallets();
   const wallet = wallets.find((w) => w.id === walletId);
@@ -126,20 +127,24 @@ export async function connectWallet(walletId) {
       window.localStorage.setItem(STORAGE_KEY_LAST_WALLET_ID, wallet.id);
     }
 
-    //If the user was browsing a specific chain in view mode, try to switch to it, so user remains in the chain he was.
-    const fallbackChainId = window.localStorage?.getItem(FALLBACK_CHAIN_ID_STORAGE_KEY);
-    if (fallbackChainId) {
+    //Try to switch to the chain the user was browsing in view mode, so they stay on it. The URL names that chain.
+    //The stored chain is only the fallback for a page whose URL names none, such as a 404: another tab may have stored a
+    //different chain since this page loaded.
+    const browsedChainId = urlChainId(browserLocation()) ?? window.localStorage?.getItem(FALLBACK_CHAIN_ID_STORAGE_KEY);
+    let switched = false;
+    if (browsedChainId) {
       try {
         await wallet.provider.request({
           method: "wallet_switchEthereumChain",
-          params: [{ chainId: `0x${Number(fallbackChainId).toString(16)}` }],
+          params: [{ chainId: `0x${Number(browsedChainId).toString(16)}` }],
         });
+        switched = true;
       } catch (_) {
         //Ignore. The wallet may not support this chain or the user may have rejected it.
       }
     }
 
-    return wallet.provider;
+    return { provider: wallet.provider, switched };
   } catch (error) {
     const message = error && typeof error === "object" && "message" in error ? error.message : String(error);
     throw new Error(`Failed to connect to ${wallet.name}: ${message}`);

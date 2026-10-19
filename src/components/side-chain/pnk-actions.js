@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import t from "prop-types";
 import styled from "styled-components/macro";
-import { Link } from "react-router-dom";
+import { ChainLink } from "../chain-navigation";
 import { Affix, Button, Divider, Modal, Typography } from "antd";
 import Web3 from "web3";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
@@ -230,7 +230,7 @@ function GetSideChainPnkModal({ defaultVisible }) {
         To be able to stake on Kleros Court, first you need to get some {xPnkTokenSymbol}.
       </StyledExplainer>
       <div style={{ textAlign: "center" }}>
-        <Link
+        <ChainLink
           to="/tokens"
           style={{
             display: "inline-block",
@@ -239,7 +239,7 @@ function GetSideChainPnkModal({ defaultVisible }) {
           <StyledButton size="large" type="secondary">
             Buy PNK
           </StyledButton>
-        </Link>
+        </ChainLink>
       </div>
     </StyledModal>
   );

@@ -1,176 +1,87 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import t from "prop-types";
-import styled from "styled-components/macro";
-import { useHistory, useLocation } from "react-router-dom";
-import { Card, Spin } from "antd";
-import useQueryParams from "../hooks/use-query-params";
+import { useParams } from "react-router-dom";
 import useChainId from "../hooks/use-chain-id";
-import SwitchNetworkMessage from "./switch-network-message";
+import useAccount from "../hooks/use-account";
+import { toPath } from "../helpers/chain-url";
+import { SwitchingNetworkSpinner } from "./switching-network";
 
-export default function RequiredChainIdGateway({ children, render, renderOnMismatch, keepChainIdInUrl }) {
-  const queryParams = useQueryParams();
-  const parsedValue = Number.parseInt(queryParams.requiredChainId, 10);
-  const requiredChainId = Number.isNaN(parsedValue) ? undefined : parsedValue;
+export default function RequiredChainIdGateway({ children, renderOnMismatch }) {
+  //Pages render only under a chain route (chainRoutePath in helpers/chain-url), so the param is always one of the supported ids.
+  const requiredChainId = Number(useParams().chainId);
   const chainId = useChainId();
-  const isReloadPending = useIsReloadPending(chainId);
+  const account = useAccount();
+  const matches = requiredChainId === chainId;
+  //No chain yet means nothing to compare; ChainIdProvider renders pages only once it is known.
+  const isReloading = useViewOnlyReload(!account && chainId !== undefined && !matches);
 
-  useClearWhenInvalid();
-  useSyncRequiredChainId({ chainId, requiredChainId, keepChainIdInUrl });
-
-  if (isReloadPending) {
-    return (
-      <Spin spinning tip="Switching network…">
-        <div></div>
-      </Spin>
-    );
+  if (isReloading) {
+    return <SwitchingNetworkSpinner />;
   }
 
-  const content = children ?? render?.({ requiredChainId }) ?? null;
-
-  return requiredChainId === undefined || requiredChainId === chainId ? content : renderOnMismatch({ requiredChainId });
-}
-
-//A wallet chain change always reloads the page.
-//If the URL still has the old chain, the "switch back" prompt and wrong-chain modals could flash. Show a spinner instead.
-function useIsReloadPending(chainId) {
-  const initialChainId = React.useRef();
-  if (initialChainId.current === undefined && chainId !== undefined) {
-    initialChainId.current = chainId;
-  }
-  return initialChainId.current !== undefined && chainId !== initialChainId.current;
+  return matches ? children : renderOnMismatch({ requiredChainId });
 }
 
 RequiredChainIdGateway.propTypes = {
   children: t.node,
-  render: t.func,
-  renderOnMismatch: t.func,
-  keepChainIdInUrl: t.bool,
+  renderOnMismatch: t.func.isRequired,
 };
 
 RequiredChainIdGateway.defaultProps = {
   children: null,
-  renderOnMismatch(props) {
-    return <DefaultRenderOnMismatch {...props} />;
-  },
-  keepChainIdInUrl: false,
 };
 
-function DefaultRenderOnMismatch({ requiredChainId }) {
-  return (
-    <StyledCard>
-      <SwitchNetworkMessage showSwitchButton title="You are on the wrong network" wantedChainId={requiredChainId} />
-    </StyledCard>
-  );
-}
+//The URL a view-only reload was already tried for.
+const VIEW_ONLY_RELOAD_KEY = "@@kleros/court/view-only-reload";
 
-DefaultRenderOnMismatch.propTypes = {
-  requiredChainId: t.number,
-};
+//Without a wallet the app boots on the URL's chain, so a mismatch only appears after Back or Forward to the case page
+//from before a header switch (other pages follow the chain then, see CanonicalChainUrl). The switch prompt needs a
+//wallet, so reload instead: boot then follows the URL.
+//Tried once per URL. If boot still lands elsewhere (an RPC configured for the wrong chain, say), the page keeps today's
+//mismatch rendering instead of reloading forever. "reloads at most once for the same URL" fails without this guard.
+//No reload when the marker cannot be saved either: the next load could not tell it already tried.
+//Returns whether to show the spinner. Once a reload is asked for, it stays until the page unloads.
+function useViewOnlyReload(isNeeded) {
+  const url = toPath(window.location);
+  //What this page did for `url`, once it tried to save the marker: { url, isReloading }.
+  const [attempt, setAttempt] = useState(null);
+  const isAttempted = attempt?.url === url;
+  const shouldTry = isNeeded && !isAttempted && readReloadMarker() !== url;
 
-export function useSetRequiredChainId() {
-  const history = useHistory();
-  const location = useLocation();
-  const queryParams = useQueryParams();
-
-  return React.useCallback(
-    (requiredChainId, { location: newLocation } = {}) => {
-      if (Number.isNaN(Number.parseInt(requiredChainId, 10))) {
-        return;
+  useEffect(() => {
+    if (shouldTry) {
+      const isSaved = writeReloadMarker(url);
+      setAttempt({ url, isReloading: isSaved });
+      if (isSaved) {
+        window.location.reload();
       }
+    } else if (!isNeeded) {
+      writeReloadMarker(null);
+    }
+  }, [shouldTry, isNeeded, url]);
 
-      const newLocationMixin = typeof newLocation === "string" ? { pathname: newLocation } : newLocation;
-
-      const newQueryParams = Object.fromEntries(
-        Object.entries({
-          ...queryParams,
-          requiredChainId,
-        })
-      );
-      history.replace({
-        ...location,
-        ...newLocationMixin,
-        search: new URLSearchParams(newQueryParams).toString(),
-      });
-    },
-    [history, location, queryParams]
-  );
+  return isNeeded && (shouldTry || (isAttempted && attempt.isReloading));
 }
 
-export function useClearRequiredChainId() {
-  const history = useHistory();
-  const location = useLocation();
-  const queryParams = useQueryParams();
-
-  return React.useCallback(() => {
-    const newQueryParams = Object.fromEntries(
-      Object.entries({
-        ...queryParams,
-      }).filter(([key, _]) => key !== "requiredChainId")
-    );
-    history.replace({
-      ...location,
-      search: new URLSearchParams(newQueryParams).toString(),
-    });
-  }, [history, location, queryParams]);
-}
-
-function useSyncRequiredChainId({ chainId, requiredChainId, keepChainIdInUrl }) {
-  const clear = useClearRequiredChainId();
-  const setRequiredChainId = useSetRequiredChainId();
-
-  React.useEffect(() => {
-    //Without a `chainID`, there's nothing to sync. Without this guard, undefined would get compared to undefined, and we'd get an infinite loop.
-    if (!chainId) {
-      return;
-    }
-
-    //Keep the chain in the URL, so a copied link opens the case on the correct chain. Only used in the case page, currently.
-    if (keepChainIdInUrl) {
-      //Only add the param when it is missing. Overwriting would silently open the wrong case instead of asking to switch.
-      if (requiredChainId === undefined) {
-        setRequiredChainId(chainId);
-      }
-    } else if (requiredChainId === chainId) {
-      //The param is not needed in this scenario.
-      clear();
-    }
-  }, [keepChainIdInUrl, chainId, requiredChainId, clear, setRequiredChainId]);
-}
-
-function useClearWhenInvalid() {
-  const clear = useClearRequiredChainId();
-  const { requiredChainId } = useQueryParams();
-
-  React.useEffect(() => {
-    if (requiredChainId !== undefined && Number.isNaN(Number.parseInt(requiredChainId, 10))) {
-      clear();
-    }
-  }, [requiredChainId, clear]);
-}
-
-const StyledCard = styled(Card)`
-  margin: 20px auto 0;
-  max-width: 768px;
-  border-radius: 12px;
-  box-shadow: ${({ theme }) => theme.cardShadow};
-
-  .ant-card-actions {
-    background: none;
-    border: none;
-    padding: 16px 24px;
-    display: flex;
-    gap: 16px;
-
-    > li {
-      text-align: inherit;
-      border: none;
-      width: auto !important;
-      padding: 0;
-    }
-
-    ::after,
-    ::before {
-      display: none;
-    }
+//Session storage can be unavailable. Then it reads as "already tried", so the page never reloads without the guard.
+function readReloadMarker() {
+  try {
+    return window.sessionStorage.getItem(VIEW_ONLY_RELOAD_KEY);
+  } catch {
+    return toPath(window.location);
   }
-`;
+}
+
+//Whether the write went through.
+function writeReloadMarker(url) {
+  try {
+    if (url === null) {
+      window.sessionStorage.removeItem(VIEW_ONLY_RELOAD_KEY);
+    } else {
+      window.sessionStorage.setItem(VIEW_ONLY_RELOAD_KEY, url);
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}

@@ -9,7 +9,7 @@ import { chainIdToNetworkShortName } from "../helpers/networks";
 import { requestSwitchChain } from "../api/side-chain";
 import { useDrizzle } from "../bootstrap/drizzle";
 import { VIEW_ONLY_ADDRESS } from "../bootstrap/dataloader";
-import { useSetRequiredChainId } from "./required-chain-id-gateway";
+import { reloadOnChain } from "../helpers/chain-url";
 
 const { useDrizzleState } = drizzleReactHooks;
 
@@ -25,14 +25,12 @@ function SwitchChainMenu() {
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
   const chainId = useChainId();
-  const setRequiredChainId = useSetRequiredChainId();
 
   const handleSwitchChain = async (targetChainId) => {
     if (targetChainId === chainId) return; // Already on this chain
 
     if (account === VIEW_ONLY_ADDRESS) {
-      setRequiredChainId(targetChainId);
-      window.location.reload();
+      reloadOnChain(targetChainId);
     } else {
       try {
         await requestSwitchChain(drizzle.web3.currentProvider, targetChainId);

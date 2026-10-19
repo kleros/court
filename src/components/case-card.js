@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { ChainLink } from "./chain-navigation";
 import PropTypes from "prop-types";
 import { Button, Card, Col, Row } from "antd";
 import { drizzleReactHooks } from "@drizzle/react-plugin";
@@ -227,9 +227,9 @@ const CaseCard = ({ ID, draws, isVoteCommitted }) => {
               isVoteCommitted={isVoteCommitted}
             />
           ),
-          <Link key="details" to={`/cases/${ID}`}>
+          <ChainLink key="details" to={`/cases/${ID}`}>
             <Button type="primary">See Details</Button>
-          </Link>,
+          </ChainLink>,
         ],
         [disputeData.deadline, dispute.period, disputeData.hiddenVotes, ID, isVoteCommitted]
       )}

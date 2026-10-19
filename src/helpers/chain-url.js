@@ -1,0 +1,258 @@
+import { matchPath } from "react-router-dom";
+import { supportedChainIds } from "./networks";
+
+//The chain a URL without any chain information resolves to, when nothing else names one.
+const DEFAULT_CHAIN_ID = 1;
+
+//Legacy query alias. Atlas, event-microservices, escrow-ui, dispute-resolver and klerosboard still emit it.
+const LEGACY_CHAIN_PARAM = "requiredChainId";
+
+//The first path segment is the chain id. Only supported ids match; anything else falls through to the 404.
+export const CHAIN_ID_ROUTE = `/:chainId(${supportedChainIds.join("|")})`;
+
+//Every page of the app, without its chain prefix. app.js builds its routes from these and nothing else.
+export const pagePaths = {
+  home: "/",
+  courts: "/courts",
+  cases: "/cases",
+  case: "/cases/:ID",
+  tokens: "/tokens",
+  convertPnk: "/convert-pnk",
+};
+
+//Pages that mount no RequiredChainIdGateway. There the connected chain wins over the URL's.
+const ungatedPagePaths = [pagePaths.tokens, pagePaths.convertPnk];
+
+//Pages that follow the connected chain after a wallet connects, and on Back or Forward inside the app.
+//Not the case page: there the same ID is another dispute elsewhere.
+const chainFollowingPagePaths = Object.values(pagePaths).filter((path) => path !== pagePaths.case);
+
+//"/cases/:ID" -> "/:chainId(1|100|10200|11155111)/cases/:ID"
+export const chainRoutePath = (pagePath) => `${CHAIN_ID_ROUTE}${pagePath}`;
+
+//The only place a chain prefix is concatenated. `path` is chain-relative and starts with "/": ("/", 1) -> "/1/".
+export const chainPath = (chainId, path) => `/${chainId}${path}`;
+
+export const toPath = ({ pathname, search = "", hash = "" }) => `${pathname}${search}${hash}`;
+
+//"/100/cases/5" -> { chainId: 100, rest: "/cases/5" }; "/100" -> rest ""; "/100/" -> rest "/".
+//Uses the router's own regex, so the parser and the routes cannot disagree about what a prefix is.
+export function splitChainPrefix(pathname) {
+  const match = matchPath(pathname, { path: CHAIN_ID_ROUTE });
+  if (!match) {
+    return { chainId: undefined, rest: pathname };
+  }
+  //match.url swallows a trailing slash ("/100/" gives url "/100/"), so slice by the id's length to keep `rest` byte for byte.
+  return { chainId: Number(match.params.chainId), rest: pathname.slice(match.params.chainId.length + 1) };
+}
+
+//parseInt keeps the previous reading of reachable values ("100abc" is 100). Only a supported id counts.
+function legacyParamChainId(search) {
+  const value = Number.parseInt(new URLSearchParams(search).get(LEGACY_CHAIN_PARAM), 10);
+  return supportedChainIds.includes(value) ? value : undefined;
+}
+
+//The chain a URL asks for: its prefix first, else a valid legacy param (the path wins). Undefined when it names none.
+export function urlChainId({ pathname, search }) {
+  return splitChainPrefix(pathname).chainId ?? legacyParamChainId(search);
+}
+
+function withoutLegacyParam(search) {
+  const params = new URLSearchParams(search);
+  if (!params.has(LEGACY_CHAIN_PARAM)) {
+    return search; //Untouched, byte for byte.
+  }
+  params.delete(LEGACY_CHAIN_PARAM);
+  const rest = params.toString();
+  return rest ? `?${rest}` : "";
+}
+
+//The prefix rewriter. Total: bare, prefixed, legacy-param and 404 URLs all come out as "/<chainId>/…".
+//The legacy param is dropped; the rest of the path, the other params and the hash are kept.
+//Neither decodes nor encodes: a router location in, a router location out; window.location in, raw out.
+export function withChainPrefix({ pathname, search = "", hash = "" }, chainId) {
+  return { pathname: chainPath(chainId, splitChainPrefix(pathname).rest), search: withoutLegacyParam(search), hash };
+}
+
+const isPage = (pathname, paths) => paths.some((p) => matchPath(pathname, { path: chainRoutePath(p), exact: true }));
+
+//The location a page must be shown under, or null when the URL is already canonical or is not a page.
+//`isHistoryMove`: the URL comes from Back or Forward inside the app, not from opening a link. Every page but the case
+//page then follows the connected chain, as tokens and convert-pnk always do.
+export function canonicalLocation(location, connectedChainId, isHistoryMove = false) {
+  //ChainIdProvider renders the router only once the chain is known, so this is never undefined in the app.
+  //Without the check, "/100/tokens" with an unknown chain would be replaced by "/undefined/tokens" (a 404),
+  //through the ungated-page branch.
+  //chain-navigation.test.js "writes nothing while the chain is unknown" fails if this check is removed.
+  if (!connectedChainId) {
+    return null;
+  }
+  const requestedChainId = urlChainId(location) ?? connectedChainId;
+  const prefixed = withChainPrefix(location, requestedChainId);
+  if (!isPage(prefixed.pathname, Object.values(pagePaths))) {
+    return null; //Not a page once prefixed, so the 404 renders in place and the URL stays.
+  }
+  const followingPaths = isHistoryMove ? chainFollowingPagePaths : ungatedPagePaths;
+  const target = isPage(prefixed.pathname, followingPaths) ? withChainPrefix(location, connectedChainId) : prefixed;
+  return toPath(target) === toPath(location) ? null : target; //Write only when the URL changes.
+}
+
+//The browser's location as the router sees it, for reading the URL's chain outside the router (app start, wallet connect).
+//The router decodes the path with decodeURI, so "/%31%30%30/courts" is chain 100 for it. A path that cannot be decoded
+//stays raw: the router then fails on it inside the error boundary. Never write this back to the address bar.
+export function browserLocation() {
+  const { pathname, search, hash } = window.location;
+  let decoded = pathname;
+  try {
+    decoded = decodeURI(pathname);
+  } catch {
+    //Keep the raw path.
+  }
+  return { pathname: decoded, search, hash };
+}
+
+//A hand-written link can percent-encode the chain prefix ("/%31%30%30/courts"). The router decodes it, but the prefix
+//rewriter (reloadOnChain) reads the raw address bar, so a later switch would land on a 404.
+//Called once at load, before the router starts: rewrites such a prefix to its plain form, the rest of the URL byte for
+//byte. decodeURI, as the router decodes, so a segment counts as a prefix exactly when the router would read one.
+export function normalizeEncodedChainPrefix() {
+  const { pathname, search, hash } = window.location;
+  const segment = pathname.split("/")[1] ?? "";
+  if (!segment.includes("%")) {
+    return;
+  }
+  let decoded;
+  try {
+    decoded = decodeURI(segment);
+  } catch {
+    return; //Malformed: the router fails on it inside the error boundary, as before.
+  }
+  if (!supportedChainIds.map(String).includes(decoded)) {
+    return;
+  }
+  const rest = pathname.slice(segment.length + 1);
+  window.history.replaceState(window.history.state, "", `/${decoded}${rest}${search}${hash}`);
+}
+
+//Boot-time chain for view-only mode: the URL (prefix, then legacy param), then storage, then mainnet.
+//`shouldStore` keeps the previous write rule: store unless storage already holds the URL's chain.
+//Pass browserLocation(), so boot reads the chain the router will show.
+//`isBackForward`: Back or Forward loaded the page. On every page but the case page the stored chain then wins, as Back
+//shows the previous page on the chain the user was on. Storage holds the chain this browser last booted on, so another
+//tab can have changed it: then the page shows that tab's chain, never another chain's data under this URL.
+export function resolveFallbackChainId(location, storedValue, isBackForward = false) {
+  const parsed = Number.parseInt(storedValue, 10);
+  //Only a supported stored chain counts. Junk, or an id like 999 left by an older version, is ignored and overwritten:
+  //booting on it finds no RPC, so drizzle falls back to the browser's wallet and asks it to connect.
+  const fromStorage = supportedChainIds.includes(parsed) ? parsed : undefined;
+  if (isBackForward && fromStorage !== undefined && isPage(location.pathname, chainFollowingPagePaths)) {
+    return { chainId: fromStorage, shouldStore: false };
+  }
+  const fromUrl = urlChainId(location);
+  const chainId = fromUrl ?? fromStorage ?? DEFAULT_CHAIN_ID;
+  return { chainId, shouldStore: fromStorage === undefined || fromStorage !== fromUrl };
+}
+
+//Set when the browser restored a page from its back/forward cache, so the reload that follows counts as a Back.
+const RESTORED_FROM_CACHE_KEY = "@@kleros/court/restored-from-back-forward-cache";
+
+let loadedByBackForward = false;
+//Whether CanonicalChainUrl has rendered on this page load: from then on the router keeps the URL right.
+let pagesShown = false;
+
+//Called once at load, before anything reads isBackForwardLoad(). Back or Forward to a page from another document (one
+//opened by a typed URL or a link) loads it again instead of a Back inside the app.
+export function detectBackForwardLoad() {
+  pagesShown = false;
+  const navigationType = window.performance?.getEntriesByType?.("navigation")?.[0]?.type;
+  let wasRestored = false;
+  try {
+    wasRestored = window.sessionStorage.getItem(RESTORED_FROM_CACHE_KEY) !== null;
+    window.sessionStorage.removeItem(RESTORED_FROM_CACHE_KEY);
+  } catch {
+    //Without session storage only the navigation type counts.
+  }
+  //The marker counts only on the reload it was set for. One left by a reload that never happened (Back pressed again
+  //first) must not make the next page opened by a link a Back.
+  loadedByBackForward = navigationType === "back_forward" || (wasRestored && navigationType === "reload");
+}
+
+export const isBackForwardLoad = () => loadedByBackForward;
+
+//Called by CanonicalChainUrl when it first renders.
+export function markPagesShown() {
+  pagesShown = true;
+}
+
+//On a page loaded by Back or Forward, writes the URL CanonicalChainUrl would write once the app has loaded, as soon as the
+//chain the app starts on is known: the old URL shows for less time. The same rule (canonicalLocation for a history move)
+//on the same router-decoded location, so it can only write that final URL. Only on a page that follows the chain, with
+//its chain prefix: the case page, bare and legacy URLs stay the router's, as before. Nothing for an unsupported chain,
+//which renders no router. A path the router cannot decode is never such a page, so it writes nothing either.
+export function showChainOnBackForwardLoad(chainId) {
+  if (!isBackForwardLoad() || !supportedChainIds.includes(chainId)) {
+    return;
+  }
+  const location = browserLocation();
+  if (!isPage(location.pathname, chainFollowingPagePaths)) {
+    return;
+  }
+  const target = canonicalLocation(location, chainId, true);
+  if (target) {
+    window.history.replaceState(window.history.state, "", toPath(target));
+  }
+}
+
+//The same, for a wallet that reconnected at load: its chain is the one the app starts on. The answer is used only if it
+//comes before the pages are shown, as from then on the router keeps the URL right, and only if the URL has not changed
+//meanwhile (a hash edited in the address bar, say). A failed request writes nothing either: the router corrects the
+//URL after loading, as before.
+export async function showWalletChainOnBackForwardLoad(provider) {
+  if (!isBackForwardLoad()) {
+    return;
+  }
+  const loadedUrl = toPath(window.location);
+  let chainId;
+  try {
+    chainId = Number(await provider.request({ method: "eth_chainId" }));
+  } catch {
+    return;
+  }
+  if (!pagesShown && toPath(window.location) === loadedUrl) {
+    showChainOnBackForwardLoad(chainId);
+  }
+}
+
+//A page the browser restores from its back/forward cache resumes with the chain it had then, which the wallet may have
+//left since. Reload it instead, so it boots like any page loaded by Back. A `pageshow` listener.
+export function reloadWhenRestoredFromCache(event) {
+  if (!event.persisted) {
+    return;
+  }
+  try {
+    window.sessionStorage.setItem(RESTORED_FROM_CACHE_KEY, "1");
+  } catch {
+    //The reload still boots on the wallet's chain; without the marker it keeps the URL's chain, as a link does.
+  }
+  window.location.reload();
+}
+
+//The chain to reload onto after a wallet connects, or undefined to reload in place.
+//When the wallet stays on another chain than the URL's (switch declined or unsupported), every page but the case page
+//follows the wallet, as a URL without a chain always did. The case page keeps its chain and asks to switch instead,
+//because the same ID is a different dispute on another chain.
+export function chainAfterConnect(location, walletChainId) {
+  const followsWallet = supportedChainIds.includes(walletChainId) && isPage(location.pathname, chainFollowingPagePaths);
+  return followsWallet ? walletChainId : undefined;
+}
+
+//Every switch that reloads goes through here: point the address bar at `chainId`, then reload, so the new document boots
+//on that chain. replaceState, not the router: nothing re-renders between the rewrite and the reload, and on
+//tokens/convert-pnk an in-router write would be canonicalized straight back to the connected chain before the reload.
+export function reloadOnChain(chainId) {
+  const nextUrl = toPath(withChainPrefix(window.location, chainId));
+  if (nextUrl !== toPath(window.location)) {
+    window.history.replaceState(window.history.state, "", nextUrl);
+  }
+  window.location.reload();
+}

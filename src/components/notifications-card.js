@@ -11,6 +11,7 @@ import TitledListCard from "./titled-list-card";
 import ListItem from "./list-item";
 import TimeAgo from "./time-ago";
 import useChainId from "../hooks/use-chain-id";
+import { useChainPath } from "./chain-navigation";
 
 const { useDrizzleState } = drizzleReactHooks;
 
@@ -19,15 +20,16 @@ const NotificationsCard = ({ history }) => {
     account: drizzleState.accounts[0] || VIEW_ONLY_ADDRESS,
   }));
   const chainId = useChainId();
+  const toChain = useChainPath();
 
   const { notifications: _notifications } = useNotifications(
     chainId,
     useCallback(
       async (_, onNotificationClick) => (_notification) => () => {
         onNotificationClick({ currentTarget: { id: _notification.key } });
-        history.push(_notification.to);
+        history.push(toChain(_notification.to));
       },
-      [history]
+      [history, toChain]
     )
   );
 
