@@ -77,11 +77,15 @@ export const isRangeLimitError = (err) => {
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // State shared by all the requests of one lookup: request budget and deadline.
-const createLookupContext = () => ({ requests: 0, deadline: Date.now() + LOOKUP_LIMITS.deadlineMs });
+export const createLookupContext = (deadlineMs = LOOKUP_LIMITS.deadlineMs) => ({
+  requests: 0,
+  deadlineMs,
+  deadline: Date.now() + deadlineMs,
+});
 
 const lookupLimitError = (message) => Object.assign(new Error(message), { lookupLimit: true });
 
-const createRpc = (chainId, context) => {
+export const createRpc = (chainId, context) => {
   const provider = new Web3.providers.HttpProvider(getReadOnlyRpcUrl(chainId), {
     timeout: LOOKUP_LIMITS.requestTimeoutMs,
   });
@@ -91,7 +95,7 @@ const createRpc = (chainId, context) => {
     if (context.requests >= LOOKUP_LIMITS.requestBudget)
       throw lookupLimitError(`Reality question lookup exceeded its budget of ${LOOKUP_LIMITS.requestBudget} requests.`);
     if (Date.now() > context.deadline)
-      throw lookupLimitError(`Reality question lookup exceeded its ${LOOKUP_LIMITS.deadlineMs} ms deadline.`);
+      throw lookupLimitError(`Reality question lookup exceeded its ${context.deadlineMs} ms deadline.`);
     context.requests++;
     nextId++;
     return new Promise((resolve, reject) => {
@@ -145,7 +149,7 @@ const uniqueLogs = (logs) => {
   });
 };
 
-const getLogs = async (rpc, filter, fromBlock, toBlock) =>
+export const getLogs = async (rpc, filter, fromBlock, toBlock) =>
   uniqueLogs(
     (await rpc.send("eth_getLogs", [{ ...filter, fromBlock: toHexBlock(fromBlock), toBlock: toHexBlock(toBlock) }])) ||
       []
@@ -199,6 +203,37 @@ export const findLogs = async (rpc, filter, fromBlock, toBlock) => {
     }
   }
   return [];
+};
+
+/**
+ * Find every log matching `filter` in [fromBlock, toBlock]. Like findLogs, the whole range is tried in one request first
+ * and refused ranges are split into shrinking windows, but every window must be answered: the scan never stops early and
+ * any other error is thrown, so an empty result means that the range has no such log.
+ */
+export const findAllLogs = async (rpc, filter, fromBlock, toBlock) => {
+  if (toBlock < fromBlock) return [];
+  let windowSize = rpc.windowSize || LOOKUP_LIMITS.windowSize;
+  if (!rpc.windowSize || toBlock - fromBlock + 1 <= windowSize) {
+    try {
+      return await getLogs(rpc, filter, fromBlock, toBlock);
+    } catch (err) {
+      if (!isRangeLimitError(err) || toBlock === fromBlock) throw err;
+    }
+  }
+
+  const logs = [];
+  for (let from = fromBlock; from <= toBlock; ) {
+    const to = Math.min(toBlock, from + windowSize - 1);
+    try {
+      logs.push(...(await getLogs(rpc, filter, from, to)));
+      from = to + 1;
+    } catch (err) {
+      if (!isRangeLimitError(err) || windowSize <= LOOKUP_LIMITS.minWindowSize || from === to) throw err;
+      windowSize = Math.max(LOOKUP_LIMITS.minWindowSize, Math.floor(windowSize / LOOKUP_LIMITS.windowShrinkFactor));
+    }
+  }
+  rpc.windowSize = windowSize;
+  return uniqueLogs(logs);
 };
 
 const requireSingleLog = (logs, what) => {
@@ -255,7 +290,7 @@ const findQuestionId = async (entry, arbitratorRpc, arbitratorChainId, disputeId
 const CLOCK_SKEW_MARGIN_S = 3600;
 const MAX_BLOCK_SEARCH_STEPS = 8;
 
-const getBlockHeader = async (rpc, block) => {
+export const getBlockHeader = async (rpc, block) => {
   const header = await rpc.send("eth_getBlockByNumber", [typeof block === "number" ? toHexBlock(block) : block, false]);
   if (!header) throw new Error(`Block ${block} not found.`);
   return { number: utils.hexToNumber(header.number), timestamp: utils.hexToNumber(header.timestamp) };

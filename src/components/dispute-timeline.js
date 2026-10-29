@@ -4,15 +4,33 @@ import Countdown, { zeroPad, calcTimeDelta } from "react-countdown";
 import PropTypes from "prop-types";
 import styled from "styled-components/macro";
 
-const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
+const formatDuration = ({ days, hours, minutes }) =>
+  `${zeroPad(days, 2)}d ${zeroPad(hours, 2)}h ${zeroPad(minutes, 2)}m`;
+
+// The countdown's spaces don't break, so it wraps as one piece.
+const loserDeadlineText = ({ completed, ...time }) =>
+  `Losing side's deadline to fund an appeal: ${completed ? "passed." : formatDuration(time).replace(/ /g, "\u00a0")}`;
+
+// The losing side's appeal deadline under the appeal period's countdown. Options are never named here.
+const LoserDeadline = ({ loserDeadline }) => {
+  if (!loserDeadline) return null;
+  if (!loserDeadline.known)
+    return <StyledLoserDeadline>The losing side may have less time to fund an appeal than this.</StyledLoserDeadline>;
+  if (loserDeadline.deadline === null) return null;
+  return (
+    <StyledLoserDeadline>
+      <Countdown date={loserDeadline.deadline * 1000} renderer={loserDeadlineText} />
+    </StyledLoserDeadline>
+  );
+};
+
+const DisputeTimeline = ({ period, lastPeriodChange, subcourt, loserDeadline }) => {
   const renderCountdown = useMemo(() => {
     return (
       subcourt?.timesPerPeriod && (
         <Countdown
           date={(parseInt(lastPeriodChange) + parseInt(subcourt.timesPerPeriod[period])) * 1000}
-          renderer={(props) => (
-            <span>{`${zeroPad(props.days, 2)}d ${zeroPad(props.hours, 2)}h ${zeroPad(props.minutes, 2)}m`}</span>
-          )}
+          renderer={(props) => <span>{formatDuration(props)}</span>}
         />
       )
     );
@@ -48,6 +66,7 @@ const DisputeTimeline = ({ period, lastPeriodChange, subcourt }) => {
                   <div>
                     <div>{periodName}</div>
                     <small> {getSubtext(i)} </small>
+                    {i === 3 && period === 3 && <LoserDeadline loserDeadline={loserDeadline} />}
                   </div>
                 </Period>
 
@@ -69,9 +88,17 @@ DisputeTimeline.propTypes = {
     timesPerPeriod: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
     hiddenVotes: PropTypes.bool.isRequired,
   }).isRequired,
+  loserDeadline: PropTypes.shape({
+    known: PropTypes.bool.isRequired,
+    deadline: PropTypes.number,
+  }),
   days: PropTypes.number.isRequired,
   hours: PropTypes.number.isRequired,
   minutes: PropTypes.number.isRequired,
+};
+
+LoserDeadline.propTypes = {
+  loserDeadline: DisputeTimeline.propTypes.loserDeadline,
 };
 
 const StyledDisputeTimeline = styled.div``;
@@ -133,16 +160,23 @@ const Period = styled(Col)`
   }
 `;
 
+const StyledLoserDeadline = styled.small`
+  display: block;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+
+  @media (min-width: 768px) {
+    max-width: 200px;
+  }
+`;
+
 const Separator = styled(Col)`
   ${({ past, theme }) => `border: 1px ${past ? theme.primaryColor : theme.borderColor} solid;`}
   height: 1px;
   margin: auto 16px;
 `;
 
-const convertToHumanReadableTime = (timeInMillis) => {
-  const time = calcTimeDelta(parseInt(timeInMillis) * 1000, { now: () => 0 });
-
-  return `${zeroPad(time.days, 2)}d ${zeroPad(time.hours, 2)}h ${zeroPad(time.minutes, 2)}m`;
-};
+const convertToHumanReadableTime = (timeInMillis) =>
+  formatDuration(calcTimeDelta(parseInt(timeInMillis) * 1000, { now: () => 0 }));
 
 export default DisputeTimeline;
