@@ -32,3 +32,13 @@ export const getAnswerString = (rulingOptions, vote, uintDisplayMode = "dec") =>
 
   return returnString;
 };
+
+// The label Court shows for a ruling, or undefined when the ruling has none in these ruling options.
+export const getRulingLabel = (rulingOptions, ruling, uintDisplayMode) => {
+  if (ruling === "0") return RTA_LABEL;
+  try {
+    return (rulingOptions && getAnswerString(rulingOptions, ruling, uintDisplayMode)) || undefined;
+  } catch {
+    return undefined;
+  }
+};

@@ -29,7 +29,9 @@ import { getReadOnlyRpcUrl } from "../bootstrap/web3";
 import useGetDraws from "../hooks/use-get-draws";
 import useLocalStorageString from "../hooks/use-local-storage-string";
 import arbitrableWhitelist from "../temp/arbitrable-whitelist";
-import { getAnswerString, RTA_LABEL } from "../temp/answer-string";
+import { getRulingLabel, RTA_LABEL } from "../temp/answer-string";
+import { decisionLines, hasRulingOptions } from "../helpers/appeal-display";
+import { useExecutedRuling, useLoserDeadline } from "../hooks/use-appeal-display";
 import RealityQuestionNotice from "./reality-question-notice";
 import { isSafeNavigationUrl } from "../utils/urlValidation";
 import { toHttpUrl } from "../utils/ipfs";
@@ -197,21 +199,20 @@ const RevealVoteButton = ({ onRevealClick, votesData, dispute }) => {
   );
 };
 
-const AnswerDisplay = ({ msg, vote, rulingOptions, uintDisplayMode }) => {
-  let answerString;
-  try {
-    answerString = rulingOptions && getAnswerString(rulingOptions, vote, uintDisplayMode);
-  } catch {
-    answerString = undefined;
-  }
-  return (
-    <>
-      {msg}
-      {vote === "0" ? RTA_LABEL : answerString || "Unknown Choice"}
-      &rdquo;.
-    </>
-  );
-};
+const AnswerDisplay = ({ msg, vote, rulingOptions, uintDisplayMode }) => (
+  <>
+    {msg}
+    {getRulingLabel(rulingOptions, vote, uintDisplayMode) || "Unknown Choice"}
+    &rdquo;.
+  </>
+);
+
+const Decision = ({ main, detail }) => (
+  <StyledDecision>
+    {main}
+    {detail && <StyledDecisionDetail>{detail}</StyledDecisionDetail>}
+  </StyledDecision>
+);
 
 export default function CaseDetailsCard({ ID }) {
   const { drizzle, useCacheCall, useCacheSend } = useDrizzle();
@@ -305,6 +306,22 @@ export default function CaseDetailsCard({ ID }) {
 
   const metaEvidence = dispute && getMetaEvidence(chainId, dispute.arbitrated, KlerosLiquid.address, ID, dispute.ruled);
   const evidence = useEvidence(chainId, ID);
+
+  const executedRuling = useExecutedRuling({
+    chainId,
+    arbitrator: KlerosLiquid.address,
+    disputeId: ID,
+    dispute,
+    courtRuling: votesData.currentRuling,
+    lastRound: disputeExtraInfo && disputeExtraInfo.votesLengths.length - 1,
+  });
+  const executedRulingLoading = dispute?.period === "4" && dispute.ruled && !executedRuling;
+  const loserDeadline = useLoserDeadline({
+    chainId,
+    dispute,
+    courtRuling: votesData.currentRuling,
+    appealPeriodTime: subcourtObj?.timesPerPeriod?.[3],
+  });
 
   const [showRefuse, setShowRefuse] = useState(false);
   useEffect(() => {
@@ -574,6 +591,7 @@ export default function CaseDetailsCard({ ID }) {
               votesData.loading ||
               !subcourts ||
               !metaEvidence ||
+              executedRulingLoading ||
               sendCommitStatus === "pending" ||
               sendVoteStatus === "pending"
             }
@@ -608,15 +626,17 @@ export default function CaseDetailsCard({ ID }) {
                   ) : (
                     "You were not drawn in the current round."
                   )}
-                  {dispute.period === "4" && (
-                    <SecondaryActionText>
-                      <AnswerDisplay
-                        msg="The winner in this case was: &ldquo;"
-                        rulingOptions={metaEvidence.rulingOptions}
-                        vote={votesData.currentRuling}
-                        {...{ uintDisplayMode }}
-                      />
-                    </SecondaryActionText>
+                  {dispute.period === "4" && !executedRulingLoading && (
+                    <Decision
+                      {...decisionLines({
+                        ruled: dispute.ruled,
+                        applied: executedRuling?.applied,
+                        courtRuling: votesData.currentRuling,
+                        reasonConfirmed: executedRuling?.reasonConfirmed,
+                        label: (ruling) => getRulingLabel(metaEvidence.rulingOptions, ruling, uintDisplayMode),
+                        optionsKnown: hasRulingOptions(metaEvidence.rulingOptions),
+                      })}
+                    />
                   )}
                   {votesData.committed && !votesData.voted ? (
                     committedVote !== undefined ? (
@@ -794,6 +814,7 @@ export default function CaseDetailsCard({ ID }) {
                 period={Number(dispute.period)}
                 lastPeriodChange={dispute.lastPeriodChange}
                 subcourt={subcourtObj}
+                loserDeadline={loserDeadline}
               />
             </div>
             <CollapsableCard
@@ -905,6 +926,11 @@ AnswerDisplay.propTypes = {
   rulingOptions: PropTypes.object.isRequired,
   vote: PropTypes.string.isRequired,
   uintDisplayMode: PropTypes.string,
+};
+
+Decision.propTypes = {
+  main: PropTypes.string.isRequired,
+  detail: PropTypes.string,
 };
 
 /**
@@ -1048,6 +1074,18 @@ const StyledRadioGroup = styled(Radio.Group)`
 
 const SecondaryActionText = styled.div`
   margin-top: 30px;
+`;
+
+const StyledDecision = styled(SecondaryActionText)`
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-align: center;
+`;
+
+const StyledDecisionDetail = styled.div`
+  font-size: 16px;
+  margin: 8px auto 0;
+  max-width: 640px;
 `;
 
 const StyledInputTextArea = styled(Input.TextArea)`
