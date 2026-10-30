@@ -41,11 +41,11 @@ describe("the losing side's deadline under the appeal countdown", () => {
   it("counts down to it while it is ahead", () => {
     const text = render(3, { known: true, deadline: NOW + 7 * 3600 + 54 * 60 + 30 });
     expect(text).toContain("02d 12h 00m");
-    expect(text).toContain("Losing side's deadline: 00d 07h 54m");
+    expect(text).toContain("Losing side: 00d 07h 54m");
   });
 
   it("says when it has passed", () => {
-    expect(render(3, { known: true, deadline: NOW })).toContain("Losing side's deadline: passed");
+    expect(render(3, { known: true, deadline: NOW })).toContain("Losing side: passed");
   });
 
   it("adds nothing when every side has the same time", () => {

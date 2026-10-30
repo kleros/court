@@ -9,7 +9,7 @@ const formatDuration = ({ days, hours, minutes }) =>
 
 // The countdown's spaces don't break, so it wraps as one piece.
 const loserDeadlineText = ({ completed, ...time }) =>
-  `Losing side's deadline: ${completed ? "passed" : formatDuration(time).replace(/ /g, "\u00a0")}`;
+  `Losing side: ${completed ? "passed" : formatDuration(time).replace(/ /g, "\u00a0")}`;
 
 // The losing side's appeal deadline under the appeal period's countdown. Options are never named here.
 const LoserDeadline = ({ loserDeadline }) => {
