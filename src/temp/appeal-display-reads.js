@@ -373,14 +373,16 @@ const FUNDING_READERS = {
 // The first block whose timestamp is at or after `timestamp`, given a block before it (`low`) and one at or after it
 // (`high`). Interpolating takes few requests on regular block times; every other step bisects, so it always converges.
 const blockAtTime = async (rpc, timestamp, low, high) => {
-  for (let step = 0; high.number - low.number > 1; step++) {
+  let bisect = false;
+  while (high.number - low.number > 1) {
     const interpolated =
       low.number +
       Math.floor(((timestamp - low.timestamp) * (high.number - low.number)) / (high.timestamp - low.timestamp));
-    const guess = step % 2 ? Math.floor((low.number + high.number) / 2) : interpolated;
+    const guess = bisect ? Math.floor((low.number + high.number) / 2) : interpolated;
     const block = await getBlockHeader(rpc, Math.min(high.number - 1, Math.max(low.number + 1, guess)));
     if (block.timestamp >= timestamp) high = block;
     else low = block;
+    bisect = !bisect;
   }
   return high;
 };

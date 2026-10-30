@@ -92,9 +92,6 @@ DisputeTimeline.propTypes = {
     known: PropTypes.bool.isRequired,
     deadline: PropTypes.number,
   }),
-  days: PropTypes.number.isRequired,
-  hours: PropTypes.number.isRequired,
-  minutes: PropTypes.number.isRequired,
 };
 
 LoserDeadline.propTypes = {
@@ -177,6 +174,6 @@ const Separator = styled(Col)`
 `;
 
 const convertToHumanReadableTime = (timeInMillis) =>
-  formatDuration(calcTimeDelta(parseInt(timeInMillis) * 1000, { now: () => 0 }));
+  formatDuration(calcTimeDelta(Number.parseInt(timeInMillis) * 1000, { now: () => 0 }));
 
 export default DisputeTimeline;
