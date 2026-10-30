@@ -30,7 +30,7 @@ import useGetDraws from "../hooks/use-get-draws";
 import useLocalStorageString from "../hooks/use-local-storage-string";
 import arbitrableWhitelist from "../temp/arbitrable-whitelist";
 import { getRulingLabel, RTA_LABEL } from "../temp/answer-string";
-import { decisionLines } from "../helpers/appeal-display";
+import { decisionLines, hasRulingOptions } from "../helpers/appeal-display";
 import { useExecutedRuling, useLoserDeadline } from "../hooks/use-appeal-display";
 import RealityQuestionNotice from "./reality-question-notice";
 import { isSafeNavigationUrl } from "../utils/urlValidation";
@@ -634,7 +634,7 @@ export default function CaseDetailsCard({ ID }) {
                         courtRuling: votesData.currentRuling,
                         reasonConfirmed: executedRuling?.reasonConfirmed,
                         label: (ruling) => getRulingLabel(metaEvidence.rulingOptions, ruling, uintDisplayMode),
-                        optionsKnown: Boolean(metaEvidence.rulingOptions?.type),
+                        optionsKnown: hasRulingOptions(metaEvidence.rulingOptions),
                       })}
                     />
                   )}

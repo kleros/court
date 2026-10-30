@@ -4,6 +4,7 @@ import {
   cloneTarget,
   decisionLines,
   familyOf,
+  hasRulingOptions,
   isReasonConfirmed,
   loserDeadline,
 } from "./appeal-display";
@@ -21,7 +22,7 @@ const lines = ({ rulingOptions = yesNo, ...dispute }) =>
   decisionLines({
     ...dispute,
     label: (ruling) => getRulingLabel(rulingOptions, ruling),
-    optionsKnown: Boolean(rulingOptions?.type),
+    optionsKnown: hasRulingOptions(rulingOptions),
   });
 
 describe("appliedRuling", () => {
@@ -184,7 +185,8 @@ describe("decisionLines", () => {
     });
   });
   it("claims no winner and no option when the case's options are unknown", () => {
-    for (const rulingOptions of [null, { titles: ["Yes", "No"] }]) {
+    // The last one is the case data shown when it fails to load (dataloader getMetaEvidence).
+    for (const rulingOptions of [null, { titles: ["Yes", "No"] }, { type: "single-select", titles: [] }]) {
       expect(lines({ ruled: true, applied: "2", courtRuling: "0", reasonConfirmed: true, rulingOptions })).toEqual({
         main: `The court ruled “${RTA_LABEL}”.`,
       });

@@ -47,6 +47,10 @@ export const loserDeadline = ({ family, multiplier, courtRuling, lastPeriodChang
   return toBN(lastPeriodChange).add(toBN(appealPeriodTime).mul(share).divn(10000)).toNumber();
 };
 
+// Whether Court has the case's options. The case data shown after it fails to load is a single-select with none.
+export const hasRulingOptions = (rulingOptions) =>
+  Boolean(rulingOptions?.type) && !(rulingOptions.type === "single-select" && !rulingOptions.titles?.length);
+
 // The decision box of an execution period case. `label(ruling)` is the ruling's label, undefined when it has none, and
 // `optionsKnown` whether Court has the case's options to label rulings with.
 export const decisionLines = ({ ruled, applied, courtRuling, reasonConfirmed, label, optionsKnown }) => {
