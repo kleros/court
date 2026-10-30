@@ -9,13 +9,13 @@ const formatDuration = ({ days, hours, minutes }) =>
 
 // The countdown's spaces don't break, so it wraps as one piece.
 const loserDeadlineText = ({ completed, ...time }) =>
-  `Losing side's deadline to fund an appeal: ${completed ? "passed." : formatDuration(time).replace(/ /g, "\u00a0")}`;
+  `Losing side's deadline: ${completed ? "passed" : formatDuration(time).replace(/ /g, "\u00a0")}`;
 
 // The losing side's appeal deadline under the appeal period's countdown. Options are never named here.
 const LoserDeadline = ({ loserDeadline }) => {
   if (!loserDeadline) return null;
   if (!loserDeadline.known)
-    return <StyledLoserDeadline>The losing side may have less time to fund an appeal than this.</StyledLoserDeadline>;
+    return <StyledLoserNote>The losing side may have less time to fund an appeal than this.</StyledLoserNote>;
   if (loserDeadline.deadline === null) return null;
   return (
     <StyledLoserDeadline>
@@ -157,14 +157,16 @@ const Period = styled(Col)`
   }
 `;
 
+// Bold like the countdown above it. The zero width keeps it from widening the step: it wraps within it instead.
 const StyledLoserDeadline = styled.small`
   display: block;
-  font-weight: 400;
+  width: 0;
+  min-width: 100%;
   overflow-wrap: anywhere;
+`;
 
-  @media (min-width: 768px) {
-    max-width: 200px;
-  }
+const StyledLoserNote = styled(StyledLoserDeadline)`
+  font-weight: 400;
 `;
 
 const Separator = styled(Col)`
