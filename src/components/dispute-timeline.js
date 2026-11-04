@@ -16,7 +16,7 @@ const loserDeadlineText = ({ completed, ...time }) => (
     <StyledLoserLead>
       {completed
         ? "Losing side: deadline passed."
-        : `Losing side: ${formatDuration(time).replace(/ /g, " ")} left to fund an appeal.`}
+        : `Losing side: ${formatDuration(time).replace(/ /g, "\u00a0")} left to fund an appeal.`}
     </StyledLoserLead>
     {WINNING_SIDE_NOTE}
   </>
@@ -51,7 +51,7 @@ const DisputeTimeline = ({ period, lastPeriodChange, subcourt, loserDeadline }) 
 
   const renderCountdown = useMemo(() => {
     return (
-      periodEnd && (
+      Boolean(periodEnd) && (
         <Countdown key={periodEnd} date={periodEnd} renderer={(props) => <span>{formatDuration(props)}</span>} />
       )
     );

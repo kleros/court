@@ -60,9 +60,15 @@ describe("the losing side's deadline below the timeline", () => {
   });
 
   it("adds nothing once the appeal period is over, even before it is passed on chain", () => {
-    const ended = String(NOW - 302400);
-    expect(render(3, { known: true, deadline: NOW - 151200 }, ended)).not.toMatch(/losing side/i);
-    expect(render(3, { known: false }, ended)).not.toMatch(/losing side/i);
+    expect(render(3, { known: true, deadline: NOW - 151200 }, String(NOW - 302400))).not.toMatch(/losing side/i);
+  });
+
+  it("drops the general note too once the appeal period is over", () => {
+    expect(render(3, { known: false }, String(NOW - 302400))).not.toMatch(/losing side/i);
+  });
+
+  it("prints nothing for a period start that is not a number", () => {
+    expect(render(3, { known: false }, "unknown")).not.toMatch(/NaN|losing side/i);
   });
 
   it("follows the period end when the court's appeal time is extended after it passed", () => {
