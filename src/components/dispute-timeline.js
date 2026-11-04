@@ -10,10 +10,13 @@ const formatDuration = ({ days, hours, minutes }) =>
 
 const WINNING_SIDE_NOTE = " The winning side has until the period ends.";
 
+// The countdown's spaces don't break, so it wraps as one piece.
 const loserDeadlineText = ({ completed, ...time }) => (
   <>
     <StyledLoserLead>
-      {completed ? "Losing side: deadline passed." : `Losing side: ${formatDuration(time)} left to fund an appeal.`}
+      {completed
+        ? "Losing side: deadline passed."
+        : `Losing side: ${formatDuration(time).replace(/ /g, " ")} left to fund an appeal.`}
     </StyledLoserLead>
     {WINNING_SIDE_NOTE}
   </>
@@ -42,16 +45,12 @@ const LoserDeadline = ({ loserDeadline }) => {
 };
 
 const DisputeTimeline = ({ period, lastPeriodChange, subcourt, loserDeadline }) => {
+  const periodEnd =
+    subcourt?.timesPerPeriod && (parseInt(lastPeriodChange) + parseInt(subcourt.timesPerPeriod[period])) * 1000;
+
   const renderCountdown = useMemo(() => {
-    return (
-      subcourt?.timesPerPeriod && (
-        <Countdown
-          date={(parseInt(lastPeriodChange) + parseInt(subcourt.timesPerPeriod[period])) * 1000}
-          renderer={(props) => <span>{formatDuration(props)}</span>}
-        />
-      )
-    );
-  }, [lastPeriodChange, period, subcourt.timesPerPeriod]);
+    return periodEnd && <Countdown date={periodEnd} renderer={(props) => <span>{formatDuration(props)}</span>} />;
+  }, [periodEnd]);
 
   const periods = ["Evidence", "Commit", "Voting", "Appeal"];
 
@@ -93,7 +92,13 @@ const DisputeTimeline = ({ period, lastPeriodChange, subcourt, loserDeadline }) 
             )
           )}
       </Row>
-      {period === 3 && <LoserDeadline loserDeadline={loserDeadline} />}
+      {period === 3 && periodEnd && (
+        // Nobody can fund an appeal once the period is over, even before it is passed on chain.
+        <Countdown
+          date={periodEnd}
+          renderer={({ completed }) => (completed ? null : <LoserDeadline loserDeadline={loserDeadline} />)}
+        />
+      )}
     </StyledDisputeTimeline>
   );
 };

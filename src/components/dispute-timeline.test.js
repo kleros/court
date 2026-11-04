@@ -22,12 +22,12 @@ afterEach(() => {
   jest.restoreAllMocks();
 });
 
-const render = (period, loserDeadline) => {
+const render = (period, loserDeadline, periodStart = lastPeriodChange) => {
   act(() => {
     ReactDOM.render(
       <DisputeTimeline
         period={period}
-        lastPeriodChange={lastPeriodChange}
+        lastPeriodChange={periodStart}
         subcourt={subcourt}
         loserDeadline={loserDeadline}
       />,
@@ -44,6 +44,7 @@ describe("the losing side's deadline below the timeline", () => {
     expect(text).toContain(
       "Losing side: 00d 07h 54m left to fund an appeal. The winning side has until the period ends."
     );
+    expect(container.textContent).toContain("00d 07h 54m");
   });
 
   it("says when it has passed", () => {
@@ -60,6 +61,12 @@ describe("the losing side's deadline below the timeline", () => {
     expect(render(3, { known: false })).toContain(
       "The losing side may have less time to fund an appeal than the full period."
     );
+  });
+
+  it("adds nothing once the appeal period is over, even before it is passed on chain", () => {
+    const ended = String(NOW - 302400);
+    expect(render(3, { known: true, deadline: NOW - 151200 }, ended)).not.toMatch(/losing side/i);
+    expect(render(3, { known: false }, ended)).not.toMatch(/losing side/i);
   });
 
   it("adds nothing while it is read or outside the appeal period", () => {
