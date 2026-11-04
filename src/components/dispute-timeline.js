@@ -50,7 +50,11 @@ const DisputeTimeline = ({ period, lastPeriodChange, subcourt, loserDeadline }) 
     (Number.parseInt(lastPeriodChange) + Number.parseInt(subcourt.timesPerPeriod[period])) * 1000;
 
   const renderCountdown = useMemo(() => {
-    return periodEnd && <Countdown date={periodEnd} renderer={(props) => <span>{formatDuration(props)}</span>} />;
+    return (
+      periodEnd && (
+        <Countdown key={periodEnd} date={periodEnd} renderer={(props) => <span>{formatDuration(props)}</span>} />
+      )
+    );
   }, [periodEnd]);
 
   const periods = ["Evidence", "Commit", "Voting", "Appeal"];
@@ -96,6 +100,7 @@ const DisputeTimeline = ({ period, lastPeriodChange, subcourt, loserDeadline }) 
       {period === 3 && Boolean(periodEnd) && (
         // Nobody can fund an appeal once the period is over, even before it is passed on chain.
         <Countdown
+          key={periodEnd}
           date={periodEnd}
           renderer={({ completed }) => (completed ? null : <LoserDeadline loserDeadline={loserDeadline} />)}
         />
