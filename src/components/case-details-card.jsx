@@ -1083,6 +1083,7 @@ const StyledDecision = styled(SecondaryActionText)`
 `;
 
 const StyledDecisionDetail = styled.div`
+  color: ${({ theme }) => theme.highlightOnPurple};
   font-size: 16px;
   margin: 8px auto 0;
   max-width: 640px;

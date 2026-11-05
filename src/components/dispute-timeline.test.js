@@ -20,32 +20,31 @@ afterEach(() => {
   ReactDOM.unmountComponentAtNode(container);
   document.body.innerHTML = "";
   jest.restoreAllMocks();
+  jest.useRealTimers();
 });
 
-const render = (period, loserDeadline) => {
+const render = (period, loserDeadline, periodStart = lastPeriodChange, court = subcourt) => {
   act(() => {
     ReactDOM.render(
-      <DisputeTimeline
-        period={period}
-        lastPeriodChange={lastPeriodChange}
-        subcourt={subcourt}
-        loserDeadline={loserDeadline}
-      />,
+      <DisputeTimeline period={period} lastPeriodChange={periodStart} subcourt={court} loserDeadline={loserDeadline} />,
       container
     );
   });
   return container.textContent.replace(/\u00a0/g, " ");
 };
 
-describe("the losing side's deadline under the appeal countdown", () => {
+describe("the losing side's deadline below the timeline", () => {
   it("counts down to it while it is ahead", () => {
     const text = render(3, { known: true, deadline: NOW + 7 * 3600 + 54 * 60 + 30 });
     expect(text).toContain("02d 12h 00m");
-    expect(text).toContain("Losing side: 00d 07h 54m");
+    expect(text).toContain("Losing side appeal deadline: 00d 07h 54m. The winning side has until the period ends.");
+    expect(container.textContent).toContain("00d\u00a007h\u00a054m");
   });
 
   it("says when it has passed", () => {
-    expect(render(3, { known: true, deadline: NOW })).toContain("Losing side: passed");
+    expect(render(3, { known: true, deadline: NOW })).toContain(
+      "Losing side appeal deadline: concluded. The winning side has until the period ends."
+    );
   });
 
   it("adds nothing when every side has the same time", () => {
@@ -53,7 +52,43 @@ describe("the losing side's deadline under the appeal countdown", () => {
   });
 
   it("adds the general note when the contract is unknown", () => {
-    expect(render(3, { known: false })).toContain("The losing side may have less time to fund an appeal than this.");
+    expect(render(3, { known: false })).toContain(
+      "The losing side may have less time to fund an appeal than the full period."
+    );
+  });
+
+  it("adds nothing once the appeal period is over, even before it is passed on chain", () => {
+    expect(render(3, { known: true, deadline: NOW - 151200 }, String(NOW - 302400))).not.toMatch(/losing side/i);
+  });
+
+  it("drops the general note too once the appeal period is over", () => {
+    expect(render(3, { known: false }, String(NOW - 302400))).not.toMatch(/losing side/i);
+  });
+
+  it("prints nothing for a period start that is not a number", () => {
+    expect(render(3, { known: false }, "unknown")).not.toMatch(/NaN|losing side/i);
+  });
+
+  it("follows the period end when the court's appeal time is extended after it passed", () => {
+    jest.useFakeTimers();
+    const ended = String(NOW - 302400);
+    const passed = { known: true, deadline: NOW - 151200 };
+    const extended = { ...subcourt, timesPerPeriod: [86400, 0, 86400, 302400 + 3600] };
+    expect(render(3, passed, ended)).not.toMatch(/losing side/i);
+    expect(render(3, passed, ended, extended)).toContain("00d 01h 00m");
+    expect(container.textContent).toMatch(/losing side appeal deadline: concluded/i);
+
+    Date.now.mockReturnValue((NOW + 120) * 1000);
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    expect(container.textContent.replace(/\u00a0/g, " ")).toContain("00d 00h 58m");
+
+    Date.now.mockReturnValue((NOW + 3601) * 1000);
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    expect(container.textContent).not.toMatch(/losing side/i);
   });
 
   it("adds nothing while it is read or outside the appeal period", () => {
