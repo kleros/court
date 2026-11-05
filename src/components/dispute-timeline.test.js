@@ -43,7 +43,7 @@ describe("the losing side's deadline below the timeline", () => {
 
   it("says when it has passed", () => {
     expect(render(3, { known: true, deadline: NOW })).toContain(
-      "Losing side appeal deadline: passed. The winning side has until the period ends."
+      "Losing side appeal deadline: concluded. The winning side has until the period ends."
     );
   });
 
@@ -76,7 +76,7 @@ describe("the losing side's deadline below the timeline", () => {
     const extended = { ...subcourt, timesPerPeriod: [86400, 0, 86400, 302400 + 3600] };
     expect(render(3, passed, ended)).not.toMatch(/losing side/i);
     expect(render(3, passed, ended, extended)).toContain("00d 01h 00m");
-    expect(container.textContent).toMatch(/losing side appeal deadline: passed/i);
+    expect(container.textContent).toMatch(/losing side appeal deadline: concluded/i);
 
     Date.now.mockReturnValue((NOW + 120) * 1000);
     act(() => {
