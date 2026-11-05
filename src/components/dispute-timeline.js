@@ -15,8 +15,8 @@ const loserDeadlineText = ({ completed, ...time }) => (
   <>
     <StyledLoserLead>
       {completed
-        ? "Losing side: deadline passed."
-        : `Losing side: ${formatDuration(time).replace(/ /g, "\u00a0")} left to fund an appeal.`}
+        ? "Losing side appeal deadline: passed."
+        : `Losing side appeal deadline: ${formatDuration(time).replace(/ /g, "\u00a0")}.`}
     </StyledLoserLead>
     {WINNING_SIDE_NOTE}
   </>

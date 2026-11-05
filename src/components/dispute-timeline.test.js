@@ -37,15 +37,13 @@ describe("the losing side's deadline below the timeline", () => {
   it("counts down to it while it is ahead", () => {
     const text = render(3, { known: true, deadline: NOW + 7 * 3600 + 54 * 60 + 30 });
     expect(text).toContain("02d 12h 00m");
-    expect(text).toContain(
-      "Losing side: 00d 07h 54m left to fund an appeal. The winning side has until the period ends."
-    );
+    expect(text).toContain("Losing side appeal deadline: 00d 07h 54m. The winning side has until the period ends.");
     expect(container.textContent).toContain("00d\u00a007h\u00a054m");
   });
 
   it("says when it has passed", () => {
     expect(render(3, { known: true, deadline: NOW })).toContain(
-      "Losing side: deadline passed. The winning side has until the period ends."
+      "Losing side appeal deadline: passed. The winning side has until the period ends."
     );
   });
 
@@ -78,7 +76,7 @@ describe("the losing side's deadline below the timeline", () => {
     const extended = { ...subcourt, timesPerPeriod: [86400, 0, 86400, 302400 + 3600] };
     expect(render(3, passed, ended)).not.toMatch(/losing side/i);
     expect(render(3, passed, ended, extended)).toContain("00d 01h 00m");
-    expect(container.textContent).toMatch(/losing side: deadline passed/i);
+    expect(container.textContent).toMatch(/losing side appeal deadline: passed/i);
 
     Date.now.mockReturnValue((NOW + 120) * 1000);
     act(() => {
