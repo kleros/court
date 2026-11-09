@@ -1,4 +1,5 @@
 import { Row, Col } from "react-bootstrap";
+import { Alert, Icon } from "antd";
 import React, { useMemo } from "react";
 import Countdown, { zeroPad, calcTimeDelta } from "react-countdown";
 import PropTypes from "prop-types";
@@ -7,34 +8,54 @@ import styled from "styled-components/macro";
 const formatDuration = ({ days, hours, minutes }) =>
   `${zeroPad(days, 2)}d ${zeroPad(hours, 2)}h ${zeroPad(minutes, 2)}m`;
 
-// The countdown's spaces don't break, so it wraps as one piece.
-const loserDeadlineText = ({ completed, ...time }) =>
-  `Losing side: ${completed ? "passed" : formatDuration(time).replace(/ /g, "\u00a0")}`;
+const WINNING_SIDE_NOTE = " The winning side has until the period ends.";
 
-// The losing side's appeal deadline under the appeal period's countdown. Options are never named here.
+// The countdown's spaces don't break, so it wraps as one piece.
+const loserDeadlineText = ({ completed, ...time }) => (
+  <>
+    <StyledLoserLead>
+      {completed
+        ? "Losing side appeal deadline: concluded."
+        : `Losing side appeal deadline: ${formatDuration(time).replace(/ /g, "\u00a0")}.`}
+    </StyledLoserLead>
+    {WINNING_SIDE_NOTE}
+  </>
+);
+
+// The losing side's appeal deadline, below the timeline during the appeal period. Options are never named here.
 const LoserDeadline = ({ loserDeadline }) => {
   if (!loserDeadline) return null;
   if (!loserDeadline.known)
-    return <StyledLoserNote>The losing side may have less time to fund an appeal than this.</StyledLoserNote>;
+    return (
+      <StyledLoserAlert
+        type="info"
+        showIcon
+        message="The losing side may have less time to fund an appeal than the full period."
+      />
+    );
   if (loserDeadline.deadline === null) return null;
   return (
-    <StyledLoserDeadline>
-      <Countdown date={loserDeadline.deadline * 1000} renderer={loserDeadlineText} />
-    </StyledLoserDeadline>
+    <StyledLoserAlert
+      type="warning"
+      showIcon
+      icon={<Icon type="clock-circle" />}
+      message={<Countdown date={loserDeadline.deadline * 1000} renderer={loserDeadlineText} />}
+    />
   );
 };
 
 const DisputeTimeline = ({ period, lastPeriodChange, subcourt, loserDeadline }) => {
+  const periodEnd =
+    subcourt?.timesPerPeriod &&
+    (Number.parseInt(lastPeriodChange) + Number.parseInt(subcourt.timesPerPeriod[period])) * 1000;
+
   const renderCountdown = useMemo(() => {
     return (
-      subcourt?.timesPerPeriod && (
-        <Countdown
-          date={(parseInt(lastPeriodChange) + parseInt(subcourt.timesPerPeriod[period])) * 1000}
-          renderer={(props) => <span>{formatDuration(props)}</span>}
-        />
+      Boolean(periodEnd) && (
+        <Countdown key={periodEnd} date={periodEnd} renderer={(props) => <span>{formatDuration(props)}</span>} />
       )
     );
-  }, [lastPeriodChange, period, subcourt.timesPerPeriod]);
+  }, [periodEnd]);
 
   const periods = ["Evidence", "Commit", "Voting", "Appeal"];
 
@@ -66,7 +87,6 @@ const DisputeTimeline = ({ period, lastPeriodChange, subcourt, loserDeadline }) 
                   <div>
                     <div>{periodName}</div>
                     <small> {getSubtext(i)} </small>
-                    {i === 3 && period === 3 && <LoserDeadline loserDeadline={loserDeadline} />}
                   </div>
                 </Period>
 
@@ -77,6 +97,14 @@ const DisputeTimeline = ({ period, lastPeriodChange, subcourt, loserDeadline }) 
             )
           )}
       </Row>
+      {period === 3 && Boolean(periodEnd) && (
+        // Nobody can fund an appeal once the period is over, even before it is passed on chain.
+        <Countdown
+          key={periodEnd}
+          date={periodEnd}
+          renderer={({ completed }) => (completed ? null : <LoserDeadline loserDeadline={loserDeadline} />)}
+        />
+      )}
     </StyledDisputeTimeline>
   );
 };
@@ -157,16 +185,17 @@ const Period = styled(Col)`
   }
 `;
 
-// Bold like the countdown above it. The zero width keeps it from widening the step: it wraps within it instead.
-const StyledLoserDeadline = styled.small`
-  display: block;
-  width: 0;
-  min-width: 100%;
-  overflow-wrap: anywhere;
+const StyledLoserAlert = styled(Alert)`
+  margin-top: 16px;
+
+  &.ant-alert-warning .ant-alert-icon {
+    color: ${({ theme }) => theme.warningText};
+  }
 `;
 
-const StyledLoserNote = styled(StyledLoserDeadline)`
-  font-weight: 400;
+const StyledLoserLead = styled.span`
+  color: ${({ theme }) => theme.warningText};
+  font-weight: 600;
 `;
 
 const Separator = styled(Col)`
