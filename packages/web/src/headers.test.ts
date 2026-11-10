@@ -1,69 +1,15 @@
 // @vitest-environment node
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { ENV_KEYS, readEnv, renderHeaders } from "@court/core";
+import { ENV_KEYS, readEnv, renderHeaders, renderIndexHtml } from "@court/core";
+import { headersFor as headersOf, parseHeaders } from "../e2e/netlify-headers.ts";
 
+const env = readEnv({ REACT_APP_WALLETCONNECT_PROJECT_ID: "id" });
 const template = readFileSync(new URL("../public/_headers", import.meta.url), "utf8");
-const rendered = renderHeaders(template, readEnv({ REACT_APP_WALLETCONNECT_PROJECT_ID: "id" }));
+const rendered = renderHeaders(template, env);
 
-interface Rule {
-  readonly pattern: string;
-  readonly headers: readonly (readonly [string, string])[];
-}
-
-/**
- * Netlify path matching as the court lab reads it (court-lab lib/build/netlify-headers.mjs): "*" = any rest of the
- * path (also nothing), ":name" = one non-empty segment, everything else literal.
- */
-function matches(pattern: string, path: string): boolean {
-  if (pattern === "") return path === "";
-  if (pattern.startsWith("*")) {
-    for (let i = 0; i <= path.length; i++) if (matches(pattern.slice(1), path.slice(i))) return true;
-    return false;
-  }
-  const param = /^:[A-Za-z_][A-Za-z0-9_]*/.exec(pattern)?.[0];
-  if (param !== undefined) {
-    const segment = /^[^/]+/.exec(path)?.[0] ?? "";
-    for (let n = 1; n <= segment.length; n++) if (matches(pattern.slice(param.length), path.slice(n))) return true;
-    return false;
-  }
-  return path.startsWith(pattern.charAt(0)) && matches(pattern.slice(1), path.slice(1));
-}
-
-/** `_headers` text -> rules in file order; a rule applies to every request path its pattern matches. */
-function parse(text: string): Rule[] {
-  const rules: { pattern: string; headers: [string, string][] }[] = [];
-  for (const line of text.split("\n")) {
-    if (line.trim() === "" || line.trimStart().startsWith("#")) continue;
-    if (!line.startsWith(" ")) {
-      rules.push({ pattern: line.trim(), headers: [] });
-      continue;
-    }
-    const rule = rules.at(-1);
-    if (rule === undefined) throw new Error(`header line before any path: ${line}`);
-    const colon = line.indexOf(":");
-    rule.headers.push([line.slice(0, colon).trim().toLowerCase(), line.slice(colon + 1).trim()]);
-  }
-  return rules;
-}
-
-const rules = parse(rendered);
-
-/** The headers a request path gets, and every name two matching rules both set (how Netlify combines them is UNVERIFIED). */
-function headersFor(path: string) {
-  const headers = new Map<string, string>();
-  const conflicts: string[] = [];
-  const matched: string[] = [];
-  for (const rule of rules) {
-    if (!matches(rule.pattern, path)) continue;
-    matched.push(rule.pattern);
-    for (const [name, value] of rule.headers) {
-      if (headers.has(name)) conflicts.push(name);
-      else headers.set(name, value);
-    }
-  }
-  return { headers, conflicts, matched };
-}
+const rules = parseHeaders(rendered);
+const headersFor = (path: string) => headersOf(rules, path);
 
 /** Request paths the app answers: pages, the root files (favicon, manifest, snapshots), built assets. */
 const APP_REQUESTS = [
@@ -125,6 +71,30 @@ describe("_headers", () => {
       const names = rule.headers.map(([name]) => name);
       expect(new Set(names).size, rule.pattern).toBe(names.length);
     }
+  });
+});
+
+describe("index.html", () => {
+  const html = renderIndexHtml(readFileSync(new URL("../index.html", import.meta.url), "utf8"), env);
+  const head = /<head>([\s\S]*?)<\/head>/.exec(html)?.[1] ?? "";
+  const tags = [...head.matchAll(/<[a-z][^>]*>/g)].map((m) => m[0]);
+
+  it("carries the header policy minus frame-ancestors as a <meta>, first after <meta charset>", () => {
+    // Covers the deep paths no _headers rule lists (e.g. /no/such/page), which still get index.html.
+    const header = headersFor("/").headers.get("content-security-policy") ?? "";
+    const withoutFrameAncestors = header
+      .split("; ")
+      .filter((d) => !d.startsWith("frame-ancestors "))
+      .join("; ");
+    expect(withoutFrameAncestors).not.toBe(header);
+    expect(tags[0]).toBe('<meta charset="utf-8" />');
+    expect(tags[1]).toBe(`<meta http-equiv="Content-Security-Policy" content="${withoutFrameAncestors}" />`);
+    expect(tags.filter((t) => t.includes("Content-Security-Policy"))).toHaveLength(1);
+  });
+
+  it("the runner page has no policy <meta>: only its own header policy (D-18)", () => {
+    const runner = readFileSync(new URL("../public/__runner/index.html", import.meta.url), "utf8");
+    expect(runner).not.toContain("Content-Security-Policy");
   });
 });
 

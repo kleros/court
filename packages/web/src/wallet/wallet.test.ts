@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, onTestFinished, vi } from "vitest";
+import { OptionsController } from "@reown/appkit-controllers";
 import { readEnv } from "@court/core";
 import { APPKIT_FEATURES, customRpcUrls } from "./appkitOptions";
 import { initWallet } from "./init";
@@ -9,7 +10,7 @@ const RPC = "https://mainnet.rpc.example/key";
 describe("no Reown project id", () => {
   it("is read-only: no connectors, no wallet discovery, AppKit never loaded", async () => {
     const wallet = await initWallet(readEnv({}), "https://court.example");
-    expect(wallet.canConnect).toBe(false);
+    expect(wallet.modal).toBeNull();
     expect(wallet.config.connectors).toHaveLength(0);
   });
 
@@ -47,5 +48,20 @@ describe("AppKit options", () => {
     const mainnet = adapter.wagmiConfig.getClient({ chainId: 1 }).transport as { type: string; url?: string };
     expect(mainnet.type).toBe("http");
     expect(mainnet.url).toBe(RPC);
+  });
+
+  it("the adapter never adds the Base Account connector (its SDK injects an inline script: D-03)", async () => {
+    vi.stubGlobal("fetch", () => Promise.reject(new Error("unit tests make no network requests")));
+    onTestFinished(() => {
+      vi.unstubAllGlobals();
+    });
+    const { createWagmiAdapter } = await import("./appkit");
+    const adapter = createWagmiAdapter("test-project-id", readEnv({}));
+    // What createAppKit sets from our options before it syncs the adapter's connectors (appkit-base-client.js:213-214,
+    // :423, :439).
+    OptionsController.setEnableCoinbase(false);
+    OptionsController.setFeatures(APPKIT_FEATURES);
+    await adapter.syncConnectors();
+    expect(adapter.wagmiConfig.connectors.map((c) => c.id)).toEqual(["injected"]);
   });
 });

@@ -4,14 +4,18 @@ import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
-import { readEnv, renderHeaders } from "@court/core";
+import { readEnv, renderHeaders, renderIndexHtml } from "@court/core";
 
 const ENV_PREFIX = "REACT_APP_";
 /** Same place as today's app: the repository root (never read by tooling here, only by Vite). */
 const envDir = fileURLToPath(new URL("../..", import.meta.url));
 
-/** Fills connect-src in dist/_headers from the configured hosts, and refuses a build whose HTML carries inline script. */
+/**
+ * Puts the app's policy (packages/core/src/csp.ts) in dist/_headers and, as a <meta>, in index.html, and refuses a
+ * build whose HTML carries inline script. Build only: the dev server needs inline scripts (React refresh).
+ */
 function securityGuards(mode: string): Plugin {
+  const env = readEnv(loadEnv(mode, envDir, ENV_PREFIX));
   let outDir = "dist";
   return {
     name: "court-security-guards",
@@ -19,8 +23,10 @@ function securityGuards(mode: string): Plugin {
     configResolved(config) {
       outDir = resolve(config.root, config.build.outDir);
     },
+    transformIndexHtml(html) {
+      return renderIndexHtml(html, env);
+    },
     closeBundle() {
-      const env = readEnv(loadEnv(mode, envDir, ENV_PREFIX));
       const headersPath = resolve(outDir, "_headers");
       writeFileSync(headersPath, renderHeaders(readFileSync(headersPath, "utf8"), env));
       for (const page of ["index.html", "__runner/index.html"]) {

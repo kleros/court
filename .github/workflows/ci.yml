@@ -1,7 +1,8 @@
 name: CI
 
 # Checks the app on every pull request and on pushes to master and the rebuild branch:
-# install from the lockfile, typecheck, lint, unit tests, production build (no environment needed).
+# install from the lockfile, typecheck, lint, unit tests, production build (no environment needed), then end-to-end
+# smoke tests in headless Chromium on a build with a placeholder Reown project id (so AppKit loads, as in production).
 
 on:
   pull_request:
@@ -44,3 +45,19 @@ jobs:
 
       - name: Build
         run: yarn build
+
+      # Not a real project id: the tests reach nothing outside their local server.
+      - name: Build the end-to-end target (placeholder Reown project id)
+        run: yarn workspace @court/web build
+        env:
+          REACT_APP_WALLETCONNECT_PROJECT_ID: "00000000000000000000000000000000"
+
+      # Into Playwright's cache in the runner's home (~/.cache/ms-playwright), never the repository.
+      - name: Install Chromium for the end-to-end tests
+        run: yarn workspace @court/web playwright install --with-deps --only-shell chromium
+
+      # Same id as the build above: the tests then require AppKit to have loaded (Connect shown, its window opens).
+      - name: End-to-end smoke tests
+        run: yarn workspace @court/web e2e
+        env:
+          REACT_APP_WALLETCONNECT_PROJECT_ID: "00000000000000000000000000000000"

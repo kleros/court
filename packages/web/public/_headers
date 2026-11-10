@@ -1,4 +1,5 @@
-# Response headers (Netlify _headers). vite.config.ts fills the connect-src placeholder from the configured hosts at build.
+# Response headers (Netlify _headers). vite.config.ts fills the APP_CSP placeholder at build with the app's policy (one
+# source: packages/core/src/csp.ts appPolicy, connect-src from the configured hosts).
 # 03 DR-1/DR-2/DR-6, D-03, D-18. Netlify header rules have no path negation, and rules matching the same path
 # are expected to combine (UNVERIFIED: check on the deploy preview), so the strict app policy is attached to the
 # app's route patterns, never to /*: the script runner below needs its own policy and must not receive the app's
@@ -6,8 +7,8 @@
 # /:page also covers /index.html and the root files (favicon, manifest, snapshots.json); a second rule for
 # /index.html would set the same names twice on one path, whose combination is UNVERIFIED.
 # Deep paths no pattern lists (e.g. /no/such/page) still get index.html through the SPA fallback; whether Netlify
-# matches them on the request path or on /index.html is UNVERIFIED, so the app also refuses to render inside a
-# frame (src/framing.ts).
+# matches them on the request path or on /index.html is UNVERIFIED, so index.html carries the same policy as a <meta>
+# (minus frame-ancestors, which a <meta> cannot carry) and the app refuses to render inside a frame (src/framing.ts).
 # A route added to the app needs its pattern here (headers test in src/headers.test.ts).
 
 # Every path: harmless for the runner too.
@@ -16,36 +17,36 @@
   Referrer-Policy: strict-origin-when-cross-origin
 
 /
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src {{CONNECT_SRC}}; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: {{APP_CSP}}
   X-Frame-Options: DENY
 
 /:page
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src {{CONNECT_SRC}}; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: {{APP_CSP}}
   X-Frame-Options: DENY
 
 /1/*
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src {{CONNECT_SRC}}; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: {{APP_CSP}}
   X-Frame-Options: DENY
 
 /100/*
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src {{CONNECT_SRC}}; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: {{APP_CSP}}
   X-Frame-Options: DENY
 
 /10200/*
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src {{CONNECT_SRC}}; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: {{APP_CSP}}
   X-Frame-Options: DENY
 
 /11155111/*
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src {{CONNECT_SRC}}; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: {{APP_CSP}}
   X-Frame-Options: DENY
 
 /cases/*
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src {{CONNECT_SRC}}; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: {{APP_CSP}}
   X-Frame-Options: DENY
 
 # Built files (hashed JS, CSS, SVG): DR-2 covers every response, not only pages.
 /assets/*
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src {{CONNECT_SRC}}; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: {{APP_CSP}}
   X-Frame-Options: DENY
 
 # Dynamic-script runner (D-18 DECIDED, like the Dispute Resolver's ADR 0004): opaque origin however it is loaded,

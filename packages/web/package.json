@@ -10,6 +10,7 @@
     "lint": "yarn run -T eslint --max-warnings 0 .",
     "test": "vitest run",
     "build": "node scripts/emit-snapshots.mjs && vite build",
+    "e2e": "playwright test",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -17,6 +18,7 @@
     "@kleros/ui-components-library": "3.10.0",
     "@reown/appkit": "1.8.24",
     "@reown/appkit-adapter-wagmi": "1.8.24",
+    "@reown/appkit-controllers": "1.8.24",
     "@sentry/react": "10.77.1",
     "@tailwindcss/postcss": "4.3.3",
     "@tanstack/react-query": "5.105.0",

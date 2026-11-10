@@ -42,16 +42,26 @@ export default tseslint.config(
   },
   {
     // Build tooling and tests read and write files at paths they compute themselves; not user input.
-    files: ["packages/*/scripts/**", "packages/*/*.config.ts", "packages/*/src/**/*.test.{ts,tsx}"],
+    files: [
+      "packages/*/scripts/**",
+      "packages/*/*.config.ts",
+      "packages/*/src/**/*.test.{ts,tsx}",
+      "packages/web/e2e/**",
+    ],
     rules: {
       "security/detect-non-literal-fs-filename": "off",
       "security/detect-object-injection": "off",
     },
   },
   {
-    files: ["packages/*/*.config.ts"],
+    files: ["packages/*/*.config.ts", "packages/web/e2e/**/*.ts"],
     extends: [tseslint.configs.recommended],
     languageOptions: { globals: globals.node },
+  },
+  {
+    // End-to-end specs and lab helpers: page.evaluate / addInitScript callbacks run in the browser.
+    files: ["packages/web/e2e/**/*.spec.ts"],
+    languageOptions: { globals: globals.browser },
   },
   {
     files: ["packages/core/src/**/*.ts"],

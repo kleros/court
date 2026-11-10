@@ -5,10 +5,13 @@ import {
   DEFAULT_IPFS_GATEWAY,
   ENV_KEYS,
   REOWN_CONNECT_SRC,
+  appPolicy,
   connectSrc,
   isCourtChainId,
+  metaPolicy,
   readEnv,
   renderHeaders,
+  renderIndexHtml,
 } from "./index.ts";
 
 describe("smoke", () => {
@@ -80,9 +83,39 @@ describe("connect-src", () => {
   });
 
   it("renderHeaders fills the placeholder and refuses leftovers", () => {
-    expect(renderHeaders("/\n  Content-Security-Policy: connect-src {{CONNECT_SRC}}\n", readEnv({}))).toContain(
-      "connect-src 'self' https://cdn.kleros.link",
+    expect(renderHeaders("/\n  Content-Security-Policy: {{APP_CSP}}\n", readEnv({}))).toBe(
+      `/\n  Content-Security-Policy: ${appPolicy(readEnv({}))}\n`,
     );
     expect(() => renderHeaders("x {{OTHER}}", readEnv({}))).toThrow(/placeholder/);
+  });
+});
+
+describe("app policy", () => {
+  const env = readEnv({ REACT_APP_WALLETCONNECT_PROJECT_ID: "id" });
+
+  it("header policy: no inline script, configured hosts only, never framed", () => {
+    expect(appPolicy(env)).toBe(
+      "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; " +
+        "font-src 'self'; frame-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; " +
+        `connect-src ${connectSrc(env)}; frame-ancestors 'none'`,
+    );
+  });
+
+  it("meta policy = header policy minus frame-ancestors (a <meta> cannot carry it), ending with connect-src", () => {
+    expect(metaPolicy(env)).toBe(appPolicy(env).replace("; frame-ancestors 'none'", ""));
+    expect(metaPolicy(env).endsWith(`connect-src ${connectSrc(env)}`)).toBe(true);
+  });
+
+  it("renderIndexHtml puts the meta policy right after <meta charset>, attribute-escaped", () => {
+    const html = '<head>\n    <meta charset="utf-8" />\n    <title>x</title>\n</head>';
+    expect(renderIndexHtml(html, env)).toBe(
+      '<head>\n    <meta charset="utf-8" />\n' +
+        `    <meta http-equiv="Content-Security-Policy" content="${metaPolicy(env)}" />\n` +
+        "    <title>x</title>\n</head>",
+    );
+    // URL parsing lets " and & (and $&) through in a host; the attribute must still hold the whole value.
+    const odd = readEnv({ REACT_APP_ATLAS_URI: 'https://a"b$&c.example/graphql' });
+    expect(renderIndexHtml(html, odd)).toContain(" https://a&quot;b$&amp;c.example ");
+    expect(() => renderIndexHtml("<head></head>", env)).toThrow(/meta charset/);
   });
 });
