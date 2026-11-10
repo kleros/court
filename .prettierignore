@@ -1,5 +1,13 @@
-# Ignore artifacts:
-build
-coverage
-public/snapshots.json
-
+legacy/
+.yarn/
+node_modules/
+**/dist/
+coverage/
+yarn.lock
+packages/web/public/snapshots.json
+# Old app's docs, CI and the reward snapshot manifest + its verifier (kept at their old paths), unchanged by the rebuild
+src/assets/snapshots.json
+scripts/verify-snapshot-roots.js
+CHANGELOG.md
+REALITY_OPS.md
+.github/

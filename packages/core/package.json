@@ -1,0 +1,21 @@
+{
+  "name": "@court/core",
+  "version": "0.0.0",
+  "description": "Framework-free Kleros Court logic: chains, data, votes. No React, no DOM. Consumed from source, so build = type check.",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "yarn run -T eslint --max-warnings 0 .",
+    "test": "vitest run",
+    "build": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
+  }
+}

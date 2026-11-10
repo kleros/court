@@ -1,0 +1,46 @@
+name: CI
+
+# Checks the app on every pull request and on pushes to master and the rebuild branch:
+# install from the lockfile, typecheck, lint, unit tests, production build (no environment needed).
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - feat/rebuild
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js (version from .nvmrc)
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable Corepack (Yarn version from package.json)
+        run: corepack enable
+
+      - name: Install
+        run: yarn install --immutable
+
+      - name: Typecheck
+        run: yarn typecheck
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Unit tests
+        run: yarn test
+
+      - name: Build
+        run: yarn build

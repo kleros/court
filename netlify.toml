@@ -1,6 +1,12 @@
+# Kleros Court (packages/web): static SPA. netlify.toml overrides the dashboard build settings.
+[build]
+  command = "yarn build"
+  publish = "packages/web/dist"
+
 [build.environment]
-  YARN_FLAGS='--pure-lockfile'
-  NODE_VERSION='16.20.2'
+  NODE_VERSION = "22.22.3"
+  # Yarn 4 from package.json "packageManager"; immutable install on CI (Yarn's default there).
+  YARN_VERSION = "4.18.1"
 
 # snapshots.json is the published list of monthly reward snapshot CIDs.
 # It is read by various consumers, so it needs CORS.
@@ -8,6 +14,8 @@
   for = "/snapshots.json"
   [headers.values]
     Access-Control-Allow-Origin = "*"
+
+# Security headers live in packages/web/public/_headers (filled at build).
 
 [[redirects]]
   from = "/*"

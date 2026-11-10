@@ -1,0 +1,16 @@
+diff --git a/dist/esm/src/CaipNetworkUtil.js b/dist/esm/src/CaipNetworkUtil.js
+index 3e4909600aacd79a201ad2177736ee7bc493747f..863dbc8606b737bd2d809bf17df218d2499c2112 100644
+--- a/dist/esm/src/CaipNetworkUtil.js
++++ b/dist/esm/src/CaipNetworkUtil.js
+@@ -203,10 +203,7 @@ export const CaipNetworksUtil = {
+         return fallback(transports);
+     },
+     extendWagmiTransports(caipNetwork, projectId, transport) {
+-        if (WC_HTTP_RPC_SUPPORTED_CHAINS.includes(caipNetwork.caipNetworkId)) {
+-            const reownRpcUrl = this.getDefaultRpcUrl(caipNetwork, caipNetwork.caipNetworkId, projectId);
+-            return fallback([transport, http(reownRpcUrl)]);
+-        }
++        // Kleros Court patch: never append Reown's RPC as a fallback to an app-provided transport (03 DEC-REOWN).
+         return transport;
+     },
+     /**
