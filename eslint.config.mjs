@@ -5,9 +5,61 @@ import reactHooks from "eslint-plugin-react-hooks";
 import security from "eslint-plugin-security";
 import noUnsanitized from "eslint-plugin-no-unsanitized";
 import globals from "globals";
+import { builtinModules } from "node:module";
 
 const WAGMI_READS =
   "Chain reads go through the app's own viem clients (src/wallet/readClients.ts), never wagmi's config (03 DEC-REOWN).";
+
+// Core runs unbuilt under Node's type stripping (lab proofs and operator scripts load its .ts files directly), so it
+// may use only TypeScript that Node can strip.
+const NODE_STRIPPABLE = [
+  {
+    selector: "TSEnumDeclaration",
+    message: "No enums in core: Node's type stripping cannot run them. Use a union of string literals.",
+  },
+  {
+    selector: "TSParameterProperty",
+    message: "No parameter properties in core: Node's type stripping cannot run them. Assign fields in the body.",
+  },
+];
+
+// Import rules for every core file, src and operator scripts.
+const CORE_IMPORT_PATTERNS = [
+  {
+    group: ["react", "react-*", "react/*", "wagmi", "wagmi/*", "@wagmi/*", "@reown/*", "@court/web"],
+    message: "core is framework-free: no React, no wallet libraries, no app code.",
+  },
+  {
+    // A relative specifier without ".ts" ("./x", "../kernel", "."): Node does not add extensions.
+    regex: "^\\.\\.?(?:/(?!.*\\.ts$).*)?$",
+    message: "Import core files with an explicit .ts specifier (../kernel/index.ts): Node loads them as named.",
+  },
+];
+
+// no-restricted-imports checks static specifiers only; an import() would pass it with any specifier.
+const STATIC_IMPORTS_ONLY = {
+  selector: "ImportExpression",
+  message: "core imports statically, so the import rules can check every specifier: no import().",
+};
+
+// Core is the same code in the browser and in Node: storage, fetch and environment values come in as arguments.
+const CORE_INJECTED = "core has no DOM and reads no environment: take it as an argument from the caller.";
+const CORE_GLOBALS = [
+  "window",
+  "self",
+  "globalThis",
+  "document",
+  "location",
+  "localStorage",
+  "sessionStorage",
+  "indexedDB",
+  "fetch",
+  "process",
+];
+
+// A Node module reads the environment without the global (import { env } from "node:process"), and none exists
+// in the browser.
+const NODE_BUILTINS = "core runs in the browser too: no Node built-in modules in src (operator scripts may use them).";
 
 export default tseslint.config(
   {
@@ -29,7 +81,8 @@ export default tseslint.config(
     languageOptions: { globals: globals.node },
   },
   {
-    files: ["packages/*/src/**/*.{ts,tsx}"],
+    // Core's operator scripts are TypeScript too; their project is packages/core/scripts/tsconfig.json (Node types).
+    files: ["packages/*/src/**/*.{ts,tsx}", "packages/core/scripts/**/*.ts"],
     extends: [tseslint.configs.strictTypeChecked, tseslint.configs.stylisticTypeChecked],
     languageOptions: {
       parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
@@ -64,18 +117,30 @@ export default tseslint.config(
     languageOptions: { globals: globals.browser },
   },
   {
+    files: ["packages/core/src/**/*.ts", "packages/core/scripts/**/*.ts"],
+    rules: {
+      "no-restricted-imports": ["error", { patterns: CORE_IMPORT_PATTERNS }],
+      "no-restricted-syntax": ["error", ...NODE_STRIPPABLE, STATIC_IMPORTS_ONLY],
+    },
+  },
+  {
+    // Operator scripts may read process.env, fetch and Node's modules; core's own code may not.
     files: ["packages/core/src/**/*.ts"],
     rules: {
+      "no-restricted-globals": ["error", ...CORE_GLOBALS.map((name) => ({ name, message: CORE_INJECTED }))],
+      // Rule options do not merge across blocks: these repeat the core patterns above and add Node's modules.
       "no-restricted-imports": [
         "error",
         {
-          patterns: [
-            {
-              group: ["react", "react-*", "react/*", "wagmi", "wagmi/*", "@wagmi/*", "@reown/*", "@court/web"],
-              message: "core is framework-free: no React, no wallet libraries, no app code.",
-            },
-          ],
+          paths: builtinModules.map((name) => ({ name, message: NODE_BUILTINS })),
+          patterns: [...CORE_IMPORT_PATTERNS, { regex: "^node:", message: NODE_BUILTINS }],
         },
+      ],
+      "no-restricted-syntax": [
+        "error",
+        ...NODE_STRIPPABLE,
+        STATIC_IMPORTS_ONLY,
+        { selector: "MemberExpression[object.type='MetaProperty'][property.name='env']", message: CORE_INJECTED },
       ],
     },
   },
