@@ -27,4 +27,5 @@ async function start(): Promise<void> {
   );
 }
 
-void start();
+// Not a top-level await: a boot failure stays an unhandled rejection of start(), not a module that failed to evaluate.
+void start(); // NOSONAR

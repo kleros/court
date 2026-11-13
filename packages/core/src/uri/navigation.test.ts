@@ -5,7 +5,7 @@ import { isSafeNavigationUrl, URL_PARSE_BOUND } from "./navigation.ts";
 function httpsUrl(length: number, fill: string, last = ""): string {
   const head = "https://example.org/";
   const url = head + fill.repeat((length - head.length - last.length) / fill.length) + last;
-  expect(url.length).toBe(length);
+  expect(url).toHaveLength(length);
   return url;
 }
 
@@ -60,8 +60,11 @@ describe("isSafeNavigationUrl", () => {
 
   it("narrows the value to a string for the caller", () => {
     const value: unknown = "https://example.org";
-    if (isSafeNavigationUrl(value)) expect(value.length).toBe(19);
-    else expect.unreachable();
+    if (isSafeNavigationUrl(value)) {
+      // Typed string: this line compiles only because the check narrowed `value`.
+      const narrowed: string = value;
+      expect(narrowed).toHaveLength(19);
+    } else expect.unreachable();
   });
 });
 

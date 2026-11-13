@@ -87,12 +87,12 @@ for (const engine of ENGINES) {
 
       if (engine.servesCutCopyAgain) {
         // The engine fact behind the change: a default-mode download gets the cut copy from the cache, no request.
-        await page.waitForTimeout(GAP_MS);
+        await page.waitForTimeout(GAP_MS); // NOSONAR
         expect(await kernelFetch(page, { url })).toEqual(cut);
         expect(requests()).toHaveLength(1);
       }
 
-      await page.waitForTimeout(GAP_MS);
+      await page.waitForTimeout(GAP_MS); // NOSONAR
       expect(await kernelFetch(page, { url, cache: "reload" })).toEqual(whole);
       // One more request, a plain GET: no preflight (the gateway's allow list has no Cache-Control or Pragma), and no
       // Range or validator, so the server sends the whole file. Cache-Control: no-cache is the engine's own mark of a
@@ -102,7 +102,7 @@ for (const engine of ENGINES) {
       expect(reload["cache-control"]).toBe("no-cache");
       expect(PARTIAL_OR_CONDITIONAL.filter((name) => name in reload)).toEqual([]);
 
-      await page.waitForTimeout(GAP_MS);
+      await page.waitForTimeout(GAP_MS); // NOSONAR
       expect(await kernelFetch(page, { url })).toEqual(whole);
       // Where the cut copy was served again, the reload replaced it: the whole file now comes from the cache.
       if (engine.servesCutCopyAgain) expect(requests()).toHaveLength(2);

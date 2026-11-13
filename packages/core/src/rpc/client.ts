@@ -32,14 +32,15 @@ function sleep(ms: number): Promise<void> {
  */
 function retrying(attempt: Attempt): Attempt {
   return async (call) => {
+    // Attempts in sequence: each retry starts only after the previous attempt failed and its delay passed.
     for (let retry = 0; ; retry += 1) {
       try {
-        return await attempt(call);
+        return await attempt(call); // NOSONAR
       } catch (error) {
         const delay = RETRY_DELAYS_MS[retry];
         const refusedRange = call.method === "eth_getLogs" && isRangeLimitError(error);
         if (delay === undefined || refusedRange || isBudgetError(error)) throw error;
-        await sleep(delay);
+        await sleep(delay); // NOSONAR
       }
     }
   };

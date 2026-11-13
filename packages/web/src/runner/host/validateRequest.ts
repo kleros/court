@@ -5,7 +5,7 @@ import type { RunnerRequestMessage } from "../types";
 // The host re-checks what core built before any frame exists, so a bad value fails at once and nothing malformed reaches
 // a script. The parameters travel as structured data in a message, never inside script text.
 
-const DECIMAL = /^(?:0|[1-9][0-9]*)$/;
+const DECIMAL = /^(?:0|[1-9]\d*)$/;
 /** 40 hex digits in either case: today's parameters carry the arbitrable address checksummed (design D9). */
 const ADDRESS = /^0x[0-9a-fA-F]{40}$/;
 

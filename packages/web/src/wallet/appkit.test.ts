@@ -109,7 +109,7 @@ describe("a network the wallet lacks", () => {
   // WalletConnectConnector.js:243). AppKit's own calls (the WalletConnect RPC map) keep the app's RPC first.
   it("is added from AppKit's networks with only the public RPC, while AppKit's own calls keep the app's first", () => {
     const networks = ChainController.getCaipNetworks();
-    expect(networks.length).toBe(4);
+    expect(networks).toHaveLength(4);
     for (const network of networks) {
       expect(network.rpcUrls.chainDefault?.http, network.name).toEqual([PUBLIC_RPC[Number(network.id)]]);
       expect(network.rpcUrls.default.http[0], network.name).toBe(OWN_RPC[network.id as keyof typeof OWN_RPC]);
@@ -119,7 +119,7 @@ describe("a network the wallet lacks", () => {
   // wagmi's connectors add a network from wagmi's chain (@wagmi/core injected.js:342-346); reads use the app's
   // transports, never these URLs.
   it("is added from wagmi's chains, which lead with the public RPC and hold none of the app's", () => {
-    expect(config.chains.length).toBe(4);
+    expect(config.chains).toHaveLength(4);
     for (const chain of config.chains) {
       expect(chain.rpcUrls.default.http[0], chain.name).toBe(PUBLIC_RPC[chain.id]);
       expect(JSON.stringify(chain.rpcUrls), chain.name).not.toContain("own-rpc.example");

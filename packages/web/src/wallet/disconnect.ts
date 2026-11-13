@@ -11,6 +11,6 @@ import { useDisconnect } from "wagmi";
 export function useDisconnectWallets(): () => Promise<void> {
   const { connectors, disconnectAsync } = useDisconnect();
   return async () => {
-    for (const connector of connectors) await disconnectAsync({ connector });
+    for (const connector of connectors) await disconnectAsync({ connector }); // NOSONAR
   };
 }

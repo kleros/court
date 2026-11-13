@@ -65,7 +65,7 @@ for (const path of ["/", "/1/cases/1", "/no/such/page"]) {
 }
 
 test("Connect opens AppKit's Connect view, with zero CSP violations", async ({ page }) => {
-  test.skip(!WALLET_BUILD, "read-only build: no Connect (checked by the zero-violation tests)");
+  test.skip(!WALLET_BUILD, "read-only build: no Connect (checked by the zero-violation tests)"); // NOSONAR
   await page.goto("/");
   await connectButton(page).click();
   // Reown's hosts are unreachable here, as in the court lab, where the same view opens and connects the mock wallet.
@@ -123,7 +123,7 @@ async function openOriginWithoutApp(page: Page) {
 // bundle: unit tests run the Node build of the library. A pairing list that is not a list stopped WalletConnect's start
 // on every load (no WalletConnect row, D-01, D-55) until the check removed it.
 test("a malformed WalletConnect record left by an earlier visit is removed when the app starts", async ({ page }) => {
-  test.skip(!WALLET_BUILD, "read-only build: AppKit and WalletConnect never start");
+  test.skip(!WALLET_BUILD, "read-only build: AppKit and WalletConnect never start"); // NOSONAR
   await openOriginWithoutApp(page);
   await walletConnectRecord(page, WALLET_CONNECT_PAIRINGS, JSON.stringify("zz"));
   expect(await walletConnectRecord(page, WALLET_CONNECT_PAIRINGS)).toBe('"zz"');
@@ -140,7 +140,7 @@ test("a malformed WalletConnect record left by an earlier visit is removed when 
 test("WalletConnect starts again without saved data it cannot read, and its row is offered in the same load", async ({
   page,
 }) => {
-  test.skip(!WALLET_BUILD, "read-only build: AppKit and WalletConnect never start");
+  test.skip(!WALLET_BUILD, "read-only build: AppKit and WalletConnect never start"); // NOSONAR
   const topic = "b".repeat(64);
   const metadata = { name: "x", description: "x", url: "https://x.example", icons: [] };
   const session = {

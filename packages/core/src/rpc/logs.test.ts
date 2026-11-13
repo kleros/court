@@ -223,6 +223,36 @@ describe("getLogsChunked", () => {
     expect(retried.ok && retried.value.stoppedEarly).toBe(false);
   });
 
+  it("an abort while the whole range timed out stops the scan before the retry: unavailable aborted", async () => {
+    const timeout = new TimeoutError({ body: {}, url: "https://rpc.invalid/key" });
+    const controller = new AbortController();
+    const slow = node([], {
+      answer: () => {
+        controller.abort();
+        return timeout;
+      },
+    });
+    const outcome = await getLogsChunked(slow.client, request(0, 15_000), { signal: controller.signal });
+    expect(slow.spans()).toEqual([[0, 15_000]]);
+    expect(!outcome.ok && outcome.failure).toMatchObject({ kind: "unavailable", reason: "aborted" });
+  });
+
+  it("fails when a single-block window is refused, even while larger than 100-block windows are allowed", async () => {
+    const { client, spans } = node([], {
+      answer: (f) =>
+        f.toBlock - f.fromBlock + 1n > 10_000n || f.fromBlock === f.toBlock
+          ? rpcError(-32005, "query returned more than 10000 results")
+          : undefined,
+    });
+    const outcome = await getLogsChunked(client, request(0, 10_000));
+    expect(spans()).toEqual([
+      [0, 10_000],
+      [0, 9_999],
+      [10_000, 10_000],
+    ]);
+    expect(!outcome.ok && outcome.failure).toMatchObject({ kind: "unavailable", reason: "rpc-error" });
+  });
+
   it("fails without splitting when the whole range fails for another reason, or a window does", async () => {
     const notFound = rpcError(-32000, "header not found");
     const whole = node([], { answer: () => notFound });
@@ -510,6 +540,26 @@ describe("getLogsChunked", () => {
     expect(during.spans()).toHaveLength(9);
   });
 
+  it("asks its first request before it returns: an abort right after the call stops only the requests after it", async () => {
+    const whole = node([]);
+    const wholeController = new AbortController();
+    const asked = getLogsChunked(whole.client, request(0, 199), { signal: wholeController.signal });
+    wholeController.abort();
+    expect((await asked).ok).toBe(true);
+    expect(whole.spans()).toEqual([[0, 199]]);
+
+    const windowed = node([]);
+    const windows: LogWindows = new WeakMap([[windowed.client, 100n]]);
+    const windowsController = new AbortController();
+    const walked = getLogsChunked(windowed.client, request(0, 199), { windows, signal: windowsController.signal });
+    windowsController.abort();
+    expect((await walked).ok).toBe(true);
+    expect(windowed.spans()).toEqual([
+      [0, 99],
+      [100, 199],
+    ]);
+  });
+
   describe("a lookup's window sizes (one state per lookup, passed to each of its scans)", () => {
     const wholeRequests = (spans: number[][], span: number) =>
       spans.filter(([from = 0, to = 0]) => to - from + 1 === span);
@@ -533,6 +583,21 @@ describe("getLogsChunked", () => {
       const before = spans().length;
       await getLogsChunked(client, request(100, 1_500), { windows });
       expect(spans().slice(before)).toEqual([[100, 1_500]]);
+    });
+
+    it("a range that fits in the remembered size but is refused starts its windows below that size, not 10,000", async () => {
+      const { client, spans } = node([], { maxSpan: 1_000 });
+      const windows: LogWindows = new WeakMap([[client, 3_000n]]);
+      await getLogsChunked(client, request(0, 2_499), { windows });
+      expect(spans()).toEqual([
+        [0, 2_499],
+        [0, 599],
+        [600, 1_199],
+        [1_200, 1_799],
+        [1_800, 2_399],
+        [2_400, 2_499],
+      ]);
+      expect(windows.get(client)).toBe(600n);
     });
 
     it("the size is remembered as soon as the whole range is refused, even when the scan then fails", async () => {

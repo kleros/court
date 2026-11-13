@@ -31,7 +31,7 @@ const CORE_IMPORT_PATTERNS = [
   },
   {
     // A relative specifier without ".ts" ("./x", "../kernel", "."): Node does not add extensions.
-    regex: "^\\.\\.?(?:/(?!.*\\.ts$).*)?$",
+    regex: String.raw`^\.\.?(?:/(?!.*\.ts$).*)?$`,
     message: "Import core files with an explicit .ts specifier (../kernel/index.ts): Node loads them as named.",
   },
 ];

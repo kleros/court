@@ -48,10 +48,10 @@ function allowsOpaqueOrigin(response: Response): boolean {
 }
 
 function allowsContentType(response: Response): boolean {
-  const names = (response.headers.get("access-control-allow-headers") ?? "")
-    .split(",")
-    .map((name) => name.trim().toLowerCase());
-  return names.includes("content-type") || names.includes("*");
+  const names = new Set(
+    (response.headers.get("access-control-allow-headers") ?? "").split(",").map((name) => name.trim().toLowerCase()),
+  );
+  return names.has("content-type") || names.has("*");
 }
 
 function problemOf(exchanged: Exchange, isPreflight: boolean): string | undefined {

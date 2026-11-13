@@ -44,7 +44,7 @@ const RECORD_LISTS: [string, IsUsable][] = [
 ];
 
 /** The relay protocols WalletConnect's relay API knows (@walletconnect/relay-api 1.0.11 RELAY_JSONRPC). */
-const RELAY_PROTOCOLS: readonly unknown[] = ["irn", "iridium", "waku"];
+const RELAY_PROTOCOLS: ReadonlySet<unknown> = new Set(["irn", "iridium", "waku"]);
 
 /**
  * The relay subscriptions of WalletConnect's core (@walletconnect/core 2.23.7 Subscriber `storageKey`), a list of
@@ -60,7 +60,7 @@ const isSubscription = (subscription: Record<string, unknown>): boolean =>
   typeof subscription.topic === "string" &&
   typeof subscription.id === "string" &&
   isPlainObject(subscription.relay) &&
-  RELAY_PROTOCOLS.includes(subscription.relay.protocol);
+  RELAY_PROTOCOLS.has(subscription.relay.protocol);
 
 /*
  * WalletConnect's keychain (@walletconnect/core 2.23.7 KeyChain `storageKey`): its keys by name, read at start

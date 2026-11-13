@@ -22,6 +22,11 @@ function parseJson(text: string): Outcome<unknown> {
   }
 }
 
+// The app never builds these keys; touching one would change what the old app reads on the same origin.
+function refuseOldKey(key: string): void {
+  if (isNeverRead(key)) throw new Error("The old app's storage keys are never written or removed by this app.");
+}
+
 /**
  * Browser storage behind one guard. The browser may withhold it (reading `localStorage` or any member throws when
  * site data is blocked) or fill it (every write throws QuotaExceededError). Reads then give null and writes a failure
@@ -35,11 +40,6 @@ export function createSafeStorage(getStorage: () => KeyValueStorage | null): Saf
     } catch {
       return null;
     }
-  }
-
-  // The app never builds these keys; touching one would change what the old app reads on the same origin.
-  function refuseOldKey(key: string): void {
-    if (isNeverRead(key)) throw new Error("The old app's storage keys are never written or removed by this app.");
   }
 
   const storage: SafeStorage = {
@@ -113,5 +113,6 @@ export function findKeyCaseInsensitive(storage: SafeStorage, key: string): strin
   if (storage.read(key) !== null) return key;
   const wanted = key.toLowerCase();
   const spellings = storage.keys("").filter((stored) => stored.toLowerCase() === wanted);
-  return spellings.sort(compareCodeUnits)[0] ?? null;
+  spellings.sort(compareCodeUnits);
+  return spellings[0] ?? null;
 }

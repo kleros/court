@@ -26,7 +26,7 @@ const SEGMENTS = [
   ".\n.",
   ".\r.",
   ".\u0000.",
-  "..\\..",
+  String.raw`..\..`,
   "a%2fb",
   "a%5cb",
   "．．",
@@ -39,27 +39,39 @@ const SUFFIXES = [
   "?/../../y",
   "#/../y",
   "/?x",
-  "?a\\..\\b",
+  String.raw`?a\..\b`,
   "?\t/../y",
   "#\n/../y",
   "?%2e%2e/x",
   "?x#y",
 ];
 
+/** What follows a CID: one or two segments of dots, escapes, controls and slashes, then a path end or ?/#. */
+function hostileTails(): string[] {
+  const tails: string[] = [];
+  for (const first of SEGMENTS) {
+    for (const second of ["", ...SEGMENTS]) {
+      const path = second === "" ? first : `${first}/${second}`;
+      for (const suffix of SUFFIXES) tails.push(`${path}${suffix}`);
+    }
+  }
+  return tails;
+}
+
 /** Every prefix and CID, then one or two segments of dots, escapes, controls and slashes, then a path end or ?/#. */
 export function hostileCorpus(): string[] {
+  const tails = hostileTails();
   const corpus: string[] = [];
-  for (const prefix of PREFIXES)
-    for (const cid of [CID, CIDV1])
-      for (const first of SEGMENTS)
-        for (const second of ["", ...SEGMENTS])
-          for (const suffix of SUFFIXES)
-            corpus.push(`${prefix}${cid}/${first}${second === "" ? "" : `/${second}`}${suffix}`);
+  for (const prefix of PREFIXES) {
+    for (const cid of [CID, CIDV1]) {
+      for (const tail of tails) corpus.push(`${prefix}${cid}/${tail}`);
+    }
+  }
   return corpus;
 }
 
 /** Every character JavaScript's trim() removes (\s): ASCII space and controls, NBSP, the Unicode spaces, U+3000, BOM. */
-const WHITESPACE = Array.from({ length: 0x10000 }, (_, code) => String.fromCharCode(code)).filter((char) =>
+const WHITESPACE = Array.from({ length: 0x10000 }, (_, code) => String.fromCodePoint(code)).filter((char) =>
   /\s/.test(char),
 );
 

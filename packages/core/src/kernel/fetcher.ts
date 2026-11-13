@@ -31,18 +31,15 @@ export function createFetcher(fetchImpl: typeof globalThis.fetch): Fetcher {
       controller.abort(TIMEOUT);
     }, request.timeoutMs);
     // A synchronous throw from fetchImpl becomes a rejection, like any network error.
-    const pending = new Promise<Response>((resolve) => {
-      resolve(
-        fetchImpl(request.url, {
-          method: request.method ?? "GET",
-          headers: request.headers,
-          body: request.body,
-          signal,
-          // Only when asked: every other request keeps fetch's default cache mode (§25.5).
-          ...(request.cache === undefined ? {} : { cache: request.cache }),
-        }),
-      );
-    });
+    const pending = (async () =>
+      fetchImpl(request.url, {
+        method: request.method ?? "GET",
+        headers: request.headers,
+        body: request.body,
+        signal,
+        // Only when asked: every other request keeps fetch's default cache mode (§25.5).
+        ...(request.cache === undefined ? {} : { cache: request.cache }),
+      }))();
     try {
       const outcome = await answer(pending, request, signal);
       // A stop during the body read ends it early (readBody cancels the reader): that short answer is the stop.

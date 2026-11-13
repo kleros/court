@@ -65,7 +65,8 @@ export function isContentAddressed(uri: string): boolean {
 /** A loop, not /\/+$/: that regex retries from every slash of a long run (quadratic). */
 function withoutTrailingSlashes(value: string): string {
   let end = value.length;
-  while (end > 0 && value.charCodeAt(end - 1) === 0x2f) end -= 1;
+  // charCodeAt on purpose: the loop steps back one UTF-16 code unit at a time, and "/" is one unit.
+  while (end > 0 && value.charCodeAt(end - 1) === 0x2f) end -= 1; // NOSONAR
   return value.slice(0, end);
 }
 

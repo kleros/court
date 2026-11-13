@@ -70,12 +70,15 @@ export function memoryStore(entries: Record<string, unknown> = {}, { failingRead
     getEntries: () => Promise.resolve([...map.entries()]),
     getItem: (key: string) =>
       key === failingRead ? Promise.reject(new Error("store read failed")) : Promise.resolve(map.get(key)),
-    setItem: (key: string, value: unknown) => Promise.resolve(void map.set(key, structuredClone(value))),
-    removeItem: vi.fn((key: string) =>
-      key === refusedRemoval
-        ? Promise.reject(new Error("store refused the removal"))
-        : Promise.resolve(void map.delete(key)),
-    ),
+    setItem: (key: string, value: unknown) => {
+      map.set(key, structuredClone(value));
+      return Promise.resolve();
+    },
+    removeItem: vi.fn((key: string) => {
+      if (key === refusedRemoval) return Promise.reject(new Error("store refused the removal"));
+      map.delete(key);
+      return Promise.resolve();
+    }),
   };
 }
 export type MemoryStore = ReturnType<typeof memoryStore>;
@@ -132,9 +135,10 @@ export function resetWalletConnect(): void {
 
 /** Stops the providers the test started (their heartbeat and relay connection). */
 export async function stopStarted(): Promise<void> {
+  // One provider after another, in the order they started.
   for (const provider of started.splice(0)) {
     provider.client.core.heartbeat.stop();
-    await provider.client.core.relayer.transportClose().catch(() => undefined);
+    await provider.client.core.relayer.transportClose().catch(() => undefined); // NOSONAR
   }
 }
 

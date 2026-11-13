@@ -117,12 +117,12 @@ describe("canonicalContentPath", () => {
 
   it("gives the same answer however many segments a path has (a 4 MiB case file holds millions)", () => {
     // A regex repeating a group per segment answered "no match" from 851,967 segments in WebKit and threw from about
-    // 3,355,400 in V8 and SpiderMonkey. Node can only show the throw: 4,000,000 is past it. Compared with ===, so a
-    // failure does not print 8 MB.
+    // 3,355,400 in V8 and SpiderMonkey. Node can only show the throw: 4,000,000 is past it. The null checks compare
+    // with ===, so a failure there does not print 8 MB.
     const path = CID + "/a".repeat(4_000_000);
-    expect(canonicalContentPath(path) === path).toBe(true);
-    expect(canonicalContentPath(`/ipfs/${path}/`) === `${path}/`).toBe(true);
-    expect(toHttpUrl(`ipfs://${path}#x`, GATEWAY) === `${GATEWAY}/ipfs/${path}#x`).toBe(true);
+    expect(canonicalContentPath(path)).toBe(path);
+    expect(canonicalContentPath(`/ipfs/${path}/`)).toBe(`${path}/`);
+    expect(toHttpUrl(`ipfs://${path}#x`, GATEWAY)).toBe(`${GATEWAY}/ipfs/${path}#x`);
     for (const end of ["//", "//x", "/..", "/./x", "/%2e%2e"]) {
       expect(canonicalContentPath(path + end) === null, end).toBe(true);
     }
@@ -249,7 +249,7 @@ describe("gatewayUrl", () => {
   it("takes linear time over a long run of slashes in the configured gateway", () => {
     const run = "/".repeat(100_000);
     const started = performance.now();
-    expect(gatewayUrl(`${run}x`, CID) === `${run}x/ipfs/${CID}`).toBe(true);
+    expect(gatewayUrl(`${run}x`, CID)).toBe(`${run}x/ipfs/${CID}`);
     expect(gatewayUrl(`${GATEWAY}${run}`, CID)).toBe(`${GATEWAY}/ipfs/${CID}`);
     expect(gatewayUrl(run, CID)).toBe(`/ipfs/${CID}`);
     expect(performance.now() - started).toBeLessThan(1000);

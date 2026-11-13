@@ -1,7 +1,7 @@
 import { COURT_CHAIN_ID_LIST, type CourtChainId } from "../chains.ts";
 
 /** Plain decimal: digits 0-9 only, no sign, spaces, exponent or leading zero. */
-const CANONICAL_DECIMAL = /^(?:0|[1-9][0-9]*)$/;
+const CANONICAL_DECIMAL = /^(?:0|[1-9]\d*)$/;
 /** The largest uint256 has 78 digits; a longer segment is refused before any number is built from it. */
 const MAX_DISPUTE_ID_DIGITS = 78;
 const UINT256_LIMIT = 2n ** 256n;

@@ -76,8 +76,8 @@ describe("toHttpUrl against today's", () => {
 
   it("requests today's URL for every hostile corpus value it accepts; each refusal has a listed reason", () => {
     const { accepted, refused } = compare(hostileCorpus());
-    expect(accepted.length).toBe(11750);
-    expect(accepted.filter(whitespaceBeforeCut).length).toBe(2970);
+    expect(accepted).toHaveLength(11750);
+    expect(accepted.filter(whitespaceBeforeCut)).toHaveLength(2970);
     expect(countByReason(refused)).toEqual({
       "tab, LF, CR, backslash or another control character in the path": 25200,
       "percent-encoded dot, slash or backslash in the path": 22320,
@@ -88,8 +88,8 @@ describe("toHttpUrl against today's", () => {
 
   it("does the same with whitespace before, inside and after ? and #, at the start and at the end", () => {
     const { accepted, refused } = compare(whitespaceCorpus());
-    expect(accepted.length).toBe(12672);
-    expect(accepted.filter(whitespaceBeforeCut).length).toBe(5760);
+    expect(accepted).toHaveLength(12672);
+    expect(accepted.filter(whitespaceBeforeCut)).toHaveLength(5760);
     expect(countByReason(refused)).toEqual({
       "not content-addressed today either": 1152,
       "tab, LF, CR, backslash or another control character in the path": 2592,
@@ -141,7 +141,7 @@ describe("toHttpUrl against today's", () => {
 
   it("requests today's URL for every one of the real values", () => {
     const { accepted, refused } = compare(REAL_URI_VALUES);
-    expect(accepted.length).toBe(REAL_URI_VALUES.length);
+    expect(accepted).toHaveLength(REAL_URI_VALUES.length);
     expect(refused).toEqual([]);
   });
 });

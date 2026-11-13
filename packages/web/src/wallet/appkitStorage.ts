@@ -102,7 +102,7 @@ const JSON_VALUES: Readonly<Record<string, Shape>> = {
 };
 
 const ACTIVE_NETWORK_KEY = "@appkit/active_caip_network_id";
-const COURT_NETWORKS: readonly string[] = COURT_CHAIN_ID_LIST.map((id) => `eip155:${String(id)}`);
+const COURT_NETWORKS: ReadonlySet<string> = new Set(COURT_CHAIN_ID_LIST.map((id) => `eip155:${String(id)}`));
 
 function parse(text: string): unknown {
   try {
@@ -126,5 +126,5 @@ export function dropUnusableAppKitValues(storage: SafeStorage): void {
     if (text !== null && !isShape(parse(text))) storage.remove(key);
   }
   const network = storage.read(ACTIVE_NETWORK_KEY);
-  if (network !== null && !COURT_NETWORKS.includes(network)) storage.remove(ACTIVE_NETWORK_KEY);
+  if (network !== null && !COURT_NETWORKS.has(network)) storage.remove(ACTIVE_NETWORK_KEY);
 }

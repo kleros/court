@@ -118,7 +118,8 @@ export function createFakeRunnerDocument(): FakeRunnerDocument {
 /** Lets pending port messages, promise callbacks and immediate timers run. */
 export async function settleMacrotasks(): Promise<void> {
   for (let turn = 0; turn < 5; turn += 1) {
-    await new Promise((resolve) => {
+    // One turn after another: five immediates awaited together would all run in the same turn.
+    await /* NOSONAR */ new Promise((resolve) => {
       setImmediate(resolve);
     });
   }

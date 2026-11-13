@@ -338,7 +338,7 @@ describe("WalletConnect's stored keychain", () => {
 
     await dropUnusableWalletConnectValues(storage);
     const client = await start(storage);
-    expect(client.session.length).toBe(0);
+    expect(client.session).toHaveLength(0);
     await expect(client.core.crypto.getClientId()).resolves.toMatch(/^did:key:/);
   });
 });

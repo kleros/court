@@ -16,7 +16,8 @@ export async function readBlockTimes(
   const worker = async (): Promise<void> => {
     for (let block = pending.shift(); block !== undefined && failure === undefined; block = pending.shift()) {
       try {
-        const { timestamp } = await client.getBlock({ blockNumber: block });
+        // One read at a time per worker: `concurrency` workers bound the reads in flight.
+        const { timestamp } = await client.getBlock({ blockNumber: block }); // NOSONAR
         times.set(block, Number(timestamp));
       } catch (error) {
         failure ??= toReadFailure(error, `the time of block ${String(block)}`);

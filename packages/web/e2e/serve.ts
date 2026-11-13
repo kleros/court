@@ -29,7 +29,8 @@ const rules = parseHeaders(readFileSync(join(DIST, "_headers"), "utf8"));
 
 function fileFor(pathname: string): string {
   const index = join(DIST, "index.html");
-  const file = resolve(DIST, `.${pathname.endsWith("/") ? `${pathname}index.html` : pathname}`);
+  const requested = pathname.endsWith("/") ? `${pathname}index.html` : pathname;
+  const file = resolve(DIST, `.${requested}`);
   if (file !== DIST && !file.startsWith(DIST + sep)) return index;
   return existsSync(file) && statSync(file).isFile() ? file : index;
 }

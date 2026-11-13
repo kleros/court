@@ -17,7 +17,7 @@ export function matches(pattern: string, path: string): boolean {
     for (let i = 0; i <= path.length; i++) if (matches(pattern.slice(1), path.slice(i))) return true;
     return false;
   }
-  const param = /^:[A-Za-z_][A-Za-z0-9_]*/.exec(pattern)?.[0];
+  const param = /^:[A-Za-z_]\w*/.exec(pattern)?.[0];
   if (param !== undefined) {
     const segment = /^[^/]+/.exec(path)?.[0] ?? "";
     for (let n = 1; n <= segment.length; n++) if (matches(pattern.slice(param.length), path.slice(n))) return true;

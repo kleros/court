@@ -71,7 +71,8 @@ async function poll(
     } catch {
       // A failed read: asked again at the next poll. `next` moves past a block only once it was searched in full.
     }
-    await sleep(Math.min(pollMs, Math.max(0, deadline - Date.now())));
+    // Polling: one round at a time, the next one at most `pollMs` after this one ended.
+    await sleep(Math.min(pollMs, Math.max(0, deadline - Date.now()))); // NOSONAR
   }
   return null;
 }
