@@ -16,17 +16,22 @@ jobs:
     outputs:
       version: ${{ steps.set-version.outputs.version }}
     steps:
-    - uses: actions/checkout@v2
-    
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
+    - uses: actions/checkout@v4
       with:
-        node-version: 14
+        persist-credentials: false
+
+    - name: Set up Node.js (version from .nvmrc)
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: .nvmrc
+
+    - name: Enable Corepack (Yarn version from package.json)
+      run: corepack enable
 
     - name: Install dependencies
-      run: yarn install
+      run: yarn install --immutable
 
-    - name: Build and deploy subgraph
+    - name: Build
       run: yarn build
 
     - name: Set version
@@ -42,5 +47,4 @@ jobs:
       with:
         environment: production
         version: ${{ steps.set-version.outputs.version }}
-        sourcemaps: ./dist
-
+        sourcemaps: ./packages/web/dist

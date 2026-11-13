@@ -1,0 +1,21 @@
+[build.environment]
+  YARN_FLAGS='--pure-lockfile'
+  NODE_VERSION='16.20.2'
+
+# snapshots.json is the published list of monthly reward snapshot CIDs.
+# It is read by various consumers, so it needs CORS.
+[[headers]]
+  for = "/snapshots.json"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "https://kleros-court.netlify.com/*"
+  to = "https://court.kleros.io/:splat"
+  status = 301
+  force = true
