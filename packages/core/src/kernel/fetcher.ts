@@ -30,8 +30,8 @@ export function createFetcher(fetchImpl: typeof globalThis.fetch): Fetcher {
     const timer = setTimeout(() => {
       controller.abort(TIMEOUT);
     }, request.timeoutMs);
-    // A synchronous throw from fetchImpl becomes a rejection, like any network error.
-    const pending = (async () =>
+    // Async with no await on purpose: a synchronous throw from fetchImpl becomes a rejection, like any network error.
+    const pending = /* NOSONAR */ (async () =>
       fetchImpl(request.url, {
         method: request.method ?? "GET",
         headers: request.headers,

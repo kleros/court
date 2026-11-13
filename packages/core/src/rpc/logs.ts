@@ -87,9 +87,10 @@ export async function getLogsChunked<const TEvent extends AbiEvent>(
 
   const walk: Walk<TEvent> = { scanned: [], next: order === "asc" ? fromBlock : toBlock, size };
   let ended = beforeBatch(scan, walk);
+  // Batches in sequence: where the next batch starts, and its window size, depend on the answers to this one.
   while (ended === null) {
     const batch = windowsFrom(walk.next, walk.size, order, fromBlock, toBlock);
-    const answers = await Promise.all(batch.map((window) => read(scan, window)));
+    const answers = await Promise.all(batch.map((window) => read(scan, window))); // NOSONAR
     ended = keepBatch(scan, walk, batch, answers) ?? beforeBatch(scan, walk);
   }
   return ended;
