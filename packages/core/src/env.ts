@@ -1,4 +1,5 @@
 import { COURT_CHAIN_IDS, type CourtChainId } from "./chains.ts";
+import { succeed, toAddress, unavailable, type Address, type Outcome } from "./kernel/index.ts";
 
 /**
  * Every environment variable the app reads. Names are the production Netlify names (REACT_APP_*), so the
@@ -33,8 +34,19 @@ export const SUBGRAPH_URL_KEYS: Record<CourtChainId, string> = {
   [COURT_CHAIN_IDS.chiado]: "REACT_APP_SUBGRAPH_CHIADO_DISPLAY",
 };
 
+/** The contracts named in CONTRACT_KEYS. The deploy block (klerosLiquidBlockNumber) is a number, not one of them. */
+export type ContractName =
+  | "klerosLiquid"
+  | "klerosLiquidExtraViews"
+  | "pinakion"
+  | "rawPinakion"
+  | "policyRegistry"
+  | "tokenBridge"
+  | "uniswapV2Factory"
+  | "uniswapV2Router02";
+
 /** Contract addresses and deploy blocks, per chain, with today's names. */
-export const CONTRACT_KEYS: Record<CourtChainId, Readonly<Record<string, string>>> = {
+export const CONTRACT_KEYS = {
   [COURT_CHAIN_IDS.mainnet]: {
     klerosLiquid: "REACT_APP_KLEROS_LIQUID_ADDRESS",
     klerosLiquidExtraViews: "REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_ADDRESS",
@@ -69,7 +81,7 @@ export const CONTRACT_KEYS: Record<CourtChainId, Readonly<Record<string, string>
     pinakion: "REACT_APP_PINAKION_CHIADO_ADDRESS",
     policyRegistry: "REACT_APP_POLICY_REGISTRY_CHIADO_ADDRESS",
   },
-};
+} as const satisfies Record<CourtChainId, Readonly<Partial<Record<ContractName | "klerosLiquidBlockNumber", string>>>>;
 
 export const SERVICE_KEYS = {
   metaEvidenceUrl: "REACT_APP_METAEVIDENCE_URL",
@@ -144,4 +156,31 @@ export function readEnv(raw: RawEnv): CourtEnv {
     sentryDsn: value(raw, SERVICE_KEYS.sentryDsn),
     context: value(raw, SERVICE_KEYS.context),
   };
+}
+
+/**
+ * Only the variables the app reads, as strings. The build hands the bundle this pick, never the whole environment,
+ * so a variable outside ENV_KEYS (a secret given the public prefix by mistake) never ships.
+ */
+export function pickPublicEnv(raw: RawEnv): Record<string, string> {
+  const picked: Record<string, string> = {};
+  for (const key of ENV_KEYS) {
+    const v = raw[key];
+    if (typeof v === "string") picked[key] = v;
+  }
+  return picked;
+}
+
+/**
+ * A contract's address on a court chain, from env, lowercase. Unset, or not 0x + 40 hex: unavailable not-configured,
+ * a deploy setting and not bad case data, so it never reads as invalid. The message names the variable, never its value.
+ */
+export function contractAddress(env: CourtEnv, chainId: CourtChainId, name: ContractName): Outcome<Address> {
+  const keys: Readonly<Partial<Record<ContractName, string>>> = CONTRACT_KEYS[chainId];
+  const key = keys[name];
+  if (key === undefined) return unavailable("not-configured", `Chain ${String(chainId)} has no ${name} contract.`);
+  const configured = env.contracts[chainId][name];
+  if (configured === undefined) return unavailable("not-configured", `${key} is not set.`);
+  const address = toAddress(configured);
+  return address === null ? unavailable("not-configured", `${key} is not a contract address.`) : succeed(address);
 }

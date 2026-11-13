@@ -4,7 +4,7 @@ import { CHAIN_BY_ID } from "./chains";
 
 /**
  * AppKit's embedded (custodial) wallet: the connector with id or type `AUTH`. AppKit registers it when email or social
- * login is on, locally or on the Reown dashboard, which overrides local settings (03 DEC-REOWN wants both off). The app
+ * login is on, locally or on the Reown dashboard, which overrides local settings (both must stay off). The app
  * never offers it and never counts it as a connection.
  */
 export function isEmbeddedWalletConnector(connector: { readonly id: string; readonly type: string }): boolean {

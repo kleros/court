@@ -1,5 +1,9 @@
 import { invalid, succeed, unavailable } from "./outcome.ts";
+import { KERNEL_INVALID } from "./reasons.ts";
 import type { FetchRequest, FetchResponse, Fetcher, Outcome } from "./types.ts";
+
+const TOO_LARGE = KERNEL_INVALID[0];
+const NOT_JSON = KERNEL_INVALID[1];
 
 // The abort reasons this fetcher gives its own signal; the first one wins (AbortController ignores later calls).
 const TIMEOUT = "timeout";
@@ -34,6 +38,8 @@ export function createFetcher(fetchImpl: typeof globalThis.fetch): Fetcher {
           headers: request.headers,
           body: request.body,
           signal,
+          // Only when asked: every other request keeps fetch's default cache mode (§25.5).
+          ...(request.cache === undefined ? {} : { cache: request.cache }),
         }),
       );
     });
@@ -72,7 +78,7 @@ async function answer(
     return overCap(response, headers, request.maxBytes);
   }
   const bytes = await readBody(response.body, request.maxBytes, signal);
-  return bytes === "too-large"
+  return bytes === TOO_LARGE
     ? overCap(response, headers, request.maxBytes)
     : succeed({ status: response.status, headers, bytes });
 }
@@ -99,7 +105,7 @@ function stopFailure(reason: unknown, request: FetchRequest): Outcome<never> {
 /** A 2xx body past the cap is bad content. An error answer is the caller's to classify, so it keeps its status. */
 function overCap(response: Response, headers: Record<string, string>, maxBytes: number): Outcome<FetchResponse> {
   return response.ok
-    ? invalid("too-large", `The answer is larger than ${maxBytes} bytes.`)
+    ? invalid(TOO_LARGE, `The answer is larger than ${maxBytes} bytes.`)
     : succeed({ status: response.status, headers, bytes: new Uint8Array() });
 }
 
@@ -121,7 +127,7 @@ async function readBody(
   body: ReadableStream<Uint8Array>,
   maxBytes: number,
   signal: AbortSignal,
-): Promise<Uint8Array | "too-large"> {
+): Promise<Uint8Array | typeof TOO_LARGE> {
   const reader = body.getReader();
   const cancel = (): void => {
     void reader.cancel().catch(ignore);
@@ -136,7 +142,7 @@ async function readBody(
       const end = total + next.value.byteLength;
       if (end > maxBytes) {
         cancel();
-        return "too-large";
+        return TOO_LARGE;
       }
       if (end > buffer.byteLength) {
         // Doubling keeps the number of copies small; the cap was checked above, so it is never passed.
@@ -161,6 +167,6 @@ export function jsonOf(response: FetchResponse): Outcome<unknown> {
   try {
     return succeed(JSON.parse(textOf(response)) as unknown);
   } catch {
-    return invalid("not-json", "The answer is not JSON.");
+    return invalid(NOT_JSON, "The answer is not JSON.");
   }
 }

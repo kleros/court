@@ -1,5 +1,5 @@
 /**
- * True when this window is inside a frame. The court is never framed (03 DR-2, DEC-FRAME): the headers in
+ * True when this window is inside a frame. The court is never framed, by any site: the headers in
  * public/_headers deny framing on the paths they list, and this check covers every other path the SPA fallback
  * answers (e.g. /no/such/page), whatever Netlify does with header rules there.
  */

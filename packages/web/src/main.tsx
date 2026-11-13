@@ -16,7 +16,7 @@ async function start(): Promise<void> {
   }
   const root = document.getElementById("root");
   if (root === null) throw new Error("#root missing from index.html");
-  await initSentry(env).catch((error: unknown) => {
+  await initSentry(env, `court@${__COURT_VERSION__}`).catch((error: unknown) => {
     console.error("Sentry failed to start.", error);
   });
   const wallet = await initWallet(env, window.location.origin);

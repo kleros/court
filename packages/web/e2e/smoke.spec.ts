@@ -2,7 +2,7 @@ import { expect, test, type Frame, type Page } from "@playwright/test";
 import { readEnv } from "@court/core";
 
 // Smoke checks of the built app as served (e2e/serve.ts): D-03 (CSP on every path the SPA fallback serves, zero
-// violations), 03 DR-1 (no inline script runs), DR-2 (never framed) and D-18 (the runner is an opaque origin only the app
+// violations), no inline script runs, the app is never framed, and D-18 (the runner is an opaque origin only the app
 // frames).
 
 /**
@@ -74,6 +74,110 @@ test("Connect opens AppKit's Connect view, with zero CSP violations", async ({ p
   expect(await violations(page)).toEqual([]);
 });
 
+/**
+ * WalletConnect's store in the browser, where its core reads its records when AppKit starts it
+ * (@walletconnect/keyvaluestorage: this IndexedDB database and object store; a key's "//" is stored as ":").
+ */
+const WALLET_CONNECT_DB = "WALLET_CONNECT_V2_INDEXED_DB";
+const WALLET_CONNECT_PAIRINGS = "wc@2:core:0.3:pairing";
+const WALLET_CONNECT_SESSIONS = "wc@2:client:0.3:session";
+
+/**
+ * Writes one record as the library does (JSON text), or reads it back; resolves once the transaction completes. The
+ * first write makes the database as the library's store makes it when it opens first (idb-keyval 6.3.0 createStore).
+ */
+function walletConnectRecord(page: Page, key: string, text?: string) {
+  return page.evaluate(
+    ({ db, key, text }) =>
+      new Promise<unknown>((resolve, reject) => {
+        const open = indexedDB.open(db);
+        open.onupgradeneeded = () => open.result.createObjectStore("keyvaluestorage");
+        open.onerror = () => reject(open.error);
+        open.onsuccess = () => {
+          const tx = open.result.transaction("keyvaluestorage", text === undefined ? "readonly" : "readwrite");
+          const store = tx.objectStore("keyvaluestorage");
+          const request = text === undefined ? store.get(key) : store.put(text, key);
+          tx.oncomplete = () => {
+            open.result.close();
+            resolve(text === undefined ? request.result : undefined);
+          };
+          tx.onerror = () => reject(tx.error);
+        };
+      }),
+    { db: WALLET_CONNECT_DB, key, text },
+  );
+}
+
+/**
+ * Opens a file of the app's origin, where the app does not run, so the records a test leaves are in place before any
+ * WalletConnect store opens. Written after a load of the app, they raced that load's WalletConnect start, which could
+ * read or rewrite them before the test looked.
+ */
+async function openOriginWithoutApp(page: Page) {
+  const response = await page.goto("/manifest.json");
+  // A path with no file is answered by the app (e2e/serve.ts, as netlify.toml): the records would race it again.
+  expect(response?.headers()["content-type"]).toBe("application/json");
+}
+
+// The boot check (src/wallet/walletConnectValues.ts) only helps if it reads the store WalletConnect itself opens in the
+// bundle: unit tests run the Node build of the library. A pairing list that is not a list stopped WalletConnect's start
+// on every load (no WalletConnect row, D-01, D-55) until the check removed it.
+test("a malformed WalletConnect record left by an earlier visit is removed when the app starts", async ({ page }) => {
+  test.skip(!WALLET_BUILD, "read-only build: AppKit and WalletConnect never start");
+  await openOriginWithoutApp(page);
+  await walletConnectRecord(page, WALLET_CONNECT_PAIRINGS, JSON.stringify("zz"));
+  expect(await walletConnectRecord(page, WALLET_CONNECT_PAIRINGS)).toBe('"zz"');
+  await page.goto("/");
+  // The app renders after the check (src/wallet/init.ts; it answers in milliseconds, bounded at 2 s).
+  await expect(connectButton(page)).toBeVisible();
+  expect(await walletConnectRecord(page, WALLET_CONNECT_PAIRINGS)).toBeUndefined();
+});
+
+// A WalletConnect session saved in a form its start cannot read (here its namespaces are null; another build of this
+// app can leave one) stopped WalletConnect's start on every load: AppKit kept the failure and the Connect window had no
+// WalletConnect row (D-01, D-55). The app starts WalletConnect itself, forgets its saved data when the start fails and
+// starts it again (src/wallet/walletConnectRecovery.ts), so the row is there in the same load.
+test("WalletConnect starts again without saved data it cannot read, and its row is offered in the same load", async ({
+  page,
+}) => {
+  test.skip(!WALLET_BUILD, "read-only build: AppKit and WalletConnect never start");
+  const topic = "b".repeat(64);
+  const metadata = { name: "x", description: "x", url: "https://x.example", icons: [] };
+  const session = {
+    topic,
+    relay: { protocol: "irn" },
+    expiry: 4102444800,
+    namespaces: null,
+    acknowledged: true,
+    pairingTopic: "a".repeat(64),
+    requiredNamespaces: {},
+    optionalNamespaces: {},
+    controller: "5".repeat(64),
+    self: { publicKey: "2".repeat(64), metadata },
+    peer: { publicKey: "5".repeat(64), metadata },
+    transportType: "relay",
+  };
+  // With its topic key: WalletConnect drops a saved session it has no key for before reading it.
+  const keychain = JSON.stringify({ [topic]: "1".repeat(64) });
+  await openOriginWithoutApp(page);
+  await walletConnectRecord(page, "wc@2:core:0.3:keychain", keychain);
+  await walletConnectRecord(page, WALLET_CONNECT_SESSIONS, JSON.stringify([session]));
+  expect(await walletConnectRecord(page, "wc@2:core:0.3:keychain")).toBe(keychain);
+  expect(await walletConnectRecord(page, WALLET_CONNECT_SESSIONS)).toBe(JSON.stringify([session]));
+  const messages: string[] = [];
+  page.on("console", (m) => messages.push(m.text()));
+  await page.goto("/");
+  await expect(connectButton(page)).toBeVisible();
+  await connectButton(page).click();
+  await expect(page.locator("w3m-modal").getByText("WalletConnect", { exact: true }).first()).toBeVisible();
+  // The row alone also shows when the start never read the session: the app's warning says the start failed on it and
+  // ran again (src/wallet/walletConnectRecovery.ts).
+  await expect
+    .poll(() => messages.some((m) => m.startsWith("WalletConnect could not start from its saved data")))
+    .toBe(true);
+  expect(await walletConnectRecord(page, WALLET_CONNECT_SESSIONS)).toBeUndefined();
+});
+
 test("an unknown deep path renders Page not found under the <meta> policy: an inline script is blocked", async ({
   page,
 }) => {
@@ -139,4 +243,14 @@ test("the app frames the script runner: it loads with origin null", async ({ pag
   });
   expect(await runner.locator(META).count()).toBe(0);
   expect(await violations(page)).toEqual([]);
+});
+
+test("the runner's files are revalidated on every load: a deploy never leaves an old runner in the cache", async ({
+  request,
+}) => {
+  for (const path of ["/__runner/index.html", "/__runner/bootstrap.js"]) {
+    const response = await request.get(path);
+    expect(response.status(), path).toBe(200);
+    expect(response.headers()["cache-control"], path).toBe("no-cache");
+  }
 });

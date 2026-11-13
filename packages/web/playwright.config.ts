@@ -4,7 +4,9 @@ import { defineConfig, devices } from "@playwright/test";
  * End-to-end smoke tests (ADR 0002) on the production build: run `yarn build` first; e2e/serve.ts serves dist/ with its
  * own _headers rules. Chromium, headless. Nothing outside the local server should be reachable: the specs abort every
  * other request, and the host resolver rules below make every name but 127.0.0.1 unresolvable, a second guard for
- * traffic routes do not see (such as WebSockets; not exercised by these tests).
+ * traffic routes do not see (such as WebSockets; not exercised by these tests). Exception: the kernel's fetch-cache
+ * test (e2e/kernel) launches WebKit, Chromium and Firefox itself with no routes (routing turns the HTTP cache off);
+ * its page loads only its own loopback servers, and its Chromium keeps the host resolver rules.
  */
 const PORT = 4319;
 

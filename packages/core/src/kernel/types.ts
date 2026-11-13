@@ -46,6 +46,8 @@ export interface FetchRequest {
   readonly timeoutMs: number;
   readonly maxBytes: number;
   readonly signal?: AbortSignal;
+  /** An engine can hand over a cut body as complete and cache it; "reload" refetches and replaces that copy (§25.5). */
+  readonly cache?: "reload";
 }
 export interface FetchResponse {
   readonly status: number;
@@ -53,8 +55,9 @@ export interface FetchResponse {
   readonly headers: Readonly<Record<string, string>>;
   readonly bytes: Uint8Array;
 }
-/** Never rejects. Network error, timeout, abort -> unavailable; body over maxBytes (declared or streamed) ->
- *  invalid "too-large"; every HTTP status -> ok (the caller decides). */
+/** Never rejects. Network error, timeout, abort -> unavailable; a 2xx body over maxBytes (declared or streamed)
+ *  -> invalid "too-large"; a non-2xx answer over maxBytes -> ok with empty bytes; every HTTP status -> ok
+ *  (the caller decides). (§20.1) */
 export type Fetcher = (request: FetchRequest) => Promise<Outcome<FetchResponse>>;
 
 export type ReadClient = PublicClient;

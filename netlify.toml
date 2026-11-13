@@ -8,6 +8,12 @@
   # Yarn 4 from package.json "packageManager"; immutable install on CI (Yarn's default there).
   YARN_VERSION = "4.18.1"
 
+# Production deploys first check that every configured read RPC answers the script runner's opaque origin
+# (`Origin: null`, D-18); the preflight exits 1 and the deploy stops otherwise. Deploy previews and branch deploys keep
+# the plain build until the providers' settings change before the preview trial.
+[context.production]
+  command = "yarn preflight:rpc && yarn build"
+
 # snapshots.json is the published list of monthly reward snapshot CIDs.
 # It is read by various consumers, so it needs CORS.
 [[headers]]

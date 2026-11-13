@@ -8,7 +8,7 @@ import globals from "globals";
 import { builtinModules } from "node:module";
 
 const WAGMI_READS =
-  "Chain reads go through the app's own viem clients (src/wallet/readClients.ts), never wagmi's config (03 DEC-REOWN).";
+  "Chain reads go through the app's own viem clients (src/wallet/readClients.ts), never wagmi's config.";
 
 // Core runs unbuilt under Node's type stripping (lab proofs and operator scripts load its .ts files directly), so it
 // may use only TypeScript that Node can strip.
@@ -71,6 +71,8 @@ export default tseslint.config(
       ".yarn/**",
       "coverage/**",
       "**/public/snapshots.json",
+      // Playwright's output (gitignored): the fetch-cache test keeps browser profiles there, with their own scripts.
+      "packages/*/test-results/**",
     ],
   },
   js.configs.recommended,
@@ -107,9 +109,19 @@ export default tseslint.config(
     },
   },
   {
-    files: ["packages/*/*.config.ts", "packages/web/e2e/**/*.ts"],
+    files: ["packages/*/*.config.ts", "packages/web/vite-plugins/**/*.ts", "packages/web/e2e/**/*.ts"],
     extends: [tseslint.configs.recommended],
     languageOptions: { globals: globals.node },
+  },
+  {
+    // Evaluating text as code happens in one function, inside the script runner's opaque-origin page (D-18); nowhere
+    // else in either package, in any form (direct or indirect eval, the Function constructor).
+    files: ["packages/**/*.{js,mjs,cjs,ts,tsx}"],
+    ignores: ["packages/web/src/runner/page/evaluate.ts"],
+    rules: {
+      "no-eval": ["error", { allowIndirect: false }],
+      "no-new-func": "error",
+    },
   },
   {
     // End-to-end specs and lab helpers: page.evaluate / addInitScript callbacks run in the browser.

@@ -308,8 +308,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@court/core@workspace:packages/core"
   dependencies:
+    "@eslint/js": "npm:9.39.5"
     "@types/node": "npm:22.20.5"
+    eslint: "npm:9.39.5"
     typescript: "npm:5.9.3"
+    typescript-eslint: "npm:8.72.1"
     viem: "npm:2.57.12"
     vite: "npm:8.3.5"
     vitest: "npm:5.0.5"
@@ -336,6 +339,9 @@ __metadata:
     "@types/react-dom": "npm:18.3.7"
     "@vitejs/plugin-react": "npm:6.1.2"
     "@wagmi/core": "npm:2.22.1"
+    "@walletconnect/keyvaluestorage": "npm:1.1.1"
+    "@walletconnect/universal-provider": "npm:2.23.7"
+    idb-keyval: "npm:6.3.0"
     jsdom: "npm:30.1.3"
     react: "npm:18.3.1"
     react-dom: "npm:18.3.1"
@@ -1485,7 +1491,7 @@ __metadata:
 
 "@reown/appkit-utils@patch:@reown/appkit-utils@npm%3A1.8.24#~/.yarn/patches/@reown-appkit-utils-npm-1.8.24-0f627c3d47.patch":
   version: 1.8.24
-  resolution: "@reown/appkit-utils@patch:@reown/appkit-utils@npm%3A1.8.24#~/.yarn/patches/@reown-appkit-utils-npm-1.8.24-0f627c3d47.patch::version=1.8.24&hash=936f87"
+  resolution: "@reown/appkit-utils@patch:@reown/appkit-utils@npm%3A1.8.24#~/.yarn/patches/@reown-appkit-utils-npm-1.8.24-0f627c3d47.patch::version=1.8.24&hash=0f2924"
   dependencies:
     "@base-org/account": "npm:2.4.0"
     "@coinbase/wallet-sdk": "npm:4.3.6"
@@ -1511,7 +1517,7 @@ __metadata:
       optional: true
     "@safe-global/safe-apps-sdk":
       optional: true
-  checksum: 10c0/f437af8fc9a6a3e1d91c3ab6b282d9621a6a74a37d97d5486ab716c997c6b13293fe721142aa228fb36883395c7912860c1ab6abf8263ced9c09eb21635b01f4
+  checksum: 10c0/b9b28326e5987dd1c40df2197274fe9b1315d0fcd462a0595fced72decce67d8de8f62f94591ae4ccc01c9e57bed6d2082237923ceb060d918afebba393d909a
   languageName: node
   linkType: hard
 
@@ -1582,6 +1588,31 @@ __metadata:
     "@lit/react":
       optional: true
   checksum: 10c0/0cfa2b13b9128dfe88ced4d029d1177edb6e05efaad24bfd1533631fda11b2c11169daa74e4be69b0449e628e76f4b796d96acbbc3a979e2b8a0f0a8152ff6c9
+  languageName: node
+  linkType: hard
+
+"@reown/appkit@patch:@reown/appkit@npm%3A1.8.24#~/.yarn/patches/@reown-appkit-npm-1.8.24-09809d4cb9.patch":
+  version: 1.8.24
+  resolution: "@reown/appkit@patch:@reown/appkit@npm%3A1.8.24#~/.yarn/patches/@reown-appkit-npm-1.8.24-09809d4cb9.patch::version=1.8.24&hash=5472b8"
+  dependencies:
+    "@lit/react": "npm:1.0.8"
+    "@reown/appkit-common": "npm:1.8.24"
+    "@reown/appkit-controllers": "npm:1.8.24"
+    "@reown/appkit-pay": "npm:1.8.24"
+    "@reown/appkit-polyfills": "npm:1.8.24"
+    "@reown/appkit-scaffold-ui": "npm:1.8.24"
+    "@reown/appkit-ui": "npm:1.8.24"
+    "@reown/appkit-utils": "npm:1.8.24"
+    "@reown/appkit-wallet": "npm:1.8.24"
+    "@walletconnect/universal-provider": "npm:2.23.7"
+    bs58: "npm:6.0.0"
+    semver: "npm:7.7.2"
+    valtio: "npm:2.1.7"
+    viem: "npm:>=2.55.13"
+  dependenciesMeta:
+    "@lit/react":
+      optional: true
+  checksum: 10c0/0ed27f886db9fe4775dfc759a4cf7ff720e9dc4a4147deae6fdc50d17fe4a545c4e36657fe49152c524eda8f1719c9409f8dc31eb6f4dd530db62010ae7dad93
   languageName: node
   linkType: hard
 
@@ -3459,6 +3490,22 @@ __metadata:
     "@react-native-async-storage/async-storage":
       optional: true
   checksum: 10c0/de2ec39d09ce99370865f7d7235b93c42b3e4fd3406bdbc644329eff7faea2722618aa88ffc4ee7d20b1d6806a8331261b65568187494cbbcceeedbe79dc30e8
+  languageName: node
+  linkType: hard
+
+"@walletconnect/keyvaluestorage@patch:@walletconnect/keyvaluestorage@npm%3A1.1.1#~/.yarn/patches/@walletconnect-keyvaluestorage-npm-1.1.1-4cdf80afee.patch":
+  version: 1.1.1
+  resolution: "@walletconnect/keyvaluestorage@patch:@walletconnect/keyvaluestorage@npm%3A1.1.1#~/.yarn/patches/@walletconnect-keyvaluestorage-npm-1.1.1-4cdf80afee.patch::version=1.1.1&hash=9f9fd7"
+  dependencies:
+    "@walletconnect/safe-json": "npm:^1.0.1"
+    idb-keyval: "npm:^6.2.1"
+    unstorage: "npm:^1.9.0"
+  peerDependencies:
+    "@react-native-async-storage/async-storage": 1.x
+  peerDependenciesMeta:
+    "@react-native-async-storage/async-storage":
+      optional: true
+  checksum: 10c0/0b27d4eaf7a232039f793fa87efd296bdcae2287da56541870cac8d7832d4fe6321d62bd58c15212bba1cd716a2021958d6e1044477d8483ed1e3dc95bbe9d7f
   languageName: node
   linkType: hard
 
@@ -6048,7 +6095,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"idb-keyval@npm:^6.2.1":
+"idb-keyval@npm:6.3.0, idb-keyval@npm:^6.2.1":
   version: 6.3.0
   resolution: "idb-keyval@npm:6.3.0"
   checksum: 10c0/d03db95199acb445c5d0ec4dfc93bbc92edc41112e2bedc901a4dc3d5c21b10d1ce7a9b766da9ca61f7ea4d09ed55591f2a997307c91b6e4a5318c0e071b849e

@@ -27,7 +27,7 @@ const APP_REQUESTS = [
   "/assets/index-AbC123.css",
   "/assets/logo-AbC123.svg",
 ];
-const RUNNER_REQUESTS = ["/__runner/", "/__runner/index.html"];
+const RUNNER_REQUESTS = ["/__runner/", "/__runner/index.html", "/__runner/bootstrap.js"];
 
 describe("_headers", () => {
   it("strict policy + DENY on every app request path, one rule each, identical everywhere", () => {
@@ -64,6 +64,10 @@ describe("_headers", () => {
       expect(policy).not.toContain("allow-same-origin");
       expect(headers.get("x-frame-options"), path).toBe("SAMEORIGIN");
     }
+  });
+
+  it("runner: revalidated on every load, so a new app never runs an old cached runner", () => {
+    for (const path of RUNNER_REQUESTS) expect(headersFor(path).headers.get("cache-control"), path).toBe("no-cache");
   });
 
   it("no header name is set twice in one rule", () => {

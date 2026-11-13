@@ -1,0 +1,14 @@
+# Secret scan rules for CI (.github/workflows/ci.yml passes this file with --config). gitleaks' default rules, plus one
+# they lack: a Slack notification token written as Travis CI takes it (`slack: <workspace>:<token>`, optionally
+# quoted, optionally `#channel`), which has no xox prefix, so the default Slack rules do not see it.
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "travis-slack-notification-token"
+description = "Slack notification token as the value of a slack key (Travis CI style)"
+# Group 1 is the whole `<workspace>:<token>` value, so --redact hides all of it.
+regex = '''(?i)\bslack\s*:\s*["']?([a-z0-9][a-z0-9_-]*:[a-z0-9]{20,})(?:#[^\s"']*)?["']?'''
+secretGroup = 1
+keywords = ["slack"]

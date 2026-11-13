@@ -1,8 +1,19 @@
 diff --git a/dist/esm/src/CaipNetworkUtil.js b/dist/esm/src/CaipNetworkUtil.js
-index 3e4909600aacd79a201ad2177736ee7bc493747f..863dbc8606b737bd2d809bf17df218d2499c2112 100644
+index 3e4909600aacd79a201ad2177736ee7bc493747f..dc2ff9b4bf371f650ce9588aa6acf4d8b2b8303a 100644
 --- a/dist/esm/src/CaipNetworkUtil.js
 +++ b/dist/esm/src/CaipNetworkUtil.js
-@@ -203,10 +203,7 @@ export const CaipNetworksUtil = {
+@@ -135,7 +135,9 @@ export const CaipNetworksUtil = {
+         const chainDefaultRpcUrl = caipNetwork?.rpcUrls?.['chainDefault']?.http?.[0] || networkDefaultRpcUrl;
+         const customRpcUrlsOfNetwork = customRpcUrls?.[caipNetworkId]?.map(i => i.url) || [];
+         const rpcUrls = [...customRpcUrlsOfNetwork, ...(reownRpcUrl ? [reownRpcUrl] : [])];
+-        const rpcUrlsWithoutReown = [...customRpcUrlsOfNetwork];
++        // Kleros Court patch: every add-network request reads chainDefault, so it holds only the network's own public RPC,
++        // never an app-provided one (the app's read RPC can carry a key, and the wallet would keep it).
++        const rpcUrlsWithoutReown = [];
+         if (chainDefaultRpcUrl && !rpcUrlsWithoutReown.includes(chainDefaultRpcUrl)) {
+             rpcUrlsWithoutReown.push(chainDefaultRpcUrl);
+         }
+@@ -203,10 +205,7 @@ export const CaipNetworksUtil = {
          return fallback(transports);
      },
      extendWagmiTransports(caipNetwork, projectId, transport) {
@@ -10,7 +21,7 @@ index 3e4909600aacd79a201ad2177736ee7bc493747f..863dbc8606b737bd2d809bf17df218d2
 -            const reownRpcUrl = this.getDefaultRpcUrl(caipNetwork, caipNetwork.caipNetworkId, projectId);
 -            return fallback([transport, http(reownRpcUrl)]);
 -        }
-+        // Kleros Court patch: never append Reown's RPC as a fallback to an app-provided transport (03 DEC-REOWN).
++        // Kleros Court patch: never append Reown's RPC as a fallback to an app-provided transport.
          return transport;
      },
      /**

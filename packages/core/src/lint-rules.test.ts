@@ -98,3 +98,39 @@ describe("core lint rules", { timeout: 30_000 }, () => {
     }
   });
 });
+
+describe("evaluating text as code", { timeout: 30_000 }, () => {
+  // Every way the rules know to evaluate text: direct and indirect eval, and the Function constructor.
+  const EVALUATIONS: [code: string, ruleId: string][] = [
+    ['export const value: unknown = eval("1");', "no-eval"],
+    ['export const value: unknown = (0, eval)("1");', "no-eval"],
+    ['export const value: unknown = globalThis.eval("1");', "no-eval"],
+    ['export const make = new Function("return 1");', "no-new-func"],
+    ['export const make = Function("return 1");', "no-new-func"],
+  ];
+
+  it("is refused in app code, tooling and tests of both packages, the runner's other files included", async () => {
+    const paths = [
+      SRC,
+      SCRIPT,
+      "../web/src/probe.ts",
+      "../web/src/runner/page/probe.ts",
+      "../web/src/runner/page/evaluate.test.ts",
+      "../web/vite-plugins/runner/probe.ts",
+      "../web/e2e/probe.spec.ts",
+      "../web/scripts/probe.mjs",
+    ];
+    for (const path of paths) {
+      for (const [code, ruleId] of EVALUATIONS) {
+        const found = await problems(path, path.endsWith(".mjs") ? code.replace(": unknown", "") : code);
+        expect(found, `${path}: ${code}`).toContainEqual(expect.objectContaining({ ruleId }));
+      }
+    }
+  });
+
+  it("is allowed in the script runner's evaluate.ts", async () => {
+    for (const [code] of EVALUATIONS) {
+      expect(await problems("../web/src/runner/page/evaluate.ts", code), code).toEqual([]);
+    }
+  });
+});

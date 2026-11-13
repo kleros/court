@@ -5,7 +5,7 @@ import { RPC_URL_KEYS, SERVICE_KEYS, SUBGRAPH_URL_KEYS, type CourtEnv } from "./
  * Reown AppKit endpoints the app may fetch or open a socket to, read from the built bundle (AppKit 1.8.24). Seen in
  * the court lab with a placeholder project id: api.web3modal.org and pulse.walletconnect.org on page load; the
  * WalletConnect path itself is not lab-testable.
- * rpc.walletconnect.org is deliberately absent: reads never go to Reown's RPC (03 DEC-REOWN). The wagmi adapter's
+ * rpc.walletconnect.org is deliberately absent: reads never go to Reown's RPC. The wagmi adapter's
  * fallback to it is patched out (.yarn/patches); AppKit's own network objects still list it after ours, so the
  * browser refusing it is the remaining guard there. AppKit also asks it for a connected account's name and avatar
  * (/v1/identity/<address>, on Mainnet and Gnosis): refused here too, one CSP violation per policy and attempt.
@@ -56,8 +56,9 @@ export function connectSrc(env: CourtEnv): string {
 
 /**
  * The app's Content-Security-Policy, the one source for both copies: the _headers rules of the app paths and the
- * <meta> in index.html. 03 DR-1 (script-src 'self', no inline script; connect-src = configured hosts), DR-2
- * (frame-ancestors 'none'), DR-6 and DEC-CSP (style-src 'unsafe-inline' only for Reown AppKit), D-03.
+ * <meta> in index.html (D-03): scripts only from the app itself, never inline; connections only to the configured
+ * hosts; never framed (frame-ancestors 'none'); no third-party stylesheet, with 'unsafe-inline' styles only because
+ * Reown AppKit needs them.
  */
 function appDirectives(env: CourtEnv): readonly (readonly [string, string])[] {
   return [
@@ -89,7 +90,7 @@ export function appPolicy(env: CourtEnv): string {
 /**
  * The policy index.html carries as a <meta>, so every path the SPA fallback answers has it, including deep paths no
  * _headers rule lists. Without frame-ancestors, which browsers ignore in a <meta>: framing stays with the header rules
- * and src/framing.ts (DR-2).
+ * and src/framing.ts (the court is never framed).
  */
 export function metaPolicy(env: CourtEnv): string {
   return join(appDirectives(env).filter(([name]) => name !== "frame-ancestors"));

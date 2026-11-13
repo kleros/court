@@ -1,9 +1,9 @@
 # Response headers (Netlify _headers). vite.config.ts fills the APP_CSP placeholder at build with the app's policy (one
 # source: packages/core/src/csp.ts appPolicy, connect-src from the configured hosts).
-# 03 DR-1/DR-2/DR-6, D-03, D-18. Netlify header rules have no path negation, and rules matching the same path
-# are expected to combine (UNVERIFIED: check on the deploy preview), so the strict app policy is attached to the
-# app's route patterns, never to /*: the script runner below needs its own policy and must not receive the app's
-# frame-ancestors 'none'.
+# D-03, D-18: no third-party script or stylesheet; the app is never framed. Netlify header rules have no path
+# negation, and rules matching the same path are expected to combine (UNVERIFIED: check on the deploy preview), so
+# the strict app policy is attached to the app's route patterns, never to /*: the script runner below needs its own
+# policy and must not receive the app's frame-ancestors 'none'.
 # /:page also covers /index.html and the root files (favicon, manifest, snapshots.json); a second rule for
 # /index.html would set the same names twice on one path, whose combination is UNVERIFIED.
 # Deep paths no pattern lists (e.g. /no/such/page) still get index.html through the SPA fallback; whether Netlify
@@ -44,13 +44,15 @@
   Content-Security-Policy: {{APP_CSP}}
   X-Frame-Options: DENY
 
-# Built files (hashed JS, CSS, SVG): DR-2 covers every response, not only pages.
+# Built files (hashed JS, CSS, SVG): framing is denied on every response, not only pages.
 /assets/*
   Content-Security-Policy: {{APP_CSP}}
   X-Frame-Options: DENY
 
 # Dynamic-script runner (D-18 DECIDED, like the Dispute Resolver's ADR 0004): opaque origin however it is loaded,
-# only the app may frame it. Enforced header, never report-only or <meta>.
+# only the app may frame it. Enforced header, never report-only or <meta>. Revalidated on every load: its file names
+# carry no hash, and after a deploy a cached old runner would answer the new app in an older message format.
 /__runner/*
   Content-Security-Policy: sandbox allow-scripts; frame-ancestors 'self'; script-src 'self' 'unsafe-eval'; object-src 'none'; base-uri 'none'
   X-Frame-Options: SAMEORIGIN
+  Cache-Control: no-cache

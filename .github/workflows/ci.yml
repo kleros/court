@@ -1,8 +1,10 @@
 name: CI
 
 # Checks the app on every pull request and on pushes to master and the rebuild branch: secret scan of the files,
-# install from the lockfile, typecheck, lint, unit tests, production build (no environment needed), then end-to-end
-# smoke tests in headless Chromium on a build with a placeholder Reown project id (so AppKit loads, as in production).
+# install from the lockfile, typecheck, lint, unit tests, production build (no environment needed) and a check that only
+# the app's public variables reach it, then end-to-end tests (smoke, script runner) in headless Chromium on a build
+# with a placeholder Reown project id (so AppKit loads, as in production), and the kernel's fetch-cache test in
+# headless WebKit, Chromium and Firefox.
 
 on:
   pull_request:
@@ -25,7 +27,8 @@ jobs:
 
       # The branch must carry no committed secret. Scans the checked-out files only (not the history), before Install
       # so dependencies are not scanned. The gitleaks release is pinned by the sha256 that its own checksums file and
-      # GitHub's asset digest both give; any other download fails the check.
+      # GitHub's asset digest both give; any other download fails the check. The rules are .gitleaks.toml (the defaults
+      # plus a Travis-style Slack token rule), named with --config so no GITLEAKS_CONFIG variable can replace them.
       - name: Secret scan (gitleaks 8.30.1, checked-out files)
         run: |
           curl -sSfL -o "$RUNNER_TEMP/gitleaks.tar.gz" \
@@ -33,7 +36,7 @@ jobs:
           echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  $RUNNER_TEMP/gitleaks.tar.gz" \
             | sha256sum --check --strict
           tar -xzf "$RUNNER_TEMP/gitleaks.tar.gz" -C "$RUNNER_TEMP" gitleaks
-          "$RUNNER_TEMP/gitleaks" detect --no-git --source . --redact --no-banner --verbose
+          "$RUNNER_TEMP/gitleaks" detect --no-git --source . --config .gitleaks.toml --redact --no-banner --verbose
 
       - name: Set up Node.js (version from .nvmrc)
         uses: actions/setup-node@v4
@@ -55,8 +58,14 @@ jobs:
       - name: Unit tests
         run: yarn test
 
-      - name: Build
-        run: yarn build
+      # One REACT_APP_ variable the app does not use is planted in the build's environment: the check fails if its name
+      # or its value, or any REACT_APP_ name outside the app's public list (ENV_KEYS), is in the build.
+      - name: Build, then check that only the app's public variables reached it
+        run: |
+          yarn build
+          node packages/web/scripts/check-bundle-env.mjs packages/web/dist
+        env:
+          REACT_APP_PLANTED_NOT_PUBLIC: planted-value-that-must-not-reach-the-bundle
 
       # Not a real project id: the tests reach nothing outside their local server.
       - name: Build the end-to-end target (placeholder Reown project id)
@@ -64,12 +73,14 @@ jobs:
         env:
           REACT_APP_WALLETCONNECT_PROJECT_ID: "00000000000000000000000000000000"
 
-      # Into Playwright's cache in the runner's home (~/.cache/ms-playwright), never the repository.
-      - name: Install Chromium for the end-to-end tests
-        run: yarn workspace @court/web playwright install --with-deps --only-shell chromium
+      # Into Playwright's cache in the runner's home (~/.cache/ms-playwright), never the repository. Firefox and WebKit
+      # for the kernel's fetch-cache test (e2e/kernel), which checks each engine's own HTTP cache.
+      - name: Install Chromium, Firefox and WebKit for the end-to-end tests
+        run: yarn workspace @court/web playwright install --with-deps --only-shell chromium firefox webkit
 
       # Same id as the build above: the tests then require AppKit to have loaded (Connect shown, its window opens).
-      - name: End-to-end smoke tests
+      # Every spec under packages/web/e2e: the smoke tests, the script runner's and the kernel's fetch-cache test.
+      - name: End-to-end tests (smoke, script runner, kernel fetch cache)
         run: yarn workspace @court/web e2e
         env:
           REACT_APP_WALLETCONNECT_PROJECT_ID: "00000000000000000000000000000000"

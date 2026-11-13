@@ -3,7 +3,7 @@ import { COURT_CHAIN_ID_LIST, type CourtChainId, type CourtEnv } from "@court/co
 
 /**
  * The app's own read transport per chain, from the configured RPC URL only. A chain without a URL gets a transport
- * that fails: it never falls back to a public or Reown endpoint (03 DEC-REOWN).
+ * that fails: it never falls back to a public or Reown endpoint.
  */
 export function ownTransport(env: CourtEnv, chainId: CourtChainId): Transport {
   const url = env.rpcUrls[chainId];

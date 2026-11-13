@@ -18,7 +18,8 @@
     "lint": "eslint --max-warnings 0 . && prettier --check .",
     "format": "prettier --write .",
     "test": "yarn workspaces foreach --all --topological-dev --exclude court-workspace run test",
-    "build": "yarn workspaces foreach --all --topological-dev --exclude court-workspace run build"
+    "build": "yarn workspaces foreach --all --topological-dev --exclude court-workspace run build",
+    "preflight:rpc": "node packages/core/scripts/preflight-rpc.ts"
   },
   "devDependencies": {
     "@eslint/js": "9.39.5",
@@ -34,6 +35,8 @@
   },
   "resolutions": {
     "@wagmi/connectors": "6.2.0",
-    "@reown/appkit-utils@npm:1.8.24": "patch:@reown/appkit-utils@npm%3A1.8.24#~/.yarn/patches/@reown-appkit-utils-npm-1.8.24-0f627c3d47.patch"
+    "@reown/appkit-utils@npm:1.8.24": "patch:@reown/appkit-utils@npm%3A1.8.24#~/.yarn/patches/@reown-appkit-utils-npm-1.8.24-0f627c3d47.patch",
+    "@walletconnect/keyvaluestorage@npm:1.1.1": "patch:@walletconnect/keyvaluestorage@npm%3A1.1.1#~/.yarn/patches/@walletconnect-keyvaluestorage-npm-1.1.1-4cdf80afee.patch",
+    "@reown/appkit@npm:1.8.24": "patch:@reown/appkit@npm%3A1.8.24#~/.yarn/patches/@reown-appkit-npm-1.8.24-09809d4cb9.patch"
   }
 }

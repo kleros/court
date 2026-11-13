@@ -99,6 +99,24 @@ describe("createFetcher: answers", () => {
     });
   });
 
+  it("without a cache mode, the fetch gets no cache field: fetch's default mode", async () => {
+    const { fetchImpl, calls } = fakeFetch(() => Promise.resolve(new Response("")));
+    await createFetcher(fetchImpl)(request);
+    expect(Object.keys(calls[0]?.init ?? {}).sort()).toEqual(["body", "headers", "method", "signal"]);
+  });
+
+  it("cache reload reaches the fetch as its cache mode, with no header added (none stays none)", async () => {
+    const { fetchImpl, calls } = fakeFetch(() => Promise.resolve(new Response("")));
+    const fetcher = createFetcher(fetchImpl);
+    await fetcher({ ...request, cache: "reload" });
+    await fetcher({ ...request, cache: "reload", headers: { accept: "application/json" } });
+    expect(Object.keys(calls[0]?.init ?? {}).sort()).toEqual(["body", "cache", "headers", "method", "signal"]);
+    expect(calls[0]?.init?.cache).toBe("reload");
+    expect(calls[0]?.init?.headers).toBeUndefined();
+    expect(calls[1]?.init?.cache).toBe("reload");
+    expect(calls[1]?.init?.headers).toEqual({ accept: "application/json" });
+  });
+
   it("keeps a header named __proto__ as a header", async () => {
     const { fetchImpl } = fakeFetch(() => Promise.resolve(new Response("", { headers: [["__proto__", "x"]] })));
     const response = value(await createFetcher(fetchImpl)(request));

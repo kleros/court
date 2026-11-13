@@ -1,5 +1,8 @@
 import { invalid, succeed } from "./outcome.ts";
+import { KERNEL_INVALID } from "./reasons.ts";
 import type { Outcome } from "./types.ts";
+
+const NOT_A_STRING = KERNEL_INVALID[2];
 
 /** An object as JSON or structured clone makes it: not an array, a date, a map or a class instance. */
 export function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -21,10 +24,12 @@ export function readString(record: Record<string, unknown>, key: string): string
 
 /**
  * Tells a missing field (ok, undefined) from a field of the wrong type (invalid "not-a-string"), so a parser can flag
- * the bad field instead of treating it as never written.
+ * the bad field instead of treating it as never written. JSON null reads as missing too: it carries no content, so it
+ * is not a wrong value to flag.
  */
 export function readOptionalString(record: Record<string, unknown>, key: string): Outcome<string | undefined> {
   const value = ownField(record, key);
-  if (value === undefined || typeof value === "string") return succeed(value);
-  return invalid("not-a-string", `Field "${key}" is not a string.`);
+  if (value === undefined || value === null) return succeed(undefined);
+  if (typeof value === "string") return succeed(value);
+  return invalid(NOT_A_STRING, `Field "${key}" is not a string.`);
 }

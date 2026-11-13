@@ -1,0 +1,35 @@
+diff --git a/dist/esm/src/client/appkit-base-client.js b/dist/esm/src/client/appkit-base-client.js
+index f4079363dfd1f2f0fde59b2258e59b77be16fc5a..a3ed11fddcf154d226965d142cf380f2e042038c 100644
+--- a/dist/esm/src/client/appkit-base-client.js
++++ b/dist/esm/src/client/appkit-base-client.js
+@@ -1499,8 +1499,13 @@ export class AppKitBaseClient {
+             logger
+         };
+         OptionsController.setManualWCControl(Boolean(this.options?.manualWCControl));
++        // Kleros Court patch: given startUniversalProvider, the app runs this start of WalletConnect (AppKit's options
++        // and logger), so that it can start WalletConnect again when its saved data makes the start fail; a start that
++        // still fails is kept for the load as before. Court: packages/web/src/wallet/appkit.ts walletConnectStart.
++        const init = () => UniversalProvider.init(universalProviderOptions);
+         this.universalProvider =
+-            this.options.universalProvider ?? (await UniversalProvider.init(universalProviderOptions));
++            this.options.universalProvider ??
++                (await (this.options.startUniversalProvider ? this.options.startUniversalProvider(init) : init()));
+         const originalDisconnect = this.universalProvider.disconnect.bind(this.universalProvider);
+         this.universalProvider.disconnect = async () => {
+             try {
+diff --git a/dist/types/src/utils/TypesUtil.d.ts b/dist/types/src/utils/TypesUtil.d.ts
+index 0572cbed8ce288a21b10588e9d7dd4e15129fa6c..81fd977bdfdce52c30017704170b6dac68bda8de 100644
+--- a/dist/types/src/utils/TypesUtil.d.ts
++++ b/dist/types/src/utils/TypesUtil.d.ts
+@@ -83,6 +83,11 @@ export type AppKitOptions = {
+      * @default undefined
+      */
+     universalProvider?: UniversalProvider;
++    /**
++     * Kleros Court patch: runs AppKit's start of WalletConnect (`init`: UniversalProvider.init with AppKit's options and
++     * logger) in AppKit's place. AppKit uses the provider it resolves; a rejection is kept for the load, as AppKit's own.
++     */
++    startUniversalProvider?: (init: () => Promise<UniversalProvider>) => Promise<UniversalProvider>;
+     /**
+      * The default account type used for each chain namespace.
+      * @default "{ bip122: 'payment', eip155: 'smartAccount', polkadot: 'eoa', solana: 'eoa', ton: 'eoa' }"

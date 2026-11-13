@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useAccount, useDisconnect } from "wagmi";
+import { useAccount } from "wagmi";
 import { chainLabel, walletState, type WalletModal } from "./connection";
+import { useDisconnectWallets } from "./disconnect";
 
 /**
  * Connect / connected account / Disconnect. Placeholder markup: the design rounds style it. Nothing in read-only mode
@@ -8,14 +9,7 @@ import { chainLabel, walletState, type WalletModal } from "./connection";
  */
 export function WalletControl({ modal }: { readonly modal: WalletModal | null }) {
   const wallet = walletState(useAccount());
-  // `connectors` = every connected wallet. On load wagmi restores each wallet that already authorised the site; AppKit
-  // drops all but one only while Reown's remote multiWallet setting is off (appkit-base-client.js:1103-1121). wagmi's
-  // disconnect() with no argument drops only the current one and makes the next one current (@wagmi/core
-  // actions/disconnect.ts:54-60): Disconnect would switch accounts instead of disconnecting.
-  const { connectors, disconnectAsync } = useDisconnect();
-  const disconnectAll = async () => {
-    for (const connector of connectors) await disconnectAsync({ connector });
-  };
+  const disconnectWallets = useDisconnectWallets();
   // openConnect waits for Reown's config and wallet list, with no time limit (AppKit ready() and open()).
   const [opening, setOpening] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
@@ -25,7 +19,7 @@ export function WalletControl({ modal }: { readonly modal: WalletModal | null })
   if (wallet.status === "connected") {
     return (
       <div className="flex flex-wrap items-center gap-2">
-        {/* The wallet's own chain, which may differ from any page's chain (T27#2 checks it again at send time). */}
+        {/* The wallet's own chain, which may differ from any page's chain (checked again when sending). */}
         <span data-testid="wallet-address" className="font-mono break-all">
           {wallet.address}
         </span>
@@ -33,7 +27,7 @@ export function WalletControl({ modal }: { readonly modal: WalletModal | null })
         <button
           type="button"
           onClick={() => {
-            disconnectAll().catch((error: unknown) => {
+            disconnectWallets().catch((error: unknown) => {
               console.error("Disconnect failed.", error);
             });
           }}

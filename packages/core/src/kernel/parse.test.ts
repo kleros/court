@@ -40,21 +40,40 @@ describe("readString", () => {
 });
 
 describe("readOptionalString", () => {
-  it("tells a missing field from one of the wrong type", () => {
-    const record: Record<string, unknown> = { title: "Case", empty: "", unset: undefined, count: 2, nothing: null };
+  const record: Record<string, unknown> = {
+    title: "Case",
+    empty: "",
+    unset: undefined,
+    nothing: null,
+    count: 2,
+    flag: false,
+    nested: { a: "x" },
+    list: ["x"],
+  };
+
+  it("returns a string field as it is", () => {
     expect(readOptionalString(record, "title")).toEqual({ ok: true, value: "Case" });
     expect(readOptionalString(record, "empty")).toEqual({ ok: true, value: "" });
-    expect(readOptionalString(record, "missing")).toEqual({ ok: true, value: undefined });
-    expect(readOptionalString(record, "unset")).toEqual({ ok: true, value: undefined });
-    for (const key of ["count", "nothing"]) {
+  });
+
+  it("reads a missing, undefined or null field as missing", () => {
+    for (const key of ["missing", "unset", "nothing"]) {
+      expect(readOptionalString(record, key)).toEqual({ ok: true, value: undefined });
+    }
+  });
+
+  it("flags any other value as not a string: a number, a boolean, an object, an array", () => {
+    for (const key of ["count", "flag", "nested", "list"]) {
       const outcome = readOptionalString(record, key);
       expect(outcome.ok).toBe(false);
       if (!outcome.ok) expect(outcome.failure).toMatchObject({ kind: "invalid", reason: "not-a-string" });
     }
   });
 
-  it("treats an inherited field as missing", () => {
-    const inherited = Object.create({ title: 7 }) as Record<string, unknown>;
-    expect(readOptionalString(inherited, "title")).toEqual({ ok: true, value: undefined });
+  it("treats an inherited field as missing, whatever its value", () => {
+    for (const title of [7, "from the prototype"]) {
+      const inherited = Object.create({ title }) as Record<string, unknown>;
+      expect(readOptionalString(inherited, "title")).toEqual({ ok: true, value: undefined });
+    }
   });
 });
