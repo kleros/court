@@ -75,7 +75,7 @@ function openFrame(
       settle(MALFORMED_REPLY);
     };
     // An opaque-origin frame accepts no other target origin; the reply can only come back through the transferred port.
-    target.postMessage(message, "*", [channel.port2]);
+    target.postMessage(message, "*", [channel.port2]); // NOSONAR
   };
 
   frame.addEventListener("load", onLoad, { once: true });

@@ -1,4 +1,5 @@
 import { COURT_CHAIN_ID_LIST } from "./chains.ts";
+import { compareCodeUnits } from "./codeUnitOrder.ts";
 import { RPC_URL_KEYS, SERVICE_KEYS, SUBGRAPH_URL_KEYS, type CourtEnv } from "./env.ts";
 
 /**
@@ -51,7 +52,7 @@ export function connectSrc(env: CourtEnv): string {
   const origins = new Set<string>();
   for (const [key, url] of sources) if (url !== undefined) origins.add(originOf(url, key));
   if (env.walletConnectProjectId !== undefined) for (const origin of REOWN_CONNECT_SRC) origins.add(origin);
-  return ["'self'", ...[...origins].sort()].join(" ");
+  return ["'self'", ...[...origins].sort(compareCodeUnits)].join(" ");
 }
 
 /**

@@ -1,3 +1,4 @@
+import { compareCodeUnits } from "../codeUnitOrder.ts";
 import { KERNEL_INVALID, invalid, succeed } from "../kernel/index.ts";
 import type { KeyValueStorage, Outcome } from "../kernel/index.ts";
 import { isNeverRead } from "./keys.ts";
@@ -112,5 +113,5 @@ export function findKeyCaseInsensitive(storage: SafeStorage, key: string): strin
   if (storage.read(key) !== null) return key;
   const wanted = key.toLowerCase();
   const spellings = storage.keys("").filter((stored) => stored.toLowerCase() === wanted);
-  return spellings.sort()[0] ?? null;
+  return spellings.sort(compareCodeUnits)[0] ?? null;
 }

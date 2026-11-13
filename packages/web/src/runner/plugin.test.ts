@@ -160,23 +160,4 @@ describe("runner headers on the preview server", () => {
   });
 });
 
-describe("runner page (public/__runner/index.html)", () => {
-  const html = readFileSync(new URL("../../public/__runner/index.html", import.meta.url), "utf8");
-  const head = /<head>([\s\S]*?)<\/head>/.exec(html)?.[1] ?? "";
-
-  it("declares UTF-8 first, so a script's non-ASCII text reads as written", () => {
-    expect(/<[a-z][^>]*>/.exec(head)?.[0]).toBe('<meta charset="utf-8" />');
-  });
-
-  it("loads only the classic bootstrap: one script element, no inline code, nothing else", () => {
-    const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)];
-    expect(scripts).toHaveLength(1);
-    expect(scripts[0]?.[1]?.trim()).toBe('src="/__runner/bootstrap.js"');
-    expect(scripts[0]?.[2]).toBe("");
-    expect(html).not.toMatch(/<(link|img|iframe|object|embed|base)\b/i);
-  });
-
-  it("keeps its title (the app's smoke test frames the runner and reads it)", () => {
-    expect(html).toContain("<title>Kleros Court script runner</title>");
-  });
-});
+// The runner page's own markup is checked in runnerPage.test.ts, with an HTML parser (this file runs under node).

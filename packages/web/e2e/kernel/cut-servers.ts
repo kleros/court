@@ -189,8 +189,9 @@ function selfSignedCertificate(): { key: string; cert: string } {
     const keyFile = join(dir, "key.pem");
     const certFile = join(dir, "cert.pem");
     const subject = ["-subj", "/CN=127.0.0.1", "-addext", "subjectAltName=IP:127.0.0.1"];
+    // By absolute path, never looked up in PATH: where Ubuntu's openssl package installs it.
     execFileSync(
-      "openssl",
+      "/usr/bin/openssl",
       ["req", "-x509", "-newkey", "rsa:2048", "-nodes", "-keyout", keyFile, "-out", certFile, "-days", "2", ...subject],
       { stdio: "ignore" },
     );

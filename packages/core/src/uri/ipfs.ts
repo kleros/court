@@ -62,12 +62,19 @@ export function isContentAddressed(uri: string): boolean {
   return canonicalContentPath(uri) !== null;
 }
 
+/** A loop, not /\/+$/: that regex retries from every slash of a long run (quadratic). */
+function withoutTrailingSlashes(value: string): string {
+  let end = value.length;
+  while (end > 0 && value.charCodeAt(end - 1) === 0x2f) end -= 1;
+  return value.slice(0, end);
+}
+
 /**
  * The gateway URL of a path from canonicalContentPath, concatenated as written (a `%20` stays `%20`). The configured
  * gateway's trailing slashes are dropped so the path is never `//ipfs/`.
  */
 export function gatewayUrl(gateway: string, path: string): string {
-  return `${gateway.replace(/\/+$/, "")}/ipfs/${path}`;
+  return `${withoutTrailingSlashes(gateway)}/ipfs/${path}`;
 }
 
 /**

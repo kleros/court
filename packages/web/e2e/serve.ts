@@ -7,11 +7,12 @@
  */
 import { createServer } from "node:http";
 import { existsSync, readFileSync, statSync } from "node:fs";
-import { extname, join, resolve } from "node:path";
+import { extname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { headersFor, parseHeaders } from "./netlify-headers.ts";
 
-const DIST = fileURLToPath(new URL("../dist/", import.meta.url));
+/** No trailing separator, so fileFor can accept only dist/ itself or a path under DIST + sep. */
+const DIST = resolve(fileURLToPath(new URL("../dist/", import.meta.url)));
 const TYPES: Readonly<Record<string, string>> = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
@@ -27,16 +28,19 @@ const TYPES: Readonly<Record<string, string>> = {
 const rules = parseHeaders(readFileSync(join(DIST, "_headers"), "utf8"));
 
 function fileFor(pathname: string): string {
+  const index = join(DIST, "index.html");
   const file = resolve(DIST, `.${pathname.endsWith("/") ? `${pathname}index.html` : pathname}`);
-  if (file.startsWith(DIST) && existsSync(file) && statSync(file).isFile()) return file;
-  return join(DIST, "index.html");
+  if (file !== DIST && !file.startsWith(DIST + sep)) return index;
+  return existsSync(file) && statSync(file).isFile() ? file : index;
 }
 
 createServer((request, response) => {
   const { pathname } = new URL(request.url ?? "/", "http://127.0.0.1");
   const { headers, conflicts } = headersFor(rules, pathname);
   if (conflicts.length > 0) {
-    response.writeHead(500).end(`_headers: two rules set ${conflicts.join(", ")} on ${pathname}`);
+    response
+      .writeHead(500, { "content-type": "text/plain; charset=utf-8" })
+      .end(`_headers: two rules set ${conflicts.join(", ")} on ${pathname}`);
     return;
   }
   const file = fileFor(pathname);

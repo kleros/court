@@ -242,6 +242,17 @@ describe("gatewayUrl", () => {
     expect(gatewayUrl(`${GATEWAY}/`, CID)).toBe(`${GATEWAY}/ipfs/${CID}`);
     expect(gatewayUrl(`${GATEWAY}//`, CID)).toBe(`${GATEWAY}/ipfs/${CID}`);
     expect(gatewayUrl("http://127.0.0.1:8080", CID)).toBe(`http://127.0.0.1:8080/ipfs/${CID}`);
+    expect(gatewayUrl("///", CID)).toBe(`/ipfs/${CID}`);
+    expect(gatewayUrl("", CID)).toBe(`/ipfs/${CID}`);
+  });
+
+  it("takes linear time over a long run of slashes in the configured gateway", () => {
+    const run = "/".repeat(100_000);
+    const started = performance.now();
+    expect(gatewayUrl(`${run}x`, CID) === `${run}x/ipfs/${CID}`).toBe(true);
+    expect(gatewayUrl(`${GATEWAY}${run}`, CID)).toBe(`${GATEWAY}/ipfs/${CID}`);
+    expect(gatewayUrl(run, CID)).toBe(`/ipfs/${CID}`);
+    expect(performance.now() - started).toBeLessThan(1000);
   });
 });
 

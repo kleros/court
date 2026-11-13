@@ -23,6 +23,12 @@ const notPublic = Object.entries(process.env).filter(
   ([name, value]) => name.startsWith("REACT_APP_") && !PUBLIC.has(name) && value,
 );
 
+/** The order `sort()` gives with no compare function (UTF-16 code units), whatever the locale. */
+function byCodeUnit(a, b) {
+  if (a < b) return -1;
+  return a > b ? 1 : 0;
+}
+
 const names = new Set();
 const valuesFound = new Set();
 for (const entry of readdirSync(dir, { recursive: true, withFileTypes: true })) {
@@ -32,9 +38,10 @@ for (const entry of readdirSync(dir, { recursive: true, withFileTypes: true })) 
   for (const [name, value] of notPublic) if (text.includes(value)) valuesFound.add(name);
 }
 
-const extraNames = [...names].filter((name) => !PUBLIC.has(name)).sort();
-console.log(`REACT_APP_ names in ${dir}: ${[...names].sort().join(", ") || "none"}`);
+const extraNames = [...names].filter((name) => !PUBLIC.has(name)).sort(byCodeUnit);
+console.log(`REACT_APP_ names in ${dir}: ${[...names].sort(byCodeUnit).join(", ") || "none"}`);
 console.log(`not-public REACT_APP_ variables in this environment: ${notPublic.length}`);
 if (extraNames.length > 0) console.error(`names not in ENV_KEYS: ${extraNames.join(", ")}`);
-if (valuesFound.size > 0) console.error(`values of not-public variables found: ${[...valuesFound].sort().join(", ")}`);
+if (valuesFound.size > 0)
+  console.error(`values of not-public variables found: ${[...valuesFound].sort(byCodeUnit).join(", ")}`);
 process.exit(extraNames.length > 0 || valuesFound.size > 0 ? 1 : 0);
