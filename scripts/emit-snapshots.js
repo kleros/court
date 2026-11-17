@@ -39,7 +39,7 @@ function assertEntriesAreWellFormed(entries, chainId) {
     if (!filename.startsWith(filenamePrefix)) {
       throw new Error(
         `snapshots.json: chain ${chainId} entry "${entry}" must start with "${filenamePrefix}" ` +
-          `— rewards.js tells the chains apart by that prefix.`
+          `— rewards.js tells the chains apart by that prefix.`,
       );
     }
   }
@@ -55,7 +55,7 @@ function assertNewestMonthIsOnEveryChain(snapshots) {
     if (!month) {
       throw new Error(
         `snapshots.json: chain ${chainId}'s newest entry "${newest}" has no YYYY-MM, ` +
-          `so it can't be checked against the other chains.`
+          `so it can't be checked against the other chains.`,
       );
     }
     return month;
@@ -68,7 +68,7 @@ function assertNewestMonthIsOnEveryChain(snapshots) {
       throw new Error(
         `snapshots.json: newest month differs per chain ` +
           `(chain ${referenceChain} ${referenceMonth}, chain ${chainId} ${month}). ` +
-          `Add the missing month, or the monthly reward total will be missing a chain.`
+          `Add the missing month, or the monthly reward total will be missing a chain.`,
       );
     }
   }
@@ -82,7 +82,7 @@ const unverifiedChains = Object.keys(snapshots).filter((chainId) => !CHAIN_IDS.i
 if (unverifiedChains.length > 0) {
   throw new Error(
     `snapshots.json: chain(s) ${unverifiedChains.join(", ")} are not verified. Add them to CHAINS ` +
-      `so they are validated before being published.`
+      `so they are validated before being published.`,
   );
 }
 

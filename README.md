@@ -15,18 +15,17 @@ The Kleros Court user interface.
 
 ## Get Started
 
-1.  Clone this repo.
-2.  Run `yarn` to install dependencies and then `yarn start` to start the dev server.
+Node 22.22.3 (`.nvmrc`) and Yarn 4 (through Corepack).
 
-> To allow view-only mode, you can the REACT_APP_WEB3_FALLBACK_URL variable to a provider of your choice. Example: REACT_APP_WEB3_FALLBACK_URL=wss://mainnet.infura.io/ws/v3/<api-key>
+1. Copy `.env.example` to `.env` and fill it in. Without `REACT_APP_WALLETCONNECT_PROJECT_ID` (the Reown project ID) the app runs read-only, with no Connect button.
+2. Run `corepack yarn` to install, then `corepack yarn dev` to start the dev server.
 
-## Other Scripts
+## Scripts
 
-- `yarn run lint:js` - Lint the all .js/jsx files in the project.
-- `yarn run lint:css` - Lint the all .css/less files in the project.
-- `yarn run lint` - Lint the entire project.
-- `yarn run fix:js` - Fix fixable linting errors in .js/jsx files.
-- `yarn run fix:css` - Fix fixable linting errors in .css/less files.
-- `yarn run fix` - Fix fixable linting errors in all files in the project.
-- `yarn run build` - Create a production build.
-- `yarn run build:analyze` - Analyze the production build using source-map-explorer.
+- `yarn dev` - Start the dev server.
+- `yarn build` - Create a production build in `dist/`.
+- `yarn preview` - Serve the production build.
+- `yarn typecheck` - Check the types.
+- `yarn lint` - Lint and check formatting.
+- `yarn format` - Format every file.
+- `yarn test` - Run the unit tests.

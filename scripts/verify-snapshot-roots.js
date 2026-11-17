@@ -37,7 +37,7 @@ const path = require("node:path");
 if (typeof fetch !== "function") {
   console.error(
     `This script needs node >= 18; running ${process.version}.\n` +
-      `Run it as: volta run --node 22 node scripts/verify-snapshot-roots.js`
+      `Run it as: volta run --node 22 node scripts/verify-snapshot-roots.js`,
   );
   process.exit(1);
 }
@@ -137,7 +137,7 @@ async function callWeekRoot(chainId, week, urls, acceptRoot) {
         throw new Error(`bad RPC response: ${JSON.stringify(payload).slice(0, 200)}`);
       }
       if (acceptRoot && !acceptRoot(payload.result.toLowerCase())) throw new Error(`root ${payload.result}`);
-    }
+    },
   );
   return rpcResponse.result.toLowerCase();
 }
@@ -161,7 +161,7 @@ function entriesToVerify(current, base) {
   const removedChains = Object.keys(base).filter((chainId) => !current[chainId]);
   if (removedChains.length > 0) {
     throw new Error(
-      `chain(s) ${removedChains.join(", ")} were removed from snapshots.json; entries must never be removed.`
+      `chain(s) ${removedChains.join(", ")} were removed from snapshots.json; entries must never be removed.`,
     );
   }
   for (const chainId of Object.keys(current)) {
@@ -171,7 +171,7 @@ function entriesToVerify(current, base) {
     if (currentEntries.length < baseEntries.length) {
       throw new Error(
         `chain ${chainId}: entries were removed (${baseEntries.length} -> ${currentEntries.length}). ` +
-          `Indices are on-chain weeks; entries must only ever be appended.`
+          `Indices are on-chain weeks; entries must only ever be appended.`,
       );
     }
     currentEntries.forEach((entry, week) => {
@@ -188,7 +188,7 @@ async function verifyEntry({ chainId, week, entry, changed }) {
     const [fileRoot, onChainRoot] = await Promise.all([fetchSnapshotRoot(entry), fetchOnChainRoot(chainId, week)]);
     if (onChainRoot === ZERO_ROOT) {
       console.log(
-        `PENDING  ${where}\n         not seeded on-chain yet — seed it, then re-run this check before merging.`
+        `PENDING  ${where}\n         not seeded on-chain yet — seed it, then re-run this check before merging.`,
       );
       return "pending";
     }
@@ -227,7 +227,7 @@ async function main() {
   }
 
   console.log(
-    `\nverified ${work.length} entr${work.length === 1 ? "y" : "ies"}: ${failed} failed, ${pending} pending.`
+    `\nverified ${work.length} entr${work.length === 1 ? "y" : "ies"}: ${failed} failed, ${pending} pending.`,
   );
   if (strict && pending > 0) console.error(`--strict: pending entries are treated as failures.`);
   if (failed > 0 || (strict && pending > 0)) process.exit(1);
