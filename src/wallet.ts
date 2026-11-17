@@ -40,6 +40,9 @@ export function createWallet(origin: string): Wallet {
       url: origin,
       icons: [`${origin}/icon-192.png`],
     },
+    // No email or social logins (kyrers 2026-11-17: keep them off). Settings made on the Reown dashboard take
+    // precedence over these, so they must stay off there too.
+    features: { email: false, socials: [] },
   });
   return { config: wagmiAdapter.wagmiConfig, canConnect: true };
 }
