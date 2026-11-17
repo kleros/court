@@ -24,6 +24,10 @@ const names = {
   REACT_APP_KLEROS_LIQUID_EXTRA_VIEWS_SEPOLIA_ADDRESS: "ev-11155111",
   REACT_APP_PINAKION_SEPOLIA_ADDRESS: "pnk-11155111",
   REACT_APP_POLICY_REGISTRY_SEPOLIA_ADDRESS: "pr-11155111",
+  REACT_APP_SUBGRAPH_MAINNET_DISPLAY: "subgraph-1",
+  REACT_APP_SUBGRAPH_GNOSIS_DISPLAY: "subgraph-100",
+  REACT_APP_SUBGRAPH_CHIADO_DISPLAY: "subgraph-10200",
+  REACT_APP_SUBGRAPH_SEPOLIA_DISPLAY: "subgraph-11155111",
 };
 
 async function loadEnv(overrides: Partial<Record<keyof typeof names, string>> = {}) {
@@ -40,6 +44,12 @@ describe("courtConfig", () => {
   it("maps master's env names to each chain's read RPC and contracts", async () => {
     const { courtConfig } = await loadEnv();
     expect(courtConfig.rpcUrls).toEqual({ 1: "rpc-1", 100: "rpc-100", 10200: "rpc-10200", 11155111: "rpc-11155111" });
+    expect(courtConfig.displaySubgraphUrls).toEqual({
+      1: "subgraph-1",
+      100: "subgraph-100",
+      10200: "subgraph-10200",
+      11155111: "subgraph-11155111",
+    });
     expect(courtConfig.contracts).toEqual({
       1: { klerosLiquid: "kl-1", klerosLiquidExtraViews: "ev-1", pinakion: "pnk-1", policyRegistry: "pr-1" },
       100: {
@@ -68,8 +78,10 @@ describe("courtConfig", () => {
     const { courtConfig } = await loadEnv({
       REACT_APP_WEB3_FALLBACK_XDAI_HTTPS_URL: "  ",
       REACT_APP_PINAKION_ADDRESS: "",
+      REACT_APP_SUBGRAPH_CHIADO_DISPLAY: " ",
     });
     expect(courtConfig.rpcUrls[100]).toBeUndefined();
     expect(courtConfig.contracts[1]?.pinakion).toBeUndefined();
+    expect(courtConfig.displaySubgraphUrls?.[10200]).toBeUndefined();
   });
 });

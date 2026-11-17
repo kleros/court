@@ -20,10 +20,18 @@ export const env = {
 /**
  * What the core reads with: the read RPCs above and the contract addresses master binds per chain
  * (src/bootstrap/drizzle.js, src/api/side-chain/create-side-chain-api.js). A missing setting is left out here;
- * the read that needs it fails then (core/config.ts), as master's getReadOnlyRpcUrl does for RPCs.
+ * the read that needs it fails then (core/config.ts), as master's getReadOnlyRpcUrl does for RPCs. The display
+ * subgraph URLs are master's displaySubgraph (src/bootstrap/subgraph.js); a missing one fails its query
+ * (core/subgraph.ts).
  */
 export const courtConfig: CourtConfig = {
   rpcUrls: env.rpcUrls,
+  displaySubgraphUrls: {
+    1: setting(import.meta.env.REACT_APP_SUBGRAPH_MAINNET_DISPLAY),
+    100: setting(import.meta.env.REACT_APP_SUBGRAPH_GNOSIS_DISPLAY),
+    10200: setting(import.meta.env.REACT_APP_SUBGRAPH_CHIADO_DISPLAY),
+    11155111: setting(import.meta.env.REACT_APP_SUBGRAPH_SEPOLIA_DISPLAY),
+  },
   contracts: {
     1: {
       klerosLiquid: setting(import.meta.env.REACT_APP_KLEROS_LIQUID_ADDRESS),

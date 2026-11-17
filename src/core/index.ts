@@ -6,3 +6,4 @@ export * from "./client.ts";
 export * from "./courts.ts";
 export * from "./juror.ts";
 export * from "./staking.ts";
+export * from "./subgraph.ts";

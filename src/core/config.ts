@@ -7,7 +7,8 @@ import type { CourtChainId } from "./chains.ts";
  * builds it from a session.
  *
  * Exports and the screens that use them (spec = vault parity/02-behavioral-spec.md):
- * - CourtConfig, CourtContracts, ContractName: every core read (this piece) and the later pieces.
+ * - CourtConfig, CourtContracts, ContractName: every core read (this piece) and the later pieces; its
+ *   displaySubgraphUrls: the display subgraph queries (core/subgraph.ts).
  * - readRpcUrl: readClient below; later the dynamic-script runner's per-chain RPC (02.1, 02.3.4).
  * - contractAddress: every core read; later the wallet actions (setStake 05.4, votes 07, deposit 05.9).
  */
@@ -24,6 +25,9 @@ export interface CourtConfig {
   readonly rpcUrls: Readonly<Partial<Record<number, string>>>;
   /** Contract addresses per Court V1 chain. */
   readonly contracts: Readonly<Partial<Record<CourtChainId, CourtContracts>>>;
+  /** Display subgraph query URL per Court V1 chain (master src/bootstrap/subgraph.js displaySubgraph). Optional:
+   * a config that only reads the chain leaves it out; a query on a chain without one throws (core/subgraph.ts). */
+  readonly displaySubgraphUrls?: Readonly<Partial<Record<CourtChainId, string>>>;
   /** Transport for a chain's read RPC; default viem `http(url)`. Unit tests pass a viem `custom` transport. */
   readonly transport?: (rpcUrl: string, chainId: number) => Transport;
 }
